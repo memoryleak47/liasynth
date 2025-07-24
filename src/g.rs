@@ -8,14 +8,15 @@ pub struct ComputeValue {
     pub veccons: Map<Vec<Value>, Id>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Info {
     pub vals: Vec<Value>,
     pub min_size: usize,
     pub ty: Ty,
+    pub already_grown: bool,
 }
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub enum Ty {
     Int,
     Bool,
@@ -33,17 +34,24 @@ impl Analysis<Term> for ComputeValue {
             Value::Int(_) => Ty::Int,
             Value::Bool(_) => Ty::Bool,
         }).unwrap_or(Ty::Int);
-        Info { vals, min_size, ty }
+        let already_grown = false;
+        Info { vals, min_size, ty, already_grown }
     }
 
     fn merge(&mut self, a: &mut Self::Data, b: Self::Data) -> DidMerge {
         assert!(&a.vals == &b.vals);
         assert!(&a.ty == &b.ty);
 
-        let a_size = a.min_size;
-        let b_size = b.min_size;
-        a.min_size = a_size.min(b_size);
-        DidMerge(a_size > b_size, b_size > a_size)
+        let a_changed = a.min_size > b.min_size;
+        let b_changed = b.min_size > a.min_size;
+        a.min_size = a.min_size.min(b.min_size);
+
+        let final_grown = a.already_grown || b.already_grown;
+        let a_changed = a_changed || (final_grown != a.already_grown);
+        let b_changed = b_changed || (final_grown != b.already_grown);
+        a.already_grown = final_grown;
+
+        DidMerge(a_changed, b_changed)
     }
 
     fn modify(eg: &mut G, i: Id) {

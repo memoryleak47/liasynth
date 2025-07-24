@@ -81,10 +81,18 @@ fn grow(id: Id, g: &mut G, sigmas: &[Sigma], problem: &impl Problem, queue: &mut
             }
         }
     }
+
+    let mut info = g[id].data.clone();
+    info.already_grown = true;
+    g.set_analysis_data(id, info);
 }
 
 fn add(term: Term, g: &mut G, sigmas: &[Sigma], problem: &impl Problem, queue: &mut PrioQueue) {
     let i = g.add(term);
-    let h = heuristic(&g[i].data, sigmas, problem);
-    queue.push(WithOrd(i, h));
+    let info = &g[i].data;
+
+    if info.ty == Ty::Int && !info.already_grown {
+        let h = heuristic(&g[i].data, sigmas, problem);
+        queue.push(WithOrd(i, h));
+    }
 }
