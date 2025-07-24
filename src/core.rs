@@ -32,11 +32,11 @@ pub trait Problem {
 }
 
 pub trait Oracle {
-    fn verify(&self, term: &Term) -> Option<Sigma>;
+    fn verify(&self, term: &RecExpr<Term>) -> Option<Sigma>;
 }
 
 pub trait Synth {
-    fn synth(&mut self, problem: &impl Problem, sigmas: &[Sigma]) -> Term;
+    fn synth(&mut self, problem: &impl Problem, sigmas: &[Sigma]) -> RecExpr<Term>;
 }
 
 fn to_int(v: Value) -> Int {
@@ -80,7 +80,7 @@ pub fn eval_term(term: &RecExpr<Term>, sigma: &Sigma) -> Value {
     vals.last().unwrap().clone()
 }
 
-pub fn cegis(problem: impl Problem, mut synth: impl Synth, oracle: impl Oracle) -> Term {
+pub fn cegis(problem: impl Problem, mut synth: impl Synth, oracle: impl Oracle) -> RecExpr<Term> {
     let mut sigmas = Vec::new();
     loop {
         let term = synth.synth(&problem, &sigmas);

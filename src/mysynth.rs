@@ -6,8 +6,7 @@ pub type Score = usize;
 pub type PrioQueue = BinaryHeap<WithOrd<Id, Score>>;
 
 fn heuristic(info: &Info, sigmas: &[Sigma], problem: &impl Problem) -> Score {
-    let counter = info.vals.iter().zip(sigmas.iter()).filter(|(val, sigma)|
-        problem.sat(val, sigma)).count();
+    let counter = satcount(info, sigmas, problem);
 
     const A: usize = 1;
     const B: usize = 1;
@@ -15,8 +14,16 @@ fn heuristic(info: &Info, sigmas: &[Sigma], problem: &impl Problem) -> Score {
     (counter + A) / (info.min_size + B)
 }
 
+fn satcount(info: &Info, sigmas: &[Sigma], problem: &impl Problem) -> usize {
+    let vals = info.vals.iter();
+    let sigmas = sigmas.iter();
+    let it = vals.zip(sigmas);
+    it.filter(|(val, sigma)| problem.sat(val, sigma))
+      .count()
+}
+
 impl Synth for MySynth {
-    fn synth(&mut self, problem: &impl Problem, sigmas: &[Sigma]) -> Term {
+    fn synth(&mut self, problem: &impl Problem, sigmas: &[Sigma]) -> RecExpr<Term> {
         let mut g = G::new(ComputeValue {
             sigmas: sigmas.iter().cloned().collect(),
             veccons: Default::default(),
@@ -31,6 +38,11 @@ impl Synth for MySynth {
 
         loop {
             let WithOrd(i, _) = queue.pop().unwrap();
+            if satcount(&g[i].data, sigmas, problem) == sigmas.len() {
+                let e = Extractor::new(&g, AstSize);
+                let (_, t) = e.find_best(i);
+                return t;
+            }
             grow(i, &mut g, sigmas, problem, &mut queue);
         }
     }
