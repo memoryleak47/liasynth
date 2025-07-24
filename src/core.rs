@@ -1,9 +1,8 @@
 use crate::*;
-use egg::{define_language, Id, RecExpr};
 
 type Int = i64; // TODO add bigint.
 
-#[derive(Clone)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Value {
     Int(Int),
     Bool(bool),
@@ -40,43 +39,43 @@ pub trait Synth {
     fn synth(&mut self, problem: &impl Problem, sigmas: &[Sigma]) -> Term;
 }
 
-fn to_int(v: &Value) -> &Int {
+fn to_int(v: Value) -> Int {
     match v {
         Value::Int(i) => i,
         _ => panic!("to_int failed"),
     }
 }
 
-fn to_bool(v: &Value) -> bool {
+fn to_bool(v: Value) -> bool {
     match v {
-        Value::Bool(b) => *b,
+        Value::Bool(b) => b,
         _ => panic!("to_int failed"),
     }
 }
 
-pub fn eval_step(term: &Term, sigma: &Sigma, children: &[Value]) -> Value {
-    let ch = |x: &Id| &children[usize::from(*x)];
+pub fn eval_step(term: &Term, sigma: &Sigma, ch: &impl Fn(Id) -> Value) -> Value {
     match term {
         Term::Var(s) => sigma[*s].clone(),
-        Term::Add([l, r]) => Value::Int(to_int(ch(l)) + to_int(ch(r))),
-        Term::Mul([l, r]) => Value::Int(to_int(ch(l)) * to_int(ch(r))),
-        Term::Sub([l, r]) => Value::Int(to_int(ch(l)) - to_int(ch(r))),
-        Term::Div([l, r]) => Value::Int(to_int(ch(l)) / to_int(ch(r))),
+        Term::Add([l, r]) => Value::Int(to_int(ch(*l)) + to_int(ch(*r))),
+        Term::Mul([l, r]) => Value::Int(to_int(ch(*l)) * to_int(ch(*r))),
+        Term::Sub([l, r]) => Value::Int(to_int(ch(*l)) - to_int(ch(*r))),
+        Term::Div([l, r]) => Value::Int(to_int(ch(*l)) / to_int(ch(*r))),
         Term::Ite([cond, then, else_]) => {
-            if to_bool(ch(cond)) {
-                ch(then).clone()
+            if to_bool(ch(*cond)) {
+                ch(*then).clone()
             } else {
-                ch(else_).clone()
+                ch(*else_).clone()
             }
         },
-        Term::Lt([l, r]) => Value::Bool(to_int(ch(l)) < to_int(ch(r))),
+        Term::Lt([l, r]) => Value::Bool(to_int(ch(*l)) < to_int(ch(*r))),
     }
 }
 
 pub fn eval_term(term: &RecExpr<Term>, sigma: &Sigma) -> Value {
-    let mut vals = Vec::new();
+    let mut vals: Vec<Value> = Vec::new();
     for t in &*term {
-        vals.push(eval_step(t, sigma, &vals));
+        let f = |i| vals[usize::from(i)].clone();
+        vals.push(eval_step(t, sigma, &f));
     }
     vals.last().unwrap().clone()
 }

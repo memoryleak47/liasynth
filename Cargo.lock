@@ -96,6 +96,7 @@ name = "heuristic-synth"
 version = "0.1.0"
 dependencies = [
  "egg",
+ "indexmap",
 ]
 
 [[package]]
