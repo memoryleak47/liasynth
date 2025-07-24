@@ -1,8 +1,8 @@
 mod core;
 pub use core::*;
 
-// mod mysynth;
-// pub use mysynth::*;
+mod mysynth;
+pub use mysynth::*;
 
 mod with_ord;
 pub use with_ord::*;
