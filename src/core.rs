@@ -1,0 +1,98 @@
+use crate::*;
+use egg::{define_language, Id, RecExpr};
+
+type Int = i64; // TODO add bigint.
+
+#[derive(Clone)]
+pub enum Value {
+    Int(Int),
+    Bool(bool),
+}
+
+pub type Var = usize;
+
+// define_language! {
+    pub enum Term {
+        Var(Var),
+
+        Add([Id; 2]),
+        Sub([Id; 2]),
+        Mul([Id; 2]),
+        Div([Id; 2]),
+
+        Ite([Id; 3]),
+        Lt([Id; 2]),
+    }
+// }
+
+pub type Sigma = Vec<Value>;
+
+pub trait Problem {
+    fn num_vars(&self) -> usize;
+    fn sat(&self, term: &Term, sigmas: &[Sigma]) -> bool;
+}
+
+pub trait Oracle {
+    fn verify(&self, term: &Term) -> Option<Sigma>;
+}
+
+pub trait Synth {
+    fn synth(&mut self, problem: &impl Problem, sigmas: &[Sigma]) -> Term;
+}
+
+fn to_int(v: &Value) -> &Int {
+    match v {
+        Value::Int(i) => i,
+        _ => panic!("to_int failed"),
+    }
+}
+
+fn to_bool(v: &Value) -> bool {
+    match v {
+        Value::Bool(b) => *b,
+        _ => panic!("to_int failed"),
+    }
+}
+
+pub fn eval_step(term: &Term, sigma: &Sigma, children: &[Value]) -> Value {
+    let ch = |x: &Id| &children[usize::from(*x)];
+    match term {
+        Term::Var(s) => sigma[*s].clone(),
+        Term::Add([l, r]) => Value::Int(to_int(ch(l)) + to_int(ch(r))),
+        Term::Mul([l, r]) => Value::Int(to_int(ch(l)) * to_int(ch(r))),
+        Term::Sub([l, r]) => Value::Int(to_int(ch(l)) - to_int(ch(r))),
+        Term::Div([l, r]) => Value::Int(to_int(ch(l)) / to_int(ch(r))),
+        Term::Ite([cond, then, else_]) => {
+            if to_bool(ch(cond)) {
+                ch(then).clone()
+            } else {
+                ch(else_).clone()
+            }
+        },
+        Term::Lt([l, r]) => Value::Bool(to_int(ch(l)) < to_int(ch(r))),
+    }
+}
+
+pub fn eval_term(term: &RecExpr<Term>, sigma: &Sigma) -> Value {
+    let mut vals = Vec::new();
+    for t in &*term {
+        vals.push(eval_step(t, sigma, &vals));
+    }
+    vals.last().unwrap().clone()
+}
+
+pub fn cegis(problem: impl Problem, mut synth: impl Synth, oracle: impl Oracle) -> Term {
+    let mut sigmas = Vec::new();
+    loop {
+        let term = synth.synth(&problem, &sigmas);
+        // dbg!(&term);
+        assert!(problem.sat(&term, &sigmas));
+
+        if let Some(sigma) = oracle.verify(&term) {
+            // dbg!(&sigma);
+            sigmas.push(sigma);
+        } else {
+            return term;
+        }
+    }
+}
