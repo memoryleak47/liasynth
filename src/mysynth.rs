@@ -49,7 +49,8 @@ impl Synth for MySynth {
 }
 
 fn grow(id: Id, g: &mut G, sigmas: &[Sigma], problem: &impl Problem, queue: &mut PrioQueue) {
-    if g[id].data.ty != Ty::Int { return; }
+    assert!(g[id].data.ty == Ty::Int);
+    assert!(!g[id].data.already_grown);
 
     let vars: Vec<Id> = (0..problem.num_vars()).map(|x| g.add(Term::Var(Var(x)))).collect();
     for &v in &vars {
