@@ -59,7 +59,12 @@ pub fn eval_step(term: &Term, sigma: &Sigma, ch: &impl Fn(Id) -> Value) -> Value
         Term::Add([l, r]) => Value::Int(to_int(ch(*l)) + to_int(ch(*r))),
         Term::Mul([l, r]) => Value::Int(to_int(ch(*l)) * to_int(ch(*r))),
         Term::Sub([l, r]) => Value::Int(to_int(ch(*l)) - to_int(ch(*r))),
-        Term::Div([l, r]) => Value::Int(to_int(ch(*l)) / to_int(ch(*r))),
+        Term::Div([l, r]) => {
+            let l = to_int(ch(*l));
+            let r = to_int(ch(*r));
+            if r == 0 { Value::Int(0) } // NOTE: division by zero is zero for now.
+            else { Value::Int(l / r) }
+        },
         Term::Ite([cond, then, else_]) => {
             if to_bool(ch(*cond)) {
                 ch(*then).clone()
@@ -84,11 +89,11 @@ pub fn cegis(problem: impl Problem, mut synth: impl Synth, oracle: impl Oracle) 
     let mut sigmas = Vec::new();
     loop {
         let term = synth.synth(&problem, &sigmas);
-        // dbg!(&term);
+        dbg!(&term);
         // TODO check this later: assert!(problem.sat(&..., &sigmas));
 
         if let Some(sigma) = oracle.verify(&term) {
-            // dbg!(&sigma);
+            dbg!(&sigma);
             sigmas.push(sigma);
         } else {
             return term;

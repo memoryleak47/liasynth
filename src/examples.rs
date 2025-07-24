@@ -1,6 +1,6 @@
 use crate::*;
 
-pub fn enumerated_problem<F: Fn(&Sigma, &Value) -> bool>(num_vars: usize, f: &F) -> (impl Problem, impl Oracle) {
+pub fn enumerated<F: Fn(&Sigma, &Value) -> bool>(num_vars: usize, f: &F) -> (impl Problem, impl Oracle) {
     struct EnumeratedProblem<'f, F: Fn(&Sigma, &Value) -> bool> {
         num_vars: usize,
         f: &'f F,
@@ -58,4 +58,19 @@ fn sigmas(i: usize, num_vars: usize) -> Vec<Sigma> {
         }
     }
     outs
+}
+
+fn vmax(v1: Value, v2: Value) -> Value {
+    match (v1, v2) {
+        (Value::Int(v1), Value::Int(v2)) => Value::Int(v1.max(v2)),
+        _ => panic!(),
+    }
+}
+
+pub fn max_n(n: usize) -> (impl Problem, impl Oracle) {
+    assert!(n > 0);
+
+    enumerated(n, &|sigma: &Sigma, v: &Value| -> bool {
+        *v == sigma.iter().cloned().fold(Value::Int(0), vmax)
+    })
 }
