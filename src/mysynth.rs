@@ -33,7 +33,7 @@ impl Synth for MySynth {
         let mut queue: PrioQueue = BinaryHeap::new();
 
         for x in 0..problem.num_vars() {
-            add(Term::Var(x), &mut g, sigmas, problem, &mut queue);
+            add(Term::Var(Var(x)), &mut g, sigmas, problem, &mut queue);
         }
 
         loop {
@@ -51,7 +51,7 @@ impl Synth for MySynth {
 fn grow(id: Id, g: &mut G, sigmas: &[Sigma], problem: &impl Problem, queue: &mut PrioQueue) {
     if g[id].data.ty != Ty::Int { return; }
 
-    let vars: Vec<Id> = (0..problem.num_vars()).map(|x| g.add(Term::Var(x))).collect();
+    let vars: Vec<Id> = (0..problem.num_vars()).map(|x| g.add(Term::Var(Var(x)))).collect();
     for &v in &vars {
         add(Term::Add([id, v]), g, sigmas, problem, queue);
         add(Term::Add([v, id]), g, sigmas, problem, queue);

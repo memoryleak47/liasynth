@@ -8,7 +8,8 @@ pub enum Value {
     Bool(bool),
 }
 
-pub type Var = usize;
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
+pub struct Var(pub usize);
 
 define_language! {
     pub enum Term {
@@ -55,7 +56,7 @@ fn to_bool(v: Value) -> bool {
 
 pub fn eval_step(term: &Term, sigma: &Sigma, ch: &impl Fn(Id) -> Value) -> Value {
     match term {
-        Term::Var(s) => sigma[*s].clone(),
+        Term::Var(s) => sigma[s.0].clone(),
         Term::Add([l, r]) => Value::Int(to_int(ch(*l)) + to_int(ch(*r))),
         Term::Mul([l, r]) => Value::Int(to_int(ch(*l)) * to_int(ch(*r))),
         Term::Sub([l, r]) => Value::Int(to_int(ch(*l)) - to_int(ch(*r))),

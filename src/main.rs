@@ -1,4 +1,4 @@
-pub use egg::*;
+pub use egg::{Extractor, EGraph, RecExpr, Id, define_language, Analysis, DidMerge, AstSize, Language};
 
 mod core;
 pub use core::*;
