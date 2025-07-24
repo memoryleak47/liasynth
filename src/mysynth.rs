@@ -11,7 +11,7 @@ fn heuristic(info: &Info, sigmas: &[Sigma], problem: &impl Problem) -> Score {
     const A: usize = 1;
     const B: usize = 1;
 
-    (counter + A) / (info.min_size + B)
+    (1000 * (counter + A)) / (info.min_size + B)
 }
 
 fn satcount(info: &Info, sigmas: &[Sigma], problem: &impl Problem) -> usize {
@@ -50,7 +50,9 @@ impl Synth for MySynth {
 
 fn grow(id: Id, g: &mut G, sigmas: &[Sigma], problem: &impl Problem, queue: &mut PrioQueue) {
     assert!(g[id].data.ty == Ty::Int);
-    assert!(!g[id].data.already_grown);
+
+    // Why does this happen?
+    if g[id].data.already_grown { return; }
 
     let vars: Vec<Id> = (0..problem.num_vars()).map(|x| g.add(Term::Var(Var(x)))).collect();
     for &v in &vars {
