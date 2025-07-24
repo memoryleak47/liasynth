@@ -9,6 +9,15 @@ struct Ctxt<'a, P> {
     queue: Queue,
     sigmas: &'a [Sigma],
     problem: &'a P,
+
+    vals_lookup: Map<Box<[Value]>, Id>,
+    classes: Vec<Class>,
+}
+
+struct Class {
+    node: Node,
+    size: usize,
+    vals: Box<[Value]>,
 }
 
 fn run<'a, P>(ctxt: &mut Ctxt<P>) -> Term {
@@ -21,6 +30,8 @@ impl Synth for MySynth {
             queue: Default::default(),
             sigmas,
             problem,
+            vals_lookup: Default::default(),
+            classes: Vec::new(),
         })
     }
 }
