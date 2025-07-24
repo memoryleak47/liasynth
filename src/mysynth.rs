@@ -65,6 +65,12 @@ fn run<'a, P: Problem>(ctxt: &mut Ctxt<'a, P>) -> RecExpr<Term> {
 
     loop {
         let WithOrd(node, _score) = ctxt.queue.pop().unwrap();
+
+        let vals = vals(&node, ctxt);
+        if let Some(i) = ctxt.g.analysis.veccons.get(&vals) {
+            if ctxt.g[*i].data.min_size <= minsize(&node, ctxt) { continue }
+        }
+
         let satcount = satcount(&node, ctxt);
         let i = ctxt.g.add(node);
 
