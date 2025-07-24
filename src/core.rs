@@ -8,21 +8,23 @@ pub enum Value {
     Bool(bool),
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Clone, Copy)]
-pub struct Var(pub usize);
+pub type Var = usize;
+pub type Id = usize;
 
-define_language! {
-    pub enum Term {
-        Var(Var),
+pub enum Node {
+    Var(Var),
 
-        "add" = Add([Id; 2]),
-        "sub" = Sub([Id; 2]),
-        "mul" = Mul([Id; 2]),
-        "div" = Div([Id; 2]),
+    Add([Id; 2]),
+    Sub([Id; 2]),
+    Mul([Id; 2]),
+    Div([Id; 2]),
 
-        "ite" = Ite([Id; 3]),
-        "lt" = Lt([Id; 2]),
-    }
+    Ite([Id; 3]),
+    Lt([Id; 2]),
+}
+
+pub struct Term {
+    elems: Vec<Node>,
 }
 
 pub type Sigma = Vec<Value>;
@@ -33,11 +35,11 @@ pub trait Problem {
 }
 
 pub trait Oracle {
-    fn verify(&self, term: &RecExpr<Term>) -> Option<Sigma>;
+    fn verify(&self, term: &Term) -> Option<Sigma>;
 }
 
 pub trait Synth {
-    fn synth(&mut self, problem: &impl Problem, sigmas: &[Sigma]) -> RecExpr<Term>;
+    fn synth(&mut self, problem: &impl Problem, sigmas: &[Sigma]) -> Term;
 }
 
 fn to_int(v: Value) -> Int {
@@ -54,47 +56,47 @@ fn to_bool(v: Value) -> bool {
     }
 }
 
-pub fn eval_step(term: &Term, sigma: &Sigma, ch: &impl Fn(Id) -> Value) -> Value {
-    match term {
-        Term::Var(s) => sigma[s.0].clone(),
-        Term::Add([l, r]) => Value::Int(to_int(ch(*l)) + to_int(ch(*r))),
-        Term::Mul([l, r]) => Value::Int(to_int(ch(*l)) * to_int(ch(*r))),
-        Term::Sub([l, r]) => Value::Int(to_int(ch(*l)) - to_int(ch(*r))),
-        Term::Div([l, r]) => {
+pub fn eval_node(node: &Node, sigma: &Sigma, ch: &impl Fn(Id) -> Value) -> Value {
+    match node {
+        Node::Var(s) => sigma[*s].clone(),
+        Node::Add([l, r]) => Value::Int(to_int(ch(*l)) + to_int(ch(*r))),
+        Node::Mul([l, r]) => Value::Int(to_int(ch(*l)) * to_int(ch(*r))),
+        Node::Sub([l, r]) => Value::Int(to_int(ch(*l)) - to_int(ch(*r))),
+        Node::Div([l, r]) => {
             let l = to_int(ch(*l));
             let r = to_int(ch(*r));
             if r == 0 { Value::Int(0) } // NOTE: division by zero is zero for now.
             else { Value::Int(l / r) }
         },
-        Term::Ite([cond, then, else_]) => {
+        Node::Ite([cond, then, else_]) => {
             if to_bool(ch(*cond)) {
                 ch(*then).clone()
             } else {
                 ch(*else_).clone()
             }
         },
-        Term::Lt([l, r]) => Value::Bool(to_int(ch(*l)) < to_int(ch(*r))),
+        Node::Lt([l, r]) => Value::Bool(to_int(ch(*l)) < to_int(ch(*r))),
     }
 }
 
-pub fn eval_term(term: &RecExpr<Term>, sigma: &Sigma) -> Value {
+pub fn eval_term(term: &Term, sigma: &Sigma) -> Value {
     let mut vals: Vec<Value> = Vec::new();
-    for t in &*term {
+    for n in &term.elems {
         let f = |i| vals[usize::from(i)].clone();
-        vals.push(eval_step(t, sigma, &f));
+        vals.push(eval_node(n, sigma, &f));
     }
     vals.last().unwrap().clone()
 }
 
-pub fn cegis(problem: impl Problem, mut synth: impl Synth, oracle: impl Oracle) -> RecExpr<Term> {
+pub fn cegis(problem: impl Problem, mut synth: impl Synth, oracle: impl Oracle) -> Term {
     let mut sigmas = Vec::new();
     loop {
         let term = synth.synth(&problem, &sigmas);
-        println!("Candidate: {}", &term);
+        // println!("Candidate: {}", &term);
         // TODO check this later: assert!(problem.sat(&..., &sigmas));
 
         if let Some(sigma) = oracle.verify(&term) {
-            println!("CE: {:?}", &sigma);
+            // println!("CE: {:?}", &sigma);
             sigmas.push(sigma);
         } else {
             return term;
