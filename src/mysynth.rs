@@ -13,7 +13,12 @@ fn heuristic(info: &Info, sigmas: &[Sigma], problem: &impl Problem) -> Score {
     const A: usize = 1;
     const B: usize = 5;
 
-    (1000 * (counter + A)) / (info.min_size + B)
+    let mut a = 100000;
+    for _ in counter..sigmas.len() {
+        a /= 2;
+    }
+
+    a / (info.min_size + B)
 }
 
 fn satcount(info: &Info, sigmas: &[Sigma], problem: &impl Problem) -> usize {
