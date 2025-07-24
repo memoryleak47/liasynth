@@ -11,19 +11,19 @@ pub enum Value {
 
 pub type Var = usize;
 
-// define_language! {
+define_language! {
     pub enum Term {
         Var(Var),
 
-        Add([Id; 2]),
-        Sub([Id; 2]),
-        Mul([Id; 2]),
-        Div([Id; 2]),
+        "add" = Add([Id; 2]),
+        "sub" = Sub([Id; 2]),
+        "mul" = Mul([Id; 2]),
+        "div" = Div([Id; 2]),
 
-        Ite([Id; 3]),
-        Lt([Id; 2]),
+        "ite" = Ite([Id; 3]),
+        "lt" = Lt([Id; 2]),
     }
-// }
+}
 
 pub type Sigma = Vec<Value>;
 
