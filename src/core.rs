@@ -2,7 +2,7 @@ use crate::*;
 
 type Int = i64; // TODO add bigint.
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, PartialEq, Eq, Hash)]
 pub enum Value {
     Int(Int),
     Bool(bool),
@@ -89,11 +89,11 @@ pub fn cegis(problem: impl Problem, mut synth: impl Synth, oracle: impl Oracle) 
     let mut sigmas = Vec::new();
     loop {
         let term = synth.synth(&problem, &sigmas);
-        dbg!(&term);
+        println!("Candidate: {}", &term);
         // TODO check this later: assert!(problem.sat(&..., &sigmas));
 
         if let Some(sigma) = oracle.verify(&term) {
-            dbg!(&sigma);
+            println!("CE: {:?}", &sigma);
             sigmas.push(sigma);
         } else {
             return term;

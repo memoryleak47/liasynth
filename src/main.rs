@@ -15,6 +15,8 @@ pub use with_ord::*;
 mod examples;
 pub use examples::*;
 
+mod fmt;
+
 pub type Map<K, V> = indexmap::IndexMap<K, V>;
 pub use std::collections::BinaryHeap;
 

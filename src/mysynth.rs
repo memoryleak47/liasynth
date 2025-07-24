@@ -2,8 +2,8 @@ use crate::*;
 
 pub struct MySynth;
 
-pub type Score = usize;
-pub type PrioQueue = BinaryHeap<WithOrd<Id, Score>>;
+type Score = usize;
+type PrioQueue = BinaryHeap<WithOrd<Id, Score>>;
 
 fn heuristic(info: &Info, sigmas: &[Sigma], problem: &impl Problem) -> Score {
     let counter = satcount(info, sigmas, problem);
