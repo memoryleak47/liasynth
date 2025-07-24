@@ -23,6 +23,16 @@ pub enum Node {
     Lt([Id; 2]),
 }
 
+impl Node {
+    pub fn children(&self) -> Box<[Id]> {
+        match self {
+            Node::Var(_) => Box::new([]),
+            Node::Add(s) | Node::Sub(s) | Node::Mul(s) | Node::Div(s) | Node::Lt(s) => Box::new(*s),
+            Node::Ite(s) => Box::new(*s),
+        }
+    }
+}
+
 pub struct Term {
     elems: Vec<Node>,
 }
