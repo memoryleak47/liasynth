@@ -28,7 +28,7 @@ pub type Sigma = Vec<Value>;
 
 pub trait Problem {
     fn num_vars(&self) -> usize;
-    fn sat(&self, term: &Term, sigmas: &[Sigma]) -> bool;
+    fn sat(&self, val: &Value, sigma: &Sigma) -> bool;
 }
 
 pub trait Oracle {
@@ -85,7 +85,7 @@ pub fn cegis(problem: impl Problem, mut synth: impl Synth, oracle: impl Oracle) 
     loop {
         let term = synth.synth(&problem, &sigmas);
         // dbg!(&term);
-        assert!(problem.sat(&term, &sigmas));
+        // TODO check this later: assert!(problem.sat(&..., &sigmas));
 
         if let Some(sigma) = oracle.verify(&term) {
             // dbg!(&sigma);
