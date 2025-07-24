@@ -9,7 +9,7 @@ fn heuristic(info: &Info, sigmas: &[Sigma], problem: &impl Problem) -> Score {
     let counter = satcount(info, sigmas, problem);
 
     const A: usize = 1;
-    const B: usize = 1;
+    const B: usize = 5;
 
     (1000 * (counter + A)) / (info.min_size + B)
 }
