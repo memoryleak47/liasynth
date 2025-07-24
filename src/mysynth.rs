@@ -1,5 +1,7 @@
 use crate::*;
 
+const DEBUG: bool = true;
+
 pub struct MySynth;
 
 type Score = usize;
@@ -37,11 +39,20 @@ impl Synth for MySynth {
         }
 
         loop {
-            let WithOrd(i, _) = queue.pop().unwrap();
-            if satcount(&g[i].data, sigmas, problem) == sigmas.len() {
+            let WithOrd(i, score) = queue.pop().unwrap();
+            let cnt = satcount(&g[i].data, sigmas, problem);
+            let b = cnt == sigmas.len();
+            if b || DEBUG {
                 let e = Extractor::new(&g, AstSize);
-                let (_, t) = e.find_best(i);
-                return t;
+                let (ast_size, t) = e.find_best(i);
+                if DEBUG {
+                    let sigs = sigmas.len();
+                    let ast2 = g[i].data.min_size;
+                    println!("[{sigs}] sc={score} sat={cnt} ast1={ast_size} ast2={ast2} {t}");
+                }
+                if b {
+                    return t;
+                }
             }
             grow(i, &mut g, sigmas, problem, &mut queue);
         }
