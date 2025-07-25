@@ -78,7 +78,7 @@ pub fn max_n(n: usize) -> (impl Problem, impl Oracle) {
     assert!(n > 0);
 
     enumerated(n, 5, &[], &|sigma: &Sigma, v: &Value| -> bool {
-        *v == sigma.iter().cloned().fold(Value::Int(0), vmax)
+        *v == sigma.iter().cloned().fold(Value::Int(Int::MIN), vmax)
     })
 }
 
