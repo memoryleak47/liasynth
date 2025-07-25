@@ -156,6 +156,11 @@ fn enqueue<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
 
 fn heuristic<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Score {
     let c = &ctxt.classes[x];
+
+    if let Ty::Bool = node_ty(&c.node) {
+        return 10000;
+    }
+
     let satcount = satcount(&c.vals, ctxt);
 
     let mut a = 100000;
