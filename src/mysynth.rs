@@ -8,7 +8,7 @@ type Queue = BinaryHeap<WithOrd<Id, Score>>;
 enum Ty { Int, Bool }
 
 struct Ctxt<'a, P> {
-    queue: Queue,
+    queue: Queue, // contains ids of pending (i.e. not solidifed Ids), or solid Ids which got an updated size.
     sigmas: &'a [Sigma],
     problem: &'a P,
 
@@ -124,9 +124,7 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) {
         if newsize < c.size {
             c.size = newsize;
             c.node = node.clone();
-            if c.handled_size.is_some() {
-                handle(i, ctxt);
-            }
+            enqueue(i, ctxt);
         }
     } else {
         let i = ctxt.classes.len();
@@ -143,7 +141,25 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) {
             handled_size: None,
         });
         ctxt.vals_lookup.insert(vals, i);
+        enqueue(i, ctxt);
     }
+}
+
+fn enqueue<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
+    let h = heuristic(x, ctxt);
+    ctxt.queue.push(WithOrd(x, h));
+}
+
+fn heuristic<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Score {
+    let c = &ctxt.classes[x];
+    let satcount = satcount(&c.vals, ctxt);
+
+    let mut a = 100000;
+    for _ in satcount..ctxt.sigmas.len() {
+        a /= 2;
+    }
+
+    a / (c.size + 5)
 }
 
 fn vals<'a, P: Problem>(node: &Node, ctxt: &Ctxt<'a, P>) -> Box<[Value]> {
@@ -155,6 +171,12 @@ fn vals<'a, P: Problem>(node: &Node, ctxt: &Ctxt<'a, P>) -> Box<[Value]> {
 
 fn minsize<'a, P: Problem>(node: &Node, ctxt: &Ctxt<'a, P>) -> usize {
     node.children().iter().map(|x| ctxt.classes[*x].size).sum::<usize>() + 1
+}
+
+fn satcount<'a, P: Problem>(vals: &[Value], ctxt: &Ctxt<'a, P>) -> usize {
+    let it = vals.iter().zip(ctxt.sigmas);
+    it.filter(|(val, sigma)| ctxt.problem.sat(val, sigma))
+      .count()
 }
 
 fn node_ty(node: &Node) -> Ty {
