@@ -52,7 +52,7 @@ impl Term {
         self.elems.push(n);
     }
 
-    pub fn push_subterm(&mut self, mut t: Term) -> Id {
+    pub fn push_subterm(&mut self, t: Term) -> Id {
         let i = self.elems.len();
         for mut n in t.elems {
             for x in n.children_mut() { *x += i; }
