@@ -32,11 +32,35 @@ impl Node {
             Node::Ite(s) => Box::new(*s),
         }
     }
+
+    pub fn children_mut(&mut self) -> &mut [Id] {
+        match self {
+            Node::Var(_) => &mut [],
+            Node::Add(s) | Node::Sub(s) | Node::Mul(s) | Node::Div(s) | Node::Lt(s) => s,
+            Node::Ite(s) => s,
+        }
+    }
 }
 
 #[derive(Debug)]
 pub struct Term {
-    elems: Vec<Node>,
+    pub elems: Vec<Node>,
+}
+
+impl Term {
+    pub fn push(&mut self, n: Node) {
+        self.elems.push(n);
+    }
+
+    pub fn push_subterm(&mut self, mut t: Term) -> Id {
+        let i = self.elems.len();
+        for mut n in t.elems {
+            for x in n.children_mut() { *x += i; }
+            self.push(n);
+        }
+
+        self.elems.len()
+    }
 }
 
 pub type Sigma = Vec<Value>;

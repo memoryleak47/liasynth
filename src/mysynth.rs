@@ -190,5 +190,40 @@ fn node_ty(node: &Node) -> Ty {
 }
 
 fn extract<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Term {
-    todo!()
+    let mut t = Term { elems: Vec::new() };
+    match ctxt.classes[x].node {
+        Node::Var(v) => { t.push(Node::Var(v)); },
+        Node::Add([x, y]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            let y = t.push_subterm(extract(y, ctxt));
+            t.push(Node::Add([x, y]));
+        },
+        Node::Sub([x, y]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            let y = t.push_subterm(extract(y, ctxt));
+            t.push(Node::Sub([x, y]));
+        },
+        Node::Mul([x, y]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            let y = t.push_subterm(extract(y, ctxt));
+            t.push(Node::Mul([x, y]));
+        },
+        Node::Div([x, y]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            let y = t.push_subterm(extract(y, ctxt));
+            t.push(Node::Div([x, y]));
+        },
+        Node::Lt([x, y]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            let y = t.push_subterm(extract(y, ctxt));
+            t.push(Node::Lt([x, y]));
+        },
+        Node::Ite([x, y, z]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            let y = t.push_subterm(extract(y, ctxt));
+            let z = t.push_subterm(extract(z, ctxt));
+            t.push(Node::Ite([x, y, z]));
+        },
+    }
+    t
 }
