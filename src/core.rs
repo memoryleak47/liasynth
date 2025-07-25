@@ -11,6 +11,7 @@ pub enum Value {
 pub type Var = usize;
 pub type Id = usize;
 
+#[derive(Clone)]
 pub enum Node {
     Var(Var),
 

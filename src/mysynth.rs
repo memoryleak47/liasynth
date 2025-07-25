@@ -115,6 +115,7 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) -> Id {
         let c = ctxt.classes.get_mut(i).unwrap();
         if newsize < c.size {
             c.size = newsize;
+            c.node = node.clone();
             grow(i, ctxt);
         }
         i
