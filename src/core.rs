@@ -2,7 +2,7 @@ use crate::*;
 
 type Int = i64; // TODO add bigint.
 
-#[derive(Clone, PartialEq, Eq, Hash)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Value {
     Int(Int),
     Bool(bool),
@@ -59,7 +59,7 @@ impl Term {
             self.push(n);
         }
 
-        self.elems.len()
+        self.elems.len() - 1
     }
 }
 
@@ -118,7 +118,7 @@ pub fn eval_node(node: &Node, sigma: &Sigma, ch: &impl Fn(Id) -> Value) -> Value
 pub fn eval_term(term: &Term, sigma: &Sigma) -> Value {
     let mut vals: Vec<Value> = Vec::new();
     for n in &term.elems {
-        let f = |i| vals[usize::from(i)].clone();
+        let f = |i: usize| vals[i].clone();
         vals.push(eval_node(n, sigma, &f));
     }
     vals.last().unwrap().clone()
