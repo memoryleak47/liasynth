@@ -19,5 +19,7 @@ fn rec(i: usize, t: &Term) -> String {
 
         &Node::Ite([x, y, z]) => format!("(ite {} {} {})", rec(x, t), rec(y, t), rec(z, t)),
         &Node::Lt([x, y]) => format!("(lt {} {})", rec(x, t), rec(y, t)),
+
+        Node::Constant(i) => format!("{i}"),
     }
 }

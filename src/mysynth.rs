@@ -33,6 +33,10 @@ fn run<'a, P: Problem>(ctxt: &mut Ctxt<P>) -> Term {
         add_node(Node::Var(v), ctxt);
     }
 
+    for &c in ctxt.problem.constants() {
+        add_node(Node::Constant(c), ctxt);
+    }
+
     while let Some(WithOrd(x, _)) = ctxt.queue.pop() {
         // dbg!(extract(x, ctxt));
         handle(x, ctxt);
@@ -190,7 +194,7 @@ fn satcount<'a, P: Problem>(vals: &[Value], ctxt: &Ctxt<'a, P>) -> usize {
 
 fn node_ty(node: &Node) -> Ty {
     match node {
-        Node::Var(_) | Node::Add(_) | Node::Sub(_) | Node::Mul(_) | Node::Div(_) | Node::Ite(_) => Ty::Int,
+        Node::Var(_) | Node::Add(_) | Node::Sub(_) | Node::Mul(_) | Node::Div(_) | Node::Ite(_) | Node::Constant(_) => Ty::Int,
         Node::Lt(_) => Ty::Bool,
     }
 }
@@ -230,6 +234,7 @@ fn extract<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Term {
             let z = t.push_subterm(extract(z, ctxt));
             t.push(Node::Ite([x, y, z]));
         },
+        Node::Constant(i) => { t.push(Node::Constant(i)); },
     }
     t
 }

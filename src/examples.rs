@@ -1,8 +1,9 @@
 use crate::*;
 
-pub fn enumerated<F: Fn(&Sigma, &Value) -> bool>(num_vars: usize, maxval: usize, f: &F) -> (impl Problem, impl Oracle) {
+pub fn enumerated<F: Fn(&Sigma, &Value) -> bool>(num_vars: usize, maxval: usize, constants: &[Int], f: &F) -> (impl Problem, impl Oracle) {
     struct EnumeratedProblem<'f, F: Fn(&Sigma, &Value) -> bool> {
         num_vars: usize,
+        constants: Box<[Int]>,
         f: &'f F,
     }
 
@@ -13,6 +14,7 @@ pub fn enumerated<F: Fn(&Sigma, &Value) -> bool>(num_vars: usize, maxval: usize,
 
     impl<'f, F: Fn(&Sigma, &Value) -> bool> Problem for EnumeratedProblem<'f, F> {
         fn num_vars(&self) -> usize { self.num_vars }
+        fn constants(&self) -> &[Int] { &*self.constants }
         fn sat(&self, val: &Value, sigma: &Sigma) -> bool {
             (self.f)(sigma, val)
         }
@@ -32,6 +34,7 @@ pub fn enumerated<F: Fn(&Sigma, &Value) -> bool>(num_vars: usize, maxval: usize,
 
     let p = EnumeratedProblem {
         num_vars,
+        constants: constants.iter().copied().collect(),
         f,
     };
 
@@ -70,13 +73,13 @@ fn vmax(v1: Value, v2: Value) -> Value {
 pub fn max_n(n: usize) -> (impl Problem, impl Oracle) {
     assert!(n > 0);
 
-    enumerated(n, 5, &|sigma: &Sigma, v: &Value| -> bool {
+    enumerated(n, 5, &[], &|sigma: &Sigma, v: &Value| -> bool {
         *v == sigma.iter().cloned().fold(Value::Int(0), vmax)
     })
 }
 
 pub fn suc_x() -> (impl Problem, impl Oracle) {
-    enumerated(1, 5, &|sigma: &Sigma, v: &Value| -> bool {
+    enumerated(1, 5, &[], &|sigma: &Sigma, v: &Value| -> bool {
         match (v, &sigma[0]) {
             (_, Value::Int(0)) => true,
             (Value::Int(l), Value::Int(r)) => *l == r+1,
@@ -86,9 +89,18 @@ pub fn suc_x() -> (impl Problem, impl Oracle) {
 }
 
 pub fn x_lt_y() -> (impl Problem, impl Oracle) {
-    enumerated(2, 5, &|sigma: &Sigma, v: &Value| -> bool {
+    enumerated(2, 5, &[], &|sigma: &Sigma, v: &Value| -> bool {
         match (sigma[..]) {
             [Value::Int(x), Value::Int(y)] => *v == Value::Bool(x < y),
+            _ => false,
+        }
+    })
+}
+
+pub fn x_plus_19() -> (impl Problem, impl Oracle) {
+    enumerated(2, 5, &[19], &|sigma: &Sigma, v: &Value| -> bool {
+        match (sigma[..]) {
+            [Value::Int(x), _] => *v == Value::Int(x+19),
             _ => false,
         }
     })

@@ -1,6 +1,6 @@
 use crate::*;
 
-type Int = i64; // TODO add bigint.
+pub type Int = i64; // TODO add bigint.
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Value {
@@ -22,12 +22,14 @@ pub enum Node {
 
     Ite([Id; 3]),
     Lt([Id; 2]),
+
+    Constant(Int),
 }
 
 impl Node {
     pub fn children(&self) -> Box<[Id]> {
         match self {
-            Node::Var(_) => Box::new([]),
+            Node::Var(_) | Node::Constant(_) => Box::new([]),
             Node::Add(s) | Node::Sub(s) | Node::Mul(s) | Node::Div(s) | Node::Lt(s) => Box::new(*s),
             Node::Ite(s) => Box::new(*s),
         }
@@ -35,7 +37,7 @@ impl Node {
 
     pub fn children_mut(&mut self) -> &mut [Id] {
         match self {
-            Node::Var(_) => &mut [],
+            Node::Var(_) | Node::Constant(_) => &mut [],
             Node::Add(s) | Node::Sub(s) | Node::Mul(s) | Node::Div(s) | Node::Lt(s) => s,
             Node::Ite(s) => s,
         }
@@ -66,6 +68,7 @@ pub type Sigma = Vec<Value>;
 
 pub trait Problem {
     fn num_vars(&self) -> usize;
+    fn constants(&self) -> &[Int];
     fn sat(&self, val: &Value, sigma: &Sigma) -> bool;
 }
 
@@ -111,6 +114,7 @@ pub fn eval_node(node: &Node, sigma: &Sigma, ch: &impl Fn(Id) -> Value) -> Value
             }
         },
         Node::Lt([l, r]) => Value::Bool(to_int(ch(*l)) < to_int(ch(*r))),
+        Node::Constant(i) => Value::Int(*i),
     }
 }
 
