@@ -5,6 +5,8 @@ pub struct MySynth;
 type Score = usize;
 type Queue = BinaryHeap<WithOrd<Id, Score>>;
 
+enum Ty { Int, Bool }
+
 struct Ctxt<'a, P> {
     queue: Queue,
     sigmas: &'a [Sigma],
@@ -12,6 +14,9 @@ struct Ctxt<'a, P> {
 
     vals_lookup: Map<Box<[Value]>, Id>,
     classes: Vec<Class>,
+
+    i_solids: Vec<Id>,
+    b_solids: Vec<Id>,
 }
 
 struct Class {
@@ -20,8 +25,66 @@ struct Class {
     vals: Box<[Value]>,
 }
 
-fn run<'a, P>(ctxt: &mut Ctxt<P>) -> Term {
-    todo!()
+fn run<'a, P: Problem>(ctxt: &mut Ctxt<P>) -> Term {
+    for v in 0..ctxt.problem.num_vars() {
+        add_node(Node::Var(v), ctxt);
+    }
+
+    while let Some(WithOrd(x, _)) = ctxt.queue.pop() {
+        solidify(x, ctxt);
+    }
+
+    panic!("No term found!")
+}
+
+fn solidify<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
+    match node_ty(&ctxt.classes[x].node) {
+        Ty::Int => &mut ctxt.i_solids,
+        Ty::Bool => &mut ctxt.b_solids,
+    }.push(x);
+
+    grow(x, ctxt);
+}
+
+fn grow<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
+    let ty = node_ty(&ctxt.classes[x].node);
+    match ty {
+        Ty::Int => {
+            let i_solids = ctxt.i_solids.clone();
+            let b_solids = ctxt.b_solids.clone();
+
+            for &y in &i_solids {
+                add_node(Node::Add([x, y]), ctxt);
+                add_node(Node::Add([y, x]), ctxt);
+
+                add_node(Node::Sub([x, y]), ctxt);
+                add_node(Node::Sub([y, x]), ctxt);
+
+                add_node(Node::Mul([x, y]), ctxt);
+                add_node(Node::Mul([y, x]), ctxt);
+
+                add_node(Node::Div([x, y]), ctxt);
+                add_node(Node::Div([y, x]), ctxt);
+
+                add_node(Node::Lt([x, y]), ctxt);
+                add_node(Node::Lt([y, x]), ctxt);
+
+                for &cond in &b_solids {
+                    add_node(Node::Ite([cond, x, y]), ctxt);
+                    add_node(Node::Ite([cond, y, x]), ctxt);
+                }
+            }
+        },
+        Ty::Bool => {
+            let i_solids = ctxt.i_solids.clone();
+
+            for &y in &i_solids {
+                for &z in &i_solids {
+                    add_node(Node::Ite([x, y, z]), ctxt);
+                }
+            }
+        },
+    }
 }
 
 impl Synth for MySynth {
@@ -32,6 +95,8 @@ impl Synth for MySynth {
             problem,
             vals_lookup: Default::default(),
             classes: Vec::new(),
+            i_solids: Vec::new(),
+            b_solids: Vec::new(),
         })
     }
 }
@@ -43,7 +108,7 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) -> Id {
         let c = ctxt.classes.get_mut(i).unwrap();
         if newsize < c.size {
             c.size = newsize;
-            // TODO upwards merge!
+            grow(i, ctxt);
         }
         i
     } else {
@@ -67,4 +132,11 @@ fn vals<'a, P: Problem>(node: &Node, ctxt: &Ctxt<'a, P>) -> Box<[Value]> {
 
 fn minsize<'a, P: Problem>(node: &Node, ctxt: &Ctxt<'a, P>) -> usize {
     node.children().iter().map(|x| ctxt.classes[*x].size).sum::<usize>() + 1
+}
+
+fn node_ty(node: &Node) -> Ty {
+    match node {
+        Node::Var(_) | Node::Add(_) | Node::Sub(_) | Node::Mul(_) | Node::Div(_) | Node::Ite(_) => Ty::Int,
+        Node::Lt(_) => Ty::Bool,
+    }
 }
