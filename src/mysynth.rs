@@ -25,7 +25,7 @@ struct Class {
     node: Node,
     size: usize,
     vals: Box<[Value]>,
-    solid: bool,
+    handled_size: Option<usize>, // what was the size when this class was handled last time.
 }
 
 fn run<'a, P: Problem>(ctxt: &mut Ctxt<P>) -> Term {
@@ -34,7 +34,7 @@ fn run<'a, P: Problem>(ctxt: &mut Ctxt<P>) -> Term {
     }
 
     while let Some(WithOrd(x, _)) = ctxt.queue.pop() {
-        solidify(x, ctxt);
+        handle(x, ctxt);
 
         if let Some(x) = ctxt.out {
             return extract(x, ctxt);
@@ -44,15 +44,18 @@ fn run<'a, P: Problem>(ctxt: &mut Ctxt<P>) -> Term {
     panic!("No term found!")
 }
 
-fn solidify<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
+// makes "x" solid if it's not solid yet.
+fn handle<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
     let c = &mut ctxt.classes[x];
 
-    c.solid = true;
+    if c.handled_size.is_none() {
+        match node_ty(&c.node) {
+            Ty::Int => &mut ctxt.i_solids,
+            Ty::Bool => &mut ctxt.b_solids,
+        }.push(x);
+    }
 
-    match node_ty(&c.node) {
-        Ty::Int => &mut ctxt.i_solids,
-        Ty::Bool => &mut ctxt.b_solids,
-    }.push(x);
+    c.handled_size = Some(c.size);
 
     grow(x, ctxt);
 }
@@ -113,7 +116,7 @@ impl Synth for MySynth {
     }
 }
 
-fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) -> Id {
+fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) {
     let vals = vals(&node, ctxt);
     if let Some(&i) = ctxt.vals_lookup.get(&vals) {
         let newsize = minsize(&node, ctxt);
@@ -121,11 +124,10 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) -> Id {
         if newsize < c.size {
             c.size = newsize;
             c.node = node.clone();
-            if c.solid {
-                grow(i, ctxt);
+            if c.handled_size.is_some() {
+                handle(i, ctxt);
             }
         }
-        i
     } else {
         let i = ctxt.classes.len();
 
@@ -138,10 +140,9 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) -> Id {
             size: minsize(&node, ctxt),
             node,
             vals: vals.clone(),
-            solid: false,
+            handled_size: None,
         });
         ctxt.vals_lookup.insert(vals, i);
-        i
     }
 }
 
