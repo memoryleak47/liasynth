@@ -105,3 +105,12 @@ pub fn x_plus_19() -> (impl Problem, impl Oracle) {
         }
     })
 }
+
+pub fn qm_neg_eq_2() -> (impl Problem, impl Oracle) {
+    enumerated(2, 5, &[0, 1], &|sigma: &Sigma, v: &Value| -> bool {
+        match (sigma[..]) {
+            [Value::Int(x), Value::Int(y)] => *v == (if x <= 0 && y <= 0 { Value::Int(1) } else { Value::Int(0) }),
+            _ => false,
+        }
+    })
+}
