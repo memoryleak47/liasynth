@@ -42,7 +42,6 @@ impl Node {
     }
 }
 
-#[derive(Debug)]
 pub struct Term {
     pub elems: Vec<Node>,
 }

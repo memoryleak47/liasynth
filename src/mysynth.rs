@@ -34,6 +34,7 @@ fn run<'a, P: Problem>(ctxt: &mut Ctxt<P>) -> Term {
     }
 
     while let Some(WithOrd(x, _)) = ctxt.queue.pop() {
+        // dbg!(extract(x, ctxt));
         handle(x, ctxt);
 
         if let Some(x) = ctxt.out {
