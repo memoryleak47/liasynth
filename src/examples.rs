@@ -54,10 +54,14 @@ fn sigmas(i: usize, num_vars: usize, maxval: usize) -> Vec<Sigma> {
     let mut outs = Vec::new();
     for rest in sigmas(i+1, num_vars, maxval) {
         for x in 0..=maxval {
-            let mut sigma = Sigma::new();
-            sigma.push(Value::Int(x as _));
-            sigma.extend(rest.clone());
-            outs.push(sigma);
+            for b in [true, false] {
+                let mut sigma = Sigma::new();
+                let x = x as i64;
+                let x = if b { x } else { -x };
+                sigma.push(Value::Int(x as _));
+                sigma.extend(rest.clone());
+                outs.push(sigma);
+            }
         }
     }
     outs
