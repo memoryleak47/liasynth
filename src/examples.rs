@@ -19,7 +19,7 @@ pub fn enumerated<F: Fn(&Sigma, &Value) -> bool>(num_vars: usize, f: &F) -> (imp
     }
 
     impl<'f, F: Fn(&Sigma, &Value) -> bool> Oracle for EnumeratedOracle<'f, F> {
-        fn verify(&self, term: &RecExpr<Term>) -> Option<Sigma> {
+        fn verify(&self, term: &Term) -> Option<Sigma> {
             for sigma in &self.sigmas {
                 let v = eval_term(term, sigma);
                 if !(self.f)(sigma, &v) {

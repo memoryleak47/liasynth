@@ -11,7 +11,7 @@ pub enum Value {
 pub type Var = usize;
 pub type Id = usize;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub enum Node {
     Var(Var),
 
@@ -34,6 +34,7 @@ impl Node {
     }
 }
 
+#[derive(Debug)]
 pub struct Term {
     elems: Vec<Node>,
 }
