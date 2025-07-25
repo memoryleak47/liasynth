@@ -48,6 +48,9 @@ fn run<'a, P: Problem>(ctxt: &mut Ctxt<P>) -> Term {
 fn handle<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
     let c = &mut ctxt.classes[x];
 
+    // if the current size is the same size of the last "handle" call, nothing it to be done.
+    if c.handled_size == Some(c.size) { return; }
+
     if c.handled_size.is_none() {
         match node_ty(&c.node) {
             Ty::Int => &mut ctxt.i_solids,
