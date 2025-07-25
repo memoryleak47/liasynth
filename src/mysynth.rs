@@ -25,6 +25,7 @@ struct Class {
     node: Node,
     size: usize,
     vals: Box<[Value]>,
+    solid: bool,
 }
 
 fn run<'a, P: Problem>(ctxt: &mut Ctxt<P>) -> Term {
@@ -44,7 +45,11 @@ fn run<'a, P: Problem>(ctxt: &mut Ctxt<P>) -> Term {
 }
 
 fn solidify<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
-    match node_ty(&ctxt.classes[x].node) {
+    let c = &mut ctxt.classes[x];
+
+    c.solid = true;
+
+    match node_ty(&c.node) {
         Ty::Int => &mut ctxt.i_solids,
         Ty::Bool => &mut ctxt.b_solids,
     }.push(x);
@@ -112,11 +117,13 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) -> Id {
     let vals = vals(&node, ctxt);
     if let Some(&i) = ctxt.vals_lookup.get(&vals) {
         let newsize = minsize(&node, ctxt);
-        let c = ctxt.classes.get_mut(i).unwrap();
+        let c = &mut ctxt.classes[i];
         if newsize < c.size {
             c.size = newsize;
             c.node = node.clone();
-            grow(i, ctxt);
+            if c.solid {
+                grow(i, ctxt);
+            }
         }
         i
     } else {
@@ -131,6 +138,7 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) -> Id {
             size: minsize(&node, ctxt),
             node,
             vals: vals.clone(),
+            solid: false,
         });
         ctxt.vals_lookup.insert(vals, i);
         i
