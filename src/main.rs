@@ -16,6 +16,6 @@ pub type Map<K, V> = indexmap::IndexMap<K, V>;
 pub use std::collections::BinaryHeap;
 
 fn main() {
-    let (problem, oracle) = suc_x();
+    let (problem, oracle) = x_lt_y();
     println!("Answer: {:?}", cegis(problem, MySynth, oracle));
 }

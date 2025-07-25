@@ -84,3 +84,12 @@ pub fn suc_x() -> (impl Problem, impl Oracle) {
         }
     })
 }
+
+pub fn x_lt_y() -> (impl Problem, impl Oracle) {
+    enumerated(2, 5, &|sigma: &Sigma, v: &Value| -> bool {
+        match (sigma[..]) {
+            [Value::Int(x), Value::Int(y)] => *v == Value::Bool(x < y),
+            _ => false,
+        }
+    })
+}
