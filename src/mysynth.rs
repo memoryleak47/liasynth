@@ -17,6 +17,8 @@ struct Ctxt<'a, P> {
 
     i_solids: Vec<Id>,
     b_solids: Vec<Id>,
+
+    out: Option<Id>,
 }
 
 struct Class {
@@ -32,6 +34,10 @@ fn run<'a, P: Problem>(ctxt: &mut Ctxt<P>) -> Term {
 
     while let Some(WithOrd(x, _)) = ctxt.queue.pop() {
         solidify(x, ctxt);
+
+        if let Some(x) = ctxt.out {
+            return extract(x, ctxt);
+        }
     }
 
     panic!("No term found!")
@@ -97,6 +103,7 @@ impl Synth for MySynth {
             classes: Vec::new(),
             i_solids: Vec::new(),
             b_solids: Vec::new(),
+            out: None,
         })
     }
 }
@@ -113,6 +120,12 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) -> Id {
         i
     } else {
         let i = ctxt.classes.len();
+
+        // write to `out`, if this [Value] was successful.
+        if ctxt.sigmas.iter().zip(vals.iter()).all(|(sigma, val)| ctxt.problem.sat(val, sigma)) {
+            ctxt.out = Some(i);
+        }
+
         ctxt.classes.push(Class {
             size: minsize(&node, ctxt),
             node,
@@ -139,4 +152,8 @@ fn node_ty(node: &Node) -> Ty {
         Node::Var(_) | Node::Add(_) | Node::Sub(_) | Node::Mul(_) | Node::Div(_) | Node::Ite(_) => Ty::Int,
         Node::Lt(_) => Ty::Bool,
     }
+}
+
+fn extract<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Term {
+    todo!()
 }
