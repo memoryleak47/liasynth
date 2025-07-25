@@ -74,3 +74,13 @@ pub fn max_n(n: usize) -> (impl Problem, impl Oracle) {
         *v == sigma.iter().cloned().fold(Value::Int(0), vmax)
     })
 }
+
+pub fn suc_x() -> (impl Problem, impl Oracle) {
+    enumerated(1, 5, &|sigma: &Sigma, v: &Value| -> bool {
+        match (v, &sigma[0]) {
+            (_, Value::Int(0)) => true,
+            (Value::Int(l), Value::Int(r)) => *l == r+1,
+            _ => false,
+        }
+    })
+}

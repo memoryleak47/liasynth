@@ -66,6 +66,8 @@ fn handle<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
 
 fn grow<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
     let ty = node_ty(&ctxt.classes[x].node);
+    dbg!(extract(x, ctxt));
+    dbg!(ctxt.i_solids.len());
     match ty {
         Ty::Int => {
             let i_solids = ctxt.i_solids.clone();
