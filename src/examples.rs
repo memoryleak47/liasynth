@@ -1,6 +1,6 @@
 use crate::*;
 
-pub fn enumerated<F: Fn(&Sigma, &Value) -> bool>(num_vars: usize, f: &F) -> (impl Problem, impl Oracle) {
+pub fn enumerated<F: Fn(&Sigma, &Value) -> bool>(num_vars: usize, maxval: usize, f: &F) -> (impl Problem, impl Oracle) {
     struct EnumeratedProblem<'f, F: Fn(&Sigma, &Value) -> bool> {
         num_vars: usize,
         f: &'f F,
@@ -36,21 +36,21 @@ pub fn enumerated<F: Fn(&Sigma, &Value) -> bool>(num_vars: usize, f: &F) -> (imp
     };
 
     let o = EnumeratedOracle {
-        sigmas: sigmas(0, num_vars),
+        sigmas: sigmas(0, num_vars, maxval),
         f,
     };
 
     (p, o)
 }
 
-fn sigmas(i: usize, num_vars: usize) -> Vec<Sigma> {
+fn sigmas(i: usize, num_vars: usize, maxval: usize) -> Vec<Sigma> {
     if i == num_vars {
         return vec![Sigma::new()];
     }
 
     let mut outs = Vec::new();
-    for rest in sigmas(i+1, num_vars) {
-        for x in 0..num_vars {
+    for rest in sigmas(i+1, num_vars, maxval) {
+        for x in 0..=maxval {
             let mut sigma = Sigma::new();
             sigma.push(Value::Int(x as _));
             sigma.extend(rest.clone());
@@ -70,7 +70,7 @@ fn vmax(v1: Value, v2: Value) -> Value {
 pub fn max_n(n: usize) -> (impl Problem, impl Oracle) {
     assert!(n > 0);
 
-    enumerated(n, &|sigma: &Sigma, v: &Value| -> bool {
+    enumerated(n, 5, &|sigma: &Sigma, v: &Value| -> bool {
         *v == sigma.iter().cloned().fold(Value::Int(0), vmax)
     })
 }
