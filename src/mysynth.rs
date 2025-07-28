@@ -125,6 +125,8 @@ impl Synth for MySynth {
 }
 
 fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) {
+    if !ctxt.problem.check_node(&node) { return; }
+
     let vals = vals(&node, ctxt);
     if let Some(&i) = ctxt.vals_lookup.get(&vals) {
         let newsize = minsize(&node, ctxt);

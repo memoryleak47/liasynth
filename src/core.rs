@@ -67,6 +67,7 @@ pub type Sigma = Vec<Value>;
 pub trait Problem {
     fn num_vars(&self) -> usize;
     fn constants(&self) -> &[Int];
+    fn check_node(&self, n: &Node) -> bool { true }
     fn sat(&self, val: &Value, sigma: &Sigma) -> bool;
 }
 
