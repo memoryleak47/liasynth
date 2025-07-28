@@ -13,16 +13,15 @@ pub use examples::*;
 mod parser;
 pub use parser::*;
 
+mod sygus;
+pub use sygus::*;
+
 mod fmt;
 
 pub type Map<K, V> = indexmap::IndexMap<K, V>;
 pub use std::collections::BinaryHeap;
 
 fn main() {
-    let s = std::fs::read_to_string("qm_neg_eq_2.sl").unwrap();
-    let parsed = parse_sygus(&s);
-    dbg!(&parsed);
-
-    let (problem, oracle) = qm_neg_eq_2();
+    let (problem, oracle) = sygus_problem("qm_neg_eq_2.sl");
     println!("Answer: {:?}", cegis(problem, MySynth, oracle));
 }
