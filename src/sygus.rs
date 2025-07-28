@@ -16,9 +16,31 @@ pub fn sygus_problem(f: &str) -> (impl Problem, impl Oracle) {
     let s = std::fs::read_to_string(f).unwrap();
     let (parsed, _) = parse_sygus(&s).unwrap();
 
-    let pao: SygusProblemAndOracle = todo!();
+    let pao = build_sygus(parsed);
 
     (pao.clone(), pao)
+}
+
+fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
+    let mut vars: Vec<(String, Type)> =
+        exprs.iter().filter_map(|x|
+            if let SyGuSExpr::SynthFun(_, vars, ..) = x {
+                Some(vars.clone())
+            } else { None }
+        ).next().unwrap();
+    let vars: Vec<String> = vars.into_iter().map(|(x, _)| x).collect();
+
+    let constraints: Box<[_]> = exprs.iter().filter_map(|x|
+        if let SyGuSExpr::Constraint(e) = x {
+            Some(vars.clone())
+        } else { None }
+    ).collect();
+
+    SygusProblemAndOracle {
+        vars,
+        constraints: todo!(),
+        constants: todo!(),
+    }
 }
 
 impl Problem for SygusProblemAndOracle {
