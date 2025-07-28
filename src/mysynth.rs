@@ -17,8 +17,6 @@ struct Ctxt<'a, P> {
 
     i_solids: Vec<Id>,
     b_solids: Vec<Id>,
-
-    out: Option<Id>,
 }
 
 struct Class {
@@ -32,16 +30,16 @@ fn run<'a, P: Problem>(ctxt: &mut Ctxt<P>) -> Term {
     for n in ctxt.problem.prod_rules() {
         let n = n.clone();
         if n.children().is_empty() {
-            add_node(n, ctxt);
+            if let Some(sol) = add_node(n, ctxt) {
+                return extract(sol, ctxt);
+            }
         }
     }
 
     while let Some(WithOrd(x, _)) = ctxt.queue.pop() {
         // dbg!(extract(x, ctxt));
-        handle(x, ctxt);
-
-        if let Some(x) = ctxt.out {
-            return extract(x, ctxt);
+        if let Some(sol) = handle(x, ctxt) {
+            return extract(sol, ctxt);
         }
     }
 
@@ -49,11 +47,11 @@ fn run<'a, P: Problem>(ctxt: &mut Ctxt<P>) -> Term {
 }
 
 // makes "x" solid if it's not solid yet.
-fn handle<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
+fn handle<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) -> Option<Id> {
     let c = &mut ctxt.classes[x];
 
     // if the current size is the same size of the last "handle" call, nothing it to be done.
-    if c.handled_size == Some(c.size) { return; }
+    if c.handled_size == Some(c.size) { return None; }
 
     if c.handled_size.is_none() {
         match node_ty(&c.node) {
@@ -64,10 +62,10 @@ fn handle<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
 
     c.handled_size = Some(c.size);
 
-    grow(x, ctxt);
+    grow(x, ctxt)
 }
 
-fn grow<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
+fn grow<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) -> Option<Id> {
     let ty = node_ty(&ctxt.classes[x].node);
 
     for rule in ctxt.problem.prod_rules() {
@@ -88,10 +86,13 @@ fn grow<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
                     .map(|(_, x)| x)
                     .zip(a.iter()).for_each(|(ptr, v)| { *ptr = *v; });
 
-                add_node(rule.clone(), ctxt);
+                if let Some(sol) = add_node(rule.clone(), ctxt) {
+                    return Some(sol);
+                }
             }
         }
     }
+    None
 }
 
 impl Synth for MySynth {
@@ -104,12 +105,11 @@ impl Synth for MySynth {
             classes: Vec::new(),
             i_solids: Vec::new(),
             b_solids: Vec::new(),
-            out: None,
         })
     }
 }
 
-fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) {
+fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) -> Option<Id> {
     let vals = vals(&node, ctxt);
     if let Some(&i) = ctxt.vals_lookup.get(&vals) {
         let newsize = minsize(&node, ctxt);
@@ -122,10 +122,7 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) {
     } else {
         let i = ctxt.classes.len();
 
-        // write to `out`, if this [Value] was successful.
-        if ctxt.sigmas.iter().zip(vals.iter()).all(|(sigma, val)| ctxt.problem.sat(val, sigma)) {
-            ctxt.out = Some(i);
-        }
+        let is_perfect = ctxt.sigmas.iter().zip(vals.iter()).all(|(sigma, val)| ctxt.problem.sat(val, sigma));
 
         ctxt.classes.push(Class {
             size: minsize(&node, ctxt),
@@ -134,8 +131,16 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) {
             handled_size: None,
         });
         ctxt.vals_lookup.insert(vals, i);
+
+        // write to `out`, if this [Value] was successful.
+        if is_perfect {
+            return Some(i);
+        }
+
         enqueue(i, ctxt);
     }
+
+    None
 }
 
 fn enqueue<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
