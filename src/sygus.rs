@@ -2,6 +2,9 @@ use crate::*;
 
 #[derive(Clone)]
 struct SygusProblemAndOracle {
+    argtypes: Vec<Ty>,
+    rettype: Ty,
+
     progname: String,
 
     // maps between the SyGuS named variables, and the
@@ -25,12 +28,9 @@ pub fn sygus_problem(f: &str) -> (impl Problem, impl Oracle) {
 }
 
 fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
-    let (progname, subgrammars): (String, Vec<SubGrammar>) =
-        exprs.iter().filter_map(|x|
-            if let SyGuSExpr::SynthFun(progname, .., subgrammars) = x {
-                Some((progname.clone(), subgrammars.clone()))
-            } else { None }
-        ).next().unwrap();
+    let Some(SyGuSExpr::SynthFun(progname, argtypes, rettype, _, subgrammars)) =
+        exprs.iter().filter(|x| matches!(x, SyGuSExpr::SynthFun(..))).cloned().next() else { panic!() };
+
     let mut vars: Vec<String> = Vec::new();
 
     let constraints_vec: Box<[String]> = exprs.iter().filter_map(|x|
@@ -77,6 +77,8 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
 
     SygusProblemAndOracle {
         progname,
+        argtypes: argtypes.into_iter().map(|(_, x)| x).collect(),
+        rettype,
         vars,
         constraint,
         prod_rules: prod_rules.into(),
@@ -90,9 +92,20 @@ fn show_val(v: &Value) -> String {
     }
 }
 
+fn type_chk(val: &Value, ty: Ty) -> bool {
+    matches!((val, ty), (Value::Int(_), Ty::Int) | (Value::Bool(_), Ty::Bool))
+}
+
 impl Problem for SygusProblemAndOracle {
     fn prod_rules(&self) -> &[Node] { &self.prod_rules }
     fn sat(&self, val: &Value, sigma: &Sigma) -> bool {
+        if !type_chk(val, self.rettype) {
+            return false;
+        }
+        if !sigma.iter().zip(self.argtypes.iter()).all(|(val, ty)| type_chk(val, *ty)) {
+            return false;
+        }
+
         let mut query = String::new();
         for (var, val2) in self.vars.iter().zip(sigma.iter()) {
             let val2 = show_val(val2);
@@ -120,6 +133,8 @@ impl Problem for SygusProblemAndOracle {
 
 impl Oracle for SygusProblemAndOracle {
     fn verify(&self, term: &Term) -> Option<Sigma> {
+        // TODO type check inputs and outputs.
+
         let mut query = String::new();
         for var in self.vars.iter() {
             query.push_str(&format!("(declare-fun {var} () Int)"));
