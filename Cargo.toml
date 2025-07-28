@@ -5,3 +5,6 @@ edition = "2024"
 
 [dependencies]
 indexmap = "*"
+thiserror = "*"
+winnow = "*"
+lazy_static = "*"
