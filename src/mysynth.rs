@@ -1,11 +1,11 @@
 use crate::*;
 
+use itertools::Itertools;
+
 pub struct MySynth;
 
 type Score = usize;
 type Queue = BinaryHeap<WithOrd<Id, Score>>;
-
-enum Ty { Int, Bool }
 
 struct Ctxt<'a, P> {
     queue: Queue, // contains ids of pending (i.e. not solidifed Ids), or solid Ids which got an updated size.
@@ -29,12 +29,11 @@ struct Class {
 }
 
 fn run<'a, P: Problem>(ctxt: &mut Ctxt<P>) -> Term {
-    for v in 0..ctxt.problem.num_vars() {
-        add_node(Node::Var(v), ctxt);
-    }
-
-    for &c in ctxt.problem.constants() {
-        add_node(Node::Constant(c), ctxt);
+    for n in ctxt.problem.prod_rules() {
+        let n = n.clone();
+        if n.children().is_empty() {
+            add_node(n, ctxt);
+        }
     }
 
     while let Some(WithOrd(x, _)) = ctxt.queue.pop() {
@@ -70,42 +69,26 @@ fn handle<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
 
 fn grow<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
     let ty = node_ty(&ctxt.classes[x].node);
-    match ty {
-        Ty::Int => {
-            let i_solids = ctxt.i_solids.clone();
-            let b_solids = ctxt.b_solids.clone();
 
-            for &y in &i_solids {
-                add_node(Node::Add([x, y]), ctxt);
-                add_node(Node::Add([y, x]), ctxt);
-
-                add_node(Node::Sub([x, y]), ctxt);
-                add_node(Node::Sub([y, x]), ctxt);
-
-                add_node(Node::Mul([x, y]), ctxt);
-                add_node(Node::Mul([y, x]), ctxt);
-
-                add_node(Node::Div([x, y]), ctxt);
-                add_node(Node::Div([y, x]), ctxt);
-
-                add_node(Node::Lt([x, y]), ctxt);
-                add_node(Node::Lt([y, x]), ctxt);
-
-                for &cond in &b_solids {
-                    add_node(Node::Ite([cond, x, y]), ctxt);
-                    add_node(Node::Ite([cond, y, x]), ctxt);
-                }
+    for rule in ctxt.problem.prod_rules() {
+        let mut rule = rule.clone();
+        let (in_types, out_type) = rule.signature();
+        for i in 0..rule.children().len() {
+            if in_types[i] != ty { continue }
+            rule.children_mut()[i] = x;
+            let mut in_types: Vec<_> = in_types.iter().cloned().collect();
+            in_types.remove(i);
+            let it = in_types.iter().map(|ty| match ty {
+                Ty::Int => ctxt.i_solids.iter(),
+                Ty::Bool => ctxt.b_solids.iter(),
+            });
+            for a in it.multi_cartesian_product() {
+                rule.children_mut().iter_mut().enumerate()
+                    .filter(|(i2, _)| *i2 != i)
+                    .map(|(_, x)| x)
+                    .zip(a.iter()).for_each(|(ptr, v)| { *ptr = **v; });
             }
-        },
-        Ty::Bool => {
-            let i_solids = ctxt.i_solids.clone();
-
-            for &y in &i_solids {
-                for &z in &i_solids {
-                    add_node(Node::Ite([x, y, z]), ctxt);
-                }
-            }
-        },
+        }
     }
 }
 
@@ -125,8 +108,6 @@ impl Synth for MySynth {
 }
 
 fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) {
-    if !ctxt.problem.check_node(&node) { return; }
-
     let vals = vals(&node, ctxt);
     if let Some(&i) = ctxt.vals_lookup.get(&vals) {
         let newsize = minsize(&node, ctxt);

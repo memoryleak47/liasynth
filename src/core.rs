@@ -9,6 +9,9 @@ pub enum Value {
 pub type Var = usize;
 pub type Id = usize;
 
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+pub enum Ty { Int, Bool }
+
 #[derive(Clone, Debug)]
 pub enum Node {
     Var(Var),
@@ -25,11 +28,11 @@ pub enum Node {
 }
 
 impl Node {
-    pub fn children(&self) -> Box<[Id]> {
+    pub fn children(&self) -> &[Id] {
         match self {
-            Node::Var(_) | Node::Constant(_) => Box::new([]),
-            Node::Add(s) | Node::Sub(s) | Node::Mul(s) | Node::Div(s) | Node::Lt(s) => Box::new(*s),
-            Node::Ite(s) => Box::new(*s),
+            Node::Var(_) | Node::Constant(_) => &[],
+            Node::Add(s) | Node::Sub(s) | Node::Mul(s) | Node::Div(s) | Node::Lt(s) => s,
+            Node::Ite(s) => s,
         }
     }
 
@@ -38,6 +41,15 @@ impl Node {
             Node::Var(_) | Node::Constant(_) => &mut [],
             Node::Add(s) | Node::Sub(s) | Node::Mul(s) | Node::Div(s) | Node::Lt(s) => s,
             Node::Ite(s) => s,
+        }
+    }
+
+    pub fn signature(&self) -> &'static (&'static [Ty], Ty) {
+        match self {
+            Node::Var(_) | Node::Constant(_) => &(&[], Ty::Int),
+            Node::Add(s) | Node::Sub(s) | Node::Mul(s) | Node::Div(s) => &(&[Ty::Int; 2], Ty::Int),
+            Node::Lt(s) => &(&[Ty::Int; 2], Ty::Bool),
+            Node::Ite(s) => &(&[Ty::Bool, Ty::Int, Ty::Int], Ty::Int),
         }
     }
 }
@@ -65,9 +77,7 @@ impl Term {
 pub type Sigma = Vec<Value>;
 
 pub trait Problem {
-    fn num_vars(&self) -> usize;
-    fn constants(&self) -> &[Int];
-    fn check_node(&self, n: &Node) -> bool { true }
+    fn prod_rules(&self) -> &[Node];
     fn sat(&self, val: &Value, sigma: &Sigma) -> bool;
 }
 

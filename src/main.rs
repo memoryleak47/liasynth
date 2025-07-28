@@ -7,8 +7,9 @@ pub use mysynth::*;
 mod with_ord;
 pub use with_ord::*;
 
-mod examples;
-pub use examples::*;
+// TODO re-add.
+// mod examples;
+// pub use examples::*;
 
 mod parser;
 pub use parser::*;

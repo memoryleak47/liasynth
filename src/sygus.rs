@@ -75,9 +75,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
 }
 
 impl Problem for SygusProblemAndOracle {
-    fn num_vars(&self) -> usize { todo!() }
-    fn constants(&self) -> &[Int] { todo!() }
-    fn check_node(&self, n: &Node) -> bool { todo!() }
+    fn prod_rules(&self) -> &[Node] { todo!() }
     fn sat(&self, val: &Value, sigma: &Sigma) -> bool { todo!() }
 }
 

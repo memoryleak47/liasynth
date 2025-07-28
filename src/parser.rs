@@ -3,6 +3,7 @@ use thiserror::Error;
 use lazy_static::lazy_static;
 use std::collections::{HashMap, HashSet};
 use std::sync::Mutex;
+use crate::Ty;
 
 use winnow::{
     ascii::{alpha1, multispace0, multispace1, digit1},
@@ -15,24 +16,17 @@ use winnow::{
 
 type SubType = String;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub enum Type {
-    Int,
-    Bool,
-    Any,
-}
-
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum SymbolTableVal {
-    Terminal(String, Type),
+    Terminal(String, Ty),
     NonTerminal(NonTerminal),
 }
 
 lazy_static! {
     static ref SYMBOL_TABLE: Mutex<HashMap<String, SymbolTableVal>> = Mutex::new(HashMap::new());
     static ref FUNCS_TABLE: Mutex<HashMap<String, SymbolTableVal>> = Mutex::new(HashMap::new());
-    static ref GRAMMAR_TABLE: Mutex<HashMap<String, Type>> = Mutex::new(HashMap::new());
+    static ref GRAMMAR_TABLE: Mutex<HashMap<String, Ty>> = Mutex::new(HashMap::new());
 }
 
 fn add_to_table(name: String, val: SymbolTableVal) {
@@ -52,12 +46,12 @@ fn print_symbol_table() {
     }
 }
 
-fn add_to_grammar_table(name: String, val: Type) {
+fn add_to_grammar_table(name: String, val: Ty) {
     let mut table = GRAMMAR_TABLE.lock().unwrap();
     table.insert(name, val);
 }
 
-fn lookup_grammar_table(gram: &str) -> Option<Type> {
+fn lookup_grammar_table(gram: &str) -> Option<Ty> {
     GRAMMAR_TABLE.lock().unwrap().get(gram).cloned()
 }
 
@@ -118,9 +112,9 @@ pub fn prettyprint(e: &Expr) -> String {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NonTerminal {
     pub op: String,
-    pub args: Vec<(String, Type)>,
+    pub args: Vec<(String, Ty)>,
     pub ret_subtype: Option<SubType>,
-    pub ret_type: Type,
+    pub ret_type: Ty,
     pub commutative: bool,
 }
 
@@ -139,14 +133,14 @@ pub struct SubGrammar {
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub enum SyGuSExpr {
     SetTheory(Theory),
-    Args(String, Type),
-    Subtype(String, Type),
-    DeclaredVar(String, Type),
-    DefinedFun(String, Vec<(String, Type)>, Type, Expr),
+    Args(String, Ty),
+    Subtype(String, Ty),
+    DeclaredVar(String, Ty),
+    DefinedFun(String, Vec<(String, Ty)>, Ty, Expr),
     SynthFun(
         String,
-        Vec<(String, Type)>,
-        Type,
+        Vec<(String, Ty)>,
+        Ty,
         Vec<SyGuSExpr>,
         Vec<SubGrammar>,
     ),
@@ -219,7 +213,7 @@ fn parse_synth_fun(i: &mut &'_ str) -> PResult<SyGuSExpr> {
             ws(s_exp(repeat(0.., s_exp(parse_subgrammar))))
         },
     )
-    .map(|(name, args, sort, subtypes, subgrams): (String, Vec<(String, Type)>, Type, Vec<SyGuSExpr>, Vec<SubGrammar>)|{
+    .map(|(name, args, sort, subtypes, subgrams): (String, Vec<(String, Ty)>, Ty, Vec<SyGuSExpr>, Vec<SubGrammar>)|{
 
         add_to_table(
             name.clone(),
@@ -247,7 +241,7 @@ fn parse_define_fun(i: &mut &'_ str) -> PResult<SyGuSExpr> {
             ws(parse_expr)
         }
     )
-    .map(|(name, args, sort, expr): (String, Vec<(String, Type)>, Type, Expr)| {
+    .map(|(name, args, sort, expr): (String, Vec<(String, Ty)>, Ty, Expr)| {
 
         add_to_table(
             name.clone(),
@@ -320,15 +314,15 @@ pub fn parse_name(i: &mut &'_ str) -> PResult<String> {
         .parse_next(i)
 }
 
-fn parse_type(i: &mut &'_ str) -> PResult<Type> {
+fn parse_type(i: &mut &'_ str) -> PResult<Ty> {
     alt((
-        "Int".map(|_| Type::Int),
-        "Bool".map(|_| Type::Bool),
+        "Int".map(|_| Ty::Int),
+        "Bool".map(|_| Ty::Bool),
     ))
     .parse_next(i)
 }
 
-fn parse_args(i: &mut &'_ str) -> PResult<(String, Type)> {
+fn parse_args(i: &mut &'_ str) -> PResult<(String, Ty)> {
     separated_pair(
         parse_name,
         multispace1,
@@ -540,11 +534,11 @@ fn initialize_comparison_operators() {
             SymbolTableVal::NonTerminal(NonTerminal {
                 op: op.to_string(),
                 args: vec![
-                    ("x".to_string(), Type::Int),
-                    ("y".to_string(), Type::Int),
+                    ("x".to_string(), Ty::Int),
+                    ("y".to_string(), Ty::Int),
                 ],
                 ret_subtype: None,
-                ret_type: Type::Bool,
+                ret_type: Ty::Bool,
                 commutative: false,  // Note: these are not commutative!
             })
         );
@@ -555,11 +549,11 @@ fn initialize_comparison_operators() {
             SymbolTableVal::NonTerminal(NonTerminal {
                 op: op.to_string(),
                 args: vec![
-                    ("x".to_string(), Type::Any),
-                    ("y".to_string(), Type::Any),
+                    ("x".to_string(), Ty::Int),
+                    ("y".to_string(), Ty::Int),
                 ],
                 ret_subtype: None,
-                ret_type: Type::Bool,
+                ret_type: Ty::Bool,
                 commutative: false,  // Note: these are not commutative!
             })
         );
@@ -575,11 +569,11 @@ fn initialize_maths_operators() {
             SymbolTableVal::NonTerminal(NonTerminal {
                 op: op.to_string(),
                 args: vec![
-                    ("x".to_string(), Type::Int),
-                    ("y".to_string(), Type::Int),
+                    ("x".to_string(), Ty::Int),
+                    ("y".to_string(), Ty::Int),
                 ],
                 ret_subtype: None,
-                ret_type: Type::Int,
+                ret_type: Ty::Int,
                 commutative: false,  // Note: these are not commutative!
             })
         );
@@ -590,11 +584,11 @@ fn initialize_maths_operators() {
             SymbolTableVal::NonTerminal(NonTerminal {
                 op: op.to_string(),
                 args: vec![
-                    ("x".to_string(), Type::Int),
-                    ("y".to_string(), Type::Int),
+                    ("x".to_string(), Ty::Int),
+                    ("y".to_string(), Ty::Int),
                 ],
                 ret_subtype: None,
-                ret_type: Type::Bool,
+                ret_type: Ty::Bool,
                 commutative: false,  // Note: these are not commutative!
             })
         );
@@ -610,11 +604,11 @@ fn initialize_boolean_operators() {
             SymbolTableVal::NonTerminal(NonTerminal {
                 op: op.to_string(),
                 args: vec![
-                    ("x".to_string(), Type::Bool),
-                    ("y".to_string(), Type::Bool),
+                    ("x".to_string(), Ty::Bool),
+                    ("y".to_string(), Ty::Bool),
                 ],
                 ret_subtype: None,
-                ret_type: Type::Bool,
+                ret_type: Ty::Bool,
                 commutative: false,  // Note: these are not commutative!
             })
         );
@@ -625,12 +619,12 @@ fn initialize_boolean_operators() {
             SymbolTableVal::NonTerminal(NonTerminal {
                 op: op.to_string(),
                 args: vec![
-                    ("x".to_string(), Type::Any),
-                    ("y".to_string(), Type::Any),
-                    ("y".to_string(), Type::Any),
+                    ("x".to_string(), Ty::Int),
+                    ("y".to_string(), Ty::Int),
+                    ("y".to_string(), Ty::Int),
                 ],
                 ret_subtype: None,
-                ret_type: Type::Any,
+                ret_type: Ty::Int,
                 commutative: false,  // Note: these are not commutative!
             })
         );
@@ -641,17 +635,17 @@ fn initialize_boolean_operators() {
             SymbolTableVal::NonTerminal(NonTerminal {
                 op: op.to_string(),
                 args: vec![
-                    ("x".to_string(), Type::Bool),
+                    ("x".to_string(), Ty::Bool),
                 ],
                 ret_subtype: None,
-                ret_type: Type::Bool,
+                ret_type: Ty::Bool,
                 commutative: false,  // Note: these are not commutative!
             })
         );
     }
 }
 
-fn verify_expr(e: &Expr) -> Result<Type, Vec<VerifyError>> {
+fn verify_expr(e: &Expr) -> Result<Ty, Vec<VerifyError>> {
     match e {
         Expr::Terminal(terminal) => verify_terminal(terminal),
         Expr::Operation { op, expr } => verify_operation(op, expr),
@@ -659,15 +653,15 @@ fn verify_expr(e: &Expr) -> Result<Type, Vec<VerifyError>> {
     }
 }
 
-fn verify_terminal(terminal: &Terminal) -> Result<Type, Vec<VerifyError>> {
+fn verify_terminal(terminal: &Terminal) -> Result<Ty, Vec<VerifyError>> {
     match terminal {
-        Terminal::Num(_) => Ok(Type::Int),
-        Terminal::Bool(_) => Ok(Type::Bool),
+        Terminal::Num(_) => Ok(Ty::Int),
+        Terminal::Bool(_) => Ok(Ty::Bool),
         Terminal::Var(name) => lookup_symbol_type(name),
     }
 }
 
-fn verify_operation(op: &str, expr: &[Expr]) -> Result<Type, Vec<VerifyError>> {
+fn verify_operation(op: &str, expr: &[Expr]) -> Result<Ty, Vec<VerifyError>> {
     let result = {
         let table1 = FUNCS_TABLE.lock().unwrap();
         if let Some(val) = table1.get(op) {
@@ -685,7 +679,7 @@ fn verify_operation(op: &str, expr: &[Expr]) -> Result<Type, Vec<VerifyError>> {
     }
 }
 
-fn verify_let(bindings: &[(String, Expr)], body: &Expr) -> Result<Type, Vec<VerifyError>> {
+fn verify_let(bindings: &[(String, Expr)], body: &Expr) -> Result<Ty, Vec<VerifyError>> {
     let mut errors = Vec::new();
     let mut symbol_types = Vec::new();
 
@@ -762,8 +756,8 @@ fn verify_function_call(
     op: &str,
     expr: &[Expr],
     func: &NonTerminal
-) -> Result<Type, Vec<VerifyError>> {
-    let func_arg_types: Vec<Type> = func.args.iter()
+) -> Result<Ty, Vec<VerifyError>> {
+    let func_arg_types: Vec<Ty> = func.args.iter()
         .filter_map(|arg| match arg {
             (_, t) | (_, t) => Some(t.clone()),
             _ => None
@@ -779,7 +773,7 @@ fn verify_function_call(
     let mut errors = Vec::new();
     for (idx, (arg, expected_type)) in expr.iter().zip(func_arg_types.iter()).enumerate() {
         match verify_expr(arg) {
-            Ok(arg_type) if arg_type == *expected_type || *expected_type == Type::Any || arg_type == Type::Any => continue,
+            Ok(arg_type) if arg_type == *expected_type || *expected_type == Ty::Int || arg_type == Ty::Int => continue,
             Ok(arg_type) => {
                 errors.push(VerifyError::TypeMismatch(
                 format!("Argument {} type mismatch: expected {:?}, got {:?}",
@@ -797,7 +791,7 @@ fn verify_function_call(
     }
 }
 
-fn lookup_symbol_type(name: &str) -> Result<Type, Vec<VerifyError>> {
+fn lookup_symbol_type(name: &str) -> Result<Ty, Vec<VerifyError>> {
     match lookup_in_symbol_table(name) {
         Some(SymbolTableVal::Terminal(_, var_type)) => Ok(var_type),
         Some(SymbolTableVal::NonTerminal(nonterminal)) => Ok(nonterminal.ret_type),
