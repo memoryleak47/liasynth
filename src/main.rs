@@ -23,6 +23,6 @@ pub type Map<K, V> = indexmap::IndexMap<K, V>;
 pub use std::collections::BinaryHeap;
 
 fn main() {
-    let (problem, oracle) = sygus_problem("qm_neg_eq_2.sl");
+    let (problem, oracle) = sygus_problem("stupid.sl");
     println!("Answer: {:?}", cegis(problem, MySynth, oracle));
 }

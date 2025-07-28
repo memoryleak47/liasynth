@@ -79,14 +79,16 @@ fn grow<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
             let mut in_types: Vec<_> = in_types.iter().cloned().collect();
             in_types.remove(i);
             let it = in_types.iter().map(|ty| match ty {
-                Ty::Int => ctxt.i_solids.iter(),
-                Ty::Bool => ctxt.b_solids.iter(),
+                Ty::Int => ctxt.i_solids.clone().into_iter(),
+                Ty::Bool => ctxt.b_solids.clone().into_iter(),
             });
             for a in it.multi_cartesian_product() {
                 rule.children_mut().iter_mut().enumerate()
                     .filter(|(i2, _)| *i2 != i)
                     .map(|(_, x)| x)
-                    .zip(a.iter()).for_each(|(ptr, v)| { *ptr = **v; });
+                    .zip(a.iter()).for_each(|(ptr, v)| { *ptr = *v; });
+
+                add_node(rule.clone(), ctxt);
             }
         }
     }

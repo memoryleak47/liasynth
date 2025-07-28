@@ -108,7 +108,6 @@ impl Problem for SygusProblemAndOracle {
         query.push_str(&format!(") Int {val})\n"));
         let constr = &self.constraint;
         query.push_str(&format!("(assert {constr})\n"));
-        query.push_str("(check-sat)\n");
 
         let config = z3::Config::new();
         let ctxt = z3::Context::new(&config);
@@ -123,7 +122,7 @@ impl Oracle for SygusProblemAndOracle {
     fn verify(&self, term: &Term) -> Option<Sigma> {
         let mut query = String::new();
         for var in self.vars.iter() {
-            query.push_str(&format!("(declare-var {var} Int)"));
+            query.push_str(&format!("(declare-fun {var} () Int)"));
         }
         let progname = &self.progname;
 
@@ -145,11 +144,11 @@ impl Oracle for SygusProblemAndOracle {
             let ce = solver.get_model().unwrap();
             let mut sigma = Sigma::new();
             for var in &self.vars {
-                let z3var = z3::ast::Int::from_str(&ctxt, var).unwrap();
+                let z3var = z3::ast::Int::new_const(&ctxt, var.to_string());
                 let z3val = ce.eval(&z3var, true); // TODO model completion?
                 sigma.push(Value::Int(z3val.unwrap().as_i64().unwrap()));
             }
-            return Some(sigma);
+            Some(sigma)
         } else { None }
     }
 }
