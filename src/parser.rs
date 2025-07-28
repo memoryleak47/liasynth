@@ -97,7 +97,7 @@ pub enum Expr {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NonTerm {
     pub op: String,
-    pub args: Vec<SyGuSExpr>,
+    pub args: Vec<(String, Type)>,
     pub ret_subtype: Option<SubType>,
     pub ret_type: Type,
     pub commutative: bool,
@@ -121,10 +121,10 @@ pub enum SyGuSExpr {
     Args(String, Type),
     Subtype(String, Type),
     DeclaredVar(String, Type),
-    DefinedFun(String, Vec<SyGuSExpr>, Type, Expr),
+    DefinedFun(String, Vec<(String, Type)>, Type, Expr),
     SynthFun(
         String,
-        Vec<SyGuSExpr>,
+        Vec<(String, Type)>,
         Type,
         Vec<SyGuSExpr>,
         Vec<SubGrammar>,
@@ -187,7 +187,7 @@ fn parse_synth_fun(i: &mut &'_ str) -> PResult<SyGuSExpr> {
             ws(s_exp(repeat(0.., s_exp(parse_args))))
                 .map(|args: Vec<_>| {
                     for arg in args.clone() {
-                    if let SyGuSExpr::Args(n, t) = arg {
+                    if let (n, t) = arg {
                         add_to_grammar_table(n.clone(), t.clone());
                     }};
 
@@ -198,7 +198,7 @@ fn parse_synth_fun(i: &mut &'_ str) -> PResult<SyGuSExpr> {
             ws(s_exp(repeat(0.., s_exp(parse_subgrammar))))
         },
     )
-    .map(|(name, args, sort, subtypes, subgrams): (String, Vec<SyGuSExpr>, Type, Vec<SyGuSExpr>, Vec<SubGrammar>)|{
+    .map(|(name, args, sort, subtypes, subgrams): (String, Vec<(String, Type)>, Type, Vec<SyGuSExpr>, Vec<SubGrammar>)|{
 
         add_to_table(
             name.clone(),
@@ -226,7 +226,7 @@ fn parse_define_fun(i: &mut &'_ str) -> PResult<SyGuSExpr> {
             ws(parse_expr)
         }
     )
-    .map(|(name, args, sort, expr): (String, Vec<SyGuSExpr>, Type, Expr)| {
+    .map(|(name, args, sort, expr): (String, Vec<(String, Type)>, Type, Expr)| {
 
         add_to_table(
             name.clone(),
@@ -307,13 +307,12 @@ fn parse_type(i: &mut &'_ str) -> PResult<Type> {
     .parse_next(i)
 }
 
-fn parse_args(i: &mut &'_ str) -> PResult<SyGuSExpr> {
+fn parse_args(i: &mut &'_ str) -> PResult<(String, Type)> {
     separated_pair(
         parse_name,
         multispace1,
         parse_type
     )
-    .map(|(name, t)| SyGuSExpr::Args(name, t))
     .parse_next(i)
 }
 
@@ -378,7 +377,7 @@ fn parse_subgrammar(i: &mut &'_ str) -> PResult<SubGrammar> {
                                 Some(t) => t,
                                 None => panic!("No subtype found in subtype table"),
                             };
-                            SyGuSExpr::Subtype(arg.to_string(), exp_type)
+                            (arg.to_string(), exp_type)
                         })
                         .collect();
 
@@ -414,7 +413,7 @@ fn parse_subgrammar(i: &mut &'_ str) -> PResult<SubGrammar> {
             &&
         nonterms.iter().all(|NonTerm{op: _, args, ret_subtype: _, ret_type: _, commutative: _}| {
             args.iter().all(|e| {
-                if let SyGuSExpr::Subtype(n, _) = e {
+                if let (n, _) = e {
                     lookup_grammar_table(n.as_ref()).is_some()
                 } else  { true  }
             })
@@ -520,8 +519,8 @@ fn initialize_comparison_operators() {
             SymbolTableVal::NonTerm(NonTerm {
                 op: op.to_string(),
                 args: vec![
-                    SyGuSExpr::Args("x".to_string(), Type::Int),
-                    SyGuSExpr::Args("y".to_string(), Type::Int),
+                    ("x".to_string(), Type::Int),
+                    ("y".to_string(), Type::Int),
                 ],
                 ret_subtype: None,
                 ret_type: Type::Bool,
@@ -535,8 +534,8 @@ fn initialize_comparison_operators() {
             SymbolTableVal::NonTerm(NonTerm {
                 op: op.to_string(),
                 args: vec![
-                    SyGuSExpr::Args("x".to_string(), Type::Any),
-                    SyGuSExpr::Args("y".to_string(), Type::Any),
+                    ("x".to_string(), Type::Any),
+                    ("y".to_string(), Type::Any),
                 ],
                 ret_subtype: None,
                 ret_type: Type::Bool,
@@ -555,8 +554,8 @@ fn initialize_maths_operators() {
             SymbolTableVal::NonTerm(NonTerm {
                 op: op.to_string(),
                 args: vec![
-                    SyGuSExpr::Args("x".to_string(), Type::Int),
-                    SyGuSExpr::Args("y".to_string(), Type::Int),
+                    ("x".to_string(), Type::Int),
+                    ("y".to_string(), Type::Int),
                 ],
                 ret_subtype: None,
                 ret_type: Type::Int,
@@ -570,8 +569,8 @@ fn initialize_maths_operators() {
             SymbolTableVal::NonTerm(NonTerm {
                 op: op.to_string(),
                 args: vec![
-                    SyGuSExpr::Args("x".to_string(), Type::Int),
-                    SyGuSExpr::Args("y".to_string(), Type::Int),
+                    ("x".to_string(), Type::Int),
+                    ("y".to_string(), Type::Int),
                 ],
                 ret_subtype: None,
                 ret_type: Type::Bool,
@@ -590,8 +589,8 @@ fn initialize_boolean_operators() {
             SymbolTableVal::NonTerm(NonTerm {
                 op: op.to_string(),
                 args: vec![
-                    SyGuSExpr::Args("x".to_string(), Type::Bool),
-                    SyGuSExpr::Args("y".to_string(), Type::Bool),
+                    ("x".to_string(), Type::Bool),
+                    ("y".to_string(), Type::Bool),
                 ],
                 ret_subtype: None,
                 ret_type: Type::Bool,
@@ -605,9 +604,9 @@ fn initialize_boolean_operators() {
             SymbolTableVal::NonTerm(NonTerm {
                 op: op.to_string(),
                 args: vec![
-                    SyGuSExpr::Args("x".to_string(), Type::Any),
-                    SyGuSExpr::Args("y".to_string(), Type::Any),
-                    SyGuSExpr::Args("y".to_string(), Type::Any),
+                    ("x".to_string(), Type::Any),
+                    ("y".to_string(), Type::Any),
+                    ("y".to_string(), Type::Any),
                 ],
                 ret_subtype: None,
                 ret_type: Type::Any,
@@ -621,7 +620,7 @@ fn initialize_boolean_operators() {
             SymbolTableVal::NonTerm(NonTerm {
                 op: op.to_string(),
                 args: vec![
-                    SyGuSExpr::Args("x".to_string(), Type::Bool),
+                    ("x".to_string(), Type::Bool),
                 ],
                 ret_subtype: None,
                 ret_type: Type::Bool,
@@ -745,7 +744,7 @@ fn verify_function_call(
 ) -> Result<Type, Vec<VerifyError>> {
     let func_arg_types: Vec<Type> = func.args.iter()
         .filter_map(|arg| match arg {
-            SyGuSExpr::Args(_, t) | SyGuSExpr::Subtype(_, t) => Some(t.clone()),
+            (_, t) | (_, t) => Some(t.clone()),
             _ => None
         })
         .collect();
