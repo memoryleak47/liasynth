@@ -23,13 +23,13 @@ pub fn sygus_problem(f: &str) -> (impl Problem, impl Oracle) {
 }
 
 fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
-    let (vars, subgrammars): (Vec<(String, Type)>, Vec<SubGrammar>) =
+    let subgrammars: Vec<SubGrammar> =
         exprs.iter().filter_map(|x|
-            if let SyGuSExpr::SynthFun(_, vars, _, _, subgrammars) = x {
-                Some((vars.clone(), subgrammars.clone()))
+            if let SyGuSExpr::SynthFun(.., subgrammars) = x {
+                Some(subgrammars.clone())
             } else { None }
         ).next().unwrap();
-    let vars: Vec<String> = vars.into_iter().map(|(x, _)| x).collect();
+    let mut vars: Vec<String> = Vec::new();
 
     let constraints: Box<[String]> = exprs.iter().filter_map(|x|
         if let SyGuSExpr::Constraint(e) = x {
@@ -42,6 +42,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
         for t in g.terminals {
             match t {
                 Terminal::Num(i) => prod_rules.push(Node::Constant(i)),
+                Terminal::Var(v) => vars.push(v.to_string()),
                 _ => {},
             }
         }
