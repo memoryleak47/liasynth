@@ -76,7 +76,7 @@ pub enum Theory {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Terminal {
-    Num(i32),
+    Num(i64),
     Bool(bool),
     Var(String),
 }
@@ -91,6 +91,27 @@ pub enum Expr {
     Let {
         bindings: Vec<(String, Expr)>,
         body: Box<Expr>
+    }
+}
+
+pub fn prettyprint(e: &Expr) -> String {
+    match e {
+        Expr::Terminal(Terminal::Num(n)) => n.to_string(),
+        Expr::Terminal(Terminal::Bool(b)) => b.to_string(),
+        Expr::Terminal(Terminal::Var(v)) => v.to_string(),
+        Expr::Operation { op, expr } => {
+            let mut s = String::from('(');
+            s.push_str(&op.to_string());
+            for (i, c) in expr.iter().enumerate() {
+                s.push_str(&prettyprint(c));
+                if i != expr.len()-1 {
+                    s.push_str(" ");
+                }
+            }
+            s.push(')');
+            s
+        },
+        Expr::Let { .. } => todo!(),
     }
 }
 
@@ -425,8 +446,8 @@ fn parse_subgrammar(i: &mut &'_ str) -> PResult<SubGrammar> {
 fn parse_terminal(i: &mut &'_ str) -> PResult<Terminal> {
     alt((
         alt(("true", "false")).try_map(|bool_str: &str| bool_str.parse::<bool>().map(|n| Terminal::Bool(n))),
-        digit1.try_map(|digit_str: &str| digit_str.parse::<i32>().map(|n| Terminal::Num(n))),
-        s_exp(preceded(ws('-'), ws(digit1))).try_map(|digit_str: &str| digit_str.parse::<i32>().map(|n| Terminal::Num(-n))),
+        digit1.try_map(|digit_str: &str| digit_str.parse::<i64>().map(|n| Terminal::Num(n))),
+        s_exp(preceded(ws('-'), ws(digit1))).try_map(|digit_str: &str| digit_str.parse::<i64>().map(|n| Terminal::Num(-n))),
         parse_name.map(|n| Terminal::Var(n)),
     ))
     .parse_next(i)
