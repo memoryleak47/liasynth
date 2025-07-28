@@ -94,8 +94,6 @@ impl Problem for SygusProblemAndOracle {
     fn prod_rules(&self) -> &[Node] { &self.prod_rules }
     fn sat(&self, val: &Value, sigma: &Sigma) -> bool {
         let mut query = String::new();
-        let constr = &self.constraint;
-        query.push_str(&format!("(assert {constr})\n"));
         for (var, val2) in self.vars.iter().zip(sigma.iter()) {
             let val2 = show_val(val2);
             query.push_str(&format!("(define-fun {var} () Int {val2})"));
@@ -108,6 +106,8 @@ impl Problem for SygusProblemAndOracle {
         }
         let val = show_val(val);
         query.push_str(&format!(") Int {val})\n"));
+        let constr = &self.constraint;
+        query.push_str(&format!("(assert {constr})\n"));
         query.push_str("(check-sat)\n");
 
         let config = z3::Config::new();
@@ -122,8 +122,6 @@ impl Problem for SygusProblemAndOracle {
 impl Oracle for SygusProblemAndOracle {
     fn verify(&self, term: &Term) -> Option<Sigma> {
         let mut query = String::new();
-        let constr = &self.constraint;
-        query.push_str(&format!("(assert (not {constr}))\n"));
         for var in self.vars.iter() {
             query.push_str(&format!("(declare-var {var} Int)"));
         }
@@ -135,7 +133,8 @@ impl Oracle for SygusProblemAndOracle {
         }
         let term = term_to_z3(term.elems.len()-1, term, &self.vars);
         query.push_str(&format!(") Int {term})\n"));
-        query.push_str("(check-sat)\n");
+        let constr = &self.constraint;
+        query.push_str(&format!("(assert (not {constr}))\n"));
 
         let config = z3::Config::new();
         let ctxt = z3::Context::new(&config);

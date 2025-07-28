@@ -96,6 +96,7 @@ pub fn prettyprint(e: &Expr) -> String {
         Expr::Operation { op, expr } => {
             let mut s = String::from('(');
             s.push_str(&op.to_string());
+            s.push_str(" ");
             for (i, c) in expr.iter().enumerate() {
                 s.push_str(&prettyprint(c));
                 if i != expr.len()-1 {
