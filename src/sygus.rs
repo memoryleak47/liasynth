@@ -42,7 +42,10 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
         for t in g.terminals {
             match t {
                 Terminal::Num(i) => prod_rules.push(Node::Constant(i)),
-                Terminal::Var(v) => vars.push(v.to_string()),
+                Terminal::Var(v) => {
+                    prod_rules.push(Node::Var(prod_rules.len()));
+                    vars.push(v.to_string());
+                },
                 _ => {},
             }
         }
@@ -75,7 +78,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
 }
 
 impl Problem for SygusProblemAndOracle {
-    fn prod_rules(&self) -> &[Node] { todo!() }
+    fn prod_rules(&self) -> &[Node] { &self.prod_rules }
     fn sat(&self, val: &Value, sigma: &Sigma) -> bool { todo!() }
 }
 
