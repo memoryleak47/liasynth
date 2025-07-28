@@ -25,8 +25,8 @@ pub enum Type {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum SymbolTableVal {
-    Term(String, Type),
-    NonTerm(NonTerm),
+    Terminal(String, Type),
+    NonTerminal(NonTerminal),
 }
 
 lazy_static! {
@@ -75,7 +75,7 @@ pub enum Theory {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub enum Term {
+pub enum Terminal {
     Num(i32),
     Bool(bool),
     Var(String),
@@ -83,7 +83,7 @@ pub enum Term {
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum Expr {
-    Term(Term),
+    Terminal(Terminal),
     Operation {
         op: String,
         expr: Vec<Expr>,
@@ -95,7 +95,7 @@ pub enum Expr {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct NonTerm {
+pub struct NonTerminal {
     pub op: String,
     pub args: Vec<(String, Type)>,
     pub ret_subtype: Option<SubType>,
@@ -105,14 +105,14 @@ pub struct NonTerm {
 
 #[derive(Debug)]
 enum GrammarElement {
-    Term(Term),
-    NonTerm(String, Vec<SubType>),
+    Terminal(Terminal),
+    NonTerminal(String, Vec<SubType>),
 }
 
 #[derive(Debug, PartialEq, Clone, Eq)]
 pub struct SubGrammar {
-    pub terms: Vec<Term>,
-    pub nonterms: Vec<NonTerm>,
+    pub terminals: Vec<Terminal>,
+    pub nonterminals: Vec<NonTerminal>,
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -202,7 +202,7 @@ fn parse_synth_fun(i: &mut &'_ str) -> PResult<SyGuSExpr> {
 
         add_to_table(
             name.clone(),
-            SymbolTableVal::NonTerm(NonTerm {
+            SymbolTableVal::NonTerminal(NonTerminal {
                 op: name.clone(),
                 args: args.clone(),
                 ret_subtype: None,
@@ -230,7 +230,7 @@ fn parse_define_fun(i: &mut &'_ str) -> PResult<SyGuSExpr> {
 
         add_to_table(
             name.clone(),
-            SymbolTableVal::NonTerm(NonTerm {
+            SymbolTableVal::NonTerminal(NonTerminal {
                 op: name.clone(),
                 args: args.clone(),
                 ret_subtype: None,
@@ -340,7 +340,7 @@ fn parse_vars(i: &mut &'_ str) -> PResult<SyGuSExpr> {
     .map(|(name, t)| {
         add_to_table(
             name.clone(),
-            SymbolTableVal::Term(name.clone(), t.clone())
+            SymbolTableVal::Terminal(name.clone(), t.clone())
         );
 
         SyGuSExpr::DeclaredVar(name, t)
@@ -352,8 +352,8 @@ fn parse_subgrammar(i: &mut &'_ str) -> PResult<SubGrammar> {
     seq! {
         parse_subtype,
         ws(s_exp(repeat(0.., ws(alt((
-            parse_term.map(GrammarElement::Term),
-            parse_nonterm.map(|(op, args)| GrammarElement::NonTerm(op, args))
+            parse_terminal.map(GrammarElement::Terminal),
+            parse_nonterminal.map(|(op, args)| GrammarElement::NonTerminal(op, args))
         )))))),
     }
     .map(|(subtype_expr, elements): (SyGuSExpr, Vec<GrammarElement>)| {
@@ -362,14 +362,14 @@ fn parse_subgrammar(i: &mut &'_ str) -> PResult<SubGrammar> {
             _ => panic!("Invalid subtype expression in subgrammar"),
         };
 
-        // Process elements into terms and nonterms
-        let mut terms = Vec::new();
-        let mut nonterms = Vec::new();
+        // Process elements into terminals and nonterminals
+        let mut terminals = Vec::new();
+        let mut nonterminals = Vec::new();
 
         for element in elements {
             match element {
-                GrammarElement::Term(term) => terms.push(term),
-                GrammarElement::NonTerm(op, args) => {
+                GrammarElement::Terminal(terminal) => terminals.push(terminal),
+                GrammarElement::NonTerminal(op, args) => {
                     let commutative = args.iter().eq(args.iter().rev());
                     let arg_pair = args.iter()
                         .map(|arg| {
@@ -381,7 +381,7 @@ fn parse_subgrammar(i: &mut &'_ str) -> PResult<SubGrammar> {
                         })
                         .collect();
 
-                    let nt = NonTerm {
+                    let nt = NonTerminal {
                         op: op.clone(),
                         args: arg_pair,
                         ret_subtype: Some(subtype.clone()),
@@ -396,22 +396,22 @@ fn parse_subgrammar(i: &mut &'_ str) -> PResult<SubGrammar> {
                         op
                     };
 
-                    add_to_table(_op, SymbolTableVal::NonTerm(nt.clone()));
-                    nonterms.push(nt);
+                    add_to_table(_op, SymbolTableVal::NonTerminal(nt.clone()));
+                    nonterminals.push(nt);
                 }
             }
         }
 
-        SubGrammar { terms, nonterms }
+        SubGrammar { terminals, nonterminals }
     })
-    .verify(|SubGrammar{ terms, nonterms}| {
-        terms.iter().all(|elm| {
-            if let Term::Var(n) = elm {
+    .verify(|SubGrammar{ terminals, nonterminals}| {
+        terminals.iter().all(|elm| {
+            if let Terminal::Var(n) = elm {
                 lookup_grammar_table(n.as_ref()).is_some()
             } else  { true  }
         })
             &&
-        nonterms.iter().all(|NonTerm{op: _, args, ret_subtype: _, ret_type: _, commutative: _}| {
+        nonterminals.iter().all(|NonTerminal{op: _, args, ret_subtype: _, ret_type: _, commutative: _}| {
             args.iter().all(|e| {
                 if let (n, _) = e {
                     lookup_grammar_table(n.as_ref()).is_some()
@@ -422,17 +422,17 @@ fn parse_subgrammar(i: &mut &'_ str) -> PResult<SubGrammar> {
     .parse_next(i)
 }
 
-fn parse_term(i: &mut &'_ str) -> PResult<Term> {
+fn parse_terminal(i: &mut &'_ str) -> PResult<Terminal> {
     alt((
-        alt(("true", "false")).try_map(|bool_str: &str| bool_str.parse::<bool>().map(|n| Term::Bool(n))),
-        digit1.try_map(|digit_str: &str| digit_str.parse::<i32>().map(|n| Term::Num(n))),
-        s_exp(preceded(ws('-'), ws(digit1))).try_map(|digit_str: &str| digit_str.parse::<i32>().map(|n| Term::Num(-n))),
-        parse_name.map(|n| Term::Var(n)),
+        alt(("true", "false")).try_map(|bool_str: &str| bool_str.parse::<bool>().map(|n| Terminal::Bool(n))),
+        digit1.try_map(|digit_str: &str| digit_str.parse::<i32>().map(|n| Terminal::Num(n))),
+        s_exp(preceded(ws('-'), ws(digit1))).try_map(|digit_str: &str| digit_str.parse::<i32>().map(|n| Terminal::Num(-n))),
+        parse_name.map(|n| Terminal::Var(n)),
     ))
     .parse_next(i)
 }
 
-fn parse_nonterm(i: &mut &'_ str) -> PResult<(String, Vec<SubType>)> {
+fn parse_nonterminal(i: &mut &'_ str) -> PResult<(String, Vec<SubType>)> {
     s_exp(
         seq! {
             ws(parse_operator),
@@ -450,7 +450,7 @@ fn parse_operator(i: &mut &'_ str) -> PResult<String> {
 
 pub fn parse_expr(i: &mut &'_ str) -> PResult<Expr> {
     alt((
-        ws(parse_term.map(Expr::Term)),
+        ws(parse_terminal.map(Expr::Terminal)),
         ws(parse_let),
         ws(s_exp(
             seq! {
@@ -516,7 +516,7 @@ fn initialize_comparison_operators() {
     // Add < and > operators
     for op in ["<", ">", ">="]  {
         table.insert(op.to_string(),
-            SymbolTableVal::NonTerm(NonTerm {
+            SymbolTableVal::NonTerminal(NonTerminal {
                 op: op.to_string(),
                 args: vec![
                     ("x".to_string(), Type::Int),
@@ -531,7 +531,7 @@ fn initialize_comparison_operators() {
 
     for op in ["="]  {
         table.insert(op.to_string(),
-            SymbolTableVal::NonTerm(NonTerm {
+            SymbolTableVal::NonTerminal(NonTerminal {
                 op: op.to_string(),
                 args: vec![
                     ("x".to_string(), Type::Any),
@@ -551,7 +551,7 @@ fn initialize_maths_operators() {
     // Add < and > operators
     for op in ["-", "+", "div", "*"] {
         table.insert(op.to_string(),
-            SymbolTableVal::NonTerm(NonTerm {
+            SymbolTableVal::NonTerminal(NonTerminal {
                 op: op.to_string(),
                 args: vec![
                     ("x".to_string(), Type::Int),
@@ -566,7 +566,7 @@ fn initialize_maths_operators() {
 
     for op in ["<=", ">="] {
         table.insert(op.to_string(),
-            SymbolTableVal::NonTerm(NonTerm {
+            SymbolTableVal::NonTerminal(NonTerminal {
                 op: op.to_string(),
                 args: vec![
                     ("x".to_string(), Type::Int),
@@ -586,7 +586,7 @@ fn initialize_boolean_operators() {
     // Add < and > operators
     for op in ["and", "or", "=>"] {
         table.insert(op.to_string(),
-            SymbolTableVal::NonTerm(NonTerm {
+            SymbolTableVal::NonTerminal(NonTerminal {
                 op: op.to_string(),
                 args: vec![
                     ("x".to_string(), Type::Bool),
@@ -601,7 +601,7 @@ fn initialize_boolean_operators() {
 
     for op in ["ite"] {
         table.insert(op.to_string(),
-            SymbolTableVal::NonTerm(NonTerm {
+            SymbolTableVal::NonTerminal(NonTerminal {
                 op: op.to_string(),
                 args: vec![
                     ("x".to_string(), Type::Any),
@@ -617,7 +617,7 @@ fn initialize_boolean_operators() {
 
     for op in ["not"] {
         table.insert(op.to_string(),
-            SymbolTableVal::NonTerm(NonTerm {
+            SymbolTableVal::NonTerminal(NonTerminal {
                 op: op.to_string(),
                 args: vec![
                     ("x".to_string(), Type::Bool),
@@ -632,17 +632,17 @@ fn initialize_boolean_operators() {
 
 fn verify_expr(e: &Expr) -> Result<Type, Vec<VerifyError>> {
     match e {
-        Expr::Term(term) => verify_term(term),
+        Expr::Terminal(terminal) => verify_terminal(terminal),
         Expr::Operation { op, expr } => verify_operation(op, expr),
         Expr::Let { bindings, body } => verify_let(bindings, body),
     }
 }
 
-fn verify_term(term: &Term) -> Result<Type, Vec<VerifyError>> {
-    match term {
-        Term::Num(_) => Ok(Type::Int),
-        Term::Bool(_) => Ok(Type::Bool),
-        Term::Var(name) => lookup_symbol_type(name),
+fn verify_terminal(terminal: &Terminal) -> Result<Type, Vec<VerifyError>> {
+    match terminal {
+        Terminal::Num(_) => Ok(Type::Int),
+        Terminal::Bool(_) => Ok(Type::Bool),
+        Terminal::Var(name) => lookup_symbol_type(name),
     }
 }
 
@@ -658,8 +658,8 @@ fn verify_operation(op: &str, expr: &[Expr]) -> Result<Type, Vec<VerifyError>> {
     };
 
     match result {
-        Some(SymbolTableVal::NonTerm(func)) => verify_function_call(op, expr, &func),
-        Some(SymbolTableVal::Term(_, _)) => Err(vec![VerifyError::UnknownSymbol(op.to_string())]),
+        Some(SymbolTableVal::NonTerminal(func)) => verify_function_call(op, expr, &func),
+        Some(SymbolTableVal::Terminal(_, _)) => Err(vec![VerifyError::UnknownSymbol(op.to_string())]),
         None => Err(vec![VerifyError::UnknownSymbol(op.to_string())]),
     }
 }
@@ -710,7 +710,7 @@ fn verify_let(bindings: &[(String, Expr)], body: &Expr) -> Result<Type, Vec<Veri
         for (name, type_) in symbol_types.iter() {
             table.insert(
                 name.clone(),
-                SymbolTableVal::Term(String::new(), type_.clone()),
+                SymbolTableVal::Terminal(String::new(), type_.clone()),
             );
         }
 
@@ -740,7 +740,7 @@ fn verify_let(bindings: &[(String, Expr)], body: &Expr) -> Result<Type, Vec<Veri
 fn verify_function_call(
     op: &str,
     expr: &[Expr],
-    func: &NonTerm
+    func: &NonTerminal
 ) -> Result<Type, Vec<VerifyError>> {
     let func_arg_types: Vec<Type> = func.args.iter()
         .filter_map(|arg| match arg {
@@ -778,8 +778,8 @@ fn verify_function_call(
 
 fn lookup_symbol_type(name: &str) -> Result<Type, Vec<VerifyError>> {
     match lookup_in_symbol_table(name) {
-        Some(SymbolTableVal::Term(_, var_type)) => Ok(var_type),
-        Some(SymbolTableVal::NonTerm(nonterm)) => Ok(nonterm.ret_type),
+        Some(SymbolTableVal::Terminal(_, var_type)) => Ok(var_type),
+        Some(SymbolTableVal::NonTerminal(nonterminal)) => Ok(nonterminal.ret_type),
         None => Err(vec![VerifyError::UnknownSymbol(name.to_string())]),
     }
 }
