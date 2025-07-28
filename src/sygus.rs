@@ -1,19 +1,27 @@
 use crate::*;
 
+
 #[derive(Clone)]
 struct SygusProblemAndOracle {
     expr: Vec<SyGuSExpr>,
 }
 
+type SynthFun<'a> = (&'a str, &'a [SyGuSExpr], &'a Type, &'a [SyGuSExpr], &'a [SubGrammar]);
+
+impl SygusProblemAndOracle {
+    fn synthfun(&self) -> SynthFun<'_> {
+        for x in self.expr.iter() {
+            if let SyGuSExpr::SynthFun(a, b, c, d, e) = x {
+                return (&*a, &*b, &*c, &*d, &*e);
+            }
+        }
+        panic!()
+    }
+}
+
 pub fn sygus_problem(f: &str) -> (impl Problem, impl Oracle) {
     let s = std::fs::read_to_string(f).unwrap();
     let (parsed, _) = parse_sygus(&s).unwrap();
-
-    let mut num_vars = 0;
-    let vars: Vec<SyGuSExpr> = parsed.iter().filter_map(|x| match x {
-        SyGuSExpr::SynthFun(_, vars, ..) => Some(vars.clone()),
-        _ => None,
-    }).next().unwrap();
 
     let pao = SygusProblemAndOracle {
         expr: parsed,
@@ -23,8 +31,13 @@ pub fn sygus_problem(f: &str) -> (impl Problem, impl Oracle) {
 }
 
 impl Problem for SygusProblemAndOracle {
-    fn num_vars(&self) -> usize { todo!() }
+    fn num_vars(&self) -> usize {
+        let (_, vars, ..) = self.synthfun();
+        vars.len()
+    }
+
     fn constants(&self) -> &[Int] { todo!() }
+
     fn sat(&self, val: &Value, sigma: &Sigma) -> bool { todo!() }
 }
 
