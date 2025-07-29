@@ -86,7 +86,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
             if vars.contains(name) { continue }
 
             let ty = ty.to_string();
-            context.push_str(&format!("(declare-var {name} {ty})\n"));
+            context.push_str(&format!("(declare-fun {name} () {ty})\n"));
         }
     }
 
