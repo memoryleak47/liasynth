@@ -10,3 +10,6 @@ winnow = "*"
 lazy_static = "*"
 itertools = "*"
 z3 = "*"
+
+[profile.release]
+debug = true
