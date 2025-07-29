@@ -16,6 +16,8 @@ struct SygusProblemAndOracle {
 
     // The ids of these Nodes will be nulled away.
     prod_rules: Box<[Node]>,
+
+    defined_funs: String,
 }
 
 pub fn sygus_problem(f: &str) -> (impl Problem, impl Oracle) {
@@ -32,6 +34,12 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
         exprs.iter().filter(|x| matches!(x, SyGuSExpr::SynthFun(..))).cloned().next() else { panic!() };
 
     let mut vars: Vec<String> = Vec::new();
+    let mut defined_funs = String::new();
+    for expr in exprs.iter() {
+        if let SyGuSExpr::DefinedFun(fun) = expr {
+            defined_funs.push_str(&fun.stringify());
+        }
+    }
 
     let constraints_vec: Box<[String]> = exprs.iter().filter_map(|x|
         if let SyGuSExpr::Constraint(e) = x {
@@ -81,6 +89,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
         vars,
         constraint,
         prod_rules: prod_rules.into(),
+        defined_funs,
     }
 }
 
@@ -102,7 +111,7 @@ impl Problem for SygusProblemAndOracle {
         }
 
         let retty = val.ty().to_string();
-        let mut query = String::new();
+        let mut query = self.defined_funs.clone();
         for (var, val2) in self.vars.iter().zip(sigma.iter()) {
             let val2 = show_val(val2);
             query.push_str(&format!("(define-fun {var} () Int {val2})"));
@@ -134,7 +143,7 @@ impl Oracle for SygusProblemAndOracle {
             return Some(vec![Value::Int(0); self.vars.len()]);
         }
 
-        let mut query = String::new();
+        let mut query = self.defined_funs.clone();
         let retty = retty.to_string();
         for var in self.vars.iter() {
             query.push_str(&format!("(declare-fun {var} () Int)"));

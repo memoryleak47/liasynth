@@ -132,12 +132,35 @@ pub struct SubGrammar {
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
+pub struct DefinedFun {
+    name: String,
+    args: Vec<(String, Ty)>,
+    ret: Ty,
+    expr: Expr,
+}
+
+impl DefinedFun {
+    pub fn stringify(&self) -> String {
+        let DefinedFun { name, args, ret, expr } = self;
+        let mut s = format!("(define-fun {name} (");
+        for (varname, varty) in args {
+            let varty = varty.to_string();
+            s.push_str(&format!("({varname} {varty}) "));
+        }
+        let ret = ret.to_string();
+        let expr = prettyprint(&expr);
+        s.push_str(&format!(") {ret} {expr})"));
+        s
+    }
+}
+
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum SyGuSExpr {
     SetTheory(Theory),
     Args(String, Ty),
     Subtype(String, Ty),
     DeclaredVar(String, Ty),
-    DefinedFun(String, Vec<(String, Ty)>, Ty, Expr),
+    DefinedFun(DefinedFun),
     SynthFun(
         String,
         Vec<(String, Ty)>,
@@ -255,7 +278,7 @@ fn parse_define_fun(i: &mut &'_ str) -> PResult<SyGuSExpr> {
             })
         );
 
-        SyGuSExpr::DefinedFun(name, args, sort, expr)
+        SyGuSExpr::DefinedFun(DefinedFun { name, args, ret: sort, expr })
     })
     .parse_next(i)
 }
