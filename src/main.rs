@@ -23,6 +23,6 @@ pub type Map<K, V> = fxhash::FxHashMap<K, V>;
 pub use std::collections::BinaryHeap;
 
 fn main() {
-    let (problem, oracle) = sygus_problem("examples/stupid_bool.sl");
+    let (problem, oracle) = sygus_problem("examples/unbdd_inv_gen_array.sl");
     println!("Answer: {:?}", cegis(problem, MySynth, oracle));
 }

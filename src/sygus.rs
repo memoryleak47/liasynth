@@ -105,7 +105,7 @@ impl Problem for SygusProblemAndOracle {
         let mut query = String::new();
         for (var, val2) in self.vars.iter().zip(sigma.iter()) {
             let val2 = show_val(val2);
-            query.push_str(&format!("(define-fun {var} () {retty} {val2})"));
+            query.push_str(&format!("(define-fun {var} () Int {val2})"));
         }
         let progname = &self.progname;
 
@@ -137,7 +137,7 @@ impl Oracle for SygusProblemAndOracle {
         let mut query = String::new();
         let retty = retty.to_string();
         for var in self.vars.iter() {
-            query.push_str(&format!("(declare-fun {var} () {retty})"));
+            query.push_str(&format!("(declare-fun {var} () Int)"));
         }
         let progname = &self.progname;
 
