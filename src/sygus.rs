@@ -48,7 +48,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
             match t {
                 Terminal::Num(i) => prod_rules.push(Node::Constant(i)),
                 Terminal::Var(v) => {
-                    prod_rules.push(Node::Var(prod_rules.len()));
+                    prod_rules.push(Node::Var(vars.len()));
                     vars.push(v.to_string());
                 },
                 _ => {},
