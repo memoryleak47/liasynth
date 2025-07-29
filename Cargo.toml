@@ -10,6 +10,7 @@ winnow = "*"
 lazy_static = "*"
 itertools = "*"
 z3 = "*"
+fxhash = "*"
 
 [profile.release]
 debug = true

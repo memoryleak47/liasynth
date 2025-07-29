@@ -108,7 +108,7 @@ impl Synth for MySynth {
             classes: Vec::new(),
             i_solids: Vec::new(),
             b_solids: Vec::new(),
-            cx_value_cache: Map::new(),
+            cx_value_cache: Map::default(),
         })
     }
 }

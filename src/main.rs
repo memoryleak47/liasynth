@@ -19,8 +19,7 @@ pub use sygus::*;
 
 mod fmt;
 
-pub type Map<K, V> = indexmap::IndexMap<K, V>;
-pub type Set<V> = std::collections::HashSet<V>;
+pub type Map<K, V> = fxhash::FxHashMap<K, V>;
 pub use std::collections::BinaryHeap;
 
 fn main() {
