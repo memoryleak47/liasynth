@@ -4,13 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-indexmap = "*"
-thiserror = "*"
-winnow = "*"
-lazy_static = "*"
-itertools = "*"
-z3 = "*"
-fxhash = "*"
+thiserror = "2.0.12"
+winnow = "0.7.12"
+lazy_static = "1.5.0"
+itertools = "0.14.0"
+z3 = "0.13.3"
+fxhash = "0.2.1"
 
 [profile.release]
 debug = true
