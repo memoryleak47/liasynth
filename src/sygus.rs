@@ -17,7 +17,7 @@ struct SygusProblemAndOracle {
     // The ids of these Nodes will be nulled away.
     prod_rules: Box<[Node]>,
 
-    defined_funs: String,
+    context: String,
 }
 
 pub fn sygus_problem(f: &str) -> (impl Problem, impl Oracle) {
@@ -34,10 +34,14 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
         exprs.iter().filter(|x| matches!(x, SyGuSExpr::SynthFun(..))).cloned().next() else { panic!() };
 
     let mut vars: Vec<String> = Vec::new();
-    let mut defined_funs = String::new();
+    let mut context: String = String::new();
     for expr in exprs.iter() {
         if let SyGuSExpr::DefinedFun(fun) = expr {
-            defined_funs.push_str(&fun.stringify());
+            context.push_str(&fun.stringify());
+        }
+        if let SyGuSExpr::DeclaredVar(name, ty) = expr {
+            let ty = ty.to_string();
+            context.push_str(&format!("(declare-var {name} {ty})"));
         }
     }
 
@@ -89,7 +93,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
         vars,
         constraint,
         prod_rules: prod_rules.into(),
-        defined_funs,
+        context,
     }
 }
 
@@ -111,7 +115,7 @@ impl Problem for SygusProblemAndOracle {
         }
 
         let retty = val.ty().to_string();
-        let mut query = self.defined_funs.clone();
+        let mut query = self.context.clone();
         for (var, val2) in self.vars.iter().zip(sigma.iter()) {
             let val2 = show_val(val2);
             query.push_str(&format!("(define-fun {var} () Int {val2})"));
@@ -130,7 +134,9 @@ impl Problem for SygusProblemAndOracle {
         let config = z3::Config::new();
         let ctxt = z3::Context::new(&config);
         let mut solver = z3::Solver::new(&ctxt);
+        // println!("SAT-QUERY: {}", &query);
         solver.from_string(query);
+        // println!("SAT-SMT: {}", solver.to_smt2());
 
         solver.check() == z3::SatResult::Sat
     }
@@ -143,7 +149,7 @@ impl Oracle for SygusProblemAndOracle {
             return Some(vec![Value::Int(0); self.vars.len()]);
         }
 
-        let mut query = self.defined_funs.clone();
+        let mut query = self.context.clone();
         let retty = retty.to_string();
         for var in self.vars.iter() {
             query.push_str(&format!("(declare-fun {var} () Int)"));
@@ -162,7 +168,9 @@ impl Oracle for SygusProblemAndOracle {
         let config = z3::Config::new();
         let ctxt = z3::Context::new(&config);
         let mut solver = z3::Solver::new(&ctxt);
+        // println!("VERIFY-QUERY: {}", &query);
         solver.from_string(query);
+        // println!("VERIFY-SMT: {}", solver.to_smt2());
 
         if solver.check() == z3::SatResult::Sat {
             let ce = solver.get_model().unwrap();
