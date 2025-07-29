@@ -40,7 +40,6 @@ fn run<'a, P: Problem>(ctxt: &mut Ctxt<P>) -> Term {
     }
 
     while let Some(WithOrd(x, _)) = ctxt.queue.pop() {
-        // dbg!(extract(x, ctxt));
         if let Some(sol) = handle(x, ctxt) {
             return extract(sol, ctxt);
         }
@@ -137,7 +136,9 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) -> Option<Id> {
         });
         ctxt.vals_lookup.insert(vals, i);
 
-        // write to `out`, if this [Value] was successful.
+        // dbg!(extract(i, ctxt));
+
+        // if this [Value] was successful, return it.
         if satcount == ctxt.sigmas.len() {
             return Some(i);
         }

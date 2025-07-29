@@ -92,17 +92,13 @@ fn show_val(v: &Value) -> String {
     }
 }
 
-fn type_chk(val: &Value, ty: Ty) -> bool {
-    matches!((val, ty), (Value::Int(_), Ty::Int) | (Value::Bool(_), Ty::Bool))
-}
-
 impl Problem for SygusProblemAndOracle {
     fn prod_rules(&self) -> &[Node] { &self.prod_rules }
     fn sat(&self, val: &Value, sigma: &Sigma) -> bool {
-        if !type_chk(val, self.rettype) {
+        if val.ty() != self.rettype {
             return false;
         }
-        if !sigma.iter().zip(self.argtypes.iter()).all(|(val, ty)| type_chk(val, *ty)) {
+        if !sigma.iter().zip(self.argtypes.iter()).all(|(val, ty)| val.ty() == *ty) {
             return false;
         }
 

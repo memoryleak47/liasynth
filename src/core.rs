@@ -6,6 +6,15 @@ pub enum Value {
     Bool(bool),
 }
 
+impl Value {
+    pub fn ty(&self) -> Ty {
+        match self {
+            Value::Int(_) => Ty::Int,
+            Value::Bool(_) => Ty::Bool,
+        }
+    }
+}
+
 pub type Var = usize;
 pub type Id = usize;
 
@@ -64,9 +73,9 @@ impl Node {
         }
     }
 
-    // TODO remove.
     pub fn ty(&self) -> Ty {
-        self.signature().1.clone()
+        let (args, ret) = self.signature();
+        *ret
     }
 }
 
