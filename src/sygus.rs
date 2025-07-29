@@ -34,16 +34,6 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
         exprs.iter().filter(|x| matches!(x, SyGuSExpr::SynthFun(..))).cloned().next() else { panic!() };
 
     let mut vars: Vec<String> = Vec::new();
-    let mut context: String = String::new();
-    for expr in exprs.iter() {
-        if let SyGuSExpr::DefinedFun(fun) = expr {
-            context.push_str(&fun.stringify());
-        }
-        if let SyGuSExpr::DeclaredVar(name, ty) = expr {
-            let ty = ty.to_string();
-            context.push_str(&format!("(declare-var {name} {ty})"));
-        }
-    }
 
     let constraints_vec: Box<[String]> = exprs.iter().filter_map(|x|
         if let SyGuSExpr::Constraint(e) = x {
@@ -83,6 +73,19 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
                 "abs" => prod_rules.push(Node::Abs([0])),
                 _ => {},
             }
+        }
+    }
+
+    let mut context: String = String::new();
+    for expr in exprs.iter() {
+        if let SyGuSExpr::DefinedFun(fun) = expr {
+            context.push_str(&fun.stringify());
+        }
+        if let SyGuSExpr::DeclaredVar(name, ty) = expr {
+            if vars.contains(name) { continue }
+
+            let ty = ty.to_string();
+            context.push_str(&format!("(declare-var {name} {ty})"));
         }
     }
 
