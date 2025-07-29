@@ -61,15 +61,14 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
                 "-" => prod_rules.push(Node::Sub([0, 0])),
                 "*" => prod_rules.push(Node::Mul([0, 0])),
                 "div" => prod_rules.push(Node::Div([0, 0])),
-
-                // TODO
-                // "mod" => prod_rules.push(Node::Mod([0, 0])),
-                // "abs" => prod_rules.push(Node::Abs([0])),
-                // "=" => prod_rules.push(Node::Ite([0, 0, 0])),
-                // >, >=, <=
-
+                "mod" => prod_rules.push(Node::Mod([0, 0])),
                 "ite" => prod_rules.push(Node::Ite([0, 0, 0])),
                 "<" => prod_rules.push(Node::Lt([0, 0])),
+                "<=" => prod_rules.push(Node::Lte([0, 0])),
+                ">" => prod_rules.push(Node::Gt([0, 0])),
+                ">=" => prod_rules.push(Node::Gte([0, 0])),
+                "=" => prod_rules.push(Node::Equals([0, 0])),
+                "abs" => prod_rules.push(Node::Abs([0])),
                 _ => {},
             }
         }
