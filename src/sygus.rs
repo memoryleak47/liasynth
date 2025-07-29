@@ -129,10 +129,13 @@ impl Problem for SygusProblemAndOracle {
 
 impl Oracle for SygusProblemAndOracle {
     fn verify(&self, term: &Term) -> Option<Sigma> {
-        // TODO type check inputs and outputs.
+        let retty = term.elems.last().unwrap().ty();
+        if retty != self.rettype {
+            return Some(vec![Value::Int(0); self.vars.len()]);
+        }
 
         let mut query = String::new();
-        let retty = term.elems.last().unwrap().ty().to_string();
+        let retty = retty.to_string();
         for var in self.vars.iter() {
             query.push_str(&format!("(declare-fun {var} () {retty})"));
         }
