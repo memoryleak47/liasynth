@@ -121,7 +121,7 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) -> Option<Id> {
         if newsize < c.size {
             c.size = newsize;
             c.node = node.clone();
-            enqueue(i, ctxt, ctxt.classes[i].satcount);
+            enqueue(i, ctxt);
         }
     } else {
         let i = ctxt.classes.len();
@@ -142,18 +142,18 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) -> Option<Id> {
             return Some(i);
         }
 
-        enqueue(i, ctxt, satcount);
+        enqueue(i, ctxt);
     }
 
     None
 }
 
-fn enqueue<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>, satcount: usize) {
-    let h = heuristic(x, ctxt, satcount);
+fn enqueue<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
+    let h = heuristic(x, ctxt);
     ctxt.queue.push(WithOrd(x, h));
 }
 
-fn heuristic<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>, satcount: usize) -> Score {
+fn heuristic<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Score {
     let c = &ctxt.classes[x];
 
     if let Ty::Bool = node_ty(&c.node) {
@@ -161,7 +161,7 @@ fn heuristic<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>, satcount: usize) -> Scor
     }
 
     let mut a = 100000;
-    for _ in satcount..ctxt.sigmas.len() {
+    for _ in c.satcount..ctxt.sigmas.len() {
         a /= 2;
     }
 
@@ -178,15 +178,6 @@ fn vals<'a, P: Problem>(node: &Node, ctxt: &Ctxt<'a, P>) -> Box<[Value]> {
 fn minsize<'a, P: Problem>(node: &Node, ctxt: &Ctxt<'a, P>) -> usize {
     node.children().iter().map(|x| ctxt.classes[*x].size).sum::<usize>() + 1
 }
-
-// We could store somewhere the known failing values for each counterexample
-// and for each val in vals that is in that then we can say that it fails on said
-// counterexample
-// fn satcount<'a, P: Problem>(vals: &[Value], ctxt: &Ctxt<'a, P>) -> usize {
-//     let it = vals.iter().zip(ctxt.sigmas);
-//     it.filter(|(val, sigma)| ctxt.problem.sat(val, sigma))
-//       .count()
-// }
 
 fn satcount<'a, P: Problem>(vals: &[Value], ctxt: &mut Ctxt<'a, P>) -> usize {
     let it = vals.iter().zip(ctxt.sigmas);
