@@ -1,6 +1,9 @@
 #!/bin/bash
 
-for f in $(ls examples/LIA)
+cargo b --release
+
+for f in $(find "examples/LIA" -type f)
 do
-    timeout 30s cargo r --release "examples/LIA/$f"
+    echo "$f:"
+    timeout 10s target/release/liasynth "$f"
 done
