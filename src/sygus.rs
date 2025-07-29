@@ -101,10 +101,11 @@ impl Problem for SygusProblemAndOracle {
             return false;
         }
 
+        let retty = val.ty().to_string();
         let mut query = String::new();
         for (var, val2) in self.vars.iter().zip(sigma.iter()) {
             let val2 = show_val(val2);
-            query.push_str(&format!("(define-fun {var} () Int {val2})"));
+            query.push_str(&format!("(define-fun {var} () {retty} {val2})"));
         }
         let progname = &self.progname;
 
@@ -113,7 +114,7 @@ impl Problem for SygusProblemAndOracle {
             query.push_str(&format!("({var} Int) "));
         }
         let val = show_val(val);
-        query.push_str(&format!(") Int {val})\n"));
+        query.push_str(&format!(") {retty} {val})\n"));
         let constr = &self.constraint;
         query.push_str(&format!("(assert {constr})\n"));
 
@@ -131,8 +132,9 @@ impl Oracle for SygusProblemAndOracle {
         // TODO type check inputs and outputs.
 
         let mut query = String::new();
+        let retty = term.elems.last().unwrap().ty().to_string();
         for var in self.vars.iter() {
-            query.push_str(&format!("(declare-fun {var} () Int)"));
+            query.push_str(&format!("(declare-fun {var} () {retty})"));
         }
         let progname = &self.progname;
 
@@ -141,7 +143,7 @@ impl Oracle for SygusProblemAndOracle {
             query.push_str(&format!("({var} Int) "));
         }
         let term = term_to_z3(term.elems.len()-1, term, &self.vars);
-        query.push_str(&format!(") Int {term})\n"));
+        query.push_str(&format!(") {retty} {term})\n"));
         let constr = &self.constraint;
         query.push_str(&format!("(assert (not {constr}))\n"));
 

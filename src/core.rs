@@ -21,6 +21,15 @@ pub type Id = usize;
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Ty { Int, Bool }
 
+impl Ty {
+    pub fn to_string(&self) -> &'static str {
+        match self {
+            Ty::Int => "Int",
+            Ty::Bool => "Bool",
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub enum Node {
     Var(Var),
