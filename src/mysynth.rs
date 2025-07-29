@@ -57,7 +57,7 @@ fn handle<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) -> Option<Id> {
     if c.handled_size == Some(c.size) { return None; }
 
     if c.handled_size.is_none() {
-        match node_ty(&c.node) {
+        match c.node.ty() {
             Ty::Int => &mut ctxt.i_solids,
             Ty::Bool => &mut ctxt.b_solids,
         }.push(x);
@@ -69,7 +69,7 @@ fn handle<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) -> Option<Id> {
 }
 
 fn grow<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) -> Option<Id> {
-    let ty = node_ty(&ctxt.classes[x].node);
+    let ty = ctxt.classes[x].node.ty();
 
     for rule in ctxt.problem.prod_rules() {
         let mut rule = rule.clone();
@@ -156,7 +156,7 @@ fn enqueue<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
 fn heuristic<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Score {
     let c = &ctxt.classes[x];
 
-    if let Ty::Bool = node_ty(&c.node) {
+    if let Ty::Bool = c.node.ty() {
         return 10000;
     }
 
@@ -197,13 +197,6 @@ fn satcount<'a, P: Problem>(vals: &[Value], ctxt: &mut Ctxt<'a, P>) -> usize {
     count
 }
 
-fn node_ty(node: &Node) -> Ty {
-    match node {
-        Node::Var(_) | Node::Add(_) | Node::Sub(_) | Node::Mul(_) | Node::Div(_) | Node::Ite(_) | Node::Constant(_) => Ty::Int,
-        Node::Lt(_) => Ty::Bool,
-    }
-}
-
 fn extract<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Term {
     let mut t = Term { elems: Vec::new() };
     match ctxt.classes[x].node {
@@ -228,10 +221,39 @@ fn extract<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Term {
             let y = t.push_subterm(extract(y, ctxt));
             t.push(Node::Div([x, y]));
         },
+        Node::Mod([x, y]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            let y = t.push_subterm(extract(y, ctxt));
+            t.push(Node::Mod([x, y]));
+        },
         Node::Lt([x, y]) => {
             let x = t.push_subterm(extract(x, ctxt));
             let y = t.push_subterm(extract(y, ctxt));
             t.push(Node::Lt([x, y]));
+        },
+        Node::Lte([x, y]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            let y = t.push_subterm(extract(y, ctxt));
+            t.push(Node::Lte([x, y]));
+        },
+        Node::Gt([x, y]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            let y = t.push_subterm(extract(y, ctxt));
+            t.push(Node::Gt([x, y]));
+        },
+        Node::Gte([x, y]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            let y = t.push_subterm(extract(y, ctxt));
+            t.push(Node::Gte([x, y]));
+        },
+        Node::Equals([x, y]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            let y = t.push_subterm(extract(y, ctxt));
+            t.push(Node::Equals([x, y]));
+        },
+        Node::Abs([x]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            t.push(Node::Abs([x]));
         },
         Node::Ite([x, y, z]) => {
             let x = t.push_subterm(extract(x, ctxt));

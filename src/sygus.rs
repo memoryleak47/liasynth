@@ -176,9 +176,15 @@ fn term_to_z3(i: usize, t: &Term, vars: &[String]) -> String {
         &Node::Sub([x, y]) => format!("(- {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
         &Node::Mul([x, y]) => format!("(* {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
         &Node::Div([x, y]) => format!("(div {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Mod([x, y]) => format!("(mod {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
 
         &Node::Ite([x, y, z]) => format!("(ite {} {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars), term_to_z3(z, t, vars)),
         &Node::Lt([x, y]) => format!("(< {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Gt([x, y]) => format!("(> {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Lte([x, y]) => format!("(<= {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Gte([x, y]) => format!("(>= {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Equals([x, y]) => format!("(= {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Abs([x]) => format!("(abs {})", term_to_z3(x, t, vars)),
 
         Node::Constant(i) => format!("{i}"),
     }

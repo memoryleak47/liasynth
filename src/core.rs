@@ -20,9 +20,17 @@ pub enum Node {
     Sub([Id; 2]),
     Mul([Id; 2]),
     Div([Id; 2]),
+    Mod([Id; 2]),
+
+    Abs([Id; 1]),
 
     Ite([Id; 3]),
+
     Lt([Id; 2]),
+    Lte([Id; 2]),
+    Gte([Id; 2]),
+    Gt([Id; 2]),
+    Equals([Id; 2]),
 
     Constant(Int),
 }
@@ -31,7 +39,8 @@ impl Node {
     pub fn children(&self) -> &[Id] {
         match self {
             Node::Var(_) | Node::Constant(_) => &[],
-            Node::Add(s) | Node::Sub(s) | Node::Mul(s) | Node::Div(s) | Node::Lt(s) => s,
+            Node::Abs(s) => s,
+            Node::Add(s) | Node::Sub(s) | Node::Mul(s) | Node::Div(s) | Node::Mod(s) | Node::Lt(s) | Node::Gt(s) | Node::Lte(s) | Node::Gte(s) | Node::Equals(s) => s,
             Node::Ite(s) => s,
         }
     }
@@ -39,7 +48,8 @@ impl Node {
     pub fn children_mut(&mut self) -> &mut [Id] {
         match self {
             Node::Var(_) | Node::Constant(_) => &mut [],
-            Node::Add(s) | Node::Sub(s) | Node::Mul(s) | Node::Div(s) | Node::Lt(s) => s,
+            Node::Abs(s) => s,
+            Node::Add(s) | Node::Sub(s) | Node::Mul(s) | Node::Div(s) | Node::Mod(s) | Node::Lt(s) | Node::Gt(s) | Node::Lte(s) | Node::Gte(s) | Node::Equals(s) => s,
             Node::Ite(s) => s,
         }
     }
@@ -47,10 +57,16 @@ impl Node {
     pub fn signature(&self) -> &'static (&'static [Ty], Ty) {
         match self {
             Node::Var(_) | Node::Constant(_) => &(&[], Ty::Int),
-            Node::Add(s) | Node::Sub(s) | Node::Mul(s) | Node::Div(s) => &(&[Ty::Int; 2], Ty::Int),
-            Node::Lt(s) => &(&[Ty::Int; 2], Ty::Bool),
-            Node::Ite(s) => &(&[Ty::Bool, Ty::Int, Ty::Int], Ty::Int),
+            Node::Add(_) | Node::Sub(_) | Node::Mul(_) | Node::Div(_) | Node::Mod(_) => &(&[Ty::Int; 2], Ty::Int),
+            Node::Lt(_) | Node::Lte(_) | Node::Gte(_) | Node::Gt(_) | Node::Equals(_) => &(&[Ty::Int; 2], Ty::Bool),
+            Node::Ite(_) => &(&[Ty::Bool, Ty::Int, Ty::Int], Ty::Int),
+            Node::Abs(_) => &(&[Ty::Int], Ty::Int),
         }
+    }
+
+    // TODO remove.
+    pub fn ty(&self) -> Ty {
+        self.signature().1.clone()
     }
 }
 
@@ -109,6 +125,7 @@ pub fn eval_node(node: &Node, sigma: &Sigma, ch: &impl Fn(Id) -> Value) -> Value
         Node::Add([l, r]) => Value::Int(to_int(ch(*l)) + to_int(ch(*r))),
         Node::Mul([l, r]) => Value::Int(to_int(ch(*l)) * to_int(ch(*r))),
         Node::Sub([l, r]) => Value::Int(to_int(ch(*l)) - to_int(ch(*r))),
+        Node::Mod([l, r]) => Value::Int(to_int(ch(*l)) % to_int(ch(*r))),
         Node::Div([l, r]) => {
             let l = to_int(ch(*l));
             let r = to_int(ch(*r));
@@ -123,6 +140,13 @@ pub fn eval_node(node: &Node, sigma: &Sigma, ch: &impl Fn(Id) -> Value) -> Value
             }
         },
         Node::Lt([l, r]) => Value::Bool(to_int(ch(*l)) < to_int(ch(*r))),
+        Node::Lte([l, r]) => Value::Bool(to_int(ch(*l)) <= to_int(ch(*r))),
+        Node::Gt([l, r]) => Value::Bool(to_int(ch(*l)) > to_int(ch(*r))),
+        Node::Gte([l, r]) => Value::Bool(to_int(ch(*l)) >= to_int(ch(*r))),
+        Node::Equals([l, r]) => Value::Bool(to_int(ch(*l)) == to_int(ch(*r))),
+
+        Node::Abs([x]) => Value::Int(to_int(ch(*x)).abs()),
+
         Node::Constant(i) => Value::Int(*i),
     }
 }
