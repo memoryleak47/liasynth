@@ -17,6 +17,8 @@ struct Ctxt<'a, P> {
 
     i_solids: Vec<Id>,
     b_solids: Vec<Id>,
+
+    cx_value_cache: Map<(usize, Value), bool>,
 }
 
 struct Class {
@@ -24,6 +26,7 @@ struct Class {
     size: usize,
     vals: Box<[Value]>,
     handled_size: Option<usize>, // what was the size when this class was handled last time.
+    satcount: usize,
 }
 
 fn run<'a, P: Problem>(ctxt: &mut Ctxt<P>) -> Term {
@@ -105,6 +108,7 @@ impl Synth for MySynth {
             classes: Vec::new(),
             i_solids: Vec::new(),
             b_solids: Vec::new(),
+            cx_value_cache: Map::new(),
         })
     }
 }
@@ -117,45 +121,44 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) -> Option<Id> {
         if newsize < c.size {
             c.size = newsize;
             c.node = node.clone();
-            enqueue(i, ctxt);
+            enqueue(i, ctxt, ctxt.classes[i].satcount);
         }
     } else {
         let i = ctxt.classes.len();
 
-        let is_perfect = ctxt.sigmas.iter().zip(vals.iter()).all(|(sigma, val)| ctxt.problem.sat(val, sigma));
+        let satcount = satcount(&vals, ctxt);
 
         ctxt.classes.push(Class {
             size: minsize(&node, ctxt),
             node,
             vals: vals.clone(),
             handled_size: None,
+            satcount
         });
         ctxt.vals_lookup.insert(vals, i);
 
         // write to `out`, if this [Value] was successful.
-        if is_perfect {
+        if satcount == ctxt.sigmas.len() {
             return Some(i);
         }
 
-        enqueue(i, ctxt);
+        enqueue(i, ctxt, satcount);
     }
 
     None
 }
 
-fn enqueue<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
-    let h = heuristic(x, ctxt);
+fn enqueue<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>, satcount: usize) {
+    let h = heuristic(x, ctxt, satcount);
     ctxt.queue.push(WithOrd(x, h));
 }
 
-fn heuristic<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Score {
+fn heuristic<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>, satcount: usize) -> Score {
     let c = &ctxt.classes[x];
 
     if let Ty::Bool = node_ty(&c.node) {
         return 10000;
     }
-
-    let satcount = satcount(&c.vals, ctxt);
 
     let mut a = 100000;
     for _ in satcount..ctxt.sigmas.len() {
@@ -176,10 +179,31 @@ fn minsize<'a, P: Problem>(node: &Node, ctxt: &Ctxt<'a, P>) -> usize {
     node.children().iter().map(|x| ctxt.classes[*x].size).sum::<usize>() + 1
 }
 
-fn satcount<'a, P: Problem>(vals: &[Value], ctxt: &Ctxt<'a, P>) -> usize {
+// We could store somewhere the known failing values for each counterexample
+// and for each val in vals that is in that then we can say that it fails on said
+// counterexample
+// fn satcount<'a, P: Problem>(vals: &[Value], ctxt: &Ctxt<'a, P>) -> usize {
+//     let it = vals.iter().zip(ctxt.sigmas);
+//     it.filter(|(val, sigma)| ctxt.problem.sat(val, sigma))
+//       .count()
+// }
+
+fn satcount<'a, P: Problem>(vals: &[Value], ctxt: &mut Ctxt<'a, P>) -> usize {
     let it = vals.iter().zip(ctxt.sigmas);
-    it.filter(|(val, sigma)| ctxt.problem.sat(val, sigma))
-      .count()
+    let mut count = 0;
+    for (i, (val, sigma)) in it.enumerate() {
+        if let Some(seen) = ctxt.cx_value_cache.get(&(i, val.clone())) {
+            if *seen { count += 1 };
+        } else {
+            if ctxt.problem.sat(val, sigma) {
+                ctxt.cx_value_cache.insert((i, val.clone()), true);
+                count += 1;
+            } else {
+                ctxt.cx_value_cache.insert((i, val.clone()), false);
+            }
+        }
+    }
+    count
 }
 
 fn node_ty(node: &Node) -> Ty {

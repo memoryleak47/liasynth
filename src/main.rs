@@ -20,9 +20,10 @@ pub use sygus::*;
 mod fmt;
 
 pub type Map<K, V> = indexmap::IndexMap<K, V>;
+pub type Set<V> = std::collections::HashSet<V>;
 pub use std::collections::BinaryHeap;
 
 fn main() {
-    let (problem, oracle) = sygus_problem("stupid.sl");
+    let (problem, oracle) = sygus_problem("qm_neg_eq_2.sl");
     println!("Answer: {:?}", cegis(problem, MySynth, oracle));
 }
