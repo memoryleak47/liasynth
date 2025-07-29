@@ -80,12 +80,13 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
     for expr in exprs.iter() {
         if let SyGuSExpr::DefinedFun(fun) = expr {
             context.push_str(&fun.stringify());
+            context.push('\n');
         }
         if let SyGuSExpr::DeclaredVar(name, ty) = expr {
             if vars.contains(name) { continue }
 
             let ty = ty.to_string();
-            context.push_str(&format!("(declare-var {name} {ty})"));
+            context.push_str(&format!("(declare-var {name} {ty})\n"));
         }
     }
 
@@ -121,7 +122,7 @@ impl Problem for SygusProblemAndOracle {
         let mut query = self.context.clone();
         for (var, val2) in self.vars.iter().zip(sigma.iter()) {
             let val2 = show_val(val2);
-            query.push_str(&format!("(define-fun {var} () Int {val2})"));
+            query.push_str(&format!("(define-fun {var} () Int {val2})\n"));
         }
         let progname = &self.progname;
 
@@ -155,7 +156,7 @@ impl Oracle for SygusProblemAndOracle {
         let mut query = self.context.clone();
         let retty = retty.to_string();
         for var in self.vars.iter() {
-            query.push_str(&format!("(declare-fun {var} () Int)"));
+            query.push_str(&format!("(declare-fun {var} () Int)\n"));
         }
         let progname = &self.progname;
 
