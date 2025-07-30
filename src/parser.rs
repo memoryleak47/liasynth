@@ -106,7 +106,19 @@ pub fn prettyprint(e: &Expr) -> String {
             s.push(')');
             s
         },
-        Expr::Let { .. } => todo!(),
+        Expr::Let { bindings, body } => {
+            let mut s = String::from("(let (");
+            for (var, e) in bindings.iter() {
+                let e = prettyprint(e);
+                s.push_str(&format!("({var} {e}) "));
+            }
+            s.pop();
+            s.push(')');
+            s.push(' ');
+            s.push_str(&prettyprint(body));
+            s.push(')');
+            s
+        },
     }
 }
 

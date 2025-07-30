@@ -92,7 +92,7 @@ fn sygus_expr_to_term_impl(e: Expr, vars: &[String], progname: &str, t: &mut Ter
             let n = match (&*op, &*exprs) {
                 ("+", &[x, y]) => Node::Add([x, y]),
                 ("-", &[x, y]) => Node::Sub([x, y]),
-                ("mul", &[x, y]) => Node::Mul([x, y]),
+                ("*", &[x, y]) => Node::Mul([x, y]),
                 ("div", &[x, y]) => Node::Div([x, y]),
                 ("mod", &[x, y]) => Node::Mod([x, y]),
                 ("abs", &[x]) => Node::Abs([x]),
