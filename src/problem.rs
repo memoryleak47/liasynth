@@ -28,6 +28,24 @@ struct Def {
     expr: Expr,
 }
 
+fn breakup_lets(e: Expr) -> Expr {
+    match e {
+        Expr::Terminal(a) => Expr::Terminal(a),
+        Expr::Operation { op, expr } => {
+            let expr: Vec<Expr> = expr.into_iter().map(|x| breakup_lets(x)).collect();
+            Expr::Operation { op, expr }
+        },
+        Expr::Let { bindings, body } => {
+            let mut body: Expr = breakup_lets(*body);
+            for (name, e) in bindings.into_iter().rev() {
+                let e = breakup_lets(e);
+                body = Expr::Let { bindings: vec![(name, e)], body: Box::new(body) };
+            }
+            body
+        },
+    }
+}
+
 // resolves "let" and "defined-funs"
 fn simplify_expr(e: Expr, defs: &Map<String, Def>, done_something: &mut bool) -> Expr {
     match e {
@@ -47,10 +65,12 @@ fn simplify_expr(e: Expr, defs: &Map<String, Def>, done_something: &mut bool) ->
         }
         Expr::Let { bindings, body } => {
             *done_something = true;
-            let mut body: Expr = *body;
-            for (var, expr) in bindings {
-                body = expr_subst(body, &var, &expr);
-            }
+
+            let [(var, t)] = &*bindings else { panic!() };
+
+            let body = expr_subst(*body, &var, &t);
+            let body = simplify_expr(body, defs, done_something);
+
             body
         },
     }
@@ -67,7 +87,12 @@ fn expr_subst(e: Expr, v: &str, t: &Expr) -> Expr {
             Expr::Operation { op, expr }
         },
         Expr::Terminal(a) => Expr::Terminal(a),
-        Expr::Let { bindings, body } => todo!(),
+        Expr::Let { bindings, body } => {
+            let [(var, tt)] = &*bindings else { panic!() };
+            let tt = expr_subst(tt.clone(), v, t);
+            let body = Box::new(expr_subst(*body, v, t));
+            Expr::Let { bindings: vec![(var.clone(), tt)], body }
+        },
     }
 }
 
@@ -205,7 +230,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
         }
     }
 
-    let mut constraint = constraint.clone();
+    let mut constraint = breakup_lets(constraint.clone());
     loop {
         let mut b = false;
         constraint = simplify_expr(constraint, &defs, &mut b);
