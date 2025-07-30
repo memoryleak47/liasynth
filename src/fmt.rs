@@ -16,7 +16,7 @@ impl Display for Term {
 
 pub fn term_to_z3(i: usize, t: &Term, vars: &[String], progname: &str) -> String {
     match &t.elems[i] {
-        Node::Var(v) => vars.get(*v).cloned().unwrap_or_else(|| format!("unknown_{v}")),
+        Node::Var(v) => vars.get(*v).cloned().unwrap_or_else(|| format!("v{v}")),
 
         &Node::Add([x, y]) => format!("(+ {} {})", term_to_z3(x, t, vars, progname), term_to_z3(y, t, vars, progname)),
         &Node::Sub([x, y]) => format!("(- {} {})", term_to_z3(x, t, vars, progname), term_to_z3(y, t, vars, progname)),
