@@ -90,7 +90,10 @@ fn expr_subst(e: Expr, v: &str, t: &Expr) -> Expr {
         Expr::Let { bindings, body } => {
             let [(var, tt)] = &*bindings else { panic!() };
             let tt = expr_subst(tt.clone(), v, t);
-            let body = Box::new(expr_subst(*body, v, t));
+            let mut body = body;
+            if var != v {
+                body = Box::new(expr_subst(*body, v, t));
+            }
             Expr::Let { bindings: vec![(var.clone(), tt)], body }
         },
     }
