@@ -29,12 +29,13 @@ struct Def {
 }
 
 // resolves "let" and "defined-funs"
-fn simplify_expr(e: Expr, defs: &Map<String, Def>) -> Expr {
+fn simplify_expr(e: Expr, defs: &Map<String, Def>, done_something: &mut bool) -> Expr {
     match e {
         Expr::Terminal(a) => Expr::Terminal(a),
         Expr::Operation { op, expr } => {
-            let expr: Vec<Expr> = expr.iter().map(|x| simplify_expr(x.clone(), defs)).collect();
+            let expr: Vec<Expr> = expr.iter().map(|x| simplify_expr(x.clone(), defs, done_something)).collect();
             if let Some(def) = defs.get(&op) {
+                *done_something = true;
                 let mut bb = def.expr.clone();
                 for (a, b) in (def.args.iter()).zip(expr.iter()) {
                     bb = expr_subst(bb, a, b);
@@ -45,6 +46,7 @@ fn simplify_expr(e: Expr, defs: &Map<String, Def>) -> Expr {
             }
         }
         Expr::Let { bindings, body } => {
+            *done_something = true;
             let mut body: Expr = *body;
             for (var, expr) in bindings {
                 body = expr_subst(body, &var, &expr);
@@ -203,7 +205,12 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
         }
     }
 
-    let constraint = simplify_expr(constraint, &defs);
+    let mut constraint = constraint.clone();
+    loop {
+        let mut b = false;
+        constraint = simplify_expr(constraint, &defs, &mut b);
+        if !b { break }
+    }
     let (constraint, instvars) = sygus_expr_to_term(constraint, &context_vars, &progname);
 
     Problem {
