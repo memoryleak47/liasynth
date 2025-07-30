@@ -22,5 +22,7 @@ pub use std::collections::BinaryHeap;
 fn main() {
     let arg = std::env::args().nth(1).unwrap_or(String::from("examples/max2_swap_renamed.sl"));
     let problem = mk_sygus_problem(&arg);
-    println!("Answer: {:?}", cegis(problem));
+
+    let term = cegis(&problem);
+    println!("Answer: {}", term_to_z3(&term, &problem.vars));
 }

@@ -12,6 +12,7 @@ pub struct Problem {
     pub vars: Vec<String>,
 
     pub constraint: Term,
+    pub constraint_str: String,
 
     // The ids of these Nodes will be nulled away.
     pub prod_rules: Box<[Node]>,
@@ -93,6 +94,12 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
         } else { None }
     ).fold(Expr::Terminal(Terminal::Bool(true)), |x, y| Expr::Operation { op: format!("and"), expr: vec![x, y],} );
 
+    let constraint_str = exprs.iter().filter_map(|x|
+        if let SyGuSExpr::Constraint(e) = x {
+            Some(prettyprint(e))
+        } else { None }
+    ).fold(String::from("true"), |x, y| format!("(and {x} {y})"));
+
     let mut prod_rules = Vec::new();
     for g in subgrammars {
         for t in g.terminals {
@@ -148,6 +155,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
         rettype,
         vars,
         constraint,
+        constraint_str,
         prod_rules: prod_rules.into(),
         context,
         context_vars,
@@ -181,11 +189,11 @@ impl Problem {
         for var in self.vars.iter() {
             query.push_str(&format!("({var} Int) "));
         }
-        let term = term_to_z3(term, &self.context_vars);
+        let term = term_to_z3(term, &self.vars);
         query.push_str(&format!(") {retty} {term})\n"));
 
-        let mut constr = term_to_z3(&self.constraint, &self.context_vars);
-        query.push_str(&format!("(assert (not {constr}))\n"));
+        let constraint_str = &self.constraint_str;
+        query.push_str(&format!("(assert (not {constraint_str}))\n"));
 
         let config = z3::Config::new();
         let ctxt = z3::Context::new(&config);

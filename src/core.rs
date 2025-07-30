@@ -200,10 +200,10 @@ pub fn eval_term_partial(i: Id, term: &[Node], sigma: &Sigma) -> Value {
     eval_node(&term[i], sigma, &f)
 }
 
-pub fn cegis(problem: Problem) -> Term {
+pub fn cegis(problem: &Problem) -> Term {
     let mut sigmas = Vec::new();
     loop {
-        let term = synth(&problem, &sigmas);
+        let term = synth(problem, &sigmas);
         println!("Candidate: {}", term_to_z3(&term, &problem.vars));
         // TODO check this later: assert!(problem.sat(&..., &sigmas));
 
