@@ -105,7 +105,7 @@ impl Node {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Term {
     pub elems: Vec<Node>,
 }

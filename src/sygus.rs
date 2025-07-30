@@ -196,10 +196,10 @@ impl Problem {
         for var in self.vars.iter() {
             query.push_str(&format!("({var} Int) "));
         }
-        let term = term_to_z3(term.elems.len()-1, term, &self.context_vars, &self.progname);
+        let term = term_to_z3(term, &self.context_vars);
         query.push_str(&format!(") {retty} {term})\n"));
 
-        let mut constr = term_to_z3(self.constraint.elems.len()-1, &self.constraint, &self.context_vars, &self.progname);
+        let mut constr = term_to_z3(&self.constraint, &self.context_vars);
         query.push_str(&format!("(assert (not {constr}))\n"));
 
         let config = z3::Config::new();
