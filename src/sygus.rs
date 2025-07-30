@@ -54,7 +54,8 @@ fn sygus_expr_to_term(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String]) 
                 (">=", &[x, y]) => Node::Gte([x, y]),
                 ("=", &[x, y]) => Node::Equals([x, y]),
                 ("distinct", &[x, y]) => Node::Distinct([x, y]),
-                (x, l) => todo!("unknown node {x} of arity {}", l.len()),
+                _ => Node::SynthFun, // TODO this is dangerous.
+                // (x, l) => todo!("unknown node {x} of arity {}", l.len()),
             };
             t.push(n);
         },
@@ -156,8 +157,19 @@ fn show_val(v: &Value) -> String {
 impl Problem for SygusProblemAndOracle {
     fn prod_rules(&self) -> &[Node] { &self.prod_rules }
     fn sat(&self, val: &Value, sigma: &Sigma) -> bool {
-        // TODO: replace the occurrence of the synth fun with `val`.
-        eval_term(&self.constraint, sigma) == Value::Bool(true)
+        let v: Node = match val {
+            Value::Bool(true) => Node::True,
+            Value::Bool(false) => Node::False,
+            Value::Int(i) => Node::ConstInt(*i),
+        };
+        let mut c = self.constraint.clone();
+        for x in &mut c.elems {
+            if let Node::SynthFun = x {
+                *x = v.clone();
+            }
+        }
+
+        eval_term(&c, sigma) == Value::Bool(true)
     }
 }
 

@@ -307,6 +307,7 @@ fn extract<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Term {
             t.push(Node::Ite([x, y, z]));
         },
         Node::ConstInt(i) => { t.push(Node::ConstInt(i)); },
+        Node::SynthFun => panic!(),
     }
     t
 }

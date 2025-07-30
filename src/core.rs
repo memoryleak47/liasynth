@@ -60,6 +60,9 @@ pub enum Node {
     Equals([Id; 2]),
     Distinct([Id; 2]),
     Ite([Id; 3]),
+
+    // TODO make this nicer:
+    SynthFun,
 }
 
 impl Node {
@@ -70,6 +73,7 @@ impl Node {
             Abs(s) | Neg(s) | Not(s) => s,
             Add(s) | Sub(s) | Mul(s) | Div(s) | Mod(s) | Lt(s) | Gt(s) | Lte(s) | Gte(s) | Equals(s) | Distinct(s) | Implies(s) | And(s) | Or(s) | Xor(s) => s,
             Ite(s) => s,
+            SynthFun => &[],
         }
     }
 
@@ -80,6 +84,7 @@ impl Node {
             Abs(s) | Neg(s) | Not(s) => s,
             Add(s) | Sub(s) | Mul(s) | Div(s) | Mod(s) | Lt(s) | Gt(s) | Lte(s) | Gte(s) | Equals(s) | Distinct(s) | Implies(s) | And(s) | Or(s) | Xor(s) => s,
             Ite(s) => s,
+            SynthFun => &mut [],
         }
     }
 
@@ -94,6 +99,7 @@ impl Node {
             Not(_) => &(&[Ty::Bool], Ty::Bool),
             Implies(_) | And(_) | Or(_) | Xor(_) | Distinct(_) => &(&[Ty::Bool; 2], Ty::Bool),
             Abs(_) => &(&[Ty::Int], Ty::Int),
+            SynthFun => &(&[Ty::Int], Ty::Int), //?
         }
     }
 
@@ -192,6 +198,7 @@ pub fn eval_node(node: &Node, sigma: &Sigma, ch: &impl Fn(Id) -> Value) -> Value
         Node::Abs([x]) => Value::Int(to_int(ch(*x)).abs()),
 
         Node::ConstInt(i) => Value::Int(*i),
+        Node::SynthFun => panic!(),
     }
 }
 
