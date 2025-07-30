@@ -195,6 +195,11 @@ pub fn eval_term(term: &Term, sigma: &Sigma) -> Value {
     vals.last().unwrap().clone()
 }
 
+pub fn eval_term_partial(i: Id, term: &[Node], sigma: &Sigma) -> Value {
+    let f = |id: Id| eval_term_partial(id, term, sigma);
+    eval_node(&term[i], sigma, &f)
+}
+
 pub fn cegis(problem: Problem) -> Term {
     let mut sigmas = Vec::new();
     loop {

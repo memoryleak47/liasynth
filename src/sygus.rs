@@ -18,6 +18,8 @@ pub struct Problem {
 
     pub context: String,
     pub context_vars: Vec<String>,
+
+    pub instvars: Vec<Box<[Id]>>,
 }
 
 fn sygus_expr_to_term(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String], progname: &str) -> (Term, Vec<Box<[Id]>>) {
@@ -149,6 +151,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
         prod_rules: prod_rules.into(),
         context,
         context_vars,
+        instvars,
     }
 }
 
@@ -174,10 +177,6 @@ impl Problem {
         let vars: Box<[_]> = (0..self.vars.len()).collect();
         eval_term(&self.constraint, sigma) == Value::Bool(true)
 */
-    }
-
-    pub fn accesses(&self) -> &[Box<[Var]>] {
-        todo!()
     }
 }
 

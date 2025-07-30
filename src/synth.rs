@@ -111,8 +111,9 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma]) -> Term {
     let mut sigma_indices: Vec<Box<[usize]>> = Vec::new();
     for bsigma in big_sigmas.iter() {
         let mut indices: Vec<usize> = Vec::new();
-        for a in problem.accesses().iter() {
-            let ssigma: Sigma = a.iter().map(|i| bsigma[*i].clone()).collect();
+        for a in problem.instvars.iter() {
+            let ssigma: Sigma = a.iter().map(|i| eval_term_partial(*i, &problem.constraint.elems, &bsigma)).collect();
+            small_sigmas.push(ssigma.clone());
             let idx = match small_sigmas.iter().position(|sigma2| sigma2 == &ssigma) {
                 Some(i) => i,
                 None => {
