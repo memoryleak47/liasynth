@@ -157,6 +157,13 @@ fn show_val(v: &Value) -> String {
 impl Problem for SygusProblemAndOracle {
     fn prod_rules(&self) -> &[Node] { &self.prod_rules }
     fn sat(&self, val: &Value, sigma: &Sigma) -> bool {
+        if val.ty() != self.rettype {
+            return false;
+        }
+        if !sigma.iter().zip(self.argtypes.iter()).all(|(val, ty)| val.ty() == *ty) {
+            return false;
+        }
+
         let v: Node = match val {
             Value::Bool(true) => Node::True,
             Value::Bool(false) => Node::False,
