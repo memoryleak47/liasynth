@@ -28,73 +28,39 @@ struct Def {
     expr: Expr,
 }
 
-fn breakup_lets(e: Expr) -> Expr {
-    match e {
-        Expr::Terminal(a) => Expr::Terminal(a),
-        Expr::Operation { op, expr } => {
-            let expr: Vec<Expr> = expr.into_iter().map(|x| breakup_lets(x)).collect();
-            Expr::Operation { op, expr }
-        },
-        Expr::Let { bindings, body } => {
-            let mut body: Expr = breakup_lets(*body);
-            for (name, e) in bindings.into_iter().rev() {
-                let e = breakup_lets(e);
-                body = Expr::Let { bindings: vec![(name, e)], body: Box::new(body) };
-            }
-            body
-        },
-    }
-}
-
 // resolves "let" and "defined-funs"
-fn simplify_expr(e: Expr, defs: &Map<String, Def>, done_something: &mut bool) -> Expr {
+// neither defs nor varmap contain already simplified exprs.
+fn simplify_expr(e: Expr, defs: &Map<String, Def>, varmap: &Vec<(String, Expr)>) -> Expr {
     match e {
-        Expr::Terminal(a) => Expr::Terminal(a),
-        Expr::Operation { op, expr } => {
-            let expr: Vec<Expr> = expr.iter().map(|x| simplify_expr(x.clone(), defs, done_something)).collect();
-            if let Some(def) = defs.get(&op) {
-                *done_something = true;
-                let mut bb = def.expr.clone();
-                for (a, b) in (def.args.iter()).zip(expr.iter()) {
-                    bb = expr_subst(bb, a, b);
+        Expr::Terminal(Terminal::Num(i)) => Expr::Terminal(Terminal::Num(i)),
+        Expr::Terminal(Terminal::Bool(b)) => Expr::Terminal(Terminal::Bool(b)),
+        Expr::Terminal(Terminal::Var(v)) => {
+            let mut varmap = varmap.clone();
+            while let Some((v2, t)) = varmap.pop() {
+                if v == v2 {
+                    return simplify_expr(t, defs, &varmap);
                 }
-                bb
-            } else {
-                Expr::Operation { op, expr }
             }
+            Expr::Terminal(Terminal::Var(v))
+        },
+        Expr::Operation { op, expr } => {
+            if let Some(def) = defs.get(&op) {
+                let mut varmap = varmap.clone();
+                for (v, ex) in (def.args.iter()).zip(expr.into_iter()) {
+                    varmap.push((v.clone(), ex));
+                }
+                return simplify_expr(def.expr.clone(), defs, &varmap);
+            }
+
+            let expr: Vec<Expr> = expr.iter().map(|x| simplify_expr(x.clone(), defs, varmap)).collect();
+            Expr::Operation { op, expr }
         }
         Expr::Let { bindings, body } => {
-            *done_something = true;
-
-            let [(var, t)] = &*bindings else { panic!() };
-
-            let body = expr_subst(*body, &var, &t);
-            let body = simplify_expr(body, defs, done_something);
-
-            body
-        },
-    }
-}
-
-// computes e[v := t]
-fn expr_subst(e: Expr, v: &str, t: &Expr) -> Expr {
-    match e {
-        Expr::Terminal(Terminal::Var(v2)) if v == v2 => {
-            t.clone()
-        },
-        Expr::Operation { op, expr } => {
-            let expr: Vec<Expr> = expr.into_iter().map(|x| expr_subst(x, v, t)).collect();
-            Expr::Operation { op, expr }
-        },
-        Expr::Terminal(a) => Expr::Terminal(a),
-        Expr::Let { bindings, body } => {
-            let [(var, tt)] = &*bindings else { panic!() };
-            let tt = expr_subst(tt.clone(), v, t);
-            let mut body = body;
-            if var != v {
-                body = Box::new(expr_subst(*body, v, t));
+            let mut varmap = varmap.clone();
+            for (var, ex) in bindings {
+                varmap.push((var, ex));
             }
-            Expr::Let { bindings: vec![(var.clone(), tt)], body }
+            simplify_expr(*body, defs, &varmap)
         },
     }
 }
@@ -233,12 +199,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
         }
     }
 
-    let mut constraint = breakup_lets(constraint.clone());
-    loop {
-        let mut b = false;
-        constraint = simplify_expr(constraint, &defs, &mut b);
-        if !b { break }
-    }
+    let constraint = simplify_expr(constraint, &defs, &Vec::new());
     let (constraint, instvars) = sygus_expr_to_term(constraint, &context_vars, &progname);
 
     Problem {
