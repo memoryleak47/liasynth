@@ -242,7 +242,7 @@ impl Problem {
     pub fn verify(&self, term: &Term) -> Option<Sigma> {
         let retty = term.elems.last().unwrap().ty();
         if retty != self.rettype {
-            return Some(vec![Value::Int(0); self.vars.len()]);
+            return Some(vec![Value::Int(0); self.context_vars.len()]);
         }
 
         let mut query = self.context.clone();
