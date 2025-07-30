@@ -18,6 +18,7 @@ mod sygus;
 pub use sygus::*;
 
 mod fmt;
+pub use fmt::*;
 
 pub type Map<K, V> = fxhash::FxHashMap<K, V>;
 pub use std::collections::BinaryHeap;

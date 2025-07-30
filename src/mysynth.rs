@@ -208,11 +208,41 @@ fn extract<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Term {
             let y = t.push_subterm(extract(y, ctxt));
             t.push(Node::Add([x, y]));
         },
+        Node::Implies([x, y]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            let y = t.push_subterm(extract(y, ctxt));
+            t.push(Node::Implies([x, y]));
+        },
+        Node::And([x, y]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            let y = t.push_subterm(extract(y, ctxt));
+            t.push(Node::And([x, y]));
+        },
+        Node::Or([x, y]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            let y = t.push_subterm(extract(y, ctxt));
+            t.push(Node::Or([x, y]));
+        },
+        Node::Xor([x, y]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            let y = t.push_subterm(extract(y, ctxt));
+            t.push(Node::Xor([x, y]));
+        },
         Node::Sub([x, y]) => {
             let x = t.push_subterm(extract(x, ctxt));
             let y = t.push_subterm(extract(y, ctxt));
             t.push(Node::Sub([x, y]));
         },
+        Node::Neg([x]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            t.push(Node::Neg([x]));
+        },
+        Node::Not([x]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            t.push(Node::Not([x]));
+        },
+        Node::True => { t.push(Node::True); },
+        Node::False => { t.push(Node::False); },
         Node::Mul([x, y]) => {
             let x = t.push_subterm(extract(x, ctxt));
             let y = t.push_subterm(extract(y, ctxt));
@@ -253,6 +283,11 @@ fn extract<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Term {
             let y = t.push_subterm(extract(y, ctxt));
             t.push(Node::Equals([x, y]));
         },
+        Node::Distinct([x, y]) => {
+            let x = t.push_subterm(extract(x, ctxt));
+            let y = t.push_subterm(extract(y, ctxt));
+            t.push(Node::Distinct([x, y]));
+        },
         Node::Abs([x]) => {
             let x = t.push_subterm(extract(x, ctxt));
             t.push(Node::Abs([x]));
@@ -263,7 +298,7 @@ fn extract<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Term {
             let z = t.push_subterm(extract(z, ctxt));
             t.push(Node::Ite([x, y, z]));
         },
-        Node::Constant(i) => { t.push(Node::Constant(i)); },
+        Node::ConstInt(i) => { t.push(Node::ConstInt(i)); },
     }
     t
 }

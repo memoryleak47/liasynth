@@ -34,51 +34,66 @@ impl Ty {
 pub enum Node {
     Var(Var),
 
-    Add([Id; 2]),
+    // https://smt-lib.org/theories-Ints.shtml
+    ConstInt(Int),
+    Neg([Id; 1]),
     Sub([Id; 2]),
+    Add([Id; 2]),
     Mul([Id; 2]),
     Div([Id; 2]),
     Mod([Id; 2]),
-
     Abs([Id; 1]),
-
-    Ite([Id; 3]),
 
     Lt([Id; 2]),
     Lte([Id; 2]),
     Gte([Id; 2]),
     Gt([Id; 2]),
-    Equals([Id; 2]),
 
-    Constant(Int),
+    // https://smt-lib.org/theories-Core.shtml
+    True,
+    False,
+    Not([Id; 1]),
+    Implies([Id; 2]),
+    And([Id; 2]),
+    Or([Id; 2]),
+    Xor([Id; 2]),
+    Equals([Id; 2]),
+    Distinct([Id; 2]),
+    Ite([Id; 3]),
 }
 
 impl Node {
     pub fn children(&self) -> &[Id] {
+        use Node::*;
         match self {
-            Node::Var(_) | Node::Constant(_) => &[],
-            Node::Abs(s) => s,
-            Node::Add(s) | Node::Sub(s) | Node::Mul(s) | Node::Div(s) | Node::Mod(s) | Node::Lt(s) | Node::Gt(s) | Node::Lte(s) | Node::Gte(s) | Node::Equals(s) => s,
-            Node::Ite(s) => s,
+            Var(_) | ConstInt(_) | True | False => &[],
+            Abs(s) | Neg(s) | Not(s) => s,
+            Add(s) | Sub(s) | Mul(s) | Div(s) | Mod(s) | Lt(s) | Gt(s) | Lte(s) | Gte(s) | Equals(s) | Distinct(s) | Implies(s) | And(s) | Or(s) | Xor(s) => s,
+            Ite(s) => s,
         }
     }
 
     pub fn children_mut(&mut self) -> &mut [Id] {
+        use Node::*;
         match self {
-            Node::Var(_) | Node::Constant(_) => &mut [],
-            Node::Abs(s) => s,
-            Node::Add(s) | Node::Sub(s) | Node::Mul(s) | Node::Div(s) | Node::Mod(s) | Node::Lt(s) | Node::Gt(s) | Node::Lte(s) | Node::Gte(s) | Node::Equals(s) => s,
-            Node::Ite(s) => s,
+            Var(_) | ConstInt(_) | True | False => &mut [],
+            Abs(s) | Neg(s) | Not(s) => s,
+            Add(s) | Sub(s) | Mul(s) | Div(s) | Mod(s) | Lt(s) | Gt(s) | Lte(s) | Gte(s) | Equals(s) | Distinct(s) | Implies(s) | And(s) | Or(s) | Xor(s) => s,
+            Ite(s) => s,
         }
     }
 
     pub fn signature(&self) -> &'static (&'static [Ty], Ty) {
+        use Node::*;
         match self {
-            Node::Var(_) | Node::Constant(_) => &(&[], Ty::Int),
-            Node::Add(_) | Node::Sub(_) | Node::Mul(_) | Node::Div(_) | Node::Mod(_) => &(&[Ty::Int; 2], Ty::Int),
-            Node::Lt(_) | Node::Lte(_) | Node::Gte(_) | Node::Gt(_) | Node::Equals(_) => &(&[Ty::Int; 2], Ty::Bool),
-            Node::Ite(_) => &(&[Ty::Bool, Ty::Int, Ty::Int], Ty::Int),
-            Node::Abs(_) => &(&[Ty::Int], Ty::Int),
+            Var(_) | ConstInt(_) | True | False => &(&[], Ty::Int),
+            Add(_) | Sub(_) | Mul(_) | Div(_) | Mod(_) => &(&[Ty::Int; 2], Ty::Int),
+            Lt(_) | Lte(_) | Gte(_) | Gt(_) | Equals(_) => &(&[Ty::Int; 2], Ty::Bool),
+            Ite(_) => &(&[Ty::Bool, Ty::Int, Ty::Int], Ty::Int),
+            Neg(_) => &(&[Ty::Int], Ty::Int),
+            Not(_) => &(&[Ty::Bool], Ty::Bool),
+            Implies(_) | And(_) | Or(_) | Xor(_) | Distinct(_) => &(&[Ty::Bool; 2], Ty::Bool),
+            Abs(_) => &(&[Ty::Int], Ty::Int),
         }
     }
 
@@ -157,15 +172,25 @@ pub fn eval_node(node: &Node, sigma: &Sigma, ch: &impl Fn(Id) -> Value) -> Value
                 ch(*else_).clone()
             }
         },
+        Node::True => Value::Bool(true),
+        Node::False => Value::Bool(false),
+        Node::Neg([x]) => Value::Int(-to_int(ch(*x))),
+        Node::Not([x]) => Value::Bool(!to_bool(ch(*x))),
         Node::Lt([l, r]) => Value::Bool(to_int(ch(*l)) < to_int(ch(*r))),
         Node::Lte([l, r]) => Value::Bool(to_int(ch(*l)) <= to_int(ch(*r))),
         Node::Gt([l, r]) => Value::Bool(to_int(ch(*l)) > to_int(ch(*r))),
         Node::Gte([l, r]) => Value::Bool(to_int(ch(*l)) >= to_int(ch(*r))),
-        Node::Equals([l, r]) => Value::Bool(to_int(ch(*l)) == to_int(ch(*r))),
+        Node::Equals([l, r]) => Value::Bool(ch(*l) == ch(*r)),
+        Node::Distinct([l, r]) => Value::Bool(ch(*l) != ch(*r)),
+
+        Node::And([l, r]) => Value::Bool(to_bool(ch(*l)) && to_bool(ch(*r))),
+        Node::Or([l, r]) => Value::Bool(to_bool(ch(*l)) || to_bool(ch(*r))),
+        Node::Xor([l, r]) => Value::Bool(to_bool(ch(*l)) != to_bool(ch(*r))),
+        Node::Implies([l, r]) => Value::Bool(!to_bool(ch(*l)) || to_bool(ch(*r))),
 
         Node::Abs([x]) => Value::Int(to_int(ch(*x)).abs()),
 
-        Node::Constant(i) => Value::Int(*i),
+        Node::ConstInt(i) => Value::Int(*i),
     }
 }
 

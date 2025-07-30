@@ -1,31 +1,48 @@
-use std::fmt::{Debug, Formatter, Result};
+use std::fmt::{Debug, Display, Formatter, Result};
 
 use crate::*;
 
 impl Debug for Term {
     fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{}", rec(self.elems.len()-1, self))
+        write!(f, "{}", term_to_z3(self.elems.len()-1, self, &[]))
     }
 }
 
-fn rec(i: usize, t: &Term) -> String {
+impl Display for Term {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        write!(f, "{}", term_to_z3(self.elems.len()-1, self, &[]))
+    }
+}
+
+pub fn term_to_z3(i: usize, t: &Term, vars: &[String]) -> String {
     match &t.elems[i] {
-        Node::Var(v) => format!("v{v}"),
+        Node::Var(v) => vars.get(*v).cloned().unwrap_or_else(|| format!("unknown_{v}")),
 
-        &Node::Add([x, y]) => format!("(add {} {})", rec(x, t), rec(y, t)),
-        &Node::Sub([x, y]) => format!("(sub {} {})", rec(x, t), rec(y, t)),
-        &Node::Mul([x, y]) => format!("(mul {} {})", rec(x, t), rec(y, t)),
-        &Node::Div([x, y]) => format!("(div {} {})", rec(x, t), rec(y, t)),
-        &Node::Mod([x, y]) => format!("(mod {} {})", rec(x, t), rec(y, t)),
+        &Node::Add([x, y]) => format!("(+ {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Sub([x, y]) => format!("(- {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Mul([x, y]) => format!("(* {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Div([x, y]) => format!("(div {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Mod([x, y]) => format!("(mod {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
 
-        &Node::Ite([x, y, z]) => format!("(ite {} {} {})", rec(x, t), rec(y, t), rec(z, t)),
-        &Node::Lt([x, y]) => format!("(lt {} {})", rec(x, t), rec(y, t)),
-        &Node::Gt([x, y]) => format!("(gt {} {})", rec(x, t), rec(y, t)),
-        &Node::Lte([x, y]) => format!("(lte {} {})", rec(x, t), rec(y, t)),
-        &Node::Gte([x, y]) => format!("(gte {} {})", rec(x, t), rec(y, t)),
-        &Node::Equals([x, y]) => format!("(eq {} {})", rec(x, t), rec(y, t)),
-        &Node::Abs([x]) => format!("(abs {})", rec(x, t)),
+        &Node::Ite([x, y, z]) => format!("(ite {} {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars), term_to_z3(z, t, vars)),
+        &Node::Lt([x, y]) => format!("(< {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Gt([x, y]) => format!("(> {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Lte([x, y]) => format!("(<= {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Gte([x, y]) => format!("(>= {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Equals([x, y]) => format!("(= {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Abs([x]) => format!("(abs {})", term_to_z3(x, t, vars)),
+        &Node::Not([x]) => format!("(not {})", term_to_z3(x, t, vars)),
+        &Node::Neg([x]) => format!("(-{})", term_to_z3(x, t, vars)),
+        &Node::True => format!("true"),
+        &Node::False => format!("false"),
+        &Node::And([x, y]) => format!("(and {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Or([x, y]) => format!("(or {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Implies([x, y]) => format!("(=> {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Xor([x, y]) => format!("(xor {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
+        &Node::Distinct([x, y]) => format!("(distinct {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
 
-        Node::Constant(i) => format!("{i}"),
+        Node::ConstInt(i) => format!("{i}"),
     }
 }
+
+

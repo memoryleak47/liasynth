@@ -48,7 +48,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
     for g in subgrammars {
         for t in g.terminals {
             match t {
-                Terminal::Num(i) => prod_rules.push(Node::Constant(i)),
+                Terminal::Num(i) => prod_rules.push(Node::ConstInt(i)),
                 Terminal::Var(v) => {
                     prod_rules.push(Node::Var(vars.len()));
                     vars.push(v.to_string());
@@ -188,26 +188,3 @@ impl Oracle for SygusProblemAndOracle {
         } else { None }
     }
 }
-
-fn term_to_z3(i: usize, t: &Term, vars: &[String]) -> String {
-    match &t.elems[i] {
-        Node::Var(v) => vars[*v].clone(),
-
-        &Node::Add([x, y]) => format!("(+ {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
-        &Node::Sub([x, y]) => format!("(- {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
-        &Node::Mul([x, y]) => format!("(* {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
-        &Node::Div([x, y]) => format!("(div {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
-        &Node::Mod([x, y]) => format!("(mod {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
-
-        &Node::Ite([x, y, z]) => format!("(ite {} {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars), term_to_z3(z, t, vars)),
-        &Node::Lt([x, y]) => format!("(< {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
-        &Node::Gt([x, y]) => format!("(> {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
-        &Node::Lte([x, y]) => format!("(<= {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
-        &Node::Gte([x, y]) => format!("(>= {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
-        &Node::Equals([x, y]) => format!("(= {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
-        &Node::Abs([x]) => format!("(abs {})", term_to_z3(x, t, vars)),
-
-        Node::Constant(i) => format!("{i}"),
-    }
-}
-
