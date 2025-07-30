@@ -270,6 +270,7 @@ impl Problem {
             let ce = solver.get_model().unwrap();
             let mut sigma = Sigma::new();
             for var in &self.context_vars {
+                // TODO examples/LIA/unbdd_inv_gen_term2.sl has a boolean-typed context var. This one assumes it's always int.
                 let z3var = z3::ast::Int::new_const(&ctxt, var.to_string());
                 let z3val = ce.eval(&z3var, true); // TODO model completion?
                 sigma.push(Value::Int(z3val.unwrap().as_i64().unwrap()));
