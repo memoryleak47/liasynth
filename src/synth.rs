@@ -25,9 +25,6 @@ struct Ctxt<'a> {
 
     i_solids: Vec<Id>,
     b_solids: Vec<Id>,
-
-    // TODO re-add
-    cx_value_cache: Map<(usize, Value), bool>,
 }
 
 struct Class {
@@ -140,7 +137,6 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma]) -> Term {
         classes: Vec::new(),
         i_solids: Vec::new(),
         b_solids: Vec::new(),
-        cx_value_cache: Map::default(),
     })
 }
 
