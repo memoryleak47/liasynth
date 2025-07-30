@@ -51,7 +51,7 @@ fn simplify_expr(e: Expr, defs: &Map<String, Def>, varmap: &Map<String, Expr>) -
                 return simplify_expr(def.expr.clone(), defs, &ivarmap);
             }
 
-            let expr: Vec<Expr> = expr.iter().map(|x| simplify_expr(x.clone(), defs, varmap)).collect();
+            let expr: Vec<Expr> = expr.into_iter().map(|x| simplify_expr(x, defs, varmap)).collect();
             Expr::Operation { op, expr }
         }
         Expr::Let { bindings, body } => {
