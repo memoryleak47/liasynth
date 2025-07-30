@@ -164,20 +164,6 @@ fn show_val(v: &Value) -> String {
 
 impl Problem {
     pub fn prod_rules(&self) -> &[Node] { &self.prod_rules }
-    pub fn sat(&self, term: &Term, sigma: &Sigma) -> bool {
-        todo!()
-/*
-        if term.elems.last().unwrap().ty() != self.rettype {
-            return false;
-        }
-        if !sigma.iter().zip(self.argtypes.iter()).all(|(val, ty)| val.ty() == *ty) {
-            return false;
-        }
-
-        let vars: Box<[_]> = (0..self.vars.len()).collect();
-        eval_term(&self.constraint, sigma) == Value::Bool(true)
-*/
-    }
 }
 
 impl Problem {

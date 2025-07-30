@@ -26,6 +26,7 @@ struct Ctxt<'a> {
     i_solids: Vec<Id>,
     b_solids: Vec<Id>,
 
+    // TODO re-add
     cx_value_cache: Map<(usize, Value), bool>,
 }
 
@@ -222,13 +223,16 @@ fn minsize(node: &Node, ctxt: &Ctxt) -> usize {
 }
 
 fn satcount(x: Id, ctxt: &mut Ctxt) -> usize {
+    if ctxt.classes[x].node.ty() != ctxt.problem.rettype {
+        return 0;
+    }
+    // TODO type-chk for arguments.
+
     // TODO re-add cx_value_cache.
     let mut count = 0;
-    let t = extract(x, ctxt);
-    for bsigma in ctxt.big_sigmas.iter() {
-        let b = ctxt.problem.sat(&t, bsigma);
+    for i in 0..ctxt.big_sigmas.len() {
+        let b = local_sat(i, x, ctxt);
         count += b as usize;
-        // ctxt.cx_value_cache.insert((i, val.clone()), b);
     }
     count
 }
