@@ -220,11 +220,11 @@ pub fn cegis(problem: impl Problem, mut synth: impl Synth, oracle: impl Oracle) 
     let mut sigmas = Vec::new();
     loop {
         let term = synth.synth(&problem, &sigmas);
-        println!("Candidate: {:?}", &term);
+        // println!("Candidate: {:?}", &term);
         // TODO check this later: assert!(problem.sat(&..., &sigmas));
 
         if let Some(sigma) = oracle.verify(&term) {
-            println!("CE: {:?}", &sigma);
+            // println!("CE: {:?}", &sigma);
             if sigmas.contains(&sigma) {
                 panic!("This is broken!");
             }

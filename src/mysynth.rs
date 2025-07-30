@@ -205,7 +205,7 @@ fn minsize<'a, P: Problem>(node: &Node, ctxt: &Ctxt<'a, P>) -> usize {
 fn satcount<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<'a, P>) -> usize {
     // TODO re-add cx_value_cache.
     let mut count = 0;
-    let t = dbg!(extract(x, ctxt));
+    let t = extract(x, ctxt);
     for bsigma in ctxt.big_sigmas.iter() {
         let b = ctxt.problem.sat(&t, bsigma);
         count += b as usize;

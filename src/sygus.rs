@@ -216,9 +216,9 @@ impl Oracle for SygusProblemAndOracle {
         let config = z3::Config::new();
         let ctxt = z3::Context::new(&config);
         let mut solver = z3::Solver::new(&ctxt);
-        println!("VERIFY-QUERY: {}", &query);
+        // println!("VERIFY-QUERY: {}", &query);
         solver.from_string(query);
-        println!("VERIFY-SMT: {}", solver.to_smt2());
+        // println!("VERIFY-SMT: {}", solver.to_smt2());
 
         if solver.check() == z3::SatResult::Sat {
             let ce = solver.get_model().unwrap();
