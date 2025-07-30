@@ -10,8 +10,8 @@ pub use with_ord::*;
 mod parser;
 pub use parser::*;
 
-mod sygus;
-pub use sygus::*;
+mod problem;
+pub use problem::*;
 
 mod fmt;
 pub use fmt::*;
