@@ -29,27 +29,26 @@ struct Def {
 }
 
 // resolves "let" and "defined-funs"
-// neither defs nor varmap contain already simplified exprs.
-fn simplify_expr(e: Expr, defs: &Map<String, Def>, varmap: &Vec<(String, Expr)>) -> Expr {
+// defs are not necessarily simplified, but varmap is.
+fn simplify_expr(e: Expr, defs: &Map<String, Def>, varmap: &Map<String, Expr>) -> Expr {
     match e {
         Expr::Terminal(Terminal::Num(i)) => Expr::Terminal(Terminal::Num(i)),
         Expr::Terminal(Terminal::Bool(b)) => Expr::Terminal(Terminal::Bool(b)),
         Expr::Terminal(Terminal::Var(v)) => {
-            let mut varmap = varmap.clone();
-            while let Some((v2, t)) = varmap.pop() {
-                if v == v2 {
-                    return simplify_expr(t, defs, &varmap);
-                }
+            if let Some(t) = varmap.get(&v) {
+                t.clone()
+            } else {
+                Expr::Terminal(Terminal::Var(v))
             }
-            Expr::Terminal(Terminal::Var(v))
         },
         Expr::Operation { op, expr } => {
             if let Some(def) = defs.get(&op) {
-                let mut varmap = varmap.clone();
+                let mut ivarmap = Map::default();
                 for (v, ex) in (def.args.iter()).zip(expr.into_iter()) {
-                    varmap.push((v.clone(), ex));
+                    let ex = simplify_expr(ex, defs, varmap);
+                    ivarmap.insert(v.clone(), ex);
                 }
-                return simplify_expr(def.expr.clone(), defs, &varmap);
+                return simplify_expr(def.expr.clone(), defs, &ivarmap);
             }
 
             let expr: Vec<Expr> = expr.iter().map(|x| simplify_expr(x.clone(), defs, varmap)).collect();
@@ -58,7 +57,8 @@ fn simplify_expr(e: Expr, defs: &Map<String, Def>, varmap: &Vec<(String, Expr)>)
         Expr::Let { bindings, body } => {
             let mut varmap = varmap.clone();
             for (var, ex) in bindings {
-                varmap.push((var, ex));
+                let ex = simplify_expr(ex, defs, &varmap);
+                varmap.insert(var, ex);
             }
             simplify_expr(*body, defs, &varmap)
         },
@@ -199,7 +199,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
         }
     }
 
-    let constraint = simplify_expr(constraint, &defs, &Vec::new());
+    let constraint = simplify_expr(constraint, &defs, &Map::default());
     let (constraint, instvars) = sygus_expr_to_term(constraint, &context_vars, &progname);
 
     Problem {
