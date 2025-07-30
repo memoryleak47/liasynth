@@ -133,7 +133,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
         }
     }
 
-    let constraint = sygus_expr_to_term(constraint, &mut Vec::new(), &vars);
+    let constraint = sygus_expr_to_term(constraint, &mut Vec::new(), &context_vars);
 
     SygusProblemAndOracle {
         progname,
