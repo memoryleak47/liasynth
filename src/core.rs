@@ -1,3 +1,5 @@
+use crate::*;
+
 pub type Int = i64; // TODO add bigint.
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -72,7 +74,7 @@ impl Node {
             Abs(s) | Neg(s) | Not(s) => s,
             Add(s) | Sub(s) | Mul(s) | Div(s) | Mod(s) | Lt(s) | Gt(s) | Lte(s) | Gte(s) | Equals(s) | Distinct(s) | Implies(s) | And(s) | Or(s) | Xor(s) => s,
             Ite(s) => s,
-            SynthFun => &[],
+            SynthCall(s) => s,
         }
     }
 
@@ -83,7 +85,7 @@ impl Node {
             Abs(s) | Neg(s) | Not(s) => s,
             Add(s) | Sub(s) | Mul(s) | Div(s) | Mod(s) | Lt(s) | Gt(s) | Lte(s) | Gte(s) | Equals(s) | Distinct(s) | Implies(s) | And(s) | Or(s) | Xor(s) => s,
             Ite(s) => s,
-            SynthFun => &mut [],
+            SynthCall(s) => s,
         }
     }
 
@@ -98,7 +100,7 @@ impl Node {
             Not(_) => &(&[Ty::Bool], Ty::Bool),
             Implies(_) | And(_) | Or(_) | Xor(_) | Distinct(_) => &(&[Ty::Bool; 2], Ty::Bool),
             Abs(_) => &(&[Ty::Int], Ty::Int),
-            SynthFun => &(&[Ty::Int], Ty::Int), //?
+            SynthCall(_) => panic!(),
         }
     }
 
@@ -132,20 +134,6 @@ impl Term {
 }
 
 pub type Sigma = Vec<Value>;
-
-pub trait Problem {
-    fn prod_rules(&self) -> &[Node];
-    fn sat(&self, term: &Term, sigma: &Sigma) -> bool;
-    fn accesses(&self) -> &[Box<[Var]>];
-}
-
-pub trait Oracle {
-    fn verify(&self, term: &Term) -> Option<Sigma>;
-}
-
-pub trait Synth {
-    fn synth(&mut self, problem: &impl Problem, sigmas: &[Sigma]) -> Term;
-}
 
 fn to_int(v: Value) -> Int {
     match v {
@@ -216,14 +204,14 @@ pub fn eval_term(term: &Term, sigma: &Sigma, synthfun: &Term) -> Value {
     vals.last().unwrap().clone()
 }
 
-pub fn cegis(problem: impl Problem, mut synth: impl Synth, oracle: impl Oracle) -> Term {
+pub fn cegis(problem: Problem) -> Term {
     let mut sigmas = Vec::new();
     loop {
-        let term = synth.synth(&problem, &sigmas);
+        let term = synth(&problem, &sigmas);
         // println!("Candidate: {:?}", &term);
         // TODO check this later: assert!(problem.sat(&..., &sigmas));
 
-        if let Some(sigma) = oracle.verify(&term) {
+        if let Some(sigma) = problem.verify(&term) {
             // println!("CE: {:?}", &sigma);
             if sigmas.contains(&sigma) {
                 panic!("This is broken!");

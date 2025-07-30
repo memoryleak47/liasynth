@@ -1,15 +1,11 @@
 mod core;
 pub use core::*;
 
-mod mysynth;
-pub use mysynth::*;
+mod synth;
+pub use synth::*;
 
 mod with_ord;
 pub use with_ord::*;
-
-// TODO re-add.
-// mod examples;
-// pub use examples::*;
 
 mod parser;
 pub use parser::*;
@@ -25,6 +21,6 @@ pub use std::collections::BinaryHeap;
 
 fn main() {
     let arg = std::env::args().nth(1).unwrap_or(String::from("examples/unbdd_inv_gen_array.sl"));
-    let (problem, oracle) = sygus_problem(&arg);
-    println!("Answer: {:?}", cegis(problem, MySynth, oracle));
+    let problem = mk_sygus_problem(&arg);
+    println!("Answer: {:?}", cegis(problem));
 }

@@ -1,7 +1,7 @@
 use crate::*;
 
 #[derive(Clone)]
-struct SygusProblemAndOracle {
+pub struct Problem {
     argtypes: Vec<Ty>,
     rettype: Ty,
 
@@ -70,16 +70,14 @@ fn sygus_expr_to_term_impl(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[Stri
     }
 }
 
-pub fn sygus_problem(f: &str) -> (impl Problem, impl Oracle) {
+pub fn mk_sygus_problem(f: &str) -> Problem {
     let s = std::fs::read_to_string(f).unwrap();
     let (parsed, _) = parse_sygus(&s).unwrap();
 
-    let pao = build_sygus(parsed);
-
-    (pao.clone(), pao)
+    build_sygus(parsed)
 }
 
-fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
+fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
     let Some(SyGuSExpr::SynthFun(progname, argtypes, rettype, _, subgrammars)) =
         exprs.iter().filter(|x| matches!(x, SyGuSExpr::SynthFun(..))).cloned().next() else { panic!() };
 
@@ -153,7 +151,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
     }
     let accesses = accesses.into();
 
-    SygusProblemAndOracle {
+    Problem {
         progname,
         argtypes: argtypes.into_iter().map(|(_, x)| x).collect(),
         rettype,
@@ -173,9 +171,9 @@ fn show_val(v: &Value) -> String {
     }
 }
 
-impl Problem for SygusProblemAndOracle {
-    fn prod_rules(&self) -> &[Node] { &self.prod_rules }
-    fn sat(&self, term: &Term, sigma: &Sigma) -> bool {
+impl Problem {
+    pub fn prod_rules(&self) -> &[Node] { &self.prod_rules }
+    pub fn sat(&self, term: &Term, sigma: &Sigma) -> bool {
         if term.elems.last().unwrap().ty() != self.rettype {
             return false;
         }
@@ -187,13 +185,13 @@ impl Problem for SygusProblemAndOracle {
         eval_term(&self.constraint, sigma, term) == Value::Bool(true)
     }
 
-    fn accesses(&self) -> &[Box<[Var]>] {
+    pub fn accesses(&self) -> &[Box<[Var]>] {
         &self.accesses
     }
 }
 
-impl Oracle for SygusProblemAndOracle {
-    fn verify(&self, term: &Term) -> Option<Sigma> {
+impl Problem {
+    pub fn verify(&self, term: &Term) -> Option<Sigma> {
         let retty = term.elems.last().unwrap().ty();
         if retty != self.rettype {
             return Some(vec![Value::Int(0); self.vars.len()]);
