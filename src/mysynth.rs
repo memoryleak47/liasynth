@@ -71,9 +71,9 @@ fn grow<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) -> Option<Id> {
     let ty = ctxt.classes[x].node.ty();
 
     for rule in ctxt.problem.prod_rules() {
-        let mut rule = rule.clone();
         let (in_types, out_type) = rule.signature();
         for i in 0..rule.children().len() {
+            let mut rule = rule.clone();
             if in_types[i] != ty { continue }
             rule.children_mut()[i] = x;
             let mut in_types: Vec<_> = in_types.iter().cloned().collect();
@@ -82,6 +82,7 @@ fn grow<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) -> Option<Id> {
                 Ty::Int => ctxt.i_solids.clone().into_iter(),
                 Ty::Bool => ctxt.b_solids.clone().into_iter(),
             });
+
             for a in it.multi_cartesian_product() {
                 rule.children_mut().iter_mut().enumerate()
                     .filter(|(i2, _)| *i2 != i)
