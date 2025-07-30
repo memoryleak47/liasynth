@@ -101,11 +101,14 @@ fn grow<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) -> Option<Id> {
 
 impl Synth for MySynth {
     fn synth(&mut self, problem: &impl Problem, big_sigmas: &[Sigma]) -> Term {
-        let small_sigmas = big_sigmas.iter().enumerate().flat_map(|(i, bsigma)| {
-            problem.accesses().iter().map(move |a|
-                a.iter().map(|i| bsigma[*i].clone()).collect()
-            )
-        }).collect();
+        let mut small_sigmas = Vec::new();
+        for bsigma in big_sigmas.iter() {
+            for a in problem.accesses().iter() {
+                let ssigma: Sigma = a.iter().map(|i| bsigma[*i].clone()).collect();
+                if !small_sigmas.contains(&ssigma) { small_sigmas.push(ssigma); }
+            }
+        }
+        let small_sigmas = small_sigmas.into();
 
         run(&mut Ctxt {
             queue: Default::default(),
