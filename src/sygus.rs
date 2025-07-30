@@ -190,15 +190,16 @@ impl Oracle for SygusProblemAndOracle {
         }
         let term = term_to_z3(term.elems.len()-1, term, &self.context_vars);
         query.push_str(&format!(") {retty} {term})\n"));
-        let constr = term_to_z3(self.constraint.elems.len()-1, &self.constraint, &self.context_vars);
+        let mut constr = term_to_z3(self.constraint.elems.len()-1, &self.constraint, &self.context_vars);
+        constr = constr.replace("synthfun", &term);
         query.push_str(&format!("(assert (not {constr}))\n"));
 
         let config = z3::Config::new();
         let ctxt = z3::Context::new(&config);
         let mut solver = z3::Solver::new(&ctxt);
-        // println!("VERIFY-QUERY: {}", &query);
+        println!("VERIFY-QUERY: {}", &query);
         solver.from_string(query);
-        // println!("VERIFY-SMT: {}", solver.to_smt2());
+        println!("VERIFY-SMT: {}", solver.to_smt2());
 
         if solver.check() == z3::SatResult::Sat {
             let ce = solver.get_model().unwrap();
