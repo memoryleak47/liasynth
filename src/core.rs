@@ -204,11 +204,11 @@ pub fn cegis(problem: Problem) -> Term {
     let mut sigmas = Vec::new();
     loop {
         let term = synth(&problem, &sigmas);
-        // println!("Candidate: {:?}", &term);
+        println!("Candidate: {}", term_to_z3(&term, &problem.vars));
         // TODO check this later: assert!(problem.sat(&..., &sigmas));
 
         if let Some(sigma) = problem.verify(&term) {
-            // println!("CE: {:?}", &sigma);
+            println!("CE: {:?}", &sigma);
             if sigmas.contains(&sigma) {
                 panic!("This is broken!");
             }
