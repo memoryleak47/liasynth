@@ -84,7 +84,6 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
             Some(e.clone())
         } else { None }
     ).fold(Expr::Terminal(Terminal::Bool(true)), |x, y| Expr::Operation { op: format!("and"), expr: vec![x, y],} );
-    let constraint = sygus_expr_to_term(constraint, &mut Vec::new(), &vars);
 
     let mut prod_rules = Vec::new();
     for g in subgrammars {
@@ -132,6 +131,8 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
             context.push_str(&format!("(declare-fun {name} () {ty})\n"));
         }
     }
+
+    let constraint = sygus_expr_to_term(constraint, &mut Vec::new(), &vars);
 
     SygusProblemAndOracle {
         progname,
