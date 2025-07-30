@@ -64,7 +64,7 @@ fn sygus_expr_to_term_impl(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[Stri
                 ("distinct", &[x, y]) => Node::Distinct([x, y]),
                 (prog, args) if prog == progname => {
                     instvars.push(args.iter().cloned().collect());
-                    Node::Var(vars.len() + instvars.len())
+                    Node::Var(vars.len() + instvars.len() - 1)
                 },
                 (x, l) => todo!("unknown node {x} of arity {}", l.len()),
             };
