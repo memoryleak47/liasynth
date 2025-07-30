@@ -158,21 +158,22 @@ fn enqueue<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) {
 
 fn heuristic<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Score {
     let c = &ctxt.classes[x];
-    let subterms = c.node.children();
-    let subterm_satcount_diff = subterms
-        .iter()
-        .map(|s| (c.satcount as isize) - (ctxt.classes[*s].satcount as isize))
-        .max()
-        .unwrap_or_else(|| 0);
-
     if let Ty::Bool = c.node.ty() {
         return 10000;
     }
 
-    let rel_satcount = c.satcount.checked_add_signed(subterm_satcount_diff).unwrap_or(0);
-
     let mut a = 100000;
-    for _ in rel_satcount..ctxt.sigmas.len() {
+    let subterms = c.node.children();
+    let max_subterm_satcount = subterms
+        .iter()
+        .map(|s| ctxt.classes[*s].satcount)
+        .max()
+        .unwrap_or_else(|| 0);
+
+
+    let tmp = c.satcount.saturating_sub(max_subterm_satcount / 2);
+
+    for _ in tmp..ctxt.sigmas.len() {
         a /= 2;
     }
 
