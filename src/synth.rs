@@ -5,10 +5,19 @@ use itertools::Itertools;
 type Score = usize;
 type Queue = BinaryHeap<WithOrd<Id, Score>>;
 
+// SmallSigma has as many values as our synthfun has arguments.
+// BigSigma has as many values as our Sygus file declares.
+// HugeSigma is BigSigma extended by one variable per instantiation of the synthfun.
+
 struct Ctxt<'a> {
     queue: Queue, // contains ids of pending (i.e. not solidifed Ids), or solid Ids which got an updated size.
+
     big_sigmas: &'a [Sigma],
     small_sigmas: Box<[Sigma]>,
+
+    // for each big_sigma, this returns the list of small_sigmas corresponding to the instantiations of the synthfun.
+    sigma_indices: Box<[Box<[usize]>]>,
+
     problem: &'a Problem,
 
     vals_lookup: Map<Box<[Value]>, Id>,
@@ -48,7 +57,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
 }
 
 // makes "x" solid if it's not solid yet.
-fn handle<'a>(x: Id, ctxt: &mut Ctxt) -> Option<Id> {
+fn handle(x: Id, ctxt: &mut Ctxt) -> Option<Id> {
     let c = &mut ctxt.classes[x];
 
     // if the current size is the same size of the last "handle" call, nothing it to be done.
@@ -66,7 +75,7 @@ fn handle<'a>(x: Id, ctxt: &mut Ctxt) -> Option<Id> {
     grow(x, ctxt)
 }
 
-fn grow<'a>(x: Id, ctxt: &mut Ctxt) -> Option<Id> {
+fn grow(x: Id, ctxt: &mut Ctxt) -> Option<Id> {
     let ty = ctxt.classes[x].node.ty();
 
     for rule in ctxt.problem.prod_rules() {
@@ -98,19 +107,32 @@ fn grow<'a>(x: Id, ctxt: &mut Ctxt) -> Option<Id> {
 }
 
 pub fn synth(problem: &Problem, big_sigmas: &[Sigma]) -> Term {
-    let mut small_sigmas = Vec::new();
+    let mut small_sigmas: Vec<Sigma> = Vec::new();
+    let mut sigma_indices: Vec<Box<[usize]>> = Vec::new();
     for bsigma in big_sigmas.iter() {
+        let mut indices: Vec<usize> = Vec::new();
         for a in problem.accesses().iter() {
             let ssigma: Sigma = a.iter().map(|i| bsigma[*i].clone()).collect();
-            if !small_sigmas.contains(&ssigma) { small_sigmas.push(ssigma); }
+            let idx = match small_sigmas.iter().position(|sigma2| sigma2 == &ssigma) {
+                Some(i) => i,
+                None => {
+                    small_sigmas.push(ssigma);
+                    small_sigmas.len() - 1
+                },
+            };
+            indices.push(idx);
         }
+        let indices: Box<[usize]> = indices.into();
+        sigma_indices.push(indices);
     }
-    let small_sigmas = small_sigmas.into();
+    let small_sigmas: Box<[Sigma]> = small_sigmas.into();
+    let sigma_indices: Box<[Box<[usize]>]> = sigma_indices.into();
 
     run(&mut Ctxt {
         queue: Default::default(),
         big_sigmas,
         small_sigmas,
+        sigma_indices,
         problem,
         vals_lookup: Default::default(),
         classes: Vec::new(),
@@ -120,7 +142,7 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma]) -> Term {
     })
 }
 
-fn add_node<'a>(node: Node, ctxt: &mut Ctxt<'a>) -> Option<Id> {
+fn add_node(node: Node, ctxt: &mut Ctxt) -> Option<Id> {
     let vals = vals(&node, ctxt);
     if let Some(&i) = ctxt.vals_lookup.get(&vals) {
         let newsize = minsize(&node, ctxt);
@@ -158,12 +180,12 @@ fn add_node<'a>(node: Node, ctxt: &mut Ctxt<'a>) -> Option<Id> {
     None
 }
 
-fn enqueue<'a>(x: Id, ctxt: &mut Ctxt) {
+fn enqueue(x: Id, ctxt: &mut Ctxt) {
     let h = heuristic(x, ctxt);
     ctxt.queue.push(WithOrd(x, h));
 }
 
-fn heuristic<'a>(x: Id, ctxt: &Ctxt<'a>) -> Score {
+fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
     if let Ty::Bool = c.node.ty() {
         return 10000;
@@ -190,7 +212,7 @@ fn heuristic<'a>(x: Id, ctxt: &Ctxt<'a>) -> Score {
 fn vals(node: &Node, ctxt: &Ctxt) -> Box<[Value]> {
     ctxt.small_sigmas.iter().enumerate().map(|(i, sigma)| {
         let f = |id: Id| ctxt.classes[id].vals[i].clone();
-        eval_node(node, sigma, &f, &Term { elems: Vec::new() })
+        eval_node(node, sigma, &f)
     }).collect()
 }
 
@@ -208,6 +230,19 @@ fn satcount(x: Id, ctxt: &mut Ctxt) -> usize {
         // ctxt.cx_value_cache.insert((i, val.clone()), b);
     }
     count
+}
+
+fn local_sat(big_sigma_idx: usize, class: Id, ctxt: &Ctxt) -> bool {
+    let mut huge_sigma = ctxt.big_sigmas[big_sigma_idx].clone();
+    let c = &ctxt.classes[class];
+    let vals = &c.vals;
+
+    let indices = &ctxt.sigma_indices[big_sigma_idx];
+    for idx in indices.iter() {
+        huge_sigma.push(vals[*idx].clone());
+    }
+
+    eval_term(&ctxt.problem.constraint, &huge_sigma) == Value::Bool(true)
 }
 
 fn extract(x: Id, ctxt: &Ctxt) -> Term {
@@ -310,7 +345,6 @@ fn extract(x: Id, ctxt: &Ctxt) -> Term {
             t.push(Node::Ite([x, y, z]));
         },
         Node::ConstInt(i) => { t.push(Node::ConstInt(i)); },
-        Node::SynthCall(_) => panic!(),
     }
     t
 }

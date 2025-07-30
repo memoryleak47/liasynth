@@ -42,18 +42,6 @@ pub fn term_to_z3(i: usize, t: &Term, vars: &[String], progname: &str) -> String
         &Node::Distinct([x, y]) => format!("(distinct {} {})", term_to_z3(x, t, vars, progname), term_to_z3(y, t, vars, progname)),
 
         Node::ConstInt(i) => format!("{i}"),
-        Node::SynthCall(args) => {
-            let mut s = String::new();
-            s.push('(');
-            s.push_str(progname);
-            s.push(' ');
-            for x in args {
-                s.push_str(&term_to_z3(*x, t, vars, progname));
-                s.push(' ');
-            }
-            s.push(')');
-            s
-        }
     }
 }
 

@@ -62,8 +62,6 @@ pub enum Node {
     Equals([Id; 2]),
     Distinct([Id; 2]),
     Ite([Id; 3]),
-
-    SynthCall(Box<[Id]>),
 }
 
 impl Node {
@@ -74,7 +72,6 @@ impl Node {
             Abs(s) | Neg(s) | Not(s) => s,
             Add(s) | Sub(s) | Mul(s) | Div(s) | Mod(s) | Lt(s) | Gt(s) | Lte(s) | Gte(s) | Equals(s) | Distinct(s) | Implies(s) | And(s) | Or(s) | Xor(s) => s,
             Ite(s) => s,
-            SynthCall(s) => s,
         }
     }
 
@@ -85,7 +82,6 @@ impl Node {
             Abs(s) | Neg(s) | Not(s) => s,
             Add(s) | Sub(s) | Mul(s) | Div(s) | Mod(s) | Lt(s) | Gt(s) | Lte(s) | Gte(s) | Equals(s) | Distinct(s) | Implies(s) | And(s) | Or(s) | Xor(s) => s,
             Ite(s) => s,
-            SynthCall(s) => s,
         }
     }
 
@@ -100,7 +96,6 @@ impl Node {
             Not(_) => &(&[Ty::Bool], Ty::Bool),
             Implies(_) | And(_) | Or(_) | Xor(_) | Distinct(_) => &(&[Ty::Bool; 2], Ty::Bool),
             Abs(_) => &(&[Ty::Int], Ty::Int),
-            SynthCall(_) => panic!(),
         }
     }
 
@@ -149,7 +144,7 @@ fn to_bool(v: Value) -> bool {
     }
 }
 
-pub fn eval_node(node: &Node, sigma: &Sigma, ch: &impl Fn(Id) -> Value, synthfun: &Term) -> Value {
+pub fn eval_node(node: &Node, sigma: &Sigma, ch: &impl Fn(Id) -> Value) -> Value {
     match node {
         Node::Var(s) => sigma[*s].clone(),
         Node::Add([l, r]) => Value::Int(to_int(ch(*l)) + to_int(ch(*r))),
@@ -188,18 +183,14 @@ pub fn eval_node(node: &Node, sigma: &Sigma, ch: &impl Fn(Id) -> Value, synthfun
         Node::Abs([x]) => Value::Int(to_int(ch(*x)).abs()),
 
         Node::ConstInt(i) => Value::Int(*i),
-        Node::SynthCall(args) => {
-            let sigma = args.iter().map(|x| ch(*x)).collect();
-            eval_term(synthfun, &sigma, synthfun)
-        },
     }
 }
 
-pub fn eval_term(term: &Term, sigma: &Sigma, synthfun: &Term) -> Value {
+pub fn eval_term(term: &Term, sigma: &Sigma) -> Value {
     let mut vals: Vec<Value> = Vec::new();
     for n in &term.elems {
         let f = |i: usize| vals[i].clone();
-        vals.push(eval_node(n, sigma, &f, synthfun));
+        vals.push(eval_node(n, sigma, &f));
     }
     vals.last().unwrap().clone()
 }

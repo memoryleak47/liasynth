@@ -2,33 +2,32 @@ use crate::*;
 
 #[derive(Clone)]
 pub struct Problem {
-    argtypes: Vec<Ty>,
-    rettype: Ty,
+    pub argtypes: Vec<Ty>,
+    pub rettype: Ty,
 
-    progname: String,
+    pub progname: String,
 
     // maps between the SyGuS named variables, and the
     // variable indices from our synthesizer.
-    vars: Vec<String>,
+    pub vars: Vec<String>,
 
-    constraint: Term,
+    pub constraint: Term,
 
     // The ids of these Nodes will be nulled away.
-    prod_rules: Box<[Node]>,
+    pub prod_rules: Box<[Node]>,
 
-    context: String,
-    context_vars: Vec<String>,
-
-    accesses: Box<[Box<[Var]>]>,
+    pub context: String,
+    pub context_vars: Vec<String>,
 }
 
-fn sygus_expr_to_term(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String], progname: &str) -> Term {
+fn sygus_expr_to_term(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String], progname: &str) -> (Term, Vec<Box<[Id]>>) {
     let mut t = Term { elems: Vec::new() };
-    sygus_expr_to_term_impl(e, lets, vars, progname, &mut t);
-    t
+    let mut instvars = Vec::new();
+    sygus_expr_to_term_impl(e, lets, vars, progname, &mut t, &mut instvars);
+    (t, instvars)
 }
 
-fn sygus_expr_to_term_impl(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String], progname: &str, t: &mut Term) -> Id {
+fn sygus_expr_to_term_impl(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String], progname: &str, t: &mut Term, instvars: &mut Vec<Box<[Id]>>) -> Id {
     match e {
         Expr::Terminal(Terminal::Var(v)) => {
             let i = vars.iter().position(|x| *x == *v).unwrap();
@@ -38,7 +37,7 @@ fn sygus_expr_to_term_impl(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[Stri
         Expr::Terminal(Terminal::Bool(false)) => { t.push(Node::False) },
         Expr::Terminal(Terminal::Num(i)) => { t.push(Node::ConstInt(i)) },
         Expr::Operation { op, expr } => {
-            let exprs: Box<[Id]> = expr.iter().map(|x| sygus_expr_to_term_impl(x.clone(), lets, vars, progname, t)).collect();
+            let exprs: Box<[Id]> = expr.iter().map(|x| sygus_expr_to_term_impl(x.clone(), lets, vars, progname, t, instvars)).collect();
             let n = match (&*op, &*exprs) {
                 ("+", &[x, y]) => Node::Add([x, y]),
                 ("-", &[x, y]) => Node::Sub([x, y]),
@@ -61,7 +60,10 @@ fn sygus_expr_to_term_impl(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[Stri
                 (">=", &[x, y]) => Node::Gte([x, y]),
                 ("=", &[x, y]) => Node::Equals([x, y]),
                 ("distinct", &[x, y]) => Node::Distinct([x, y]),
-                (prog, args) if prog == progname => Node::SynthCall(args.iter().copied().collect()),
+                (prog, args) if prog == progname => {
+                    instvars.push(args.iter().cloned().collect());
+                    Node::Var(vars.len() + instvars.len())
+                },
                 (x, l) => todo!("unknown node {x} of arity {}", l.len()),
             };
             t.push(n)
@@ -136,20 +138,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
         }
     }
 
-    let constraint = sygus_expr_to_term(constraint, &mut Vec::new(), &context_vars, &progname);
-
-    let mut accesses = Vec::new();
-    for x in constraint.elems.iter() {
-        if let Node::SynthCall(args) = x {
-            let access = args.iter().map(|a|
-                match &constraint.elems[*a] {
-                    Node::Var(v) => *v,
-                    _ => panic!("Can only depend on variables!"),
-                }).collect();
-            accesses.push(access);
-        }
-    }
-    let accesses = accesses.into();
+    let (constraint, instvars) = sygus_expr_to_term(constraint, &mut Vec::new(), &context_vars, &progname);
 
     Problem {
         progname,
@@ -160,7 +149,6 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
         prod_rules: prod_rules.into(),
         context,
         context_vars,
-        accesses,
     }
 }
 
@@ -174,6 +162,8 @@ fn show_val(v: &Value) -> String {
 impl Problem {
     pub fn prod_rules(&self) -> &[Node] { &self.prod_rules }
     pub fn sat(&self, term: &Term, sigma: &Sigma) -> bool {
+        todo!()
+/*
         if term.elems.last().unwrap().ty() != self.rettype {
             return false;
         }
@@ -182,11 +172,12 @@ impl Problem {
         }
 
         let vars: Box<[_]> = (0..self.vars.len()).collect();
-        eval_term(&self.constraint, sigma, term) == Value::Bool(true)
+        eval_term(&self.constraint, sigma) == Value::Bool(true)
+*/
     }
 
     pub fn accesses(&self) -> &[Box<[Var]>] {
-        &self.accesses
+        todo!()
     }
 }
 
