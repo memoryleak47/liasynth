@@ -4,6 +4,8 @@ cargo b --release
 
 for f in $(find "examples/LIA" -type f)
 do
+    echo
+    echo ==========
     echo "$f:"
     timeout 10s target/release/liasynth "$f"
 done
