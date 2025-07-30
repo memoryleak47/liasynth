@@ -22,16 +22,21 @@ struct SygusProblemAndOracle {
 
 fn sygus_expr_to_term(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String], progname: &str) -> Term {
     let mut t = Term { elems: Vec::new() };
+    sygus_expr_to_term_impl(e, lets, vars, progname, &mut t);
+    t
+}
+
+fn sygus_expr_to_term_impl(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String], progname: &str, t: &mut Term) -> Id {
     match e {
         Expr::Terminal(Terminal::Var(v)) => {
             let i = vars.iter().position(|x| *x == *v).unwrap();
-            t.push(Node::Var(i));
+            t.push(Node::Var(i))
         },
-        Expr::Terminal(Terminal::Bool(true)) => { t.push(Node::True); },
-        Expr::Terminal(Terminal::Bool(false)) => { t.push(Node::False); },
-        Expr::Terminal(Terminal::Num(i)) => { t.push(Node::ConstInt(i)); },
+        Expr::Terminal(Terminal::Bool(true)) => { t.push(Node::True) },
+        Expr::Terminal(Terminal::Bool(false)) => { t.push(Node::False) },
+        Expr::Terminal(Terminal::Num(i)) => { t.push(Node::ConstInt(i)) },
         Expr::Operation { op, expr } => {
-            let exprs: Box<[usize]> = expr.iter().map(|x| t.push_subterm(sygus_expr_to_term(x.clone(), lets, vars, progname))).collect();
+            let exprs: Box<[Id]> = expr.iter().map(|x| sygus_expr_to_term_impl(x.clone(), lets, vars, progname, t)).collect();
             let n = match (&*op, &*exprs) {
                 ("+", &[x, y]) => Node::Add([x, y]),
                 ("-", &[x, y]) => Node::Sub([x, y]),
@@ -57,12 +62,10 @@ fn sygus_expr_to_term(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String], 
                 (prog, args) if prog == progname => Node::SynthCall(args.iter().copied().collect()),
                 (x, l) => todo!("unknown node {x} of arity {}", l.len()),
             };
-            t.push(n);
+            t.push(n)
         },
         Expr::Let { bindings, body } => todo!(),
     }
-
-    t
 }
 
 pub fn sygus_problem(f: &str) -> (impl Problem, impl Oracle) {

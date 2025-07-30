@@ -114,8 +114,10 @@ pub struct Term {
 }
 
 impl Term {
-    pub fn push(&mut self, n: Node) {
+    pub fn push(&mut self, n: Node) -> Id {
         self.elems.push(n);
+
+        self.elems.len() - 1
     }
 
     pub fn push_subterm(&mut self, t: Term) -> Id {
