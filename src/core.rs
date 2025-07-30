@@ -136,6 +136,7 @@ pub type Sigma = Vec<Value>;
 pub trait Problem {
     fn prod_rules(&self) -> &[Node];
     fn sat(&self, term: &Term, sigma: &Sigma) -> bool;
+    fn accesses(&self) -> &[Box<[Var]>];
 }
 
 pub trait Oracle {

@@ -9,7 +9,8 @@ type Queue = BinaryHeap<WithOrd<Id, Score>>;
 
 struct Ctxt<'a, P> {
     queue: Queue, // contains ids of pending (i.e. not solidifed Ids), or solid Ids which got an updated size.
-    sigmas: &'a [Sigma],
+    big_sigmas: &'a [Sigma],
+    small_sigmas: Box<[Sigma]>,
     problem: &'a P,
 
     vals_lookup: Map<Box<[Value]>, Id>,
@@ -99,10 +100,17 @@ fn grow<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<P>) -> Option<Id> {
 }
 
 impl Synth for MySynth {
-    fn synth(&mut self, problem: &impl Problem, sigmas: &[Sigma]) -> Term {
+    fn synth(&mut self, problem: &impl Problem, big_sigmas: &[Sigma]) -> Term {
+        let small_sigmas = big_sigmas.iter().enumerate().flat_map(|(i, bsigma)| {
+            problem.accesses().iter().map(move |a|
+                a.iter().map(|i| bsigma[*i].clone()).collect()
+            )
+        }).collect();
+
         run(&mut Ctxt {
             queue: Default::default(),
-            sigmas,
+            big_sigmas,
+            small_sigmas,
             problem,
             vals_lookup: Default::default(),
             classes: Vec::new(),
@@ -141,7 +149,7 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) -> Option<Id> {
         // dbg!(extract(i, ctxt));
 
         // if this [Value] was successful, return it.
-        if satcount == ctxt.sigmas.len() {
+        if satcount == ctxt.big_sigmas.len() {
             return Some(i);
         }
 
@@ -173,7 +181,7 @@ fn heuristic<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Score {
 
     let tmp = c.satcount.saturating_sub(max_subterm_satcount / 2);
 
-    for _ in tmp..ctxt.sigmas.len() {
+    for _ in tmp..ctxt.big_sigmas.len() {
         a /= 2;
     }
 
@@ -181,10 +189,10 @@ fn heuristic<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Score {
 }
 
 fn vals<'a, P: Problem>(node: &Node, ctxt: &Ctxt<'a, P>) -> Box<[Value]> {
-    ctxt.sigmas.iter().enumerate().map(|(i, sigma)| {
+    ctxt.small_sigmas.iter().enumerate().map(|(i, sigma)| {
         let f = |id: Id| ctxt.classes[id].vals[i].clone();
         eval_node(node, sigma, &f, &Term { elems: Vec::new() })
-    }).collect::<Box<[_]>>()
+    }).collect()
 }
 
 fn minsize<'a, P: Problem>(node: &Node, ctxt: &Ctxt<'a, P>) -> usize {
@@ -194,9 +202,9 @@ fn minsize<'a, P: Problem>(node: &Node, ctxt: &Ctxt<'a, P>) -> usize {
 fn satcount<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<'a, P>) -> usize {
     // TODO re-add cx_value_cache.
     let mut count = 0;
-    let t = extract(x, ctxt);
-    for sigma in ctxt.sigmas.iter() {
-        let b = ctxt.problem.sat(&t, sigma);
+    let t = dbg!(extract(x, ctxt));
+    for bsigma in ctxt.big_sigmas.iter() {
+        let b = ctxt.problem.sat(&t, bsigma);
         count += b as usize;
         // ctxt.cx_value_cache.insert((i, val.clone()), b);
     }

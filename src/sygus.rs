@@ -18,6 +18,8 @@ struct SygusProblemAndOracle {
 
     context: String,
     context_vars: Vec<String>,
+
+    accesses: Box<[Box<[Var]>]>,
 }
 
 fn sygus_expr_to_term(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String], progname: &str) -> Term {
@@ -138,6 +140,19 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
 
     let constraint = sygus_expr_to_term(constraint, &mut Vec::new(), &context_vars, &progname);
 
+    let mut accesses = Vec::new();
+    for x in constraint.elems.iter() {
+        if let Node::SynthCall(args) = x {
+            let access = args.iter().map(|a|
+                match &constraint.elems[*a] {
+                    Node::Var(v) => *v,
+                    _ => panic!("Can only depend on variables!"),
+                }).collect();
+            accesses.push(access);
+        }
+    }
+    let accesses = accesses.into();
+
     SygusProblemAndOracle {
         progname,
         argtypes: argtypes.into_iter().map(|(_, x)| x).collect(),
@@ -147,6 +162,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
         prod_rules: prod_rules.into(),
         context,
         context_vars,
+        accesses,
     }
 }
 
@@ -169,6 +185,10 @@ impl Problem for SygusProblemAndOracle {
 
         let vars: Box<[_]> = (0..self.vars.len()).collect();
         eval_term(&self.constraint, sigma, term) == Value::Bool(true)
+    }
+
+    fn accesses(&self) -> &[Box<[Var]>] {
+        &self.accesses
     }
 }
 
