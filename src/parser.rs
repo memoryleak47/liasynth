@@ -133,10 +133,10 @@ pub struct SubGrammar {
 
 #[derive(Debug, PartialEq, Eq, Clone)]
 pub struct DefinedFun {
-    name: String,
-    args: Vec<(String, Ty)>,
-    ret: Ty,
-    expr: Expr,
+    pub name: String,
+    pub args: Vec<(String, Ty)>,
+    pub ret: Ty,
+    pub expr: Expr,
 }
 
 impl DefinedFun {

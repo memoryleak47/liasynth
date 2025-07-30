@@ -23,14 +23,60 @@ pub struct Problem {
     pub instvars: Vec<Box<[Id]>>,
 }
 
-fn sygus_expr_to_term(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String], progname: &str) -> (Term, Vec<Box<[Id]>>) {
+struct Def {
+    args: Vec<String>,
+    expr: Expr,
+}
+
+// resolves "let" and "defined-funs"
+fn simplify_expr(e: Expr, defs: &Map<String, Def>) -> Expr {
+    match e {
+        Expr::Terminal(a) => Expr::Terminal(a),
+        Expr::Operation { op, expr } => {
+            let expr: Vec<Expr> = expr.iter().map(|x| simplify_expr(x.clone(), defs)).collect();
+            if let Some(def) = defs.get(&op) {
+                let mut bb = def.expr.clone();
+                for (a, b) in (def.args.iter()).zip(expr.iter()) {
+                    bb = expr_subst(bb, a, b);
+                }
+                bb
+            } else {
+                Expr::Operation { op, expr }
+            }
+        }
+        Expr::Let { bindings, body } => {
+            let mut body: Expr = *body;
+            for (var, expr) in bindings {
+                body = expr_subst(body, &var, &expr);
+            }
+            body
+        },
+    }
+}
+
+// computes e[v := t]
+fn expr_subst(e: Expr, v: &str, t: &Expr) -> Expr {
+    match e {
+        Expr::Terminal(Terminal::Var(v2)) if v == v2 => {
+            t.clone()
+        },
+        Expr::Operation { op, expr } => {
+            let expr: Vec<Expr> = expr.into_iter().map(|x| expr_subst(x, v, t)).collect();
+            Expr::Operation { op, expr }
+        },
+        Expr::Terminal(a) => Expr::Terminal(a),
+        Expr::Let { bindings, body } => todo!(),
+    }
+}
+
+fn sygus_expr_to_term(e: Expr, vars: &[String], progname: &str) -> (Term, Vec<Box<[Id]>>) {
     let mut t = Term { elems: Vec::new() };
     let mut instvars = Vec::new();
-    sygus_expr_to_term_impl(e, lets, vars, progname, &mut t, &mut instvars);
+    sygus_expr_to_term_impl(e, vars, progname, &mut t, &mut instvars);
     (t, instvars)
 }
 
-fn sygus_expr_to_term_impl(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String], progname: &str, t: &mut Term, instvars: &mut Vec<Box<[Id]>>) -> Id {
+fn sygus_expr_to_term_impl(e: Expr, vars: &[String], progname: &str, t: &mut Term, instvars: &mut Vec<Box<[Id]>>) -> Id {
     match e {
         Expr::Terminal(Terminal::Var(v)) => {
             let i = vars.iter().position(|x| *x == *v).unwrap();
@@ -40,7 +86,7 @@ fn sygus_expr_to_term_impl(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[Stri
         Expr::Terminal(Terminal::Bool(false)) => { t.push(Node::False) },
         Expr::Terminal(Terminal::Num(i)) => { t.push(Node::ConstInt(i)) },
         Expr::Operation { op, expr } => {
-            let exprs: Box<[Id]> = expr.iter().map(|x| sygus_expr_to_term_impl(x.clone(), lets, vars, progname, t, instvars)).collect();
+            let exprs: Box<[Id]> = expr.iter().map(|x| sygus_expr_to_term_impl(x.clone(), vars, progname, t, instvars)).collect();
             let n = match (&*op, &*exprs) {
                 ("+", &[x, y]) => Node::Add([x, y]),
                 ("-", &[x, y]) => Node::Sub([x, y]),
@@ -85,6 +131,16 @@ pub fn mk_sygus_problem(f: &str) -> Problem {
 fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
     let Some(SyGuSExpr::SynthFun(progname, argtypes, rettype, _, subgrammars)) =
         exprs.iter().filter(|x| matches!(x, SyGuSExpr::SynthFun(..))).cloned().next() else { panic!() };
+
+    let defs: Map<String, Def> = exprs.iter().filter_map(|x|
+        if let SyGuSExpr::DefinedFun(f) = x {
+            let def = Def {
+                args: f.args.iter().map(|(x, _)| x.clone()).collect(),
+                expr: f.expr.clone(),
+            };
+            Some((f.name.clone(), def))
+        } else { None }
+    ).collect();
 
     let mut vars: Vec<String> = Vec::new();
 
@@ -147,7 +203,8 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
         }
     }
 
-    let (constraint, instvars) = sygus_expr_to_term(constraint, &mut Vec::new(), &context_vars, &progname);
+    let constraint = simplify_expr(constraint, &defs);
+    let (constraint, instvars) = sygus_expr_to_term(constraint, &context_vars, &progname);
 
     Problem {
         progname,
