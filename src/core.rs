@@ -187,6 +187,9 @@ pub fn cegis(problem: impl Problem, mut synth: impl Synth, oracle: impl Oracle) 
 
         if let Some(sigma) = oracle.verify(&term) {
             println!("CE: {:?}", &sigma);
+            if sigmas.contains(&sigma) {
+                panic!("This is broken!");
+            }
             sigmas.push(sigma);
         } else {
             return term;
