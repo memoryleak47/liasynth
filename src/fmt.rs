@@ -42,7 +42,7 @@ pub fn term_to_z3(i: usize, t: &Term, vars: &[String]) -> String {
         &Node::Distinct([x, y]) => format!("(distinct {} {})", term_to_z3(x, t, vars), term_to_z3(y, t, vars)),
 
         Node::ConstInt(i) => format!("{i}"),
-        Node::SynthFun => format!("synthfun"),
+        Node::SynthCall(_) => format!("synthfun"),
     }
 }
 

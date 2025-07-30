@@ -126,16 +126,17 @@ fn add_node<'a, P: Problem>(node: Node, ctxt: &mut Ctxt<'a, P>) -> Option<Id> {
     } else {
         let i = ctxt.classes.len();
 
-        let satcount = satcount(&vals, ctxt);
-
         ctxt.classes.push(Class {
             size: minsize(&node, ctxt),
             node,
             vals: vals.clone(),
             handled_size: None,
-            satcount
+            satcount: 0, // will be set later!
         });
         ctxt.vals_lookup.insert(vals, i);
+
+        let satcount = satcount(i, ctxt);
+        ctxt.classes[i].satcount = satcount;
 
         // dbg!(extract(i, ctxt));
 
@@ -181,7 +182,7 @@ fn heuristic<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Score {
 fn vals<'a, P: Problem>(node: &Node, ctxt: &Ctxt<'a, P>) -> Box<[Value]> {
     ctxt.sigmas.iter().enumerate().map(|(i, sigma)| {
         let f = |id: Id| ctxt.classes[id].vals[i].clone();
-        eval_node(node, sigma, &f)
+        eval_node(node, sigma, &f, &Term { elems: Vec::new() })
     }).collect::<Box<[_]>>()
 }
 
@@ -189,20 +190,14 @@ fn minsize<'a, P: Problem>(node: &Node, ctxt: &Ctxt<'a, P>) -> usize {
     node.children().iter().map(|x| ctxt.classes[*x].size).sum::<usize>() + 1
 }
 
-fn satcount<'a, P: Problem>(vals: &[Value], ctxt: &mut Ctxt<'a, P>) -> usize {
-    let it = vals.iter().zip(ctxt.sigmas);
+fn satcount<'a, P: Problem>(x: Id, ctxt: &mut Ctxt<'a, P>) -> usize {
+    // TODO re-add cx_value_cache.
     let mut count = 0;
-    for (i, (val, sigma)) in it.enumerate() {
-        if let Some(seen) = ctxt.cx_value_cache.get(&(i, val.clone())) {
-            if *seen { count += 1 };
-        } else {
-            if ctxt.problem.sat(val, sigma) {
-                ctxt.cx_value_cache.insert((i, val.clone()), true);
-                count += 1;
-            } else {
-                ctxt.cx_value_cache.insert((i, val.clone()), false);
-            }
-        }
+    let t = extract(x, ctxt);
+    for sigma in ctxt.sigmas.iter() {
+        let b = ctxt.problem.sat(&t, sigma);
+        count += b as usize;
+        // ctxt.cx_value_cache.insert((i, val.clone()), b);
     }
     count
 }
@@ -307,7 +302,7 @@ fn extract<'a, P: Problem>(x: Id, ctxt: &Ctxt<'a, P>) -> Term {
             t.push(Node::Ite([x, y, z]));
         },
         Node::ConstInt(i) => { t.push(Node::ConstInt(i)); },
-        Node::SynthFun => panic!(),
+        Node::SynthCall(_) => panic!(),
     }
     t
 }

@@ -61,8 +61,7 @@ pub enum Node {
     Distinct([Id; 2]),
     Ite([Id; 3]),
 
-    // TODO make this nicer:
-    SynthFun,
+    SynthCall(Box<[Id]>),
 }
 
 impl Node {
@@ -134,7 +133,7 @@ pub type Sigma = Vec<Value>;
 
 pub trait Problem {
     fn prod_rules(&self) -> &[Node];
-    fn sat(&self, val: &Value, sigma: &Sigma) -> bool;
+    fn sat(&self, term: &Term, sigma: &Sigma) -> bool;
 }
 
 pub trait Oracle {
@@ -159,7 +158,7 @@ fn to_bool(v: Value) -> bool {
     }
 }
 
-pub fn eval_node(node: &Node, sigma: &Sigma, ch: &impl Fn(Id) -> Value) -> Value {
+pub fn eval_node(node: &Node, sigma: &Sigma, ch: &impl Fn(Id) -> Value, synthfun: &Term) -> Value {
     match node {
         Node::Var(s) => sigma[*s].clone(),
         Node::Add([l, r]) => Value::Int(to_int(ch(*l)) + to_int(ch(*r))),
@@ -198,15 +197,18 @@ pub fn eval_node(node: &Node, sigma: &Sigma, ch: &impl Fn(Id) -> Value) -> Value
         Node::Abs([x]) => Value::Int(to_int(ch(*x)).abs()),
 
         Node::ConstInt(i) => Value::Int(*i),
-        Node::SynthFun => panic!(),
+        Node::SynthCall(args) => {
+            let sigma = args.iter().map(|x| ch(*x)).collect();
+            eval_term(synthfun, &sigma, synthfun)
+        },
     }
 }
 
-pub fn eval_term(term: &Term, sigma: &Sigma) -> Value {
+pub fn eval_term(term: &Term, sigma: &Sigma, synthfun: &Term) -> Value {
     let mut vals: Vec<Value> = Vec::new();
     for n in &term.elems {
         let f = |i: usize| vals[i].clone();
-        vals.push(eval_node(n, sigma, &f));
+        vals.push(eval_node(n, sigma, &f, synthfun));
     }
     vals.last().unwrap().clone()
 }

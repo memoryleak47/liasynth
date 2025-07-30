@@ -20,7 +20,7 @@ struct SygusProblemAndOracle {
     context_vars: Vec<String>,
 }
 
-fn sygus_expr_to_term(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String]) -> Term {
+fn sygus_expr_to_term(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String], progname: &str) -> Term {
     let mut t = Term { elems: Vec::new() };
     match e {
         Expr::Terminal(Terminal::Var(v)) => {
@@ -31,7 +31,7 @@ fn sygus_expr_to_term(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String]) 
         Expr::Terminal(Terminal::Bool(false)) => { t.push(Node::False); },
         Expr::Terminal(Terminal::Num(i)) => { t.push(Node::ConstInt(i)); },
         Expr::Operation { op, expr } => {
-            let exprs: Box<[usize]> = expr.iter().map(|x| t.push_subterm(sygus_expr_to_term(x.clone(), lets, vars))).collect();
+            let exprs: Box<[usize]> = expr.iter().map(|x| t.push_subterm(sygus_expr_to_term(x.clone(), lets, vars, progname))).collect();
             let n = match (&*op, &*exprs) {
                 ("+", &[x, y]) => Node::Add([x, y]),
                 ("-", &[x, y]) => Node::Sub([x, y]),
@@ -54,8 +54,8 @@ fn sygus_expr_to_term(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String]) 
                 (">=", &[x, y]) => Node::Gte([x, y]),
                 ("=", &[x, y]) => Node::Equals([x, y]),
                 ("distinct", &[x, y]) => Node::Distinct([x, y]),
-                _ => Node::SynthFun, // TODO this is dangerous.
-                // (x, l) => todo!("unknown node {x} of arity {}", l.len()),
+                (prog, args) if prog == progname => Node::SynthCall(args.iter().copied().collect()),
+                (x, l) => todo!("unknown node {x} of arity {}", l.len()),
             };
             t.push(n);
         },
@@ -133,7 +133,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
         }
     }
 
-    let constraint = sygus_expr_to_term(constraint, &mut Vec::new(), &context_vars);
+    let constraint = sygus_expr_to_term(constraint, &mut Vec::new(), &context_vars, &progname);
 
     SygusProblemAndOracle {
         progname,
@@ -156,27 +156,16 @@ fn show_val(v: &Value) -> String {
 
 impl Problem for SygusProblemAndOracle {
     fn prod_rules(&self) -> &[Node] { &self.prod_rules }
-    fn sat(&self, val: &Value, sigma: &Sigma) -> bool {
-        if val.ty() != self.rettype {
+    fn sat(&self, term: &Term, sigma: &Sigma) -> bool {
+        if term.elems.last().unwrap().ty() != self.rettype {
             return false;
         }
         if !sigma.iter().zip(self.argtypes.iter()).all(|(val, ty)| val.ty() == *ty) {
             return false;
         }
 
-        let v: Node = match val {
-            Value::Bool(true) => Node::True,
-            Value::Bool(false) => Node::False,
-            Value::Int(i) => Node::ConstInt(*i),
-        };
-        let mut c = self.constraint.clone();
-        for x in &mut c.elems {
-            if let Node::SynthFun = x {
-                *x = v.clone();
-            }
-        }
-
-        eval_term(&c, sigma) == Value::Bool(true)
+        let vars: Box<[_]> = (0..self.vars.len()).collect();
+        eval_term(&self.constraint, sigma, term) == Value::Bool(true)
     }
 }
 
