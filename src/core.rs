@@ -103,6 +103,7 @@ impl Node {
     }
 }
 
+#[derive(Clone)]
 pub struct Term {
     pub elems: Vec<Node>,
 }

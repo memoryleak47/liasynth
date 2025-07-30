@@ -11,14 +11,57 @@ struct SygusProblemAndOracle {
     // variable indices from our synthesizer.
     vars: Vec<String>,
 
-    // These strings will be interpreted by Z3.
-    constraint: String,
+    constraint: Term,
 
     // The ids of these Nodes will be nulled away.
     prod_rules: Box<[Node]>,
 
     context: String,
     context_vars: Vec<String>,
+}
+
+fn sygus_expr_to_term(e: Expr, lets: &mut Vec<(String, Term)>, vars: &[String]) -> Term {
+    let mut t = Term { elems: Vec::new() };
+    match e {
+        Expr::Terminal(Terminal::Var(v)) => {
+            let i = vars.iter().position(|x| *x == *v).unwrap();
+            t.push(Node::Var(i));
+        },
+        Expr::Terminal(Terminal::Bool(true)) => { t.push(Node::True); },
+        Expr::Terminal(Terminal::Bool(false)) => { t.push(Node::False); },
+        Expr::Terminal(Terminal::Num(i)) => { t.push(Node::ConstInt(i)); },
+        Expr::Operation { op, expr } => {
+            let exprs: Box<[usize]> = expr.iter().map(|x| t.push_subterm(sygus_expr_to_term(x.clone(), lets, vars))).collect();
+            let n = match (&*op, &*exprs) {
+                ("+", &[x, y]) => Node::Add([x, y]),
+                ("-", &[x, y]) => Node::Sub([x, y]),
+                ("mul", &[x, y]) => Node::Mul([x, y]),
+                ("div", &[x, y]) => Node::Div([x, y]),
+                ("mod", &[x, y]) => Node::Mod([x, y]),
+                ("abs", &[x]) => Node::Abs([x]),
+                ("-", &[x]) => Node::Neg([x]),
+                ("=>", &[x, y]) => Node::Implies([x, y]),
+                ("ite", &[x, y, z]) => Node::Ite([x, y, z]),
+                ("and", &[x, y]) => Node::And([x, y]),
+                ("or", &[x, y]) => Node::Or([x, y]),
+                ("xor", &[x, y]) => Node::Xor([x, y]),
+                ("not", &[x]) => Node::Not([x]),
+                ("true", &[]) => Node::True,
+                ("false", &[]) => Node::False,
+                ("<", &[x, y]) => Node::Lt([x, y]),
+                ("<=", &[x, y]) => Node::Lte([x, y]),
+                (">", &[x, y]) => Node::Gt([x, y]),
+                (">=", &[x, y]) => Node::Gte([x, y]),
+                ("=", &[x, y]) => Node::Equals([x, y]),
+                ("distinct", &[x, y]) => Node::Distinct([x, y]),
+                (x, l) => todo!("unknown node {x} of arity {}", l.len()),
+            };
+            t.push(n);
+        },
+        Expr::Let { bindings, body } => todo!(),
+    }
+
+    t
 }
 
 pub fn sygus_problem(f: &str) -> (impl Problem, impl Oracle) {
@@ -36,14 +79,12 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> SygusProblemAndOracle {
 
     let mut vars: Vec<String> = Vec::new();
 
-    let constraints_vec: Box<[String]> = exprs.iter().filter_map(|x|
+    let constraint: Expr = exprs.iter().filter_map(|x|
         if let SyGuSExpr::Constraint(e) = x {
-            Some(prettyprint(&e))
+            Some(e.clone())
         } else { None }
-    ).collect();
-
-    let constraint_s = constraints_vec.join(" ");
-    let constraint = format!("(and {constraint_s})");
+    ).fold(Expr::Terminal(Terminal::Bool(true)), |x, y| Expr::Operation { op: format!("and"), expr: vec![x, y],} );
+    let constraint = sygus_expr_to_term(constraint, &mut Vec::new(), &vars);
 
     let mut prod_rules = Vec::new();
     for g in subgrammars {
@@ -114,7 +155,8 @@ fn show_val(v: &Value) -> String {
 impl Problem for SygusProblemAndOracle {
     fn prod_rules(&self) -> &[Node] { &self.prod_rules }
     fn sat(&self, val: &Value, sigma: &Sigma) -> bool {
-        todo!();
+        // TODO: replace the occurrence of the synth fun with `val`.
+        eval_term(&self.constraint, sigma) == Value::Bool(true)
     }
 }
 
