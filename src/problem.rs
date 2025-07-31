@@ -153,25 +153,31 @@ fn build_sygus(exprs: Vec<SyGuSExpr>, synth_problem: SynthProblem) -> Problem {
     ).fold(String::from("true"), |x, y| format!("(and {x} {y})"));
 
     let mut prod_rules = Vec::new();
-    for g in subgrammars {
-        for t in g.terminals {
-            match t {
-                Terminal::Num(i) => prod_rules.push(Node::ConstInt(i)),
-                Terminal::Var(v) => {
+    for (_, ntdef) in synth_fun.nonterminal_defs.iter() {
+        for rule in ntdef.prod_rules.iter() {
+            match rule {
+                GrammarTerm::NonTerminal(_) => {
+                    // we'll iterate over the referenced non-terminal anyways.
+                    // Thus, no need to do it now again.
+                },
+                GrammarTerm::Op(op, nts) => {
+                    let args: Vec<_> = nts.iter().map(|_| 0).collect();
+                    if let Some(node) = Node::parse(&*op, &*args) {
+                        prod_rules.push(node);
+                    }
+                },
+                GrammarTerm::ConstInt(i) => prod_rules.push(Node::ConstInt(*i)),
+                GrammarTerm::ConstBool(true) => prod_rules.push(Node::True),
+                GrammarTerm::ConstBool(false) => prod_rules.push(Node::False),
+                GrammarTerm::SynthArg(v) => {
                     let i = vars.get_index_of(&*v).unwrap();
-                    match g.ty {
+                    let ty = vars[v];
+                    match ty {
                         Ty::Int => prod_rules.push(Node::VarInt(i)),
                         Ty::Bool => prod_rules.push(Node::VarBool(i)),
                     }
                 },
-                _ => {},
-            }
-        }
-
-        for n in g.nonterminals {
-            let args: Vec<_> = n.args.iter().map(|_| 0).collect();
-            if let Some(node) = Node::parse(&*n.op, &*args) {
-                prod_rules.push(node);
+                GrammarTerm::DefinedFunCall(f, args) => todo!(),
             }
         }
     }
