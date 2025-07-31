@@ -9,8 +9,8 @@ define_language! {
         (And, [Ty::Bool, Ty::Bool], Ty::Bool, "and", Value::Bool(to_bool(ev(0)?) && to_bool(ev(1)?))),
         (Or, [Ty::Bool, Ty::Bool], Ty::Bool, "or", Value::Bool(to_bool(ev(0)?) || to_bool(ev(1)?))),
         (Xor, [Ty::Bool, Ty::Bool], Ty::Bool, "xor", Value::Bool(to_bool(ev(0)?) != to_bool(ev(1)?))),
-        (Equals, [Ty::Int, Ty::Int], Ty::Bool, "=", Value::Bool(to_int(ev(0)?) == to_int(ev(1)?))),
-        (Distinct, [Ty::Int, Ty::Int], Ty::Bool, "distinct", Value::Bool(to_int(ev(0)?) != to_int(ev(1)?))),
+        (Equals, [Ty::Int, Ty::Int], Ty::Bool, "=", Value::Bool(ev(0)? == ev(1)?)),
+        (Distinct, [Ty::Int, Ty::Int], Ty::Bool, "distinct", Value::Bool(ev(0)? != ev(1)?)),
         (Ite, [Ty::Bool, Ty::Int, Ty::Int], Ty::Int, "ite", (if to_bool(ev(0)?) { ev(1)? } else { ev(2)? })),
 
         // https://smt-lib.org/theories-Ints.shtml
