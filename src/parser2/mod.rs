@@ -8,13 +8,13 @@ use sexpr::*;
 mod build;
 use build::*;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NonterminalDef {
     ty: Ty,
     rules: Vec<ProdRule>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct SynthFun {
     args: IndexMap<String, Ty>,
     ret: Ty,
@@ -22,34 +22,34 @@ pub struct SynthFun {
     nonterminal_defs: IndexMap<String, NonterminalDef>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum ProdRule {
     NonTerminal(String),
     Op(String, Vec<ProdRule>),
     Const(String), // what does Const include?
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Expr {
     Op(String, Vec<Expr>),
     Let(IndexMap<String, Expr>, Box<Expr>),
     Const(String), // what does Const include?
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 enum Logic {
     LIA,
     BitVec,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct DefinedFun {
     ret: Ty,
     args: IndexMap<String, Ty>,
     expr: Expr,
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct SynthProblem {
     logic: Option<Logic>,
     synthfuns: IndexMap<String, SynthFun>,

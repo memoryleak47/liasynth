@@ -4,6 +4,8 @@ use indexmap::IndexMap;
 
 #[derive(Clone)]
 pub struct Problem {
+    pub synth_problem: SynthProblem,
+
     pub argtypes: Vec<Ty>,
     pub rettype: Ty,
 
@@ -106,15 +108,14 @@ fn sygus_expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str,
 pub fn mk_sygus_problem(f: &str) -> Problem {
     let s = std::fs::read_to_string(f).unwrap();
 
-    dbg!(parse_synth(&s));
-    std::process::exit(0);
+    let synth_problem = parse_synth(&s);
 
     let (parsed, _) = parse_sygus(&s).unwrap();
 
-    build_sygus(parsed)
+    build_sygus(parsed, synth_problem)
 }
 
-fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
+fn build_sygus(exprs: Vec<SyGuSExpr>, synth_problem: SynthProblem) -> Problem {
     let Some(SyGuSExpr::SynthFun(progname, argtypes, rettype, _, subgrammars)) =
         exprs.iter().filter(|x| matches!(x, SyGuSExpr::SynthFun(..))).cloned().next() else { panic!() };
 
@@ -189,6 +190,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
     let (constraint, instvars) = sygus_expr_to_term(constraint, &context_vars, &progname);
 
     Problem {
+        synth_problem,
         progname,
         argtypes: argtypes.into_iter().map(|(_, x)| x).collect(),
         rettype,
