@@ -50,6 +50,7 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
     let get_children_cases = get_children_cases(&edef);
     let get_children_mut_cases = get_children_mut_cases(&edef);
     let eval_cases = eval_cases(&edef);
+    let extract_cases = extract_cases(&edef);
 
     let out: TokenStream1 = quote! {
         #[derive(PartialEq, Eq, Hash, Clone, Debug, PartialOrd, Ord)]
@@ -93,8 +94,15 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
                     Node::ConstInt(i) => Value::Int(*i),
                     Node::True => Value::Bool(true),
                     Node::False => Value::Bool(false),
-                    Node::VarInt(v) | Node::VarBool(v) => sigma.get(*v).unwrap().clone(),
+                    Node::VarInt(v) | Node::VarBool(v) => sigma.get(*v).unwrap_or_else(|| panic!("Failed {sigma:?} index with {v}")).clone(),
                     #(#eval_cases),*
+                }
+            }
+
+            pub fn extract(&self, ex: &impl Fn(Id) -> Node, out: &mut Vec<Node>) {
+                match self {
+                    a@(Node::ConstInt(_) | Node::True | Node::False | Node::VarInt(_) | Node::VarBool(_)) => out.push(a.clone()),
+                    #(#extract_cases),*
                 }
             }
         }
@@ -175,6 +183,27 @@ fn eval_cases(edef: &EnumDef) -> Vec<TokenStream2> {
             Node::#ident(s) => {
                 let ev = |x: usize| -> Value { ch(s[x]) };
                 #compute
+            }
+        };
+        cases.push(v);
+    }
+    cases
+}
+
+fn extract_cases(edef: &EnumDef) -> Vec<TokenStream2> {
+    let mut cases: Vec<TokenStream2> = Vec::new();
+    for c in edef.cases.iter() {
+        let ident = &c.ident;
+        let compute = &c.compute;
+        let v = quote! {
+            Node::#ident(s) => {
+                let mut a = self.clone();
+                for child in a.children_mut() {
+                    let child: &mut Id = child;
+                    ex(*child).extract(ex, out);
+                    *child = out.len() - 1;
+                }
+                out.push(a);
             }
         };
         cases.push(v);
