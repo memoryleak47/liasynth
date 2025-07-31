@@ -139,6 +139,7 @@ enum GrammarElement {
 
 #[derive(Debug, PartialEq, Clone, Eq)]
 pub struct SubGrammar {
+    pub ty: Ty,
     pub terminals: Vec<Terminal>,
     pub nonterminals: Vec<NonTerminal>,
 }
@@ -453,9 +454,9 @@ fn parse_subgrammar(i: &mut &'_ str) -> PResult<SubGrammar> {
             }
         }
 
-        SubGrammar { terminals, nonterminals }
+        SubGrammar { ty: sort, terminals, nonterminals }
     })
-    .verify(|SubGrammar{ terminals, nonterminals}| {
+    .verify(|SubGrammar{ ty: _, terminals, nonterminals}| {
         terminals.iter().all(|elm| {
             if let Terminal::Var(n) = elm {
                 lookup_grammar_table(n.as_ref()).is_some()

@@ -20,7 +20,7 @@ impl Value {
 pub type Var = usize;
 pub type Id = usize;
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Hash)]
 pub enum Ty { Int, Bool }
 
 impl Ty {
@@ -96,7 +96,7 @@ pub fn cegis(problem: &Problem) -> Term {
     let mut sigmas = Vec::new();
     loop {
         let term = synth(problem, &sigmas);
-        println!("Candidate: {}", term_to_z3(&term, &problem.vars));
+        println!("Candidate: {}", term_to_z3(&term, &problem.vars.keys().cloned().collect::<Box<[_]>>()));
         // TODO check this later: assert!(problem.sat(&..., &sigmas));
 
         if let Some(sigma) = problem.verify(&term) {

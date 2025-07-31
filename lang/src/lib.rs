@@ -57,7 +57,8 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
             ConstInt(Int),
             True,
             False,
-            Var(Var),
+            VarInt(Var),
+            VarBool(Var),
             #(#enum_cases),*
         }
 
@@ -67,21 +68,22 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
                     Node::ConstInt(i) => &(&[], Ty::Int),
                     Node::True => &(&[], Ty::Bool),
                     Node::False => &(&[], Ty::Bool),
-                    Node::Var(v) => &(&[], Ty::Int),
+                    Node::VarInt(v) => &(&[], Ty::Int),
+                    Node::VarBool(v) => &(&[], Ty::Bool),
                     #(#signature_cases),*
                 }
             }
 
             pub fn children(&self) -> &[Id] {
                 match self {
-                    Node::ConstInt(_) | Node::True | Node::False | Node::Var(_) => &[],
+                    Node::ConstInt(_) | Node::True | Node::False | Node::VarInt(_) | Node::VarBool(_) => &[],
                     #(#get_children_cases),*
                 }
             }
 
             pub fn children_mut(&mut self) -> &mut [Id] {
                 match self {
-                    Node::ConstInt(_) | Node::True | Node::False | Node::Var(_) => &mut [],
+                    Node::ConstInt(_) | Node::True | Node::False | Node::VarInt(_) | Node::VarBool(_) => &mut [],
                     #(#get_children_mut_cases),*
                 }
             }
@@ -91,7 +93,7 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
                     Node::ConstInt(i) => Value::Int(*i),
                     Node::True => Value::Bool(true),
                     Node::False => Value::Bool(false),
-                    Node::Var(v) => sigma.get(*v).unwrap().clone(),
+                    Node::VarInt(v) | Node::VarBool(v) => sigma.get(*v).unwrap().clone(),
                     #(#eval_cases),*
                 }
             }
