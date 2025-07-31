@@ -1,5 +1,4 @@
 use indexmap::IndexMap;
-use std::fmt::*;
 use crate::*;
 
 mod sexpr;
@@ -7,6 +6,8 @@ use sexpr::*;
 
 mod build;
 use build::*;
+
+mod fmt;
 
 #[derive(Debug, Clone)]
 pub struct NonterminalDef {
@@ -58,13 +59,14 @@ pub enum Expr {
 }
 
 #[derive(Debug, Clone)]
-enum Logic {
+pub enum Logic {
     LIA,
     BitVec,
 }
 
 #[derive(Debug, Clone)]
-struct DefinedFun {
+pub struct DefinedFun {
+    pub name: String,
     pub ret: Ty,
     pub args: IndexMap<String, Ty>,
     pub expr: Expr,

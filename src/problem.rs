@@ -146,11 +146,8 @@ fn build_sygus(exprs: Vec<SyGuSExpr>, synth_problem: SynthProblem) -> Problem {
         } else { None }
     ).fold(Expr::Terminal(Terminal::Bool(true)), |x, y| Expr::Operation { op: format!("and"), expr: vec![x, y],} );
 
-    let constraint_str = exprs.iter().filter_map(|x|
-        if let SyGuSExpr::Constraint(e) = x {
-            Some(prettyprint(e))
-        } else { None }
-    ).fold(String::from("true"), |x, y| format!("(and {x} {y})"));
+    let constraint_str = synth_problem.constraints.iter().map(|x| x.to_string())
+        .fold(String::from("true"), |x, y| format!("(and {x} {y})"));
 
     let mut prod_rules = Vec::new();
     for (_, ntdef) in synth_fun.nonterminal_defs.iter() {
@@ -183,11 +180,8 @@ fn build_sygus(exprs: Vec<SyGuSExpr>, synth_problem: SynthProblem) -> Problem {
     }
 
     let mut context: String = String::new();
-    for expr in exprs.iter() {
-        if let SyGuSExpr::DefinedFun(fun) = expr {
-            context.push_str(&fun.stringify());
-            context.push('\n');
-        }
+    for (_, def) in synth_problem.defined_funs.iter() {
+        context.push_str(&format!("{def}\n"));
     }
 
     let context_vars = synth_problem.declared_vars.clone();

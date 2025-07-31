@@ -178,6 +178,7 @@ fn handle_define_fun(l: &[SExpr], synth: &mut SynthProblem) {
     }
 
     let fun = DefinedFun {
+        name: name.clone(),
         args,
         expr: as_expr(expr, &synth.defined_funs, &synth.synthfuns),
         ret: as_ty(ret),

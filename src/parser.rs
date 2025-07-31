@@ -88,40 +88,6 @@ pub enum Expr {
     }
 }
 
-pub fn prettyprint(e: &Expr) -> String {
-    match e {
-        Expr::Terminal(Terminal::Num(n)) => n.to_string(),
-        Expr::Terminal(Terminal::Bool(b)) => b.to_string(),
-        Expr::Terminal(Terminal::Var(v)) => v.to_string(),
-        Expr::Operation { op, expr } => {
-            let mut s = String::from('(');
-            s.push_str(&op.to_string());
-            s.push_str(" ");
-            for (i, c) in expr.iter().enumerate() {
-                s.push_str(&prettyprint(c));
-                if i != expr.len()-1 {
-                    s.push_str(" ");
-                }
-            }
-            s.push(')');
-            s
-        },
-        Expr::Let { bindings, body } => {
-            let mut s = String::from("(let (");
-            for (var, e) in bindings.iter() {
-                let e = prettyprint(e);
-                s.push_str(&format!("({var} {e}) "));
-            }
-            s.pop();
-            s.push(')');
-            s.push(' ');
-            s.push_str(&prettyprint(body));
-            s.push(')');
-            s
-        },
-    }
-}
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct NonTerminal {
     pub op: String,
@@ -150,21 +116,6 @@ pub struct DefinedFun {
     pub args: Vec<(String, Ty)>,
     pub ret: Ty,
     pub expr: Expr,
-}
-
-impl DefinedFun {
-    pub fn stringify(&self) -> String {
-        let DefinedFun { name, args, ret, expr } = self;
-        let mut s = format!("(define-fun {name} (");
-        for (varname, varty) in args {
-            let varty = varty.to_string();
-            s.push_str(&format!("({varname} {varty}) "));
-        }
-        let ret = ret.to_string();
-        let expr = prettyprint(&expr);
-        s.push_str(&format!(") {ret} {expr})"));
-        s
-    }
 }
 
 #[derive(Debug, PartialEq, Eq, Clone)]
