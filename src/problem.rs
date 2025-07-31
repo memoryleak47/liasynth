@@ -89,34 +89,14 @@ fn sygus_expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str,
         Expr::Terminal(Terminal::Num(i)) => { t.push(Node::ConstInt(i)) },
         Expr::Operation { op, expr } => {
             let exprs: Box<[Id]> = expr.iter().map(|x| sygus_expr_to_term_impl(x.clone(), vars, progname, t, instvars)).collect();
-            let n = match (&*op, &*exprs) {
-                ("+", &[x, y]) => Node::Add([x, y]),
-                ("-", &[x, y]) => Node::Sub([x, y]),
-                ("*", &[x, y]) => Node::Mul([x, y]),
-                ("div", &[x, y]) => Node::Div([x, y]),
-                ("mod", &[x, y]) => Node::Mod([x, y]),
-                ("abs", &[x]) => Node::Abs([x]),
-                ("-", &[x]) => Node::Neg([x]),
-                ("=>", &[x, y]) => Node::Implies([x, y]),
-                ("ite", &[x, y, z]) => Node::Ite([x, y, z]),
-                ("and", &[x, y]) => Node::And([x, y]),
-                ("or", &[x, y]) => Node::Or([x, y]),
-                ("xor", &[x, y]) => Node::Xor([x, y]),
-                ("not", &[x]) => Node::Not([x]),
-                ("true", &[]) => Node::True,
-                ("false", &[]) => Node::False,
-                ("<", &[x, y]) => Node::Lt([x, y]),
-                ("<=", &[x, y]) => Node::Lte([x, y]),
-                (">", &[x, y]) => Node::Gt([x, y]),
-                (">=", &[x, y]) => Node::Gte([x, y]),
-                ("=", &[x, y]) => Node::Equals([x, y]),
-                ("distinct", &[x, y]) => Node::Distinct([x, y]),
-                (prog, args) if prog == progname => {
-                    instvars.push(args.iter().cloned().collect());
+            let n = Node::parse(&*op, &*exprs).unwrap_or_else(|| {
+                if op == progname {
+                    instvars.push(exprs.iter().cloned().collect());
                     Node::VarInt(vars.len() + instvars.len() - 1)
-                },
-                (x, l) => todo!("unknown node {x} of arity {}", l.len()),
-            };
+                } else {
+                    panic!("unknown node {op} of arity {}", exprs.len())
+                }
+            });
             t.push(n)
         },
         Expr::Let { bindings, body } => todo!(),

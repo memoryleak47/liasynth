@@ -51,6 +51,7 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
     let get_children_mut_cases = get_children_mut_cases(&edef);
     let eval_cases = eval_cases(&edef);
     let extract_cases = extract_cases(&edef);
+    let parse_cases = parse_cases(&edef);
 
     let out: TokenStream1 = quote! {
         #[derive(PartialEq, Eq, Hash, Clone, Debug, PartialOrd, Ord)]
@@ -103,6 +104,13 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
                 match self {
                     a@(Node::ConstInt(_) | Node::True | Node::False | Node::VarInt(_) | Node::VarBool(_)) => out.push(a.clone()),
                     #(#extract_cases),*
+                }
+            }
+
+            pub fn parse(op: &str, args: &[Id]) -> Option<Node> {
+                match (op, args) {
+                    #(#parse_cases,)*
+                    _ => None,
                 }
             }
         }
@@ -205,6 +213,19 @@ fn extract_cases(edef: &EnumDef) -> Vec<TokenStream2> {
                 }
                 out.push(a);
             }
+        };
+        cases.push(v);
+    }
+    cases
+}
+
+fn parse_cases(edef: &EnumDef) -> Vec<TokenStream2> {
+    let mut cases: Vec<TokenStream2> = Vec::new();
+    for c in edef.cases.iter() {
+        let ident = &c.ident;
+        let symb = &c.symb;
+        let v = quote! {
+            (#symb, s) => Some(Node::#ident(s.iter().cloned().collect::<Vec<_>>().try_into().unwrap()))
         };
         cases.push(v);
     }
