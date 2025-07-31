@@ -176,18 +176,18 @@ fn build_sygus(exprs: Vec<SyGuSExpr>, synth_problem: SynthProblem) -> Problem {
     }
 
     let mut context: String = String::new();
-    let mut context_vars: IndexMap<String, Ty> = IndexMap::new();
     for expr in exprs.iter() {
         if let SyGuSExpr::DefinedFun(fun) = expr {
             context.push_str(&fun.stringify());
             context.push('\n');
         }
-        if let SyGuSExpr::DeclaredVar(name, ty) = expr {
+    }
 
-            context_vars.insert(name.clone(), *ty);
-            let ty = ty.to_string();
-            context.push_str(&format!("(declare-fun {name} () {ty})\n"));
-        }
+    let context_vars = synth_problem.declared_vars.clone();
+
+    for (name, ty) in context_vars.iter() {
+        let ty = ty.to_string();
+        context.push_str(&format!("(declare-fun {name} () {ty})\n"));
     }
 
     let constraint = simplify_expr(constraint, &defs, &Map::default());
