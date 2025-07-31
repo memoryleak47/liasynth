@@ -123,9 +123,6 @@ fn build_sygus(exprs: Vec<SyGuSExpr>, synth_problem: SynthProblem) -> Problem {
     let progname = synth_problem.synthfuns.keys().next().unwrap().clone();
     let rettype = synth_fun.ret;
 
-    let Some(SyGuSExpr::SynthFun(_, _, _, _, subgrammars)) =
-        exprs.iter().filter(|x| matches!(x, SyGuSExpr::SynthFun(..))).cloned().next() else { panic!() };
-
     let argtypes: Vec<Ty> = synth_fun.args.iter().map(|(_, x)| *x).collect();
 
     let defs: Map<String, Def> = exprs.iter().filter_map(|x|
