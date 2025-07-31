@@ -38,8 +38,12 @@ fn as_ty(s: &str) -> Ty {
     }
 }
 
+fn as_rule(s: &SExpr) -> ProdRule {
+    todo!()
+}
+
 fn handle_synth_fun(l: &[SExpr], synth: &mut SynthProblem) {
-    let [SExpr::Ident(name), SExpr::List(args_), SExpr::Ident(ret), SExpr::List(nonterminals_), SExpr::List(nonterminal_defs)] = l else { panic!() };
+    let [SExpr::Ident(name), SExpr::List(args_), SExpr::Ident(ret), SExpr::List(nonterminals_), SExpr::List(nonterminal_defs_)] = l else { panic!() };
 
     let mut args = IndexMap::new();
     for a in args_ {
@@ -51,15 +55,26 @@ fn handle_synth_fun(l: &[SExpr], synth: &mut SynthProblem) {
     let mut nonterminals = IndexMap::new();
     for a in nonterminals_ {
         let SExpr::List(v) = a else { panic!() };
-        let [SExpr::Ident(l), SExpr::Ident(r)] = &v[..] else { panic!() };
-        nonterminals.insert(l.clone(), as_ty(r));
+        let [SExpr::Ident(name), SExpr::Ident(ty)] = &v[..] else { panic!() };
+        nonterminals.insert(name.clone(), as_ty(ty));
+    }
+
+    let mut nonterminal_defs = IndexMap::new();
+    for a in nonterminal_defs_ {
+        let SExpr::List(v) = a else { panic!() };
+        let [SExpr::Ident(name), SExpr::Ident(ty), SExpr::List(rules)] = &v[..] else { panic!() };
+        let rules = rules.iter().map(as_rule).collect();
+        nonterminal_defs.insert(name.clone(), NonterminalDef {
+            ty: as_ty(ty),
+            rules,
+        });
     }
 
     synth.synthfuns.insert(name.clone(), SynthFun {
         ret: as_ty(ret),
         args,
         nonterminals,
-        nonterminal_defs: IndexMap::default(), // TODO
+        nonterminal_defs,
     });
 }
 
