@@ -10,16 +10,16 @@ use build::*;
 
 #[derive(Debug, Clone)]
 pub struct NonterminalDef {
-    ty: Ty,
-    rules: Vec<ProdRule>,
+    pub ty: Ty,
+    pub rules: Vec<ProdRule>,
 }
 
 #[derive(Debug, Clone)]
 pub struct SynthFun {
-    args: IndexMap<String, Ty>,
-    ret: Ty,
-    nonterminals: IndexMap<String, Ty>,
-    nonterminal_defs: IndexMap<String, NonterminalDef>,
+    pub args: IndexMap<String, Ty>,
+    pub ret: Ty,
+    pub nonterminals: IndexMap<String, Ty>,
+    pub nonterminal_defs: IndexMap<String, NonterminalDef>,
 }
 
 #[derive(Debug, Clone)]
@@ -44,9 +44,9 @@ enum Logic {
 
 #[derive(Debug, Clone)]
 struct DefinedFun {
-    ret: Ty,
-    args: IndexMap<String, Ty>,
-    expr: Expr,
+    pub ret: Ty,
+    pub args: IndexMap<String, Ty>,
+    pub expr: Expr,
 }
 
 #[derive(Debug, Default, Clone)]

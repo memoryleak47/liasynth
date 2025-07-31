@@ -133,11 +133,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>, synth_problem: SynthProblem) -> Problem {
         } else { None }
     ).collect();
 
-    let mut vars: IndexMap<String, Ty> = IndexMap::default();
-
-    for (name, ty) in argtypes.iter() {
-        vars.insert(name.clone(), *ty);
-    }
+    let vars = synth_fun.args.clone();
 
     let constraint: Expr = exprs.iter().filter_map(|x|
         if let SyGuSExpr::Constraint(e) = x {
