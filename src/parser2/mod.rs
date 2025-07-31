@@ -2,6 +2,12 @@ use indexmap::IndexMap;
 use std::fmt::*;
 use crate::Ty;
 
+mod sexpr;
+use sexpr::*;
+
+mod build;
+use build::*;
+
 #[derive(Debug)]
 struct NonterminalDef {
     ty: Ty,
@@ -36,6 +42,7 @@ enum Logic {
     BitVec,
 }
 
+
 #[derive(Debug)]
 struct DeclaredVar {
     var: String,
@@ -60,120 +67,6 @@ pub struct SynthProblem {
     check_synth: bool,
 }
 
-#[derive(PartialEq, Eq)]
-enum SExpr {
-    Ident(String),
-    List(Vec<SExpr>),
-}
-
-impl Debug for SExpr {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        print(self, f, 0)
-    }
-}
-
-fn print(expr: &SExpr, f: &mut Formatter<'_>, indent: usize) -> Result {
-    match expr {
-        SExpr::Ident(id) => write!(f, "{id}", ),
-        SExpr::List(l) => {
-            write!(f, "(")?;
-            for (i, x) in l.iter().enumerate() {
-                print(x, f, indent+2);
-                if i != l.len()-1 {
-                    write!(f, " ")?;
-                }
-            }
-            write!(f, ")\n")?;
-            for _ in 0..indent {
-                write!(f, " ")?;
-            }
-            Ok(())
-        },
-    }
-}
-
-#[derive(Debug, PartialEq, Eq)]
-enum Token {
-    Ident(String),
-    LParen,
-    RParen,
-}
-
-fn tokenize(s: &str) -> Vec<Token> {
-    let mut tokens = Vec::new();
-    let svec: Box<[_]> = s.chars().collect();
-
-    let mut s: &[char] = &svec[..];
-
-    while s.len() > 0 {
-        match s[0] {
-            '(' => tokens.push(Token::LParen),
-            ')' => tokens.push(Token::RParen),
-            x if x.is_whitespace() => {},
-            x => {
-                let i = s.iter().position(|x| x.is_whitespace() || *x == '(' || *x == ')').unwrap();
-                tokens.push(Token::Ident(s[0..i].iter().collect()));
-                s = &s[i..];
-                continue;
-            },
-        }
-        s = &s[1..];
-    }
-
-    tokens
-}
-
-fn assemble(toks: &[Token]) -> Option<(SExpr, &[Token])> {
-    match toks {
-        [Token::LParen, toks@..] => {
-            let mut toks = toks;
-            let mut subexprs = Vec::new();
-            while let Some((expr, toks2)) = assemble(toks) {
-                toks = toks2;
-                subexprs.push(expr);
-            }
-            if toks[0] != Token::RParen { return None; }
-            let toks = &toks[1..];
-
-            Some((SExpr::List(subexprs), toks))
-        },
-        [Token::Ident(id), toks@..] => Some((SExpr::Ident(id.clone()), toks)),
-        [Token::RParen, ..] => None,
-        [] => None,
-    }
-}
-
-fn build_synth(exprs: Vec<SExpr>) -> SynthProblem {
-    let mut synth = SynthProblem::default();
-    for e in exprs {
-        let SExpr::List(l) = e else { panic!() };
-        let SExpr::Ident(a) = &l[0] else { panic!() };
-        match &**a {
-            "set-logic" => handle_set_logic(&l[1..], &mut synth),
-            "check-synth" => handle_check_synth(&l[1..], &mut synth),
-            "synth-fun" => handle_synth_fun(&l[1..], &mut synth),
-            f => panic!("unknown SynthProblem command {f}"),
-        }
-    }
-    synth
-}
-
-fn handle_set_logic(l: &[SExpr], synth: &mut SynthProblem) {
-    let [SExpr::Ident(s)] = l else { panic!() };
-    match &**s {
-        "LIA" => { synth.logic = Some(Logic::LIA); },
-        s => panic!("unsupported logic {s}"),
-    }
-}
-
-fn handle_check_synth(l: &[SExpr], synth: &mut SynthProblem) {
-    synth.check_synth = true;
-}
-
-fn handle_synth_fun(l: &[SExpr], synth: &mut SynthProblem) {
-    todo!()
-}
-
 pub fn parse_synth(s: &str) -> SynthProblem {
     let toks_src = tokenize(s);
     let mut toks = &*toks_src;
@@ -187,3 +80,4 @@ pub fn parse_synth(s: &str) -> SynthProblem {
     assert!(toks.is_empty());
     build_synth(exprs)
 }
+
