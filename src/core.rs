@@ -64,17 +64,18 @@ impl Term {
 
 pub type Sigma = Vec<Value>;
 
+
 pub fn to_int(v: Value) -> Int {
     match v {
         Value::Int(i) => i,
-        _ => panic!("to_int failed"),
+        _ => panic!("to_int failed on val {:?}", v),
     }
 }
 
 pub fn to_bool(v: Value) -> bool {
     match v {
         Value::Bool(b) => b,
-        _ => panic!("to_int failed"),
+        _ => panic!("to_bool failed on val {:?}", v),
     }
 }
 

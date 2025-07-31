@@ -126,6 +126,10 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
 
     let mut vars: IndexMap<String, Ty> = IndexMap::default();
 
+    for (name, ty) in argtypes.iter() {
+        vars.insert(name.clone(), *ty);
+    }
+
     let constraint: Expr = exprs.iter().filter_map(|x|
         if let SyGuSExpr::Constraint(e) = x {
             Some(e.clone())
@@ -144,6 +148,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
             match t {
                 Terminal::Num(i) => prod_rules.push(Node::ConstInt(i)),
                 Terminal::Var(v) => {
+                    if vars.get(&v).is_some() { continue; }
                     match g.ty {
                         Ty::Int => prod_rules.push(Node::VarInt(vars.len())),
                         Ty::Bool => prod_rules.push(Node::VarBool(vars.len())),
@@ -209,7 +214,14 @@ impl Problem {
     pub fn verify(&self, term: &Term) -> Option<Sigma> {
         let retty = term.elems.last().unwrap().ty();
         if retty != self.rettype {
-            return Some(vec![Value::Int(0); self.context_vars.len()]);
+            let mut ret = Vec::new();
+            for (v, ty) in self.vars.iter() {
+                match ty {
+                    Ty::Int => ret.push(Value::Int(0)),
+                    Ty::Bool => ret.push(Value::Bool(true)),
+                }
+            }
+            return Some(ret);
         }
 
         let mut query = self.context.clone();
