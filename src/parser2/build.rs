@@ -45,7 +45,7 @@ fn valid_op(op: &str, arity: usize) -> bool {
     Node::parse(op, &v).is_some()
 }
 
-fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<String, Ty>) -> GrammarTerm {
+fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<String, Ty>, defs: &IndexMap<String, DefinedFun>) -> GrammarTerm {
     match s {
         SExpr::Ident(id) => {
             if nonterminals.contains_key(id) { return GrammarTerm::NonTerminal(id.clone()); }
@@ -53,8 +53,8 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<Strin
             if id == "true" { return GrammarTerm::ConstBool(true); }
             if id == "false" { return GrammarTerm::ConstBool(false); }
             if args.contains_key(id) { return GrammarTerm::SynthArg(id.clone()); }
-            // TODO defined function call
-            todo!()
+
+            panic!("unknown ident: {id}")
         },
         SExpr::List(l) => {
             let [SExpr::Ident(op), rst@..] = &l[..] else { panic!() };
@@ -66,13 +66,25 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<Strin
                 }
             }
 
-            assert!(valid_op(op, rst.len()), "Not a valid op: {op}");
-            let rst = rst.iter().map(|x| {
-                let SExpr::Ident(id) = x else { panic!() };
-                assert!(nonterminals.contains_key(id));
-                id.clone()
-            }).collect();
-            GrammarTerm::Op(op.clone(), rst)
+            if defs.contains_key(op) {
+                let rst = rst.iter().map(|x| {
+                    let SExpr::Ident(id) = x else { panic!() };
+                    assert!(args.contains_key(id));
+                    id.clone()
+                }).collect();
+                return GrammarTerm::DefinedFunCall(op.clone(), rst);
+            }
+
+            if valid_op(op, rst.len()) {
+                let rst = rst.iter().map(|x| {
+                    let SExpr::Ident(id) = x else { panic!() };
+                    assert!(nonterminals.contains_key(id));
+                    id.clone()
+                }).collect();
+                return GrammarTerm::Op(op.clone(), rst);
+            }
+
+            panic!("unknown op: {op}")
         }
     }
 }
@@ -122,7 +134,7 @@ fn handle_synth_fun(l: &[SExpr], synth: &mut SynthProblem) {
     for a in nonterminal_defs_ {
         let SExpr::List(v) = a else { panic!() };
         let [SExpr::Ident(name), SExpr::Ident(ty), SExpr::List(rules)] = &v[..] else { panic!() };
-        let prod_rules = rules.iter().map(|x| as_rule(x, &nonterminals, &args)).collect();
+        let prod_rules = rules.iter().map(|x| as_rule(x, &nonterminals, &args, &synth.defined_funs)).collect();
         nonterminal_defs.insert(name.clone(), NonterminalDef {
             ty: as_ty(ty),
             prod_rules,
