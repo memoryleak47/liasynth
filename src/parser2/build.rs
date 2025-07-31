@@ -45,14 +45,14 @@ fn valid_op(op: &str, arity: usize) -> bool {
     Node::parse(op, &v).is_some()
 }
 
-fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>) -> GrammarTerm {
+fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<String, Ty>) -> GrammarTerm {
     match s {
         SExpr::Ident(id) => {
             if nonterminals.contains_key(id) { return GrammarTerm::NonTerminal(id.clone()); }
             if let Ok(i) = id.parse::<Int>() { return GrammarTerm::ConstInt(i); }
             if id == "true" { return GrammarTerm::ConstBool(true); }
             if id == "false" { return GrammarTerm::ConstBool(false); }
-            // TODO syntharg
+            if args.contains_key(id) { return GrammarTerm::SynthArg(id.clone()); }
             // TODO defined function call
             todo!()
         },
@@ -122,7 +122,7 @@ fn handle_synth_fun(l: &[SExpr], synth: &mut SynthProblem) {
     for a in nonterminal_defs_ {
         let SExpr::List(v) = a else { panic!() };
         let [SExpr::Ident(name), SExpr::Ident(ty), SExpr::List(rules)] = &v[..] else { panic!() };
-        let prod_rules = rules.iter().map(|x| as_rule(x, &nonterminals)).collect();
+        let prod_rules = rules.iter().map(|x| as_rule(x, &nonterminals, &args)).collect();
         nonterminal_defs.insert(name.clone(), NonterminalDef {
             ty: as_ty(ty),
             prod_rules,
