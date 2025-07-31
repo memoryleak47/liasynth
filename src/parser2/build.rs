@@ -55,7 +55,7 @@ fn as_expr(s: &SExpr) -> Expr {
     match s {
         SExpr::Ident(id) => Expr { op: id.clone(), children: Vec::new() },
         SExpr::List(l) => {
-            let [SExpr::Ident(op), rst@..] = &l[..] else { panic!() };
+            let [SExpr::Ident(op), rst@..] = &l[..] else { panic!("{:?}", l) };
             let rst = rst.iter().map(|x| as_expr(x)).collect();
             Expr { op: op.clone(), children: rst }
         }
