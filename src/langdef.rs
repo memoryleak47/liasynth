@@ -5,7 +5,7 @@ define_language! {
     [
         // https://smt-lib.org/theories-Core.shtml
         (Not, [Ty::Bool], Ty::Bool, "not", Value::Bool(!to_bool(ev(0)))),
-        (Implies, [Ty::Bool, Ty::Bool], Ty::Bool, "implies", Value::Bool(!to_bool(ev(0)) || to_bool(ev(1)))),
+        (Implies, [Ty::Bool, Ty::Bool], Ty::Bool, "=>", Value::Bool(!to_bool(ev(0)) || to_bool(ev(1)))),
         (And, [Ty::Bool, Ty::Bool], Ty::Bool, "and", Value::Bool(to_bool(ev(0)) && to_bool(ev(1)))),
         (Or, [Ty::Bool, Ty::Bool], Ty::Bool, "or", Value::Bool(to_bool(ev(0)) || to_bool(ev(1)))),
         (Xor, [Ty::Bool, Ty::Bool], Ty::Bool, "xor", Value::Bool(to_bool(ev(0)) != to_bool(ev(1)))),
