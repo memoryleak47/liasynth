@@ -25,15 +25,15 @@ pub struct SynthFun {
 #[derive(Debug)]
 pub enum ProdRule {
     NonTerminal(String),
-    Const(String),
     Op(String, Vec<ProdRule>),
+    Const(String), // what does Const include?
 }
 
 #[derive(Debug)]
-// TODO support let.
-pub struct Expr {
-    op: String,
-    children: Vec<Expr>,
+pub enum Expr {
+    Op(String, Vec<Expr>),
+    Let(IndexMap<String, Expr>, Box<Expr>),
+    Const(String), // what does Const include?
 }
 
 #[derive(Debug)]

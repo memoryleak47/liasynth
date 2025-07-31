@@ -53,11 +53,24 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>) -> ProdRule {
 
 fn as_expr(s: &SExpr) -> Expr {
     match s {
-        SExpr::Ident(id) => Expr { op: id.clone(), children: Vec::new() },
+        SExpr::Ident(id) => Expr::Const(id.clone()),
         SExpr::List(l) => {
             let [SExpr::Ident(op), rst@..] = &l[..] else { panic!("{:?}", l) };
-            let rst = rst.iter().map(|x| as_expr(x)).collect();
-            Expr { op: op.clone(), children: rst }
+            if op == "let" {
+                let [SExpr::List(bindings_), expr] = rst else { panic!() };
+                let mut bindings = IndexMap::new();
+                for b in bindings_ {
+                    let SExpr::List(b) = b else { panic!() };
+                    let [SExpr::Ident(var), ex] = &**b else { panic!() };
+                    let ex = as_expr(ex);
+                    bindings.insert(var.clone(), ex);
+                }
+                let expr = as_expr(expr);
+                Expr::Let(bindings, Box::new(expr))
+            } else {
+                let rst = rst.iter().map(|x| as_expr(x)).collect();
+                Expr::Op(op.clone(), rst)
+            }
         }
     }
 }
