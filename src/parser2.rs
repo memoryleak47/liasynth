@@ -2,11 +2,13 @@ use indexmap::IndexMap;
 use std::fmt::*;
 use crate::Ty;
 
+#[derive(Debug)]
 struct NonterminalDef {
     ty: Ty,
     rules: Vec<ProdRule>,
 }
 
+#[derive(Debug)]
 struct SynthFun {
     name: String,
     args: IndexMap<String, Ty>,
@@ -15,27 +17,32 @@ struct SynthFun {
     nonterminal_defs: IndexMap<String, NonterminalDef>,
 }
 
+#[derive(Debug)]
 enum ProdRule {
     NonTerminal(String),
     Const(String),
     Op(String, Vec<ProdRule>),
 }
 
+#[derive(Debug)]
 struct Expr {
     op: String,
     children: Vec<Expr>,
 }
 
+#[derive(Debug)]
 enum Logic {
     LIA,
     BitVec,
 }
 
+#[derive(Debug)]
 struct DeclaredVar {
     var: String,
     ty: Ty, // can really only be Int / Bool / BitVec.
 }
 
+#[derive(Debug)]
 struct DefinedFun {
     name: String,
     ret: Ty,
@@ -43,6 +50,7 @@ struct DefinedFun {
     expr: Expr,
 }
 
+#[derive(Debug)]
 pub struct SynthProblem {
     logic: Logic,
     synthfuns: Vec<SynthFun>,
@@ -52,7 +60,7 @@ pub struct SynthProblem {
 }
 
 #[derive(PartialEq, Eq)]
-pub enum SExpr {
+enum SExpr {
     Ident(String),
     List(Vec<SExpr>),
 }
@@ -84,13 +92,13 @@ fn print(expr: &SExpr, f: &mut Formatter<'_>, indent: usize) -> Result {
 }
 
 #[derive(Debug, PartialEq, Eq)]
-pub enum Token {
+enum Token {
     Ident(String),
     LParen,
     RParen,
 }
 
-pub fn tokenize(s: &str) -> Vec<Token> {
+fn tokenize(s: &str) -> Vec<Token> {
     let mut tokens = Vec::new();
     let mut svec = Vec::new();
 
@@ -118,7 +126,7 @@ pub fn tokenize(s: &str) -> Vec<Token> {
     tokens
 }
 
-pub fn assemble(toks: &[Token]) -> Option<(SExpr, &[Token])> {
+fn assemble(toks: &[Token]) -> Option<(SExpr, &[Token])> {
     match toks {
         [Token::LParen, toks@..] => {
             let mut toks = toks;
@@ -136,4 +144,15 @@ pub fn assemble(toks: &[Token]) -> Option<(SExpr, &[Token])> {
         [Token::RParen, ..] => None,
         [] => None,
     }
+}
+
+fn build_synth(expr: &SExpr) -> SynthProblem {
+    todo!()
+}
+
+pub fn parse_synth(s: &str) -> SynthProblem {
+    let toks = tokenize(s);
+    let (expr, toks) = assemble(&toks).unwrap();
+    assert!(toks.is_empty());
+    build_synth(&expr)
 }
