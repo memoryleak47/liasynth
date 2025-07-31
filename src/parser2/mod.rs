@@ -9,13 +9,13 @@ mod build;
 use build::*;
 
 #[derive(Debug)]
-struct NonterminalDef {
+pub struct NonterminalDef {
     ty: Ty,
     rules: Vec<ProdRule>,
 }
 
 #[derive(Debug)]
-struct SynthFun {
+pub struct SynthFun {
     args: IndexMap<String, Ty>,
     ret: Ty,
     nonterminals: IndexMap<String, Ty>,
@@ -23,14 +23,14 @@ struct SynthFun {
 }
 
 #[derive(Debug)]
-enum ProdRule {
+pub enum ProdRule {
     NonTerminal(String),
     Const(String),
     Op(String, Vec<ProdRule>),
 }
 
 #[derive(Debug)]
-struct Expr {
+pub struct Expr {
     op: String,
     children: Vec<Expr>,
 }

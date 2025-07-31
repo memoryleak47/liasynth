@@ -1,5 +1,5 @@
 use crate::*;
-use crate::parser2::*;
+use crate::parser2::{Expr, *};
 
 pub fn build_synth(exprs: Vec<SExpr>) -> SynthProblem {
     let mut synth = SynthProblem::default();
@@ -50,6 +50,17 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>) -> ProdRule {
     }
 }
 
+fn as_expr(s: &SExpr) -> Expr {
+    match s {
+        SExpr::Ident(id) => Expr { op: id.clone(), children: Vec::new() },
+        SExpr::List(l) => {
+            let [SExpr::Ident(op), rst@..] = &l[..] else { panic!() };
+            let rst = rst.iter().map(|x| as_expr(x)).collect();
+            Expr { op: op.clone(), children: rst }
+        }
+    }
+}
+
 fn handle_synth_fun(l: &[SExpr], synth: &mut SynthProblem) {
     let [SExpr::Ident(name), SExpr::List(args_), SExpr::Ident(ret), SExpr::List(nonterminals_), SExpr::List(nonterminal_defs_)] = l else { panic!() };
 
@@ -92,6 +103,6 @@ fn handle_declare_var(l: &[SExpr], synth: &mut SynthProblem) {
 }
 
 fn handle_constraint(l: &[SExpr], synth: &mut SynthProblem) {
-    let [SExpr::List(l)] = l else { panic!() };
-    // TODO add constraint.
+    let [e] = &l[..] else { panic!() };
+    synth.constraints.push(as_expr(e));
 }
