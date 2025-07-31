@@ -38,8 +38,16 @@ fn as_ty(s: &str) -> Ty {
     }
 }
 
-fn as_rule(s: &SExpr) -> ProdRule {
-    todo!()
+fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>) -> ProdRule {
+    match s {
+        SExpr::Ident(id) if nonterminals.contains_key(id) => ProdRule::NonTerminal(id.clone()),
+        SExpr::Ident(id) => ProdRule::Const(id.clone()),
+        SExpr::List(l) => {
+            let [SExpr::Ident(op), rst@..] = &l[..] else { panic!() };
+            let rst = rst.iter().map(|x| as_rule(x, nonterminals)).collect();
+            ProdRule::Op(op.clone(), rst)
+        }
+    }
 }
 
 fn handle_synth_fun(l: &[SExpr], synth: &mut SynthProblem) {
@@ -63,7 +71,7 @@ fn handle_synth_fun(l: &[SExpr], synth: &mut SynthProblem) {
     for a in nonterminal_defs_ {
         let SExpr::List(v) = a else { panic!() };
         let [SExpr::Ident(name), SExpr::Ident(ty), SExpr::List(rules)] = &v[..] else { panic!() };
-        let rules = rules.iter().map(as_rule).collect();
+        let rules = rules.iter().map(|x| as_rule(x, &nonterminals)).collect();
         nonterminal_defs.insert(name.clone(), NonterminalDef {
             ty: as_ty(ty),
             rules,
