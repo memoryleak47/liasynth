@@ -249,7 +249,8 @@ fn local_sat(big_sigma_idx: usize, class: Id, ctxt: &Ctxt) -> bool {
 fn extract(x: Id, ctxt: &Ctxt) -> Term {
     let mut t = Term { elems: Vec::new() };
     match ctxt.classes[x].node {
-        Node::Var(v) => { t.push(Node::Var(v)); },
+        Node::VarInt(v) => { t.push(Node::VarInt(v)); },
+        Node::VarBool(v) => { t.push(Node::VarBool(v)); },
         Node::Add([x, y]) => {
             let x = t.push_subterm(extract(x, ctxt));
             let y = t.push_subterm(extract(y, ctxt));

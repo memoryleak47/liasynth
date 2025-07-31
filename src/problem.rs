@@ -1,5 +1,7 @@
 use crate::*;
 
+use indexmap::IndexMap;
+
 #[derive(Clone)]
 pub struct Problem {
     pub argtypes: Vec<Ty>,
@@ -9,7 +11,7 @@ pub struct Problem {
 
     // maps between the SyGuS named variables, and the
     // variable indices from our synthesizer.
-    pub vars: Vec<String>,
+    pub vars: IndexMap<String, Ty>,
 
     pub constraint: Term,
     pub constraint_str: String,
@@ -18,7 +20,7 @@ pub struct Problem {
     pub prod_rules: Box<[Node]>,
 
     pub context: String,
-    pub context_vars: Vec<String>,
+    pub context_vars: IndexMap<String, Ty>,
 
     pub instvars: Vec<Box<[Id]>>,
 }
@@ -65,18 +67,22 @@ fn simplify_expr(e: Expr, defs: &Map<String, Def>, varmap: &Map<String, Expr>) -
     }
 }
 
-fn sygus_expr_to_term(e: Expr, vars: &[String], progname: &str) -> (Term, Vec<Box<[Id]>>) {
+fn sygus_expr_to_term(e: Expr, vars: &IndexMap<String, Ty>, progname: &str) -> (Term, Vec<Box<[Id]>>) {
     let mut t = Term { elems: Vec::new() };
     let mut instvars = Vec::new();
     sygus_expr_to_term_impl(e, vars, progname, &mut t, &mut instvars);
     (t, instvars)
 }
 
-fn sygus_expr_to_term_impl(e: Expr, vars: &[String], progname: &str, t: &mut Term, instvars: &mut Vec<Box<[Id]>>) -> Id {
+fn sygus_expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, t: &mut Term, instvars: &mut Vec<Box<[Id]>>) -> Id {
     match e {
         Expr::Terminal(Terminal::Var(v)) => {
-            let i = vars.iter().position(|x| *x == *v).unwrap();
-            t.push(Node::Var(i))
+            let i = vars.iter().position(|x| *x.0 == *v).unwrap();
+            let (_, ty) = vars.get_index(i).unwrap();
+            match ty {
+                Ty::Int =>  t.push(Node::VarInt(i)),
+                Ty::Bool =>  t.push(Node::VarBool(i)),
+            }
         },
         Expr::Terminal(Terminal::Bool(true)) => { t.push(Node::True) },
         Expr::Terminal(Terminal::Bool(false)) => { t.push(Node::False) },
@@ -107,7 +113,7 @@ fn sygus_expr_to_term_impl(e: Expr, vars: &[String], progname: &str, t: &mut Ter
                 ("distinct", &[x, y]) => Node::Distinct([x, y]),
                 (prog, args) if prog == progname => {
                     instvars.push(args.iter().cloned().collect());
-                    Node::Var(vars.len() + instvars.len() - 1)
+                    Node::VarInt(vars.len() + instvars.len() - 1)
                 },
                 (x, l) => todo!("unknown node {x} of arity {}", l.len()),
             };
@@ -138,7 +144,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
         } else { None }
     ).collect();
 
-    let mut vars: Vec<String> = Vec::new();
+    let mut vars: IndexMap<String, Ty> = IndexMap::default();
 
     let constraint: Expr = exprs.iter().filter_map(|x|
         if let SyGuSExpr::Constraint(e) = x {
@@ -158,8 +164,11 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
             match t {
                 Terminal::Num(i) => prod_rules.push(Node::ConstInt(i)),
                 Terminal::Var(v) => {
-                    prod_rules.push(Node::Var(vars.len()));
-                    vars.push(v.to_string());
+                    match g.ty {
+                        Ty::Int => prod_rules.push(Node::VarInt(vars.len())),
+                        Ty::Bool => prod_rules.push(Node::VarBool(vars.len())),
+                    }
+                    vars.insert(v.to_string(), g.ty);
                 },
                 _ => {},
             }
@@ -185,7 +194,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
     }
 
     let mut context: String = String::new();
-    let mut context_vars: Vec<String> = Vec::new();
+    let mut context_vars: IndexMap<String, Ty> = IndexMap::new();
     for expr in exprs.iter() {
         if let SyGuSExpr::DefinedFun(fun) = expr {
             context.push_str(&fun.stringify());
@@ -193,8 +202,8 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
         }
         if let SyGuSExpr::DeclaredVar(name, ty) = expr {
 
+            context_vars.insert(name.clone(), *ty);
             let ty = ty.to_string();
-            context_vars.push(name.clone());
             context.push_str(&format!("(declare-fun {name} () {ty})\n"));
         }
     }
@@ -239,10 +248,10 @@ impl Problem {
         let progname = &self.progname;
 
         query.push_str(&format!("(define-fun {progname} ("));
-        for var in self.vars.iter() {
-            query.push_str(&format!("({var} Int) "));
+        for (var, ty) in self.vars.iter() {
+            query.push_str(&format!("({var} {}) ", ty.to_string()));
         }
-        let term = term_to_z3(term, &self.vars);
+        let term = term_to_z3(term, &self.vars.keys().cloned().collect::<Box<[_]>>());
         query.push_str(&format!(") {retty} {term})\n"));
 
         let constraint_str = &self.constraint_str;
@@ -258,11 +267,16 @@ impl Problem {
         if solver.check() == z3::SatResult::Sat {
             let ce = solver.get_model().unwrap();
             let mut sigma = Sigma::new();
-            for var in &self.context_vars {
-                // TODO examples/LIA/unbdd_inv_gen_term2.sl has a boolean-typed context var. This one assumes it's always int.
-                let z3var = z3::ast::Int::new_const(&ctxt, var.to_string());
-                let z3val = ce.eval(&z3var, true); // TODO model completion?
-                sigma.push(Value::Int(z3val.unwrap().as_i64().unwrap()));
+            for (var, ty) in &self.context_vars {
+                if matches!(ty, Ty::Int) {
+                    let z3var = z3::ast::Int::new_const(&ctxt, var.to_string());
+                    let z3val = ce.eval(&z3var, true);
+                    sigma.push(Value::Int(z3val.unwrap().as_i64().unwrap()));
+                } else {
+                    let z3var = z3::ast::Bool::new_const(&ctxt, var.to_string());
+                    let z3val = ce.eval(&z3var, true);
+                    sigma.push(Value::Bool(z3val.unwrap().as_bool().unwrap()));
+                };
             }
             Some(sigma)
         } else { None }

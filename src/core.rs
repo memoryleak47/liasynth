@@ -20,7 +20,7 @@ impl Value {
 pub type Var = usize;
 pub type Id = usize;
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Hash)]
 pub enum Ty { Int, Bool }
 
 impl Ty {
@@ -34,7 +34,8 @@ impl Ty {
 
 #[derive(Clone, Debug)]
 pub enum Node {
-    Var(Var),
+    VarInt(Var),
+    VarBool(Var),
 
     // https://smt-lib.org/theories-Ints.shtml
     ConstInt(Int),
@@ -68,7 +69,7 @@ impl Node {
     pub fn children(&self) -> &[Id] {
         use Node::*;
         match self {
-            Var(_) | ConstInt(_) | True | False => &[],
+            VarInt(_) | VarBool(_) | ConstInt(_) | True | False => &[],
             Abs(s) | Neg(s) | Not(s) => s,
             Add(s) | Sub(s) | Mul(s) | Div(s) | Mod(s) | Lt(s) | Gt(s) | Lte(s) | Gte(s) | Equals(s) | Distinct(s) | Implies(s) | And(s) | Or(s) | Xor(s) => s,
             Ite(s) => s,
@@ -78,7 +79,7 @@ impl Node {
     pub fn children_mut(&mut self) -> &mut [Id] {
         use Node::*;
         match self {
-            Var(_) | ConstInt(_) | True | False => &mut [],
+            VarInt(_) | VarBool(_) | ConstInt(_) | True | False => &mut [],
             Abs(s) | Neg(s) | Not(s) => s,
             Add(s) | Sub(s) | Mul(s) | Div(s) | Mod(s) | Lt(s) | Gt(s) | Lte(s) | Gte(s) | Equals(s) | Distinct(s) | Implies(s) | And(s) | Or(s) | Xor(s) => s,
             Ite(s) => s,
@@ -88,7 +89,8 @@ impl Node {
     pub fn signature(&self) -> &'static (&'static [Ty], Ty) {
         use Node::*;
         match self {
-            Var(_) | ConstInt(_) | True | False => &(&[], Ty::Int),
+            VarInt(_) | ConstInt(_) => &(&[], Ty::Int),
+            VarBool(_) | True | False => &(&[], Ty::Bool),
             Add(_) | Sub(_) | Mul(_) | Div(_) | Mod(_) => &(&[Ty::Int; 2], Ty::Int),
             Lt(_) | Lte(_) | Gte(_) | Gt(_) | Equals(_) => &(&[Ty::Int; 2], Ty::Bool),
             Ite(_) => &(&[Ty::Bool, Ty::Int, Ty::Int], Ty::Int),
@@ -146,7 +148,7 @@ fn to_bool(v: Value) -> bool {
 
 pub fn eval_node(node: &Node, sigma: &Sigma, ch: &impl Fn(Id) -> Value) -> Value {
     match node {
-        Node::Var(s) => sigma[*s].clone(),
+        Node::VarInt(s) | Node::VarBool(s) => sigma[*s].clone(),
         Node::Add([l, r]) => Value::Int(to_int(ch(*l)) + to_int(ch(*r))),
         Node::Mul([l, r]) => Value::Int(to_int(ch(*l)) * to_int(ch(*r))),
         Node::Sub([l, r]) => Value::Int(to_int(ch(*l)) - to_int(ch(*r))),
@@ -204,7 +206,7 @@ pub fn cegis(problem: &Problem) -> Term {
     let mut sigmas = Vec::new();
     loop {
         let term = synth(problem, &sigmas);
-        println!("Candidate: {}", term_to_z3(&term, &problem.vars));
+        println!("Candidate: {}", term_to_z3(&term, &problem.vars.keys().cloned().collect::<Box<[_]>>()));
         // TODO check this later: assert!(problem.sat(&..., &sigmas));
 
         if let Some(sigma) = problem.verify(&term) {
