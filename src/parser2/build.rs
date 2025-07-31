@@ -89,9 +89,14 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<Strin
     }
 }
 
-fn as_expr(s: &SExpr) -> Expr {
+fn as_expr(s: &SExpr, defined_funs: &IndexMap<String, DefinedFun>, synth_funs: &IndexMap<String, SynthFun>) -> Expr {
     match s {
-        SExpr::Ident(id) => Expr::Const(id.clone()),
+        SExpr::Ident(id) => {
+            if let Ok(i) = id.parse::<Int>() { return Expr::ConstInt(i); }
+            if id == "true" { return Expr::ConstBool(true); }
+            if id == "false" { return Expr::ConstBool(false); }
+            Expr::Var(id.clone()) // TODO always correct?
+        },
         SExpr::List(l) => {
             let [SExpr::Ident(op), rst@..] = &l[..] else { panic!("{:?}", l) };
             if op == "let" {
@@ -100,14 +105,22 @@ fn as_expr(s: &SExpr) -> Expr {
                 for b in bindings_ {
                     let SExpr::List(b) = b else { panic!() };
                     let [SExpr::Ident(var), ex] = &**b else { panic!() };
-                    let ex = as_expr(ex);
+                    let ex = as_expr(ex, defined_funs, synth_funs);
                     bindings.insert(var.clone(), ex);
                 }
-                let expr = as_expr(expr);
+                let expr = as_expr(expr, defined_funs, synth_funs);
                 Expr::Let(bindings, Box::new(expr))
-            } else {
-                let rst = rst.iter().map(|x| as_expr(x)).collect();
+            } else if valid_op(op, rst.len()) {
+                let rst = rst.iter().map(|x| as_expr(x, defined_funs, synth_funs)).collect();
                 Expr::Op(op.clone(), rst)
+            } else if defined_funs.contains_key(op) {
+                let rst = rst.iter().map(|x| as_expr(x, defined_funs, synth_funs)).collect();
+                Expr::DefinedFunCall(op.clone(), rst)
+            } else if synth_funs.contains_key(op) {
+                let rst = rst.iter().map(|x| as_expr(x, defined_funs, synth_funs)).collect();
+                Expr::SynthFunCall(op.clone(), rst)
+            } else {
+                panic!("invalid op: {op}")
             }
         }
     }
@@ -166,7 +179,7 @@ fn handle_define_fun(l: &[SExpr], synth: &mut SynthProblem) {
 
     let fun = DefinedFun {
         args,
-        expr: as_expr(expr),
+        expr: as_expr(expr, &synth.defined_funs, &synth.synthfuns),
         ret: as_ty(ret),
     };
     synth.defined_funs.insert(name.clone(), fun);
@@ -174,5 +187,5 @@ fn handle_define_fun(l: &[SExpr], synth: &mut SynthProblem) {
 
 fn handle_constraint(l: &[SExpr], synth: &mut SynthProblem) {
     let [e] = &l[..] else { panic!() };
-    synth.constraints.push(as_expr(e));
+    synth.constraints.push(as_expr(e, &synth.defined_funs, &synth.synthfuns));
 }

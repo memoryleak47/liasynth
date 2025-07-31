@@ -46,10 +46,15 @@ pub enum GrammarTerm {
 }
 
 #[derive(Debug, Clone)]
+// used in constraints and defined funs.
 pub enum Expr {
-    Op(String, Vec<Expr>),
+    Op(Op, Vec<Expr>),
     Let(IndexMap<String, Expr>, Box<Expr>),
-    Const(String), // what does Const include?
+    DefinedFunCall(String, Vec<Expr>),
+    SynthFunCall(String, Vec<Expr>),
+    Var(String), // may come from DefinedFun arg; DeclaredVar; or let.
+    ConstInt(Int),
+    ConstBool(bool),
 }
 
 #[derive(Debug, Clone)]
