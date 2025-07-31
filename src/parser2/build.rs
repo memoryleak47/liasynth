@@ -39,14 +39,40 @@ fn as_ty(s: &str) -> Ty {
     }
 }
 
-fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>) -> ProdRule {
+// checks whether 'op' is an OP.
+fn valid_op(op: &str, arity: usize) -> bool {
+    let v: Box<[Id]> = (0..arity).collect();
+    Node::parse(op, &v).is_some()
+}
+
+fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>) -> GrammarTerm {
     match s {
-        SExpr::Ident(id) if nonterminals.contains_key(id) => ProdRule::NonTerminal(id.clone()),
-        SExpr::Ident(id) => ProdRule::Const(id.clone()),
+        SExpr::Ident(id) => {
+            if nonterminals.contains_key(id) { return GrammarTerm::NonTerminal(id.clone()); }
+            if let Ok(i) = id.parse::<Int>() { return GrammarTerm::ConstInt(i); }
+            if id == "true" { return GrammarTerm::ConstBool(true); }
+            if id == "false" { return GrammarTerm::ConstBool(false); }
+            // TODO syntharg
+            // TODO defined function call
+            todo!()
+        },
         SExpr::List(l) => {
             let [SExpr::Ident(op), rst@..] = &l[..] else { panic!() };
-            let rst = rst.iter().map(|x| as_rule(x, nonterminals)).collect();
-            ProdRule::Op(op.clone(), rst)
+
+            // special case for negative number constants:
+            if let [SExpr::Ident(a)] = rst && op == "-" {
+                if let Ok(i) = a.parse::<Int>() {
+                    return GrammarTerm::ConstInt(-i);
+                }
+            }
+
+            assert!(valid_op(op, rst.len()), "Not a valid op: {op}");
+            let rst = rst.iter().map(|x| {
+                let SExpr::Ident(id) = x else { panic!() };
+                assert!(nonterminals.contains_key(id));
+                id.clone()
+            }).collect();
+            GrammarTerm::Op(op.clone(), rst)
         }
     }
 }
@@ -96,10 +122,10 @@ fn handle_synth_fun(l: &[SExpr], synth: &mut SynthProblem) {
     for a in nonterminal_defs_ {
         let SExpr::List(v) = a else { panic!() };
         let [SExpr::Ident(name), SExpr::Ident(ty), SExpr::List(rules)] = &v[..] else { panic!() };
-        let rules = rules.iter().map(|x| as_rule(x, &nonterminals)).collect();
+        let prod_rules = rules.iter().map(|x| as_rule(x, &nonterminals)).collect();
         nonterminal_defs.insert(name.clone(), NonterminalDef {
             ty: as_ty(ty),
-            rules,
+            prod_rules,
         });
     }
 

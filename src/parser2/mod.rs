@@ -1,6 +1,6 @@
 use indexmap::IndexMap;
 use std::fmt::*;
-use crate::Ty;
+use crate::*;
 
 mod sexpr;
 use sexpr::*;
@@ -11,7 +11,7 @@ use build::*;
 #[derive(Debug, Clone)]
 pub struct NonterminalDef {
     pub ty: Ty,
-    pub rules: Vec<ProdRule>,
+    pub prod_rules: Vec<GrammarTerm>,
 }
 
 #[derive(Debug, Clone)]
@@ -22,11 +22,27 @@ pub struct SynthFun {
     pub nonterminal_defs: IndexMap<String, NonterminalDef>,
 }
 
+// NonTerminals defined in `nonterminals` in the SynthFun.
+pub type NonTerminal = String;
+
+// 'op' needs to be defined in
+// - https://smt-lib.org/theories-Core.shtml, or
+// - https://smt-lib.org/theories-Ints.shtml
+// This doesn't include ops with zero arguments, like vars and constants.
+pub type Op = String;
+
+// an argument of the synth fun.
+pub type SynthArg = String;
+
+// This grammar is built from the things we've observed in the sygus benchmark.
 #[derive(Debug, Clone)]
-pub enum ProdRule {
-    NonTerminal(String),
-    Op(String, Vec<ProdRule>),
-    Const(String), // what does Const include?
+pub enum GrammarTerm {
+    NonTerminal(NonTerminal),
+    Op(Op, Vec<NonTerminal>),
+    ConstInt(Int), // also covers negative numbers, like this: (- 3)
+    ConstBool(bool),
+    SynthArg(SynthArg),
+    DefinedFunCall(String, Vec<SynthArg>),
 }
 
 #[derive(Debug, Clone)]
