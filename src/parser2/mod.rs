@@ -16,7 +16,6 @@ struct NonterminalDef {
 
 #[derive(Debug)]
 struct SynthFun {
-    name: String,
     args: IndexMap<String, Ty>,
     ret: Ty,
     nonterminals: IndexMap<String, Ty>,
@@ -42,16 +41,8 @@ enum Logic {
     BitVec,
 }
 
-
-#[derive(Debug)]
-struct DeclaredVar {
-    var: String,
-    ty: Ty, // can really only be Int / Bool / BitVec.
-}
-
 #[derive(Debug)]
 struct DefinedFun {
-    name: String,
     ret: Ty,
     args: Vec<(String, Ty)>,
     expr: Expr,
@@ -60,10 +51,10 @@ struct DefinedFun {
 #[derive(Debug, Default)]
 pub struct SynthProblem {
     logic: Option<Logic>,
-    synthfuns: Vec<SynthFun>,
+    synthfuns: IndexMap<String, SynthFun>,
     constraints: Vec<Expr>,
-    defined_funs: Vec<DefinedFun>,
-    declared_vars: Vec<DeclaredVar>,
+    defined_funs: IndexMap<String, DefinedFun>,
+    declared_vars: IndexMap<String, Ty>,
     check_synth: bool,
 }
 
