@@ -3,7 +3,7 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
 use syn::*;
 
-const DEBUG: bool = true;
+const DEBUG: bool = false;
 
 struct Case {
     ident: Expr,
