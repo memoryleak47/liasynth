@@ -39,7 +39,7 @@ fn as_ty(s: &str) -> Ty {
 }
 
 fn handle_synth_fun(l: &[SExpr], synth: &mut SynthProblem) {
-    let [SExpr::Ident(name), SExpr::List(args_), SExpr::Ident(ret), SExpr::List(nonterminals), SExpr::List(nonterminal_defs)] = l else { panic!() };
+    let [SExpr::Ident(name), SExpr::List(args_), SExpr::Ident(ret), SExpr::List(nonterminals_), SExpr::List(nonterminal_defs)] = l else { panic!() };
 
     let mut args = IndexMap::new();
     for a in args_ {
@@ -48,10 +48,17 @@ fn handle_synth_fun(l: &[SExpr], synth: &mut SynthProblem) {
         args.insert(l.clone(), as_ty(r));
     }
 
+    let mut nonterminals = IndexMap::new();
+    for a in nonterminals_ {
+        let SExpr::List(v) = a else { panic!() };
+        let [SExpr::Ident(l), SExpr::Ident(r)] = &v[..] else { panic!() };
+        nonterminals.insert(l.clone(), as_ty(r));
+    }
+
     synth.synthfuns.insert(name.clone(), SynthFun {
         ret: as_ty(ret),
         args,
-        nonterminals: IndexMap::default(), // TODO
+        nonterminals,
         nonterminal_defs: IndexMap::default(), // TODO
     });
 }
