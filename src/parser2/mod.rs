@@ -44,7 +44,7 @@ enum Logic {
 #[derive(Debug)]
 struct DefinedFun {
     ret: Ty,
-    args: Vec<(String, Ty)>,
+    args: IndexMap<String, Ty>,
     expr: Expr,
 }
 

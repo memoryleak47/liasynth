@@ -1,5 +1,5 @@
 use crate::*;
-use crate::parser2::{Expr, *};
+use crate::parser2::{Expr, DefinedFun, *};
 
 pub fn build_synth(exprs: Vec<SExpr>) -> SynthProblem {
     let mut synth = SynthProblem::default();
@@ -11,6 +11,7 @@ pub fn build_synth(exprs: Vec<SExpr>) -> SynthProblem {
             "check-synth" => handle_check_synth(&l[1..], &mut synth),
             "synth-fun" => handle_synth_fun(&l[1..], &mut synth),
             "declare-var" => handle_declare_var(&l[1..], &mut synth),
+            "define-fun" => handle_define_fun(&l[1..], &mut synth),
             "constraint" => handle_constraint(&l[1..], &mut synth),
             f => panic!("unknown SynthProblem command {f}"),
         }
@@ -100,6 +101,24 @@ fn handle_synth_fun(l: &[SExpr], synth: &mut SynthProblem) {
 fn handle_declare_var(l: &[SExpr], synth: &mut SynthProblem) {
     let [SExpr::Ident(s), SExpr::Ident(ty)] = l else { panic!() };
     synth.declared_vars.insert(s.to_string(), as_ty(ty));
+}
+
+fn handle_define_fun(l: &[SExpr], synth: &mut SynthProblem) {
+    let [SExpr::Ident(name), SExpr::List(args_), SExpr::Ident(ret), expr] = l else { panic!() };
+
+    let mut args = IndexMap::new();
+    for a in args_ {
+        let SExpr::List(v) = a else { panic!() };
+        let [SExpr::Ident(var), SExpr::Ident(ty)] = &v[..] else { panic!() };
+        args.insert(var.to_string(), as_ty(ty));
+    }
+
+    let fun = DefinedFun {
+        args,
+        expr: as_expr(expr),
+        ret: as_ty(ret),
+    };
+    synth.defined_funs.insert(name.clone(), fun);
 }
 
 fn handle_constraint(l: &[SExpr], synth: &mut SynthProblem) {
