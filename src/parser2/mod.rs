@@ -51,12 +51,12 @@ struct DefinedFun {
 
 #[derive(Debug, Default, Clone)]
 pub struct SynthProblem {
-    logic: Option<Logic>,
-    synthfuns: IndexMap<String, SynthFun>,
-    constraints: Vec<Expr>,
-    defined_funs: IndexMap<String, DefinedFun>,
-    declared_vars: IndexMap<String, Ty>,
-    check_synth: bool,
+    pub logic: Option<Logic>,
+    pub synthfuns: IndexMap<String, SynthFun>,
+    pub constraints: Vec<Expr>,
+    pub defined_funs: IndexMap<String, DefinedFun>,
+    pub declared_vars: IndexMap<String, Ty>,
+    pub check_synth: bool,
 }
 
 pub fn parse_synth(s: &str) -> SynthProblem {

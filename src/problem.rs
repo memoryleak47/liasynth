@@ -5,6 +5,7 @@ use indexmap::IndexMap;
 #[derive(Clone)]
 pub struct Problem {
     pub synth_problem: SynthProblem,
+    pub synth_fun: SynthFun,
 
     pub argtypes: Vec<Ty>,
     pub rettype: Ty,
@@ -116,6 +117,9 @@ pub fn mk_sygus_problem(f: &str) -> Problem {
 }
 
 fn build_sygus(exprs: Vec<SyGuSExpr>, synth_problem: SynthProblem) -> Problem {
+    assert_eq!(synth_problem.synthfuns.len(), 1);
+    let synth_fun = synth_problem.synthfuns[0].clone();
+
     let Some(SyGuSExpr::SynthFun(progname, argtypes, rettype, _, subgrammars)) =
         exprs.iter().filter(|x| matches!(x, SyGuSExpr::SynthFun(..))).cloned().next() else { panic!() };
 
@@ -191,6 +195,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>, synth_problem: SynthProblem) -> Problem {
 
     Problem {
         synth_problem,
+        synth_fun,
         progname,
         argtypes: argtypes.into_iter().map(|(_, x)| x).collect(),
         rettype,
