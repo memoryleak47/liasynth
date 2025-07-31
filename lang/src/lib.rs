@@ -90,14 +90,14 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
                 }
             }
 
-            pub fn eval(&self, ch: impl Fn(Id) -> Value, sigma: &Sigma) -> Value {
-                match self {
+            pub fn eval(&self, ch: impl Fn(Id) -> Option<Value>, sigma: &Sigma) -> Option<Value> {
+                Some(match self {
                     Node::ConstInt(i) => Value::Int(*i),
                     Node::True => Value::Bool(true),
                     Node::False => Value::Bool(false),
                     Node::VarInt(v) | Node::VarBool(v) => sigma.get(*v).unwrap_or_else(|| panic!("Failed {sigma:?} index with {v}")).clone(),
                     #(#eval_cases),*
-                }
+                })
             }
 
             pub fn extract(&self, ex: &impl Fn(Id) -> Node, out: &mut Vec<Node>) {
@@ -189,7 +189,7 @@ fn eval_cases(edef: &EnumDef) -> Vec<TokenStream2> {
         let compute = &c.compute;
         let v = quote! {
             Node::#ident(s) => {
-                let ev = |x: usize| -> Value { ch(s[x]) };
+                let ev = |x: usize| -> Option<Value> { ch(s[x]) };
                 #compute
             }
         };

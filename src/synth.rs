@@ -110,7 +110,7 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma]) -> Term {
     for bsigma in big_sigmas.iter() {
         let mut indices: Vec<usize> = Vec::new();
         for a in problem.instvars.iter() {
-            let ssigma: Sigma = a.iter().map(|i| eval_term_partial(*i, &problem.constraint.elems, &bsigma)).collect();
+            let ssigma: Sigma = a.iter().map(|i| eval_term_partial(*i, &problem.constraint.elems, &bsigma).unwrap()).collect();
             small_sigmas.push(ssigma.clone());
             let idx = match small_sigmas.iter().position(|sigma2| sigma2 == &ssigma) {
                 Some(i) => i,
@@ -141,7 +141,8 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma]) -> Term {
 }
 
 fn add_node(node: Node, ctxt: &mut Ctxt) -> Option<Id> {
-    let vals = vals(&node, ctxt);
+    let Some(vals) = vals(&node, ctxt) else { return None };
+
     if let Some(&i) = ctxt.vals_lookup.get(&vals) {
         let newsize = minsize(&node, ctxt);
         let c = &mut ctxt.classes[i];
@@ -207,9 +208,9 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     a / (c.size + 5)
 }
 
-fn vals(node: &Node, ctxt: &Ctxt) -> Box<[Value]> {
+fn vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
     ctxt.small_sigmas.iter().enumerate().map(|(i, sigma)| {
-        let f = |id: Id| ctxt.classes[id].vals[i].clone();
+        let f = |id: Id| Some(ctxt.classes[id].vals[i].clone());
         node.eval(&f, sigma)
     }).collect()
 }
@@ -243,7 +244,7 @@ fn local_sat(big_sigma_idx: usize, class: Id, ctxt: &Ctxt) -> bool {
         huge_sigma.push(vals[*idx].clone());
     }
 
-    eval_term(&ctxt.problem.constraint, &huge_sigma) == Value::Bool(true)
+    eval_term(&ctxt.problem.constraint, &huge_sigma).unwrap() == Value::Bool(true)
 }
 
 fn extract(x: Id, ctxt: &Ctxt) -> Term {

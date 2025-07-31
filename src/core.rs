@@ -79,16 +79,16 @@ pub fn to_bool(v: Value) -> bool {
     }
 }
 
-pub fn eval_term(term: &Term, sigma: &Sigma) -> Value {
+pub fn eval_term(term: &Term, sigma: &Sigma) -> Option<Value> {
     let mut vals: Vec<Value> = Vec::new();
     for n in &term.elems {
-        let f = |i: usize| vals[i].clone();
-        vals.push(n.eval(&f, sigma));
+        let f = |i: usize| Some(vals[i].clone());
+        vals.push(n.eval(&f, sigma)?);
     }
-    vals.last().unwrap().clone()
+    Some(vals.last().unwrap().clone())
 }
 
-pub fn eval_term_partial(i: Id, term: &[Node], sigma: &Sigma) -> Value {
+pub fn eval_term_partial(i: Id, term: &[Node], sigma: &Sigma) -> Option<Value> {
     let f = |id: Id| eval_term_partial(id, term, sigma);
     term[i].eval(&f, sigma)
 }
