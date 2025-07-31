@@ -32,73 +32,7 @@ impl Ty {
     }
 }
 
-#[derive(Clone, Debug)]
-pub enum Node {
-    Var(Var),
-
-    // https://smt-lib.org/theories-Ints.shtml
-    ConstInt(Int),
-    Neg([Id; 1]),
-    Sub([Id; 2]),
-    Add([Id; 2]),
-    Mul([Id; 2]),
-    Div([Id; 2]),
-    Mod([Id; 2]),
-    Abs([Id; 1]),
-
-    Lt([Id; 2]),
-    Lte([Id; 2]),
-    Gte([Id; 2]),
-    Gt([Id; 2]),
-
-    // https://smt-lib.org/theories-Core.shtml
-    True,
-    False,
-    Not([Id; 1]),
-    Implies([Id; 2]),
-    And([Id; 2]),
-    Or([Id; 2]),
-    Xor([Id; 2]),
-    Equals([Id; 2]),
-    Distinct([Id; 2]),
-    Ite([Id; 3]),
-}
-
 impl Node {
-    pub fn children(&self) -> &[Id] {
-        use Node::*;
-        match self {
-            Var(_) | ConstInt(_) | True | False => &[],
-            Abs(s) | Neg(s) | Not(s) => s,
-            Add(s) | Sub(s) | Mul(s) | Div(s) | Mod(s) | Lt(s) | Gt(s) | Lte(s) | Gte(s) | Equals(s) | Distinct(s) | Implies(s) | And(s) | Or(s) | Xor(s) => s,
-            Ite(s) => s,
-        }
-    }
-
-    pub fn children_mut(&mut self) -> &mut [Id] {
-        use Node::*;
-        match self {
-            Var(_) | ConstInt(_) | True | False => &mut [],
-            Abs(s) | Neg(s) | Not(s) => s,
-            Add(s) | Sub(s) | Mul(s) | Div(s) | Mod(s) | Lt(s) | Gt(s) | Lte(s) | Gte(s) | Equals(s) | Distinct(s) | Implies(s) | And(s) | Or(s) | Xor(s) => s,
-            Ite(s) => s,
-        }
-    }
-
-    pub fn signature(&self) -> &'static (&'static [Ty], Ty) {
-        use Node::*;
-        match self {
-            Var(_) | ConstInt(_) | True | False => &(&[], Ty::Int),
-            Add(_) | Sub(_) | Mul(_) | Div(_) | Mod(_) => &(&[Ty::Int; 2], Ty::Int),
-            Lt(_) | Lte(_) | Gte(_) | Gt(_) | Equals(_) => &(&[Ty::Int; 2], Ty::Bool),
-            Ite(_) => &(&[Ty::Bool, Ty::Int, Ty::Int], Ty::Int),
-            Neg(_) => &(&[Ty::Int], Ty::Int),
-            Not(_) => &(&[Ty::Bool], Ty::Bool),
-            Implies(_) | And(_) | Or(_) | Xor(_) | Distinct(_) => &(&[Ty::Bool; 2], Ty::Bool),
-            Abs(_) => &(&[Ty::Int], Ty::Int),
-        }
-    }
-
     pub fn ty(&self) -> Ty {
         let (args, ret) = self.signature();
         *ret
@@ -130,59 +64,17 @@ impl Term {
 
 pub type Sigma = Vec<Value>;
 
-fn to_int(v: Value) -> Int {
+pub fn to_int(v: Value) -> Int {
     match v {
         Value::Int(i) => i,
         _ => panic!("to_int failed"),
     }
 }
 
-fn to_bool(v: Value) -> bool {
+pub fn to_bool(v: Value) -> bool {
     match v {
         Value::Bool(b) => b,
         _ => panic!("to_int failed"),
-    }
-}
-
-pub fn eval_node(node: &Node, sigma: &Sigma, ch: &impl Fn(Id) -> Value) -> Value {
-    match node {
-        Node::Var(s) => sigma[*s].clone(),
-        Node::Add([l, r]) => Value::Int(to_int(ch(*l)) + to_int(ch(*r))),
-        Node::Mul([l, r]) => Value::Int(to_int(ch(*l)) * to_int(ch(*r))),
-        Node::Sub([l, r]) => Value::Int(to_int(ch(*l)) - to_int(ch(*r))),
-        Node::Mod([l, r]) => Value::Int(to_int(ch(*l)) % to_int(ch(*r))),
-        Node::Div([l, r]) => {
-            let l = to_int(ch(*l));
-            let r = to_int(ch(*r));
-            if r == 0 { Value::Int(0) } // NOTE: division by zero is zero for now.
-            else { Value::Int(l / r) }
-        },
-        Node::Ite([cond, then, else_]) => {
-            if to_bool(ch(*cond)) {
-                ch(*then).clone()
-            } else {
-                ch(*else_).clone()
-            }
-        },
-        Node::True => Value::Bool(true),
-        Node::False => Value::Bool(false),
-        Node::Neg([x]) => Value::Int(-to_int(ch(*x))),
-        Node::Not([x]) => Value::Bool(!to_bool(ch(*x))),
-        Node::Lt([l, r]) => Value::Bool(to_int(ch(*l)) < to_int(ch(*r))),
-        Node::Lte([l, r]) => Value::Bool(to_int(ch(*l)) <= to_int(ch(*r))),
-        Node::Gt([l, r]) => Value::Bool(to_int(ch(*l)) > to_int(ch(*r))),
-        Node::Gte([l, r]) => Value::Bool(to_int(ch(*l)) >= to_int(ch(*r))),
-        Node::Equals([l, r]) => Value::Bool(ch(*l) == ch(*r)),
-        Node::Distinct([l, r]) => Value::Bool(ch(*l) != ch(*r)),
-
-        Node::And([l, r]) => Value::Bool(to_bool(ch(*l)) && to_bool(ch(*r))),
-        Node::Or([l, r]) => Value::Bool(to_bool(ch(*l)) || to_bool(ch(*r))),
-        Node::Xor([l, r]) => Value::Bool(to_bool(ch(*l)) != to_bool(ch(*r))),
-        Node::Implies([l, r]) => Value::Bool(!to_bool(ch(*l)) || to_bool(ch(*r))),
-
-        Node::Abs([x]) => Value::Int(to_int(ch(*x)).abs()),
-
-        Node::ConstInt(i) => Value::Int(*i),
     }
 }
 
@@ -190,14 +82,14 @@ pub fn eval_term(term: &Term, sigma: &Sigma) -> Value {
     let mut vals: Vec<Value> = Vec::new();
     for n in &term.elems {
         let f = |i: usize| vals[i].clone();
-        vals.push(eval_node(n, sigma, &f));
+        vals.push(n.eval(&f, sigma));
     }
     vals.last().unwrap().clone()
 }
 
 pub fn eval_term_partial(i: Id, term: &[Node], sigma: &Sigma) -> Value {
     let f = |id: Id| eval_term_partial(id, term, sigma);
-    eval_node(&term[i], sigma, &f)
+    term[i].eval(&f, sigma)
 }
 
 pub fn cegis(problem: &Problem) -> Term {

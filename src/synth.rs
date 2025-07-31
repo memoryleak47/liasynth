@@ -210,7 +210,7 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
 fn vals(node: &Node, ctxt: &Ctxt) -> Box<[Value]> {
     ctxt.small_sigmas.iter().enumerate().map(|(i, sigma)| {
         let f = |id: Id| ctxt.classes[id].vals[i].clone();
-        eval_node(node, sigma, &f)
+        node.eval(&f, sigma)
     }).collect()
 }
 

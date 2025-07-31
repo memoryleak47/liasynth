@@ -10,6 +10,7 @@ lazy_static = "1.5.0"
 itertools = "0.14.0"
 z3 = "0.13.3"
 fxhash = "0.2.1"
+lang = { path = "./lang" }
 
 [profile.release]
 debug = true
