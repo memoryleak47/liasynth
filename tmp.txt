@@ -1,0 +1,1701 @@
+
+==========
+examples/LIA/qm_loop_3.sl:
+Candidate: x
+CE: [Int(1), Int(0), Int(0)]
+Candidate: y
+CE: [Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_array.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(5), Int(5), Int(0), Int(0), Int(-1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 -2)
+CE: [Int(5), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_sum1.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(3), Int(1), Int(2), Int(0), Int(0)]
+Candidate: (<= 0 -1)
+CE: [Int(1), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/t9.sl:
+Candidate: yearInt
+CE: [Int(0)]
+Candidate: (<= yearInt yearInt)
+Answer: (<= yearInt yearInt)
+
+==========
+examples/LIA/MPwoL_d5s7.sl:
+
+==========
+examples/LIA/qm_neg_eq_3.sl:
+Candidate: x
+CE: [Int(1), Int(0), Int(0)]
+Candidate: y
+CE: [Int(0), Int(0), Int(0)]
+Candidate: (- 1 x)
+CE: [Int(2), Int(0), Int(0)]
+Candidate: (- 1 (ite (< 1 x) 1 x))
+CE: [Int(-1), Int(0), Int(0)]
+Candidate: (ite (< (- (ite (< 1 x) 1 x) x) x) (- (- (ite (< 1 x) 1 x) x) (ite (< x (- (ite (< 1 x) 1 x) x)) 1 (- (ite (< 1 x) 1 x) x))) 1)
+CE: [Int(-1), Int(0), Int(1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_finf1.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(1), Int(0), Int(0), Int(0)]
+Candidate: (<= x 0)
+CE: [Int(0), Int(-1), Int(0), Int(0), Int(0)]
+Candidate: (= x 0)
+Answer: (= x 0)
+
+==========
+examples/LIA/mpg_plane1.sl:
+Candidate: x
+CE: [Int(0), Int(1), Int(0)]
+Candidate: y
+CE: [Int(1), Int(0), Int(0)]
+Candidate: 1
+CE: [Int(2), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_winf1.sl:
+Candidate: 0
+CE: [Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/qm_loop_1.sl:
+Candidate: x
+CE: [Int(4)]
+Candidate: 3
+CE: [Int(1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/qm_neg_1.sl:
+Candidate: x
+CE: [Int(1)]
+Candidate: 0
+CE: [Int(-1)]
+Candidate: (ite (< x 1) 1 (- x 1))
+CE: [Int(2)]
+Candidate: (- (- (- (ite (< 1 x) 1 x) x) (ite (< 1 x) 1 x)) (ite (< x 1) (- (ite (< 1 x) 1 x) x) (- (- (ite (< 1 x) 1 x) x) (ite (< 1 x) 1 x))))
+CE: [Int(-2)]
+Candidate: (ite (< (- (ite (< 1 x) 1 x) x) x) (- (ite (< (ite (< 1 (- (- (ite (< 1 x) 1 x) x) (ite (< 1 x) 1 x))) (- (ite (< 1 x) 1 x) x) (- (- (ite (< 1 x) 1 x) x) (ite (< 1 x) 1 x))) 1) (ite (< 1 (- (- (ite (< 1 x) 1 x) x) (ite (< 1 x) 1 x))) (- (ite (< 1 x) 1 x) x) (- (- (ite (< 1 x) 1 x) x) (ite (< 1 x) 1 x))) x) (ite (< 1 (- (- (ite (< 1 x) 1 x) x) (ite (< 1 x) 1 x))) (- (ite (< 1 x) 1 x) x) (- (- (ite (< 1 x) 1 x) x) (ite (< 1 x) 1 x)))) 1)
+CE: [Int(0)]
+Candidate: (- (ite (< x (- (ite (< 1 x) 1 x) x)) 1 (- (ite (< 1 x) 1 x) x)) (- (ite (< 1 x) 1 x) x))
+Answer: (- (ite (< x (- (ite (< 1 x) 1 x) x)) 1 (- (ite (< 1 x) 1 x) x)) (- (ite (< 1 x) 1 x) x))
+
+==========
+examples/LIA/t10.sl:
+Candidate: this.total
+CE: [Int(0), Int(0), Int(0)]
+Candidate: (>= this.total this.total)
+CE: [Int(2), Int(1), Int(0)]
+Candidate: (> this.total this.total)
+Answer: (> this.total this.total)
+
+==========
+examples/LIA/inv_gen_tcs.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(0), Int(1), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_cegar2.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(1), Int(-1), Int(1), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_fig3.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 -1)
+CE: [Int(0), Int(0), Int(0), Int(0), Int(1), Int(0), Int(1), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/mpg_example5.sl:
+Candidate: x
+CE: [Int(301), Int(-296)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_vmail.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(-1), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/MPwoL_d4s3.sl:
+
+==========
+examples/LIA/qm_neg_eq_2.sl:
+Candidate: x
+CE: [Int(1), Int(0)]
+Candidate: y
+CE: [Int(0), Int(1)]
+Candidate: 0
+CE: [Int(0), Int(0)]
+
+==========
+examples/LIA/inv_gen_w1.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(0), Int(-1), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/t14.sl:
+Candidate: newLength
+CE: [Int(0), Int(0)]
+Candidate: (> newLength newLength)
+CE: [Int(2048), Int(2050)]
+Candidate: (>= newLength newLength)
+Answer: (>= newLength newLength)
+
+==========
+examples/LIA/array_search_13.sl:
+Candidate: 0
+CE: [Int(-11), Int(-10), Int(-9), Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(0), Int(2), Int(1)]
+Candidate: 12
+CE: [Int(-2), Int(0), Int(1), Int(2), Int(3), Int(4), Int(5), Int(6), Int(7), Int(8), Int(9), Int(10), Int(11), Int(-1)]
+Candidate: (ite (< 0 k1) 12 1)
+CE: [Int(-12), Int(-11), Int(-10), Int(-9), Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(1), Int(0)]
+
+==========
+examples/LIA/array_search_4.sl:
+Candidate: 0
+CE: [Int(-3), Int(-2), Int(-1), Int(1), Int(0)]
+Candidate: 3
+CE: [Int(-2), Int(-1), Int(0), Int(1), Int(-3)]
+Candidate: (ite (< y2 k1) 3 0)
+CE: [Int(-3), Int(-1), Int(0), Int(1), Int(-2)]
+Candidate: (ite (< y1 k1) (ite (< k1 0) 1 3) 0)
+CE: [Int(-5), Int(-4), Int(-3), Int(-2), Int(-1)]
+
+==========
+examples/LIA/s2.sl:
+Candidate: x
+CE: [Int(-2), Int(-1)]
+Candidate: y
+CE: [Int(2), Int(-2)]
+Candidate: -1
+Answer: -1
+
+==========
+examples/LIA/inv_gen_n_c11.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(-1), Int(0), Int(-1), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/qm_max5.sl:
+Candidate: v
+CE: [Int(0), Int(1), Int(1), Int(0), Int(1)]
+Candidate: w
+CE: [Int(1), Int(0), Int(0), Int(0), Int(0)]
+Candidate: 1
+CE: [Int(-1), Int(0), Int(-1), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/mpg_example1.sl:
+Candidate: x
+CE: [Int(-6), Int(2)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/MPwL_d4s7.sl:
+
+==========
+examples/LIA/unbdd_inv_gen_ex23.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(-1), Int(35), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_trex1.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 -1)
+CE: [Int(0), Int(0), Int(0), Int(0), Int(1), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_w1.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(0), Int(-1), Int(0)]
+Candidate: (<= 0 n)
+CE: [Int(0), Int(1), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/max7.sl:
+Candidate: x1
+CE: [Int(0), Int(1), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: x2
+CE: [Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: 1
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_ex7.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(-1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 i)
+CE: [Int(0), Int(0), Int(1), Int(0), Int(1), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/t12.sl:
+Candidate: pair.length
+CE: [Int(0)]
+Candidate: (> pair.length pair.length)
+CE: [Int(2)]
+Candidate: (>= pair.length pair.length)
+Answer: (>= pair.length pair.length)
+
+==========
+examples/LIA/max13.sl:
+Candidate: x1
+CE: [Int(0), Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: x2
+CE: [Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: 1
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(2), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_ex14.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(0), Int(0), Int(10)]
+Candidate: (<= 2 0)
+CE: [Int(1), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/max10.sl:
+Candidate: x1
+CE: [Int(0), Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: x2
+CE: [Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: 1
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(2), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/max9.sl:
+Candidate: x1
+CE: [Int(0), Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: x2
+CE: [Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: 1
+CE: [Int(0), Int(0), Int(0), Int(0), Int(2), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/max6.sl:
+Candidate: x1
+CE: [Int(0), Int(1), Int(0), Int(0), Int(0), Int(0)]
+Candidate: x2
+CE: [Int(1), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: 1
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/qm_neg_eq_1.sl:
+Candidate: x
+CE: [Int(1)]
+Candidate: 0
+CE: [Int(0)]
+Candidate: (- 1 x)
+CE: [Int(2)]
+Candidate: (- 1 (ite (< 1 x) 1 x))
+CE: [Int(-1)]
+Candidate: (ite (< (- (ite (< 1 x) 1 x) x) x) (- (- (ite (< 1 x) 1 x) x) (ite (< x (- (ite (< 1 x) 1 x) x)) 1 (- (ite (< 1 x) 1 x) x))) 1)
+Answer: (ite (< (- (ite (< 1 x) 1 x) x) x) (- (- (ite (< 1 x) 1 x) x) (ite (< x (- (ite (< 1 x) 1 x) x)) 1 (- (ite (< 1 x) 1 x) x))) 1)
+
+==========
+examples/LIA/unbdd_inv_gen_winf1.sl:
+Candidate: 0
+CE: [Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(1)]
+Candidate: (<= x 0)
+CE: [Int(0), Int(-1)]
+Candidate: (= x 0)
+Answer: (= x 0)
+
+==========
+examples/LIA/mpg_ite1.sl:
+Candidate: x
+CE: [Int(0), Int(0), Int(-2)]
+Candidate: (- x 1)
+CE: [Int(0), Int(-3), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/max_11.sl:
+Candidate: x1
+CE: [Int(0), Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: x2
+CE: [Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: 1
+CE: [Int(2), Int(1), Int(1), Int(1), Int(1), Int(1), Int(1), Int(1), Int(1), Int(1), Int(1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/LinExpr_inv1_ex.sl:
+Candidate: x
+CE: [Int(13), Int(15)]
+Candidate: 1
+CE: [Int(1), Int(24)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/mpg_ite2.sl:
+Candidate: x
+CE: [Int(2), Int(1), Int(-1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/t18.sl:
+Candidate: entry
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (> entry entry)
+CE: [Int(1), Int(1), Int(8), Int(1)]
+Candidate: (>= entry entry)
+CE: [Int(0), Int(0), Int(2), Int(1)]
+Candidate: (>= entry 1)
+Answer: (>= entry 1)
+
+==========
+examples/LIA/qm_max2.sl:
+Candidate: x
+CE: [Int(-1), Int(0)]
+Candidate: y
+CE: [Int(0), Int(-1)]
+Candidate: 0
+CE: [Int(-1), Int(-1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/t20.sl:
+Candidate: MC_741360
+CE: [Int(0), Int(0), Int(0)]
+Candidate: (= MC_741360 MC_741360)
+CE: [Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/core.rs:213:17:
+This is broken!
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/LinExpr_eq1ex.sl:
+Candidate: x
+CE: [Int(8), Int(36), Int(22)]
+Candidate: y
+CE: [Int(19), Int(3), Int(22)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/MPwL_d5s7.sl:
+
+==========
+examples/LIA/MPwL_d1s7.sl:
+
+==========
+examples/LIA/array_search_5.sl:
+Candidate: 0
+CE: [Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(0)]
+Candidate: 5
+CE: [Int(-3), Int(-2), Int(-1), Int(0), Int(2), Int(1)]
+Candidate: (ite (<= k1 0) 5 4)
+CE: [Int(-4), Int(-3), Int(-2), Int(-1), Int(1), Int(0)]
+Candidate: (ite (< 0 y5) 4 5)
+CE: [Int(-5), Int(-4), Int(-3), Int(-2), Int(0), Int(-1)]
+Candidate: (ite (< y5 0) 5 4)
+CE: [Int(-6), Int(-5), Int(-4), Int(-3), Int(-1), Int(-2)]
+Candidate: (ite (< y5 0) (ite (<= 0 k1) (ite (<= k1 0) 5 y3) 4) 4)
+CE: [Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(1)]
+
+==========
+examples/LIA/s0.sl:
+Candidate: x
+CE: [Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_ex7.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(-1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/array_search_2.sl:
+Candidate: 0
+CE: [Int(-1), Int(0), Int(1)]
+Candidate: 2
+CE: [Int(0), Int(2), Int(1)]
+Candidate: (ite (<= y2 0) 2 1)
+CE: [Int(-2), Int(0), Int(-1)]
+Candidate: (ite (< y2 k1) 2 1)
+CE: [Int(0), Int(1), Int(-1)]
+Candidate: (ite (< y2 k1) 2 (ite (< (ite (< 0 y2) 1 k1) y2) 1 0))
+CE: [Int(-1), Int(0), Int(-2)]
+Candidate: (ite (< y2 k1) 2 (ite (< k1 y2) (ite (< y1 k1) 1 0) y1))
+Answer: (ite (< y2 k1) 2 (ite (< k1 y2) (ite (< y1 k1) 1 0) y1))
+
+==========
+examples/LIA/mpg_example3.sl:
+Candidate: x
+CE: [Int(5), Int(9), Int(1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_sum4.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(9), Int(-1), Int(0), Int(0)]
+Candidate: (<= 0 -14)
+CE: [Int(1), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/s3.sl:
+Candidate: x
+CE: [Int(-2), Int(-1)]
+Candidate: y
+CE: [Int(2), Int(-2)]
+Candidate: -1
+Answer: -1
+
+==========
+examples/LIA/LinExpr_inv1.sl:
+Candidate: x
+CE: [Int(0), Int(2), Int(0), Int(0), Int(1), Int(0), Int(0), Int(1), Int(0), Int(2)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/mpg_example4.sl:
+Candidate: x
+CE: [Int(4), Int(-9), Int(0), Int(-1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_term3.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+Answer: (<= 0 0)
+
+==========
+examples/LIA/mpg_guard1.sl:
+Candidate: x
+CE: [Int(0), Int(1), Int(0)]
+Candidate: y
+CE: [Int(-1), Int(-1), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/max2.sl:
+Candidate: x
+CE: [Int(-1), Int(0)]
+Candidate: y
+CE: [Int(0), Int(-1)]
+Candidate: 0
+CE: [Int(-1), Int(-1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/max15.sl:
+Candidate: x1
+CE: [Int(0), Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: x2
+CE: [Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: 1
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(2)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/mpg_guard3.sl:
+Candidate: x
+CE: [Int(0), Int(-1), Int(0)]
+Candidate: 1
+CE: [Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_w2.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(0), Int(0), Int(1)]
+Candidate: (<= 2 0)
+CE: [Int(0), Int(0), Int(1), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/t17.sl:
+Candidate: j
+CE: [Int(0), Int(0)]
+Candidate: (= j j)
+Answer: (= j j)
+
+==========
+examples/LIA/t2.sl:
+Candidate: data.length
+CE: [Int(0)]
+Candidate: (> data.length data.length)
+CE: [Int(1)]
+Candidate: (> data.length 0)
+Answer: (> data.length 0)
+
+==========
+examples/LIA/array_search_12.sl:
+Candidate: 0
+CE: [Int(-10), Int(-9), Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(0), Int(2), Int(1)]
+Candidate: 11
+CE: [Int(-9), Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(0), Int(2), Int(3), Int(1)]
+Candidate: (ite (< 0 y11) 10 11)
+CE: [Int(-9), Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(0), Int(1), Int(3), Int(2)]
+
+==========
+examples/LIA/unbdd_inv_gen_term2.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/core.rs:143:14:
+to_int failed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_winf2.sl:
+Candidate: 0
+CE: [Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(1)]
+Candidate: (<= x 0)
+CE: [Int(0), Int(-1)]
+Candidate: (= x 0)
+Answer: (= x 0)
+
+==========
+examples/LIA/mpg_guard2.sl:
+Candidate: x
+CE: [Int(0), Int(-1), Int(0)]
+Candidate: 1
+CE: [Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_ex23.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(-1), Int(35), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_trex1.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 -1)
+CE: [Int(0), Int(0), Int(0), Int(0), Int(1), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/qm_choose_yz.sl:
+Candidate: x
+CE: [Int(1), Int(0), Int(0)]
+Candidate: y
+CE: [Int(1), Int(1), Int(0)]
+Candidate: z
+CE: [Int(0), Int(0), Int(1)]
+Candidate: 0
+CE: [Int(1), Int(1), Int(1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/s1.sl:
+Candidate: x
+CE: [Int(0)]
+Candidate: (+ (+ (+ (+ x x) (+ x x)) (+ (+ x x) (+ x x))) (+ x x))
+CE: [Int(6)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/max8.sl:
+Candidate: x1
+CE: [Int(0), Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: x2
+CE: [Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: 1
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_cgr1.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(4), Int(0), Int(0), Int(0)]
+Candidate: (<= x 0)
+CE: [Int(-1), Int(3), Int(1), Int(5)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_fig3.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 -1)
+CE: [Int(0), Int(0), Int(0), Int(0), Int(1), Int(0), Int(1), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/qm_max3.sl:
+Candidate: x
+CE: [Int(-1), Int(0), Int(0)]
+Candidate: y
+CE: [Int(1), Int(0), Int(0)]
+Candidate: (- (ite (< (+ x x) x) x (+ x x)) x)
+CE: [Int(-1), Int(-1), Int(-1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/MPwL_d1s3.sl:
+
+==========
+examples/LIA/qm_in_range.sl:
+Candidate: x
+CE: [Int(2), Int(1), Int(3)]
+Candidate: y
+CE: [Int(3), Int(2), Int(4)]
+Candidate: 1
+CE: [Int(0), Int(0), Int(1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_sum3.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(0), Int(0), Int(1), Int(1), Int(2)]
+Candidate: (<= x 0)
+CE: [Int(0), Int(0), Int(0), Int(0), Int(1), Int(1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_fig1.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 -1)
+CE: [Int(-50), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_w2.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(0), Int(0), Int(1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_trex2.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/core.rs:143:14:
+to_int failed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/max3.sl:
+Candidate: x
+CE: [Int(0), Int(1), Int(0)]
+Candidate: y
+CE: [Int(1), Int(0), Int(0)]
+Candidate: 1
+CE: [Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_cgr1.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(4), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_finf1.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(1), Int(0), Int(0), Int(0)]
+Candidate: (<= 2 0)
+CE: [Int(0), Int(0), Int(0), Int(1), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_finf2.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(1), Int(0), Int(0), Int(0)]
+Candidate: (<= 2 0)
+CE: [Int(0), Int(0), Int(0), Int(1), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/array_search_15.sl:
+Candidate: 0
+CE: [Int(-12), Int(-11), Int(-10), Int(-9), Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(0), Int(1), Int(2), Int(3), Int(-1)]
+Candidate: 11
+CE: [Int(-13), Int(-12), Int(-11), Int(-10), Int(-9), Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(0), Int(2), Int(1)]
+Candidate: (ite (< k1 0) 11 14)
+CE: [Int(-15), Int(-14), Int(-13), Int(-12), Int(-11), Int(-10), Int(-9), Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(0), Int(-1)]
+
+==========
+examples/LIA/unbdd_inv_gen_cegar2.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(1), Int(-1), Int(1), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 m)
+CE: [Int(1), Int(1), Int(1), Int(2), Int(2), Int(1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_fig6.sl:
+Candidate: 0
+CE: [Int(0), Int(0)]
+Candidate: (<= 0 0)
+Answer: (<= 0 0)
+
+==========
+examples/LIA/MPwL_d4s3.sl:
+
+==========
+examples/LIA/unbdd_inv_gen_vmail.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(-1), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 i)
+Answer: (<= 0 i)
+
+==========
+examples/LIA/t15.sl:
+Candidate: enabled
+CE: [Int(0), Int(0), Int(0)]
+Candidate: (= enabled enabled)
+CE: [Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/core.rs:213:17:
+This is broken!
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/max4.sl:
+Candidate: x
+CE: [Int(0), Int(1), Int(0), Int(0)]
+Candidate: y
+CE: [Int(1), Int(0), Int(0), Int(0)]
+Candidate: 1
+CE: [Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/t8.sl:
+Candidate: x2
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (< x2 x2)
+CE: [Int(1), Int(1), Int(0), Int(-1)]
+Candidate: (= x2 x2)
+Answer: (= x2 x2)
+
+==========
+examples/LIA/s0_d1.sl:
+Candidate: x
+CE: [Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/mpg_example2.sl:
+Candidate: x
+CE: [Int(5), Int(2), Int(6)]
+Candidate: y
+CE: [Int(2), Int(5), Int(6)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_array.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(5), Int(5), Int(0), Int(0), Int(-1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 a0)
+CE: [Int(5), Int(0), Int(0), Int(0), Int(-1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_fig9.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(-1), Int(0)]
+Candidate: (<= 0 y)
+CE: [Int(-1), Int(0), Int(-1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/LinExpr_eq2ex.sl:
+Candidate: x
+CE: [Int(49), Int(11), Int(28)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/qm_neg_eq_5.sl:
+Candidate: v
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: 1
+CE: [Int(1), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (- 1 v)
+CE: [Int(-1), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (ite (< v 1) 1 (- v 1))
+CE: [Int(0), Int(0), Int(0), Int(0), Int(1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/max14.sl:
+Candidate: x1
+CE: [Int(0), Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: x2
+CE: [Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: 1
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/MPwL_d5s3.sl:
+
+==========
+examples/LIA/commutative.sl:
+Candidate: x
+CE: [Int(1), Int(0)]
+Candidate: (- x x)
+Answer: (- x x)
+
+==========
+examples/LIA/array_search_3.sl:
+Candidate: 0
+CE: [Int(-1), Int(0), Int(2), Int(1)]
+Candidate: 2
+CE: [Int(-2), Int(0), Int(1), Int(-1)]
+Candidate: y3
+CE: [Int(-2), Int(-1), Int(1), Int(0)]
+Candidate: (ite (<= 0 k1) 2 y3)
+CE: [Int(-3), Int(-2), Int(1), Int(-1)]
+Candidate: (ite (< y2 0) 2 y3)
+CE: [Int(-1), Int(0), Int(1), Int(-2)]
+Candidate: (ite (< y1 k1) (ite (< y2 0) 2 y3) 0)
+CE: [Int(-2), Int(-1), Int(2), Int(3)]
+
+==========
+examples/LIA/qm_neg_3.sl:
+Candidate: x
+CE: [Int(-1), Int(-1), Int(-1)]
+Candidate: 1
+CE: [Int(0), Int(-1), Int(-1)]
+Candidate: (- (- 1 x) 1)
+CE: [Int(-2), Int(-1), Int(-1)]
+Candidate: (ite (< 1 (- 1 x)) 1 x)
+CE: [Int(1), Int(-1), Int(-1)]
+Candidate: (ite (< 1 (- 1 x)) 1 (ite (< (ite (< 1 (- 1 x)) x (- 1 x)) 1) (- 1 x) x))
+CE: [Int(2), Int(-1), Int(-1)]
+Candidate: (ite (< 1 (- (ite (< 1 x) x 1) x)) 1 (ite (< (ite (< 1 (- (ite (< 1 x) x 1) x)) x (- (ite (< 1 x) x 1) x)) 1) (- (ite (< 1 x) x 1) x) x))
+CE: [Int(-1), Int(-1), Int(0)]
+
+==========
+examples/LIA/qm_neg_4.sl:
+Candidate: w
+CE: [Int(-1), Int(-1), Int(-1), Int(-1)]
+Candidate: 1
+CE: [Int(0), Int(-1), Int(-1), Int(-1)]
+Candidate: (- 0 w)
+CE: [Int(-2), Int(-1), Int(-1), Int(-1)]
+
+==========
+examples/LIA/MPwoL_d1s3.sl:
+
+==========
+examples/LIA/MPwoL_d5s3.sl:
+
+==========
+examples/LIA/unbdd_inv_gen_fig6.sl:
+Candidate: 0
+CE: [Int(0), Int(0)]
+Candidate: (<= 0 0)
+Answer: (<= 0 0)
+
+==========
+examples/LIA/inv_gen_sum1.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(3), Int(1), Int(2), Int(0), Int(0)]
+Candidate: (<= 0 -3)
+CE: [Int(1), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/t3.sl:
+Candidate: this.y
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (= this.y this.y)
+CE: [Int(2), Int(1), Int(3), Int(1)]
+Candidate: (= 1 this.y)
+CE: [Int(2), Int(1), Int(2), Int(1)]
+Candidate: (= y this.y)
+Answer: (= y this.y)
+
+==========
+examples/LIA/qm_choose_01.sl:
+Candidate: x
+CE: [Int(1)]
+Candidate: 0
+CE: [Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/constant.sl:
+Candidate: x
+CE: [Int(1), Int(0)]
+Candidate: 0
+Answer: 0
+
+==========
+examples/LIA/mpg_guard4.sl:
+Candidate: x
+CE: [Int(0), Int(-1), Int(0)]
+Candidate: 1
+CE: [Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_finf2.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(1), Int(0), Int(0), Int(0)]
+Candidate: (<= x 0)
+CE: [Int(0), Int(-1), Int(0), Int(0), Int(0)]
+Candidate: (= x 0)
+Answer: (= x 0)
+
+==========
+examples/LIA/t6.sl:
+Candidate: i
+CE: [Int(0), Int(0)]
+Candidate: (< i i)
+CE: [Int(84), Int(150)]
+Candidate: (<= i i)
+CE: [Int(151), Int(150)]
+Candidate: (< i MC_741360)
+CE: [Int(150), Int(150)]
+Candidate: (<= i MC_741360)
+Answer: (<= i MC_741360)
+
+==========
+examples/LIA/inv_gen_trex4.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/core.rs:143:14:
+to_int failed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/array_search_9.sl:
+Candidate: 0
+CE: [Int(-4), Int(-3), Int(-2), Int(0), Int(1), Int(2), Int(3), Int(4), Int(5), Int(-1)]
+Candidate: 3
+CE: [Int(1), Int(2), Int(3), Int(4), Int(5), Int(6), Int(7), Int(8), Int(9), Int(0)]
+Candidate: (ite (< k1 0) 3 0)
+CE: [Int(-9), Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(0), Int(-1)]
+Candidate: (ite (< y5 0) 8 (ite (< y9 6) (ite (< 0 y5) 3 y3) 0))
+CE: [Int(-1), Int(0), Int(8), Int(10), Int(11), Int(12), Int(13), Int(14), Int(15), Int(9)]
+
+==========
+examples/LIA/array_search_8.sl:
+Candidate: 0
+CE: [Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(0), Int(2), Int(1)]
+Candidate: 7
+CE: [Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(0), Int(1), Int(-7)]
+Candidate: (ite (< 0 k1) 7 0)
+CE: [Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(1), Int(0)]
+Candidate: (ite (< y6 k1) 7 0)
+CE: [Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(0)]
+
+==========
+examples/LIA/qm_neg_eq_4.sl:
+Candidate: w
+CE: [Int(1), Int(0), Int(0), Int(0)]
+Candidate: x
+CE: [Int(0), Int(1), Int(0), Int(0)]
+Candidate: y
+CE: [Int(0), Int(0), Int(1), Int(0)]
+Candidate: z
+CE: [Int(0), Int(0), Int(0), Int(0)]
+
+==========
+examples/LIA/inv_gen_sum3.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(0), Int(0), Int(1), Int(1), Int(2)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/qm_area_sel_2.sl:
+Candidate: x
+CE: [Int(-1), Int(0), Int(-2), Int(0), Int(-1), Int(1)]
+Candidate: y
+CE: [Int(0), Int(-1), Int(-1), Int(-1), Int(0), Int(0)]
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/array_search_6.sl:
+Candidate: 0
+CE: [Int(-4), Int(-3), Int(-2), Int(-1), Int(0), Int(2), Int(1)]
+Candidate: 5
+CE: [Int(-4), Int(-3), Int(-2), Int(-1), Int(1), Int(2), Int(0)]
+Candidate: (ite (< 0 k1) 5 4)
+CE: [Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(1), Int(0)]
+Candidate: (ite (< (ite (<= k1 0) y6 0) 2) 5 4)
+CE: [Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(2), Int(0)]
+Candidate: (ite (< y5 0) 5 (ite (< 0 k1) 5 (ite (< y6 2) y4 4)))
+CE: [Int(-6), Int(-5), Int(-4), Int(-3), Int(-1), Int(0), Int(-2)]
+
+==========
+examples/LIA/array_search_7.sl:
+Candidate: 0
+CE: [Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(1), Int(0)]
+Candidate: 6
+CE: [Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(1), Int(2), Int(0)]
+Candidate: (ite (<= 2 y7) 5 6)
+CE: [Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(0), Int(1), Int(-1)]
+Candidate: (ite (< k1 y6) 5 6)
+CE: [Int(-4), Int(-3), Int(-2), Int(-1), Int(0), Int(1), Int(2), Int(3)]
+
+==========
+examples/LIA/inv_gen_term2.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/core.rs:143:14:
+to_int failed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/t7.sl:
+Candidate: bufferIndex
+CE: [Int(0), Int(0)]
+Candidate: (>= bufferIndex bufferIndex)
+CE: [Int(1), Int(0)]
+Candidate: (> bufferIndex bufferIndex)
+Answer: (> bufferIndex bufferIndex)
+
+==========
+examples/LIA/MPwoL_d1s7.sl:
+
+==========
+examples/LIA/array_search_11.sl:
+Candidate: 0
+CE: [Int(-9), Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(0), Int(2), Int(1)]
+Candidate: 10
+CE: [Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(0), Int(2), Int(3), Int(1)]
+Candidate: (ite (< 0 y10) 9 10)
+CE: [Int(-2), Int(-1), Int(1), Int(2), Int(3), Int(4), Int(5), Int(6), Int(7), Int(8), Int(9), Int(0)]
+Candidate: (ite (< 2 (ite (< y3 0) y11 0)) 9 (ite (< 2 y11) (ite (< 0 y3) 2 0) 10))
+CE: [Int(-1), Int(1), Int(2), Int(3), Int(4), Int(5), Int(6), Int(7), Int(8), Int(9), Int(10), Int(0)]
+
+==========
+examples/LIA/inv_gen_fig9.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(-1), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/array_search_10.sl:
+Candidate: 0
+CE: [Int(-9), Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(1), Int(0)]
+Candidate: 9
+CE: [Int(-9), Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(0), Int(1), Int(-1)]
+Candidate: (ite (< k1 0) 8 9)
+CE: [Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(0), Int(1), Int(2), Int(-1)]
+Candidate: (ite (<= y9 (ite (< k1 0) 0 y4)) 8 (ite (< 0 y9) 7 (ite (< k1 0) 1 9)))
+CE: [Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(0), Int(1), Int(2), Int(3)]
+
+==========
+examples/LIA/t4.sl:
+Candidate: x.end
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (= x.end x.end)
+CE: [Int(300), Int(2), Int(1), Int(305)]
+Candidate: (> x.end x.end)
+CE: [Int(122), Int(2), Int(1), Int(109)]
+Candidate: (> x.end elem.end)
+Answer: (> x.end elem.end)
+
+==========
+examples/LIA/mpg_plane2.sl:
+Candidate: x
+CE: [Int(1), Int(-2), Int(0)]
+Candidate: z
+CE: [Int(0), Int(0), Int(4)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/qm_neg_5.sl:
+Candidate: v
+CE: [Int(-1), Int(-1), Int(-1), Int(-1), Int(-1)]
+Candidate: 1
+CE: [Int(0), Int(-1), Int(-1), Int(-1), Int(-1)]
+Candidate: (- (- 1 v) 1)
+CE: [Int(-2), Int(-1), Int(-1), Int(-1), Int(-1)]
+Candidate: (ite (< 1 (- 1 v)) 1 v)
+CE: [Int(-1), Int(-1), Int(-1), Int(-1), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/s0_d2.sl:
+Candidate: x
+CE: [Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_tcs.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(0), Int(1), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= y 0)
+CE: [Int(0), Int(0), Int(2), Int(0), Int(2), Int(-1), Int(1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/t5.sl:
+Candidate: MC_741360
+CE: [Int(0), Int(0), Int(0)]
+Candidate: (< MC_741360 MC_741360)
+CE: [Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/core.rs:213:17:
+This is broken!
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/t11.sl:
+Candidate: NCK_NEQ_741360
+CE: [Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:54:5:
+No term found!
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_ex14.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(0), Int(0), Int(10)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_n_c11.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(-1), Int(0), Int(-1), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_trex4.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/core.rs:143:14:
+to_int failed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/mpg_plane3.sl:
+Candidate: x
+CE: [Int(1), Int(-2), Int(0)]
+Candidate: z
+CE: [Int(0), Int(0), Int(6)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/qm_loop_2.sl:
+Candidate: x
+CE: [Int(1), Int(0)]
+Candidate: y
+CE: [Int(2), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_sum4.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(9), Int(-1), Int(0), Int(0)]
+Candidate: (<= 0 -1)
+CE: [Int(1), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/qm_max4.sl:
+Candidate: w
+CE: [Int(0), Int(1), Int(2), Int(2)]
+Candidate: y
+CE: [Int(1), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/array_search_14.sl:
+Candidate: 0
+CE: [Int(-12), Int(-11), Int(-10), Int(-9), Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(0), Int(2), Int(1)]
+Candidate: 13
+CE: [Int(-12), Int(-11), Int(-10), Int(-9), Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(1), Int(2), Int(0)]
+Candidate: (ite (<= k1 0) 12 13)
+CE: [Int(-13), Int(-12), Int(-11), Int(-10), Int(-9), Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(1), Int(0)]
+Candidate: (ite (< y13 0) 13 (ite (<= k1 0) 12 13))
+CE: [Int(-11), Int(-10), Int(-9), Int(-8), Int(-7), Int(-6), Int(-5), Int(-4), Int(-3), Int(-2), Int(-1), Int(1), Int(2), Int(3), Int(0)]
+
+==========
+examples/LIA/s0_d0.sl:
+Candidate: x
+CE: [Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/max12.sl:
+Candidate: x1
+CE: [Int(0), Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: x2
+CE: [Int(1), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: 1
+CE: [Int(0), Int(0), Int(0), Int(0), Int(2), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_fig8.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(1), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 2 0)
+CE: [Int(0), Int(0), Int(1), Int(1), Int(0), Int(0), Int(1), Int(-1), Int(0), Int(0), Int(-1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_fig8.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(1), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= l 0)
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(-1), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (= l 0)
+Answer: (= l 0)
+
+==========
+examples/LIA/unbdd_inv_gen_fig1.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 -1)
+CE: [Int(-50), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/unbdd_inv_gen_term3.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0)]
+Candidate: (<= 0 0)
+Answer: (<= 0 0)
+
+==========
+examples/LIA/MPwoL_d4s7.sl:
+
+==========
+examples/LIA/max5.sl:
+Candidate: x
+CE: [Int(0), Int(1), Int(0), Int(0), Int(0)]
+Candidate: y
+CE: [Int(1), Int(0), Int(0), Int(0), Int(0)]
+Candidate: 1
+CE: [Int(2), Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_trex2.sl:
+Candidate: 0
+CE: [Int(0), Int(0), Int(0), Int(0)]
+
+thread 'main' panicked at src/core.rs:143:14:
+to_int failed
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/qm_neg_2.sl:
+Candidate: x
+CE: [Int(-1), Int(-1)]
+Candidate: 1
+CE: [Int(0), Int(-1)]
+Candidate: (- (- 1 x) 1)
+CE: [Int(-2), Int(-1)]
+Candidate: (ite (< 1 (- 1 x)) 1 x)
+CE: [Int(-1), Int(0)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/inv_gen_winf2.sl:
+Candidate: 0
+CE: [Int(0), Int(0)]
+Candidate: (<= 0 0)
+CE: [Int(0), Int(1)]
+
+thread 'main' panicked at src/synth.rs:207:5:
+attempt to divide by zero
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+==========
+examples/LIA/t1.sl:
+Candidate: stopTime
+CE: [Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0), Int(0)]
+Candidate: (= stopTime stopTime)
+CE: [Int(0), Int(0), Int(1), Int(10), Int(3), Int(0), Int(0), Int(11), Int(10), Int(2), Int(0), Int(3)]
+Candidate: (= this.splitState stopTime)
+Answer: (= this.splitState stopTime)

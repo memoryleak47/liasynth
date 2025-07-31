@@ -68,11 +68,11 @@ pub enum Theory {
     LIA,
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Terminal {
     Num(i64),
     Bool(bool),
-    Var(String),
+    Var(String, Ty),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -92,7 +92,7 @@ pub fn prettyprint(e: &Expr) -> String {
     match e {
         Expr::Terminal(Terminal::Num(n)) => n.to_string(),
         Expr::Terminal(Terminal::Bool(b)) => b.to_string(),
-        Expr::Terminal(Terminal::Var(v)) => v.to_string(),
+        Expr::Terminal(Terminal::Var(v, _)) => v.to_string(),
         Expr::Operation { op, expr } => {
             let mut s = String::from('(');
             s.push_str(&op.to_string());
@@ -122,7 +122,7 @@ pub fn prettyprint(e: &Expr) -> String {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NonTerminal {
     pub op: String,
     pub args: Vec<(String, Ty)>,
@@ -140,6 +140,12 @@ enum GrammarElement {
 #[derive(Debug, PartialEq, Clone, Eq)]
 pub struct SubGrammar {
     pub ty: Ty,
+    pub terminals: Vec<Terminal>,
+    pub nonterminals: Vec<NonTerminal>,
+}
+
+#[derive(Debug, PartialEq, Clone, Eq)]
+pub struct Grammar {
     pub terminals: Vec<Terminal>,
     pub nonterminals: Vec<NonTerminal>,
 }
@@ -178,8 +184,8 @@ pub enum SyGuSExpr {
         String,
         Vec<(String, Ty)>,
         Ty,
-        Vec<SyGuSExpr>,
-        Vec<SubGrammar>,
+        Vec<(String, Ty)>,
+        Grammar,
     ),
     Constraint(Expr),
 }
@@ -250,7 +256,7 @@ fn parse_synth_fun(i: &mut &'_ str) -> PResult<SyGuSExpr> {
             ws(s_exp(repeat(0.., s_exp(parse_subgrammar))))
         },
     )
-    .map(|(name, args, sort, subtypes, subgrams): (String, Vec<(String, Ty)>, Ty, Vec<SyGuSExpr>, Vec<SubGrammar>)|{
+    .map(|(name, args, sort, subtypes, subgrams): (String, Vec<(String, Ty)>, Ty, Vec<(String, Ty)>, Vec<SubGrammar>)|{
 
         add_to_table(
             name.clone(),
@@ -263,7 +269,25 @@ fn parse_synth_fun(i: &mut &'_ str) -> PResult<SyGuSExpr> {
             })
         );
 
-        SyGuSExpr::SynthFun(name, args, sort, subtypes, subgrams)
+        let mut terminals = HashSet::new();
+        let mut nonterminals = HashSet::new();
+
+        for sg in subgrams {
+            for t in sg.terminals {
+                if let Terminal::Var(n, _) = t {
+                    if subtypes.iter().find(|x| x.0 == n).is_some() {
+                        continue;
+                    }
+                } else {
+                    terminals.insert(t);
+                }
+            }
+            nonterminals.extend(sg.nonterminals);
+        }
+
+        let gram = Grammar { terminals: terminals.into_iter().collect(), nonterminals: nonterminals.into_iter().collect() };
+
+        SyGuSExpr::SynthFun(name, args, sort, subtypes, gram )
     })
     .parse_next(i)
 }
@@ -369,7 +393,7 @@ fn parse_args(i: &mut &'_ str) -> PResult<(String, Ty)> {
 }
 
 // For now this and parse_args have the same functionality
-fn parse_subtype(i: &mut &'_ str) -> PResult<SyGuSExpr> {
+fn parse_subtype(i: &mut &'_ str) -> PResult<(String, Ty)> {
     separated_pair(
         parse_name,
         multispace1,
@@ -377,7 +401,7 @@ fn parse_subtype(i: &mut &'_ str) -> PResult<SyGuSExpr> {
     )
     .map(|(name, t)| {
         add_to_grammar_table(name.clone(), t.clone());
-        SyGuSExpr::Subtype(name, t)
+        (name, t)
     })
     .parse_next(i)
 }
@@ -408,11 +432,8 @@ fn parse_subgrammar(i: &mut &'_ str) -> PResult<SubGrammar> {
             parse_nonterminal.map(|(op, args)| GrammarElement::NonTerminal(op, args))
         )))))),
     }
-    .map(|(subtype_expr, elements): (SyGuSExpr, Vec<GrammarElement>)| {
-        let (subtype, sort) = match subtype_expr {
-            SyGuSExpr::Subtype(n, t) => (n, t),
-            _ => panic!("Invalid subtype expression in subgrammar"),
-        };
+    .map(|(subtype_expr, elements): ((String, Ty), Vec<GrammarElement>)| {
+        let (subtype, sort) = subtype_expr;
 
         // Process elements into terminals and nonterminals
         let mut terminals = Vec::new();
@@ -420,7 +441,12 @@ fn parse_subgrammar(i: &mut &'_ str) -> PResult<SubGrammar> {
 
         for element in elements {
             match element {
-                GrammarElement::Terminal(terminal) => terminals.push(terminal),
+                GrammarElement::Terminal(terminal) => {
+                    match terminal {
+                        Terminal::Var(t, _) => terminals.push(Terminal::Var(t, sort)),
+                        _ => terminals.push(terminal),
+                    }
+                },
                 GrammarElement::NonTerminal(op, args) => {
                     let commutative = args.iter().eq(args.iter().rev());
                     let arg_pair = args.iter()
@@ -458,7 +484,7 @@ fn parse_subgrammar(i: &mut &'_ str) -> PResult<SubGrammar> {
     })
     .verify(|SubGrammar{ ty: _, terminals, nonterminals}| {
         terminals.iter().all(|elm| {
-            if let Terminal::Var(n) = elm {
+            if let Terminal::Var(n, _) = elm {
                 lookup_grammar_table(n.as_ref()).is_some()
             } else  { true  }
         })
@@ -479,7 +505,7 @@ fn parse_terminal(i: &mut &'_ str) -> PResult<Terminal> {
         alt(("true", "false")).try_map(|bool_str: &str| bool_str.parse::<bool>().map(|n| Terminal::Bool(n))),
         digit1.try_map(|digit_str: &str| digit_str.parse::<i64>().map(|n| Terminal::Num(n))),
         s_exp(preceded(ws('-'), ws(digit1))).try_map(|digit_str: &str| digit_str.parse::<i64>().map(|n| Terminal::Num(-n))),
-        parse_name.map(|n| Terminal::Var(n)),
+        parse_name.map(|n| Terminal::Var(n, Ty::Int)),
     ))
     .parse_next(i)
 }
@@ -694,7 +720,7 @@ fn verify_terminal(terminal: &Terminal) -> Result<Ty, Vec<VerifyError>> {
     match terminal {
         Terminal::Num(_) => Ok(Ty::Int),
         Terminal::Bool(_) => Ok(Ty::Bool),
-        Terminal::Var(name) => lookup_symbol_type(name),
+        Terminal::Var(name, _) => lookup_symbol_type(name),
     }
 }
 

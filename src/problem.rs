@@ -36,11 +36,11 @@ fn simplify_expr(e: Expr, defs: &Map<String, Def>, varmap: &Map<String, Expr>) -
     match e {
         Expr::Terminal(Terminal::Num(i)) => Expr::Terminal(Terminal::Num(i)),
         Expr::Terminal(Terminal::Bool(b)) => Expr::Terminal(Terminal::Bool(b)),
-        Expr::Terminal(Terminal::Var(v)) => {
+        Expr::Terminal(Terminal::Var(v, t)) => {
             if let Some(t) = varmap.get(&v) {
                 t.clone()
             } else {
-                Expr::Terminal(Terminal::Var(v))
+                Expr::Terminal(Terminal::Var(v, t))
             }
         },
         Expr::Operation { op, expr } => {
@@ -76,7 +76,7 @@ fn sygus_expr_to_term(e: Expr, vars: &IndexMap<String, Ty>, progname: &str) -> (
 
 fn sygus_expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, t: &mut Term, instvars: &mut Vec<Box<[Id]>>) -> Id {
     match e {
-        Expr::Terminal(Terminal::Var(v)) => {
+        Expr::Terminal(Terminal::Var(v, _)) => {
             let i = vars.iter().position(|x| *x.0 == *v).unwrap();
             let (_, ty) = vars.get_index(i).unwrap();
             match ty {
@@ -111,7 +111,7 @@ pub fn mk_sygus_problem(f: &str) -> Problem {
 }
 
 fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
-    let Some(SyGuSExpr::SynthFun(progname, argtypes, rettype, _, subgrammars)) =
+    let Some(SyGuSExpr::SynthFun(progname, argtypes, rettype, _, grammar)) =
         exprs.iter().filter(|x| matches!(x, SyGuSExpr::SynthFun(..))).cloned().next() else { panic!() };
 
     let defs: Map<String, Def> = exprs.iter().filter_map(|x|
@@ -143,26 +143,24 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
     ).fold(String::from("true"), |x, y| format!("(and {x} {y})"));
 
     let mut prod_rules = Vec::new();
-    for g in subgrammars {
-        for t in g.terminals {
-            match t {
-                Terminal::Num(i) => prod_rules.push(Node::ConstInt(i)),
-                Terminal::Var(v) => {
-                    let i = vars.get_index_of(&*v).unwrap();
-                    match g.ty {
-                        Ty::Int => prod_rules.push(Node::VarInt(i)),
-                        Ty::Bool => prod_rules.push(Node::VarBool(i)),
-                    }
-                },
-                _ => {},
-            }
+    for t in grammar.terminals {
+        match t {
+            Terminal::Num(i) => prod_rules.push(Node::ConstInt(i)),
+            Terminal::Var(v, ty) => {
+                let i = vars.get_index_of(&*v).unwrap();
+                match ty {
+                    Ty::Int => prod_rules.push(Node::VarInt(i)),
+                    Ty::Bool => prod_rules.push(Node::VarBool(i)),
+                }
+            },
+            _ => {},
         }
+    }
 
-        for n in g.nonterminals {
-            let args: Vec<_> = n.args.iter().map(|_| 0).collect();
-            if let Some(node) = Node::parse(&*n.op, &*args) {
-                prod_rules.push(node);
-            }
+    for n in grammar.nonterminals {
+        let args: Vec<_> = n.args.iter().map(|_| 0).collect();
+        if let Some(node) = Node::parse(&*n.op, &*args) {
+            prod_rules.push(node);
         }
     }
 
