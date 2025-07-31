@@ -10,6 +10,9 @@ pub use with_ord::*;
 mod parser;
 pub use parser::*;
 
+mod parser2;
+pub use parser2::*;
+
 mod problem;
 pub use problem::*;
 
