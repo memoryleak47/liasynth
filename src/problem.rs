@@ -155,20 +155,9 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
         }
 
         for n in g.nonterminals {
-            match &*n.op {
-                "+" => prod_rules.push(Node::Add([0, 0])),
-                "-" => prod_rules.push(Node::Sub([0, 0])),
-                "*" => prod_rules.push(Node::Mul([0, 0])),
-                "div" => prod_rules.push(Node::Div([0, 0])),
-                "mod" => prod_rules.push(Node::Mod([0, 0])),
-                "ite" => prod_rules.push(Node::Ite([0, 0, 0])),
-                "<" => prod_rules.push(Node::Lt([0, 0])),
-                "<=" => prod_rules.push(Node::Lte([0, 0])),
-                ">" => prod_rules.push(Node::Gt([0, 0])),
-                ">=" => prod_rules.push(Node::Gte([0, 0])),
-                "=" => prod_rules.push(Node::Equals([0, 0])),
-                "abs" => prod_rules.push(Node::Abs([0])),
-                _ => {},
+            let args: Vec<_> = n.args.iter().map(|_| 0).collect();
+            if let Some(node) = Node::parse(&*n.op, &*args) {
+                prod_rules.push(node);
             }
         }
     }

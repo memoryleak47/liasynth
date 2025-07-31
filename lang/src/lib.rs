@@ -224,8 +224,9 @@ fn parse_cases(edef: &EnumDef) -> Vec<TokenStream2> {
     for c in edef.cases.iter() {
         let ident = &c.ident;
         let symb = &c.symb;
+        let n = c.argtys.len();
         let v = quote! {
-            (#symb, s) => Some(Node::#ident(s.iter().cloned().collect::<Vec<_>>().try_into().unwrap()))
+            (#symb, s) if s.len() == #n => Some(Node::#ident(s.iter().cloned().collect::<Vec<_>>().try_into().unwrap()))
         };
         cases.push(v);
     }
