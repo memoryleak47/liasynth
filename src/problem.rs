@@ -214,7 +214,7 @@ impl Problem {
         let retty = term.elems.last().unwrap().ty();
         if retty != self.rettype {
             let mut ret = Vec::new();
-            for (v, ty) in self.vars.iter() {
+            for (v, ty) in self.context_vars.iter() {
                 match ty {
                     Ty::Int => ret.push(Value::Int(0)),
                     Ty::Bool => ret.push(Value::Bool(true)),
