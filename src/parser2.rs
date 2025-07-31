@@ -50,9 +50,9 @@ struct DefinedFun {
     expr: Expr,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct SynthProblem {
-    logic: Logic,
+    logic: Option<Logic>,
     synthfuns: Vec<SynthFun>,
     constraints: Vec<Expr>,
     defined_funs: Vec<DefinedFun>,
@@ -100,11 +100,7 @@ enum Token {
 
 fn tokenize(s: &str) -> Vec<Token> {
     let mut tokens = Vec::new();
-    let mut svec = Vec::new();
-
-    svec.push('(');
-    svec.extend(s.chars());
-    svec.push(')');
+    let svec: Box<[_]> = s.chars().collect();
 
     let mut s: &[char] = &svec[..];
 
@@ -146,13 +142,33 @@ fn assemble(toks: &[Token]) -> Option<(SExpr, &[Token])> {
     }
 }
 
-fn build_synth(expr: &SExpr) -> SynthProblem {
-    todo!()
+fn build_synth(exprs: Vec<SExpr>) -> SynthProblem {
+    let mut synth = SynthProblem::default();
+    for e in exprs {
+        let SExpr::List(l) = e else { panic!() };
+        let SExpr::Ident(a) = &l[0] else { panic!() };
+        match &**a {
+            "set-logic" => {
+                if l[1] == SExpr::Ident(String::from("LIA")) {
+                    synth.logic = Some(Logic::LIA);
+                }
+            },
+            _ => {},
+        }
+    }
+    synth
 }
 
 pub fn parse_synth(s: &str) -> SynthProblem {
-    let toks = tokenize(s);
-    let (expr, toks) = assemble(&toks).unwrap();
+    let toks_src = tokenize(s);
+    let mut toks = &*toks_src;
+
+    let mut exprs = Vec::new();
+    while toks.len() > 0 {
+        let (expr, toks2) = assemble(&toks).unwrap();
+        toks = toks2;
+        exprs.push(expr)
+    }
     assert!(toks.is_empty());
-    build_synth(&expr)
+    build_synth(exprs)
 }
