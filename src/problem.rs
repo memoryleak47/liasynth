@@ -148,12 +148,11 @@ fn build_sygus(exprs: Vec<SyGuSExpr>) -> Problem {
             match t {
                 Terminal::Num(i) => prod_rules.push(Node::ConstInt(i)),
                 Terminal::Var(v) => {
-                    if vars.get(&v).is_some() { continue; }
+                    let i = vars.get_index_of(&*v).unwrap();
                     match g.ty {
-                        Ty::Int => prod_rules.push(Node::VarInt(vars.len())),
-                        Ty::Bool => prod_rules.push(Node::VarBool(vars.len())),
+                        Ty::Int => prod_rules.push(Node::VarInt(i)),
+                        Ty::Bool => prod_rules.push(Node::VarBool(i)),
                     }
-                    vars.insert(v.to_string(), g.ty);
                 },
                 _ => {},
             }
