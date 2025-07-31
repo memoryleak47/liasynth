@@ -106,8 +106,6 @@ fn sygus_expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str,
 pub fn mk_sygus_problem(f: &str) -> Problem {
     let s = std::fs::read_to_string(f).unwrap();
 
-    dbg!(parse_synth(&s));
-
     let (parsed, _) = parse_sygus(&s).unwrap();
 
     build_sygus(parsed)
