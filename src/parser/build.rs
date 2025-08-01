@@ -1,5 +1,5 @@
 use crate::*;
-use crate::parser2::{Expr, DefinedFun, *};
+use crate::parser::*;
 
 pub fn build_synth(exprs: Vec<SExpr>) -> SynthProblem {
     let mut synth = SynthProblem::default();

@@ -28,38 +28,37 @@ pub struct Problem {
     pub instvars: Vec<Box<[Id]>>,
 }
 
-struct Def {
-    args: Vec<String>,
-    expr: Expr,
-}
-
 // resolves "let" and "defined-funs"
 // defs are not necessarily simplified, but varmap is.
-fn simplify_expr(e: Expr, defs: &Map<String, Def>, varmap: &Map<String, Expr>) -> Expr {
+fn simplify_expr(e: Expr, defs: &IndexMap<String, DefinedFun>, varmap: &Map<String, Expr>) -> Expr {
     match e {
-        Expr::Terminal(Terminal::Num(i)) => Expr::Terminal(Terminal::Num(i)),
-        Expr::Terminal(Terminal::Bool(b)) => Expr::Terminal(Terminal::Bool(b)),
-        Expr::Terminal(Terminal::Var(v)) => {
+        Expr::ConstInt(i) => Expr::ConstInt(i),
+        Expr::ConstBool(b) => Expr::ConstBool(b),
+        Expr::Var(v) => {
             if let Some(t) = varmap.get(&v) {
                 t.clone()
             } else {
-                Expr::Terminal(Terminal::Var(v))
+                Expr::Var(v)
             }
         },
-        Expr::Operation { op, expr } => {
-            if let Some(def) = defs.get(&op) {
-                let mut ivarmap = Map::default();
-                for (v, ex) in (def.args.iter()).zip(expr.into_iter()) {
-                    let ex = simplify_expr(ex, defs, varmap);
-                    ivarmap.insert(v.clone(), ex);
-                }
-                return simplify_expr(def.expr.clone(), defs, &ivarmap);
+        Expr::DefinedFunCall(op, exprs) => {
+            let def = &defs[&op];
+            let mut ivarmap: Map<String, Expr> = Map::default();
+            for ((v, _), ex) in (def.args.iter()).zip(exprs.into_iter()) {
+                let ex = simplify_expr(ex, defs, varmap);
+                ivarmap.insert(v.clone(), ex);
             }
-
-            let expr: Vec<Expr> = expr.into_iter().map(|x| simplify_expr(x, defs, varmap)).collect();
-            Expr::Operation { op, expr }
+            simplify_expr(def.expr.clone(), defs, &ivarmap)
+        },
+        Expr::SynthFunCall(op, exprs) => {
+            let exprs: Vec<Expr> = exprs.into_iter().map(|x| simplify_expr(x, defs, varmap)).collect();
+            Expr::SynthFunCall(op, exprs)
+        },
+        Expr::Op(op, exprs) => {
+            let exprs: Vec<Expr> = exprs.into_iter().map(|x| simplify_expr(x, defs, varmap)).collect();
+            Expr::Op(op, exprs)
         }
-        Expr::Let { bindings, body } => {
+        Expr::Let(bindings, body) => {
             let mut varmap = varmap.clone();
             for (var, ex) in bindings {
                 let ex = simplify_expr(ex, defs, &varmap);
@@ -70,16 +69,16 @@ fn simplify_expr(e: Expr, defs: &Map<String, Def>, varmap: &Map<String, Expr>) -
     }
 }
 
-fn sygus_expr_to_term(e: Expr, vars: &IndexMap<String, Ty>, progname: &str) -> (Term, Vec<Box<[Id]>>) {
+fn expr_to_term(e: Expr, vars: &IndexMap<String, Ty>, progname: &str) -> (Term, Vec<Box<[Id]>>) {
     let mut t = Term { elems: Vec::new() };
     let mut instvars = Vec::new();
-    sygus_expr_to_term_impl(e, vars, progname, &mut t, &mut instvars);
+    expr_to_term_impl(e, vars, progname, &mut t, &mut instvars);
     (t, instvars)
 }
 
-fn sygus_expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, t: &mut Term, instvars: &mut Vec<Box<[Id]>>) -> Id {
+fn expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, t: &mut Term, instvars: &mut Vec<Box<[Id]>>) -> Id {
     match e {
-        Expr::Terminal(Terminal::Var(v)) => {
+        Expr::Var(v) => {
             let i = vars.iter().position(|x| *x.0 == *v).unwrap();
             let (_, ty) = vars.get_index(i).unwrap();
             match ty {
@@ -87,36 +86,31 @@ fn sygus_expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str,
                 Ty::Bool =>  t.push(Node::VarBool(i)),
             }
         },
-        Expr::Terminal(Terminal::Bool(true)) => { t.push(Node::True) },
-        Expr::Terminal(Terminal::Bool(false)) => { t.push(Node::False) },
-        Expr::Terminal(Terminal::Num(i)) => { t.push(Node::ConstInt(i)) },
-        Expr::Operation { op, expr } => {
-            let exprs: Box<[Id]> = expr.iter().map(|x| sygus_expr_to_term_impl(x.clone(), vars, progname, t, instvars)).collect();
-            let n = Node::parse(&*op, &*exprs).unwrap_or_else(|| {
-                if op == progname {
-                    instvars.push(exprs.iter().cloned().collect());
-                    Node::VarInt(vars.len() + instvars.len() - 1)
-                } else {
-                    panic!("unknown node {op} of arity {}", exprs.len())
-                }
-            });
+        Expr::ConstBool(true) => { t.push(Node::True) },
+        Expr::ConstBool(false) => { t.push(Node::False) },
+        Expr::ConstInt(i) => { t.push(Node::ConstInt(i)) },
+        Expr::Op(op, exprs) => {
+            let exprs: Box<[Id]> = exprs.into_iter().map(|x| expr_to_term_impl(x, vars, progname, t, instvars)).collect();
+            let n = Node::parse(&*op, &*exprs).unwrap();
             t.push(n)
         },
-        Expr::Let { bindings, body } => todo!(),
+        Expr::SynthFunCall(_name, exprs) => {
+            let exprs: Box<[Id]> = exprs.into_iter().map(|x| expr_to_term_impl(x, vars, progname, t, instvars)).collect();
+            instvars.push(exprs.iter().cloned().collect());
+            t.push(Node::VarInt(vars.len() + instvars.len() - 1))
+        },
+        Expr::DefinedFunCall(..) => unreachable!("DefinedFunCalls should already be resolved!"),
+        Expr::Let(..) => unreachable!("Lets should already be resolved!"),
     }
 }
 
 pub fn mk_sygus_problem(f: &str) -> Problem {
     let s = std::fs::read_to_string(f).unwrap();
-
     let synth_problem = parse_synth(&s);
-
-    let (parsed, _) = parse_sygus(&s).unwrap();
-
-    build_sygus(parsed, synth_problem)
+    build_sygus(synth_problem)
 }
 
-fn build_sygus(exprs: Vec<SyGuSExpr>, synth_problem: SynthProblem) -> Problem {
+fn build_sygus(synth_problem: SynthProblem) -> Problem {
     assert_eq!(synth_problem.synthfuns.len(), 1);
     let synth_fun = synth_problem.synthfuns[0].clone();
 
@@ -125,23 +119,12 @@ fn build_sygus(exprs: Vec<SyGuSExpr>, synth_problem: SynthProblem) -> Problem {
 
     let argtypes: Vec<Ty> = synth_fun.args.iter().map(|(_, x)| *x).collect();
 
-    let defs: Map<String, Def> = exprs.iter().filter_map(|x|
-        if let SyGuSExpr::DefinedFun(f) = x {
-            let def = Def {
-                args: f.args.iter().map(|(x, _)| x.clone()).collect(),
-                expr: f.expr.clone(),
-            };
-            Some((f.name.clone(), def))
-        } else { None }
-    ).collect();
+    let defs: IndexMap<String, DefinedFun> = synth_problem.defined_funs.clone();
 
     let vars = synth_fun.args.clone();
 
-    let constraint: Expr = exprs.iter().filter_map(|x|
-        if let SyGuSExpr::Constraint(e) = x {
-            Some(e.clone())
-        } else { None }
-    ).fold(Expr::Terminal(Terminal::Bool(true)), |x, y| Expr::Operation { op: format!("and"), expr: vec![x, y],} );
+    let constraint: Expr = synth_problem.constraints.iter()
+        .fold(Expr::ConstBool(true), |x, y| Expr::Op(String::from("and"), vec![x.clone(), y.clone()]));
 
     let constraint_str = synth_problem.constraints.iter().map(|x| x.to_string())
         .fold(String::from("true"), |x, y| format!("(and {x} {y})"));
@@ -189,7 +172,7 @@ fn build_sygus(exprs: Vec<SyGuSExpr>, synth_problem: SynthProblem) -> Problem {
     }
 
     let constraint = simplify_expr(constraint, &defs, &Map::default());
-    let (constraint, instvars) = sygus_expr_to_term(constraint, &context_vars, &progname);
+    let (constraint, instvars) = expr_to_term(constraint, &context_vars, &progname);
 
     Problem {
         synth_problem,

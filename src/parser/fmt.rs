@@ -1,5 +1,4 @@
 use crate::*;
-use crate::parser2::{Expr, DefinedFun};
 use std::fmt::*;
 
 impl Display for Expr {
