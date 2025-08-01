@@ -1,6 +1,10 @@
 #!/bin/bash
 
 cargo b --release
+outfile=bench.txt
+if [[ -n "$1" ]]; then
+    outfile=$1
+fi
 
 function run() {
     t=$(mktemp -d)
@@ -13,11 +17,11 @@ function run() {
         timeout 10s $t/liasynth "$f"
     done
 
-    success=$(cat bench.txt | grep Answer | wc -l)
+    success=$(cat $outfile | grep Answer | wc -l)
     all=$(find "examples/LIA" | wc -l)
 
     echo
     echo "Completed $success/$all"
 }
 
-run 2>&1 | tee bench.txt
+run 2>&1 | tee $outfile
