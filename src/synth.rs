@@ -188,7 +188,7 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
 
     if ctxt.problem.rettype != c.node.ty() {
-        return Score::MAX / 100;
+        return Score::MAX / 10;
     }
 
     let mut a = Score::MAX;
