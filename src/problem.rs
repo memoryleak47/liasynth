@@ -25,6 +25,9 @@ pub struct Problem {
     pub context: String,
     pub context_vars: IndexMap<String, Ty>,
 
+    // For each occurence i of a synthfun call, instvars[i] contains the Ids (indexed into problem.constraint.elems)
+    // with which it is called.
+    // During sat checking, this synthfun call is replaced by a special variable -- an instvar.
     pub instvars: Vec<Box<[Id]>>,
 }
 

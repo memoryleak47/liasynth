@@ -20,7 +20,9 @@ struct Ctxt<'a> {
 
     problem: &'a Problem,
 
+    // indexed by small-sigma.
     vals_lookup: Map<Box<[Value]>, Id>,
+
     classes: Vec<Class>,
 
     i_solids: Vec<Id>,
