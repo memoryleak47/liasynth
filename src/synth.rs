@@ -186,12 +186,11 @@ fn enqueue(x: Id, ctxt: &mut Ctxt) {
 
 fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
-
-    if ctxt.problem.rettype != c.node.ty() {
-        return Score::MAX / 10;
+    if let Ty::Bool = c.node.ty() {
+        return 10000;
     }
 
-    let mut a = Score::MAX;
+    let mut a = 100000;
     let subterms = c.node.children();
     let max_subterm_satcount = subterms
         .iter()
@@ -200,7 +199,7 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
         .unwrap_or_else(|| 0);
 
 
-    let tmp = (2 * c.satcount).saturating_sub(max_subterm_satcount);
+    let tmp = c.satcount.saturating_sub(max_subterm_satcount / 2);
 
     for _ in tmp..ctxt.big_sigmas.len() {
         a /= 2;
