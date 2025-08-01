@@ -126,8 +126,7 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
     let constraint: Expr = synth_problem.constraints.iter()
         .fold(Expr::ConstBool(true), |x, y| Expr::Op(String::from("and"), vec![x.clone(), y.clone()]));
 
-    let constraint_str = synth_problem.constraints.iter().map(|x| x.to_string())
-        .fold(String::from("true"), |x, y| format!("(and {x} {y})"));
+    let constraint_str = constraint.to_string();
 
     let mut prod_rules = Vec::new();
     for (_, ntdef) in synth_fun.nonterminal_defs.iter() {
