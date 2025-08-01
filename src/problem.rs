@@ -82,8 +82,8 @@ fn expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, t: &m
             let i = vars.iter().position(|x| *x.0 == *v).unwrap();
             let (_, ty) = vars.get_index(i).unwrap();
             match ty {
-                Ty::Int =>  t.push(Node::VarInt(i)),
-                Ty::Bool =>  t.push(Node::VarBool(i)),
+                Ty::Int => t.push(Node::VarInt(i)),
+                Ty::Bool => t.push(Node::VarBool(i)),
             }
         },
         Expr::ConstBool(true) => { t.push(Node::True) },
