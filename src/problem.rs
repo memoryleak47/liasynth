@@ -123,8 +123,11 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
 
     let vars = synth_fun.args.clone();
 
-    let constraint: Expr = synth_problem.constraints.iter()
-        .fold(Expr::ConstBool(true), |x, y| Expr::Op(String::from("and"), vec![x.clone(), y.clone()]));
+    assert!(synth_problem.constraints.len() > 0);
+    let mut constraint: Expr = synth_problem.constraints[0].clone();
+    for c in synth_problem.constraints[1..].iter() {
+        constraint = Expr::Op(String::from("and"), vec![constraint, c.clone()]);
+    }
 
     let constraint_str = constraint.to_string();
 
