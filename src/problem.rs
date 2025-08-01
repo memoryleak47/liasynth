@@ -155,7 +155,7 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
                         Ty::Bool => prod_rules.push(Node::VarBool(i)),
                     }
                 },
-                GrammarTerm::DefinedFunCall(f, args) => todo!(),
+                GrammarTerm::DefinedFunCall(f, args) => todo!("handle DefinedFunCalls in the grammar"),
             }
         }
     }

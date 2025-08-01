@@ -68,9 +68,7 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<Strin
 
             if defs.contains_key(op) {
                 let rst = rst.iter().map(|x| {
-                    let SExpr::Ident(id) = x else { panic!() };
-                    assert!(args.contains_key(id));
-                    id.clone()
+                    as_rule(x, nonterminals, args, defs)
                 }).collect();
                 return GrammarTerm::DefinedFunCall(op.clone(), rst);
             }

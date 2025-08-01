@@ -43,7 +43,7 @@ pub enum GrammarTerm {
     ConstInt(Int), // also covers negative numbers, like this: (- 3)
     ConstBool(bool),
     SynthArg(SynthArg),
-    DefinedFunCall(String, Vec<SynthArg>),
+    DefinedFunCall(String, Vec<GrammarTerm>), // GrammarTerm might be NonTerminal or SynthArg.
 }
 
 #[derive(Debug, Clone)]
