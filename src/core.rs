@@ -34,7 +34,7 @@ impl Ty {
 
 impl Node {
     pub fn ty(&self) -> Ty {
-        let (args, ret) = self.signature();
+        let (_args, ret) = self.signature();
         *ret
     }
 }
@@ -112,10 +112,11 @@ pub fn cegis(problem: &Problem) -> Term {
     }
 }
 
+#[allow(unused)]
 fn init_sigmas(problem: &Problem) -> Vec<Sigma> {
     let mut sigmas = Vec::new();
     for i in 0..=problem.context_vars.len() {
-        let sigma = problem.context_vars.iter().enumerate().map(|(i2, (v, ty))| {
+        let sigma = problem.context_vars.iter().enumerate().map(|(i2, (_v, ty))| {
             match (i == i2, ty) {
                 (b, Ty::Bool) => Value::Bool(b),
                 (b, Ty::Int) => Value::Int(b as i64),

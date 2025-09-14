@@ -18,14 +18,14 @@ struct EnumDef {
 }
 
 fn build_enum_def(input: TokenStream1) -> EnumDef {
-    let mut arr: ExprArray = parse(input).unwrap();
+    let arr: ExprArray = parse(input).unwrap();
 
     let mut cases: Vec<Case> = Vec::new();
     for x in arr.elems.iter() {
         let Expr::Tuple(tup) = x else { panic!() };
         let [ident, argtys, retty, symb, compute] = &*tup.elems.iter().collect::<Box<[_]>>() else { panic!() };
         let Expr::Array(argtys) = argtys else { panic!() };
-        let n = LitInt::new(&argtys.elems.len().to_string(), proc_macro2::Span::call_site());
+        let _n = LitInt::new(&argtys.elems.len().to_string(), proc_macro2::Span::call_site());
         let case = Case {
             ident: (**ident).clone(),
             argtys: argtys.elems.iter().cloned().collect(),
@@ -202,7 +202,7 @@ fn extract_cases(edef: &EnumDef) -> Vec<TokenStream2> {
     let mut cases: Vec<TokenStream2> = Vec::new();
     for c in edef.cases.iter() {
         let ident = &c.ident;
-        let compute = &c.compute;
+        let _compute = &c.compute;
         let v = quote! {
             Node::#ident(s) => {
                 let mut a = self.clone();

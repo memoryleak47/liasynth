@@ -158,7 +158,7 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
                         Ty::Bool => prod_rules.push(Node::VarBool(i)),
                     }
                 },
-                GrammarTerm::DefinedFunCall(f, args) => todo!("handle DefinedFunCalls in the grammar"),
+                GrammarTerm::DefinedFunCall(_f, _args) => todo!("handle DefinedFunCalls in the grammar"),
             }
         }
     }
@@ -194,6 +194,7 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
     }
 }
 
+#[allow(unused)]
 fn show_val(v: &Value) -> String {
     match v {
         Value::Int(i) => i.to_string(),
@@ -210,7 +211,7 @@ impl Problem {
         let retty = term.elems.last().unwrap().ty();
         if retty != self.rettype {
             let mut ret = Vec::new();
-            for (v, ty) in self.context_vars.iter() {
+            for (_v, ty) in self.context_vars.iter() {
                 match ty {
                     Ty::Int => ret.push(Value::Int(0)),
                     Ty::Bool => ret.push(Value::Bool(true)),
@@ -235,7 +236,7 @@ impl Problem {
 
         let config = z3::Config::new();
         let ctxt = z3::Context::new(&config);
-        let mut solver = z3::Solver::new(&ctxt);
+        let solver = z3::Solver::new(&ctxt);
         // println!("VERIFY-QUERY: {}", &query);
         solver.from_string(query);
         // println!("VERIFY-SMT: {}", solver.to_smt2());

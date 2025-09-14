@@ -11,7 +11,7 @@ define_language! {
         (Xor, [Ty::Bool, Ty::Bool], Ty::Bool, "xor", Value::Bool(to_bool(ev(0)?) != to_bool(ev(1)?))),
         (Equals, [Ty::Int, Ty::Int], Ty::Bool, "=", Value::Bool(ev(0)? == ev(1)?)),
         (Distinct, [Ty::Int, Ty::Int], Ty::Bool, "distinct", Value::Bool(ev(0)? != ev(1)?)),
-        (Ite, [Ty::Bool, Ty::Int, Ty::Int], Ty::Int, "ite", (if to_bool(ev(0)?) { ev(1)? } else { ev(2)? })),
+        (Ite, [Ty::Bool, Ty::Int, Ty::Int], Ty::Int, "ite", if to_bool(ev(0)?) { ev(1)? } else { ev(2)? }),
 
         // https://smt-lib.org/theories-Ints.shtml
         (Neg, [Ty::Int], Ty::Int, "-", Value::Int(-to_int(ev(0)?))),

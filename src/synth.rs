@@ -1,14 +1,19 @@
 use crate::*;
 
+use ordered_float::OrderedFloat;
 use itertools::Itertools;
 
-type Score = usize;
+type Score = OrderedFloat<f64>;
 type Queue = BinaryHeap<WithOrd<Id, Score>>;
 
 // SmallSigma has as many values as our synthfun has arguments.
 // BigSigma has as many values as our Sygus file declares.
 // HugeSigma is BigSigma extended by one variable per instantiation of the synthfun.
 
+// TODO:
+//   -> Look in to incrememntal computation (propogating parts previously computed each time a new counterexample is found)
+//   -> Frontier seach (reduces the memory burden by storing only the frontier nodes and not the previously searched nodes)
+//     - https://dl.acm.org/doi/pdf/10.1145/1089023.1089024
 struct Ctxt<'a> {
     queue: Queue, // contains ids of pending (i.e. not solidifed Ids), or solid Ids which got an updated size.
 
@@ -27,6 +32,8 @@ struct Ctxt<'a> {
 
     i_solids: Vec<Id>,
     b_solids: Vec<Id>,
+
+    bayes_infer: BayesianLinearRegression,
 }
 
 struct Class {
@@ -41,7 +48,8 @@ fn run(ctxt: &mut Ctxt) -> Term {
     for n in ctxt.problem.prod_rules() {
         let n = n.clone();
         if n.children().is_empty() {
-            if let Some(sol) = add_node(n, ctxt) {
+            let (_, sol) = add_node(n, ctxt);
+            if let Some(sol) = sol {
                 return extract(sol, ctxt);
             }
         }
@@ -72,14 +80,20 @@ fn handle(x: Id, ctxt: &mut Ctxt) -> Option<Id> {
 
     c.handled_size = Some(c.size);
 
-    grow(x, ctxt)
+    let (maxsat, sol) = grow(x, ctxt);
+    let X = get_features(x, ctxt);
+
+    let _ = ctxt.bayes_infer.update_1d(&X, &[maxsat as f64]);
+
+    sol
 }
 
-fn grow(x: Id, ctxt: &mut Ctxt) -> Option<Id> {
+fn grow(x: Id, ctxt: &mut Ctxt) -> (usize, Option<Id>) {
     let ty = ctxt.classes[x].node.ty();
+    let mut max_satocunt = 0;
 
     for rule in ctxt.problem.prod_rules() {
-        let (in_types, out_type) = rule.signature();
+        let (in_types, _out_type) = rule.signature();
         for i in 0..rule.children().len() {
             let mut rule = rule.clone();
             if in_types[i] != ty { continue }
@@ -97,18 +111,23 @@ fn grow(x: Id, ctxt: &mut Ctxt) -> Option<Id> {
                     .map(|(_, x)| x)
                     .zip(a.iter()).for_each(|(ptr, v)| { *ptr = *v; });
 
-                if let Some(sol) = add_node(rule.clone(), ctxt) {
-                    return Some(sol);
+                let (id, sol) = add_node(rule.clone(), ctxt);
+                max_satocunt = std::cmp::max(max_satocunt, ctxt.classes[id].satcount);
+                if let Some(sol) = sol {
+                    return (max_satocunt, Some(sol));
                 }
             }
         }
     }
-    None
+    (max_satocunt, None)
 }
 
 pub fn synth(problem: &Problem, big_sigmas: &[Sigma]) -> Term {
     let mut small_sigmas: Vec<Sigma> = Vec::new();
     let mut sigma_indices: Vec<Box<[usize]>> = Vec::new();
+
+    let baye = BayesianLinearRegression::new(3,  0.01, 1.0);
+
     for bsigma in big_sigmas.iter() {
         let mut indices: Vec<usize> = Vec::new();
         for a in problem.instvars.iter() {
@@ -139,11 +158,13 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma]) -> Term {
         classes: Vec::new(),
         i_solids: Vec::new(),
         b_solids: Vec::new(),
+        bayes_infer: baye,
     })
 }
 
-fn add_node(node: Node, ctxt: &mut Ctxt) -> Option<Id> {
-    let Some(vals) = vals(&node, ctxt) else { return None };
+fn add_node(node: Node, ctxt: &mut Ctxt) -> (usize, Option<Id>) {
+    let Some(vals) = vals(&node, ctxt) else { return (0, None) };
+    let count_sat;
 
     if let Some(&i) = ctxt.vals_lookup.get(&vals) {
         let newsize = minsize(&node, ctxt);
@@ -153,6 +174,7 @@ fn add_node(node: Node, ctxt: &mut Ctxt) -> Option<Id> {
             c.node = node.clone();
             enqueue(i, ctxt);
         }
+        count_sat = ctxt.classes[i].satcount;
     } else {
         let i = ctxt.classes.len();
 
@@ -168,28 +190,36 @@ fn add_node(node: Node, ctxt: &mut Ctxt) -> Option<Id> {
         let satcount = satcount(i, ctxt);
         ctxt.classes[i].satcount = satcount;
 
+        count_sat = satcount;
+
         // dbg!(extract(i, ctxt));
 
         // if this [Value] was successful, return it.
         if satcount == ctxt.big_sigmas.len() {
-            return Some(i);
+            return (count_sat, Some(i));
         }
 
         enqueue(i, ctxt);
     }
 
-    None
+    (count_sat, None)
 }
 
+// From my understanding this is equivalent to A* search
 fn enqueue(x: Id, ctxt: &mut Ctxt) {
-    let h = heuristic(x, ctxt);
+    let h = heuristic_bayes(x, ctxt);
+    println!("this: {}", h);
     ctxt.queue.push(WithOrd(x, h));
 }
 
+// In this paper they also use satcount as a reward to a reinforcement learner
+//   -> Put here for purpose of referencing if we want
+//   -> https://www.cs.toronto.edu/~six/data/iclr19.pdf
+#[allow(unused)]
 fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
     if let Ty::Bool = c.node.ty() {
-        return 10000;
+        return OrderedFloat(1000f64);
     }
 
     let mut a = 100000;
@@ -207,7 +237,57 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
         a /= 2;
     }
 
-    a / (c.size + 5)
+    OrderedFloat((a / (c.size + 5)) as f64)
+}
+
+#[allow(unused)]
+fn heuristic_perceptron(x: Id, ctxt: &Ctxt) -> Score {
+    todo!();
+}
+
+#[allow(unused)]
+fn heuristic_bayes(x: Id, ctxt: &Ctxt) -> Score {
+    let X = get_features(x, ctxt);
+    println!("features: {:?}", X);
+    if let Ok((mean, _std)) = ctxt.bayes_infer.predict_1d(&X) {
+        return OrderedFloat(mean[0]);
+    } else {
+        panic!("Uh oh, baye not working");
+    }
+}
+
+// TODO: Include an embedding of the program
+// From Machine Learning for Automated Theorem Proving: Learning to Solve SAT and QSAT:
+//   => Can us a GNN to encode formula as a vector (X needs pretraining and overkill)
+//   => R feature: ratio of clasues to number of variables of the problem
+//   => Formula as binary strings representing if a literal appeared in a clause
+//   => For a CNF: Clause-variable incidence graph
+//                 Variable incidence graph
+//                 Clause incidence graph
+//   => 12 groups of the _standard features_
+//   => Structure related features
+// Can utilise information from the previous iteration
+//   => What clause gave the new counterexample
+//   => Why did it not solve the spec
+//   => etc.
+fn get_features(x: Id, ctxt: &Ctxt) -> Vec<f64> {
+    let c = &ctxt.classes[x];
+
+    let subterms = c.node.children();
+    let mut subterm_satcount: Vec<f64> = subterms
+        .iter()
+        .map(|s| ctxt.classes[*s].satcount as f64)
+        .collect();
+    subterm_satcount.resize(3, 0f64);
+
+    let mut X = vec![c.satcount as f64, c.size as f64];
+    X.extend_from_slice(&subterm_satcount);
+    let ty = match c.node.ty() {
+        Ty::Int => 1f64,
+        Ty::Bool => 0f64,
+    };
+    X.push(ty);
+    X
 }
 
 fn vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {

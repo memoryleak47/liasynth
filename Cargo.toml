@@ -12,6 +12,8 @@ z3 = "0.13.3"
 fxhash = "0.2.1"
 lang = { path = "./lang" }
 indexmap = "2.10.0"
+nalgebra = "0.34.0"
+ordered-float = "5.0.0"
 
 [profile.release]
 debug = true

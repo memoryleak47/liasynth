@@ -1,5 +1,3 @@
-use std::fmt::{Debug, Display, Formatter, Result};
-
 use crate::*;
 
 pub fn term_to_z3(t: &Term, vars: &[String]) -> String {

@@ -27,7 +27,7 @@ fn handle_set_logic(l: &[SExpr], synth: &mut SynthProblem) {
     }
 }
 
-fn handle_check_synth(l: &[SExpr], synth: &mut SynthProblem) {
+fn handle_check_synth(_l: &[SExpr], synth: &mut SynthProblem) {
     synth.check_synth = true;
 }
 

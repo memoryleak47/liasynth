@@ -1,6 +1,4 @@
-use indexmap::IndexMap;
 use std::fmt::*;
-use crate::Ty;
 
 #[derive(PartialEq, Eq)]
 pub enum SExpr {
@@ -20,7 +18,7 @@ fn print(expr: &SExpr, f: &mut Formatter<'_>, indent: usize) -> Result {
         SExpr::List(l) => {
             write!(f, "(")?;
             for (i, x) in l.iter().enumerate() {
-                print(x, f, indent+2);
+                let _ = print(x, f, indent+2);
                 if i != l.len()-1 {
                     write!(f, " ")?;
                 }
@@ -52,7 +50,7 @@ pub fn tokenize(s: &str) -> Vec<Token> {
             '(' => tokens.push(Token::LParen),
             ')' => tokens.push(Token::RParen),
             x if x.is_whitespace() => {},
-            x => {
+            _x => {
                 let i = s.iter().position(|x| x.is_whitespace() || *x == '(' || *x == ')').unwrap();
                 tokens.push(Token::Ident(s[0..i].iter().collect()));
                 s = &s[i..];

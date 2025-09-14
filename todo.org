@@ -1,0 +1,36 @@
+#+title: TODO to get this to a presentable state
+
+*** Learning heuristics
+Currently we use a heuristic that seems to work well but is hand-wavy.
+It is worthwhile to find a better heuristic, specifically,
+we can use ideas from previous synthesis tools and automated theorem proving
+that use Bayesian or network based methods to online-learn
+a good heuristic for a given specification.
+
+There are a number of choices that need to be made:
+- What features do we use? (Many features are sparse)
+  - Need features that provide some kind of proxy to getting us closer to a solution
+    (In offline learning, this can be done retroactively, but I don't think it is worth it
+    to do offline, could be wrong)
+- Do we provide specification context, or assume this is captured during learning
+
+*** Incremental computation
+Currently we restart the algorithm each time we get a new counterexample.
+However, there is some information that remains relevant across counterexample sets.
+For instance, given a counterexample set, C,
+if we have x and y in the same node, n, and have another node, m, that represents n+n,
+in the next run of the algorithm with counterexample set, C + {q},
+we know that x and y are equal up to C and only need to evaluate them on q
+and we know that all programs, x+x, x+y, y+y, y+x, are also equal up to C and
+also only need to evaluate them on q.
+
+This is only relevant if it is not the case that the majority of the runtime of the algorithm
+is in the final iteration where a solution is found.
+After some, very brief, exploration it seems there are a number of benchmarks for which this
+occurs for which incremental computation could benefit.
+
+
+*** Other benchmarks
+There is a need for other benchmarks than just SyGus to test our method on.
+The main one we are looking at is sorting kernels,
+I will try find how to integrate our tool into their benchmarks.
