@@ -34,7 +34,8 @@ struct Ctxt<'a> {
     b_solids: Vec<Id>,
 }
 
-struct Class {
+#[derive(Debug)]
+pub struct Class {
     node: Node,
     size: usize,
     vals: Box<[Value]>,
@@ -43,9 +44,14 @@ struct Class {
 }
 
 fn run(ctxt: &mut Ctxt) -> Term {
+
+    for cls in ctxt.classes.drain(..).collect::<Vec<_>>() {
+        add_node_part(cls, ctxt);
+    }
+
     for n in ctxt.problem.prod_rules() {
         let n = n.clone();
-        if n.children().is_empty() {
+        if n.children().is_empty() && !ctxt.classes.iter().any(|c| c.node == n) {
             let (_, sol) = add_node(n, ctxt);
             if let Some(sol) = sol {
                 return extract(sol, ctxt);
@@ -118,7 +124,7 @@ fn grow(x: Id, ctxt: &mut Ctxt) -> (usize, Option<Id>) {
     (max_satocunt, None)
 }
 
-pub fn synth(problem: &Problem, big_sigmas: &[Sigma]) -> Term {
+pub fn synth(problem: &Problem, big_sigmas: &[Sigma], classes: Option<Vec<Class>>) -> (Term, Vec<Class>) {
     let mut small_sigmas: Vec<Sigma> = Vec::new();
     let mut sigma_indices: Vec<Box<[usize]>> = Vec::new();
 
@@ -142,17 +148,67 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma]) -> Term {
     let small_sigmas: Box<[Sigma]> = small_sigmas.into();
     let sigma_indices: Box<[Box<[usize]>]> = sigma_indices.into();
 
-    run(&mut Ctxt {
+    let mut ctxt = Ctxt {
         queue: Default::default(),
         big_sigmas,
         small_sigmas,
         sigma_indices,
         problem,
         vals_lookup: Default::default(),
-        classes: Vec::new(),
+        classes: classes.unwrap_or(Vec::new()),
         i_solids: Vec::new(),
         b_solids: Vec::new(),
-    })
+    };
+
+    (run(&mut ctxt), ctxt.classes)
+}
+
+fn add_node_part(old_class: Class, ctxt: &mut Ctxt) -> (usize, Option<Id>) {
+    let node = old_class.node;
+    let new_sigmas = if old_class.vals.is_empty() {
+        0
+    } else {
+        ctxt.small_sigmas.len() - old_class.vals.len()
+    };
+    let Some(new_vals): &Option<Box<[Value]>> = &ctxt.small_sigmas[new_sigmas..].iter().enumerate().map(|(i, sigma)| {
+            let f = |id: Id| Some(ctxt.classes[id].vals[i].clone());
+            node.eval(&f, sigma)
+        }).collect() else {return (0, None)};
+
+
+    let mut old_vals = old_class.vals.into_iter().collect::<Vec<_>>();
+    old_vals.extend(new_vals.into_iter().cloned().collect::<Vec<_>>());
+    let vals = old_vals.into_boxed_slice();
+
+    let i = ctxt.classes.len();
+
+    ctxt.classes.push(Class {
+        size: old_class.size,
+        node,
+        vals: vals.clone(),
+        handled_size: old_class.handled_size,
+        satcount: 0, // will be set later!
+    });
+    ctxt.vals_lookup.insert(vals, i);
+
+    let bs = ctxt.big_sigmas.len() - 1;
+    let b = local_sat(bs, i, ctxt);
+    let satcount = old_class.satcount + b as usize;
+
+    ctxt.classes[i].satcount = satcount;
+
+    let count_sat = satcount;
+
+    // dbg!(extract(i, ctxt));
+
+    // if this [Value] was successful, return it.
+    if satcount == ctxt.big_sigmas.len() {
+        return (count_sat, Some(i));
+    }
+
+    enqueue(i, ctxt);
+
+    (count_sat, None)
 }
 
 fn add_node(node: Node, ctxt: &mut Ctxt) -> (usize, Option<Id>) {
@@ -200,8 +256,7 @@ fn add_node(node: Node, ctxt: &mut Ctxt) -> (usize, Option<Id>) {
 
 // From my understanding this is equivalent to A* search
 fn enqueue(x: Id, ctxt: &mut Ctxt) {
-    let h = heuristic_bayes(x, ctxt);
-    println!("this: {}", h);
+    let h = heuristic(x, ctxt);
     ctxt.queue.push(WithOrd(x, h));
 }
 
@@ -211,7 +266,7 @@ fn enqueue(x: Id, ctxt: &mut Ctxt) {
 #[allow(unused)]
 fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
-    if let Ty::Bool = c.node.ty() {
+    if ctxt.problem.synth_fun.ret != c.node.ty() {
         return OrderedFloat(1000f64);
     }
 
