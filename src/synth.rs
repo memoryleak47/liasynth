@@ -32,8 +32,6 @@ struct Ctxt<'a> {
 
     i_solids: Vec<Id>,
     b_solids: Vec<Id>,
-
-    bayes_infer: BayesianLinearRegression,
 }
 
 struct Class {
@@ -83,8 +81,6 @@ fn handle(x: Id, ctxt: &mut Ctxt) -> Option<Id> {
     let (maxsat, sol) = grow(x, ctxt);
     let X = get_features(x, ctxt);
 
-    let _ = ctxt.bayes_infer.update_1d(&X, &[maxsat as f64]);
-
     sol
 }
 
@@ -126,8 +122,6 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma]) -> Term {
     let mut small_sigmas: Vec<Sigma> = Vec::new();
     let mut sigma_indices: Vec<Box<[usize]>> = Vec::new();
 
-    let baye = BayesianLinearRegression::new(3,  0.01, 1.0);
-
     for bsigma in big_sigmas.iter() {
         let mut indices: Vec<usize> = Vec::new();
         for a in problem.instvars.iter() {
@@ -158,7 +152,6 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma]) -> Term {
         classes: Vec::new(),
         i_solids: Vec::new(),
         b_solids: Vec::new(),
-        bayes_infer: baye,
     })
 }
 
@@ -247,13 +240,7 @@ fn heuristic_perceptron(x: Id, ctxt: &Ctxt) -> Score {
 
 #[allow(unused)]
 fn heuristic_bayes(x: Id, ctxt: &Ctxt) -> Score {
-    let X = get_features(x, ctxt);
-    println!("features: {:?}", X);
-    if let Ok((mean, _std)) = ctxt.bayes_infer.predict_1d(&X) {
-        return OrderedFloat(mean[0]);
-    } else {
-        panic!("Uh oh, baye not working");
-    }
+    todo!();
 }
 
 // TODO: Include an embedding of the program

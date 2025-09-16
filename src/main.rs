@@ -19,9 +19,6 @@ pub use fmt::*;
 mod langdef;
 pub use langdef::*;
 
-mod bayes;
-pub use bayes::*;
-
 mod perceptron;
 pub use perceptron::*;
 
