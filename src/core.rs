@@ -95,8 +95,10 @@ pub fn eval_term_partial(i: Id, term: &[Node], sigma: &Sigma) -> Option<Value> {
 
 pub fn cegis(problem: &Problem) -> Term {
     let mut sigmas = Vec::new();
+    let mut classes = None;
     loop {
-        let term = synth(problem, &sigmas);
+        let (term, clss) = synth(problem, &sigmas, classes);
+        classes = Some(clss);
         println!("Candidate: {}", term_to_z3(&term, &problem.vars.keys().cloned().collect::<Box<[_]>>()));
         // TODO check this later: assert!(problem.sat(&..., &sigmas));
 

@@ -29,7 +29,7 @@ struct Ctxt<'a> {
     b_solids: Vec<Id>,
 }
 
-struct Class {
+pub struct Class {
     node: Node,
     size: usize,
     vals: Box<[Value]>,
@@ -38,6 +38,11 @@ struct Class {
 }
 
 fn run(ctxt: &mut Ctxt) -> Term {
+
+    for cls in ctxt.classes.drain(..).collect::<Vec<_>>() {
+        add_node_part(cls, ctxt);
+    }
+
     for n in ctxt.problem.prod_rules() {
         let n = n.clone();
         if n.children().is_empty() {
@@ -106,7 +111,7 @@ fn grow(x: Id, ctxt: &mut Ctxt) -> Option<Id> {
     None
 }
 
-pub fn synth(problem: &Problem, big_sigmas: &[Sigma]) -> Term {
+pub fn synth(problem: &Problem, big_sigmas: &[Sigma], classes: Option<Vec<Class>>) -> (Term, Vec<Class>) {
     let mut small_sigmas: Vec<Sigma> = Vec::new();
     let mut sigma_indices: Vec<Box<[usize]>> = Vec::new();
     for bsigma in big_sigmas.iter() {
@@ -129,26 +134,82 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma]) -> Term {
     let small_sigmas: Box<[Sigma]> = small_sigmas.into();
     let sigma_indices: Box<[Box<[usize]>]> = sigma_indices.into();
 
-    run(&mut Ctxt {
+    let mut ctxt = Ctxt {
         queue: Default::default(),
         big_sigmas,
         small_sigmas,
         sigma_indices,
         problem,
         vals_lookup: Default::default(),
-        classes: Vec::new(),
+        classes: classes.unwrap_or(Vec::new()),
         i_solids: Vec::new(),
         b_solids: Vec::new(),
-    })
+    };
+
+    (run(&mut ctxt), ctxt.classes)
 }
 
+
+fn add_node_part(old_class: Class, ctxt: &mut Ctxt) -> (usize, Option<Id>) {
+    let node = old_class.node;
+    let new_sigmas = old_class.vals.len();
+
+    let new_vals: Vec<Value> = {
+        let mut vals = Vec::new();
+        for (i, sigma) in ctxt.small_sigmas[new_sigmas..].iter().enumerate() {
+            let f = |id: Id| {
+                Some(ctxt.classes[id].vals[new_sigmas + i].clone())
+            } ;
+            match node.eval(&f, sigma) {
+                Some(val) => vals.push(val),
+                None => return (0, None),
+            }
+        }
+        vals
+    };
+
+    let vals: Box<[Value]> = old_class.vals
+        .into_iter()
+        .chain(new_vals)
+        .collect();
+
+    let i = ctxt.classes.len();
+
+    ctxt.classes.push(Class {
+        size: old_class.size,
+        node,
+        vals: vals.clone(),
+        handled_size: old_class.handled_size,
+        satcount: 0,
+    });
+    ctxt.vals_lookup.insert(vals, i);
+
+    let bs = ctxt.big_sigmas.len() - 1;
+    let satcount = if ctxt.classes[i].node.ty() != ctxt.problem.rettype {
+        old_class.satcount
+    } else {
+        let b = local_sat(bs, i, ctxt);
+        old_class.satcount + b as usize
+    };
+
+    ctxt.classes[i].satcount = satcount;
+
+    enqueue(i, ctxt);
+
+    (satcount, None)
+}
+
+
 fn add_node(node: Node, ctxt: &mut Ctxt) -> Option<Id> {
+
     let Some(vals) = vals(&node, ctxt) else { return None };
 
     if let Some(&i) = ctxt.vals_lookup.get(&vals) {
         let newsize = minsize(&node, ctxt);
         let c = &mut ctxt.classes[i];
         if newsize < c.size {
+            println!("{:?}", c.node);
+            println!("{:?}", node);
             c.size = newsize;
             c.node = node.clone();
             enqueue(i, ctxt);
