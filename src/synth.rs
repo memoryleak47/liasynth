@@ -37,6 +37,7 @@ pub struct Class {
     vals: Box<[Value]>,
     handled_size: Option<usize>, // what was the size when this class was handled last time.
     satcount: usize,
+    prev_sol: usize,
 }
 
 fn run(ctxt: &mut Ctxt) -> Term {
@@ -60,6 +61,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
         let n = n.clone();
         if n.children().is_empty() {
             if let Some(sol) = add_node(n, ctxt) {
+                handle_sol(sol, ctxt);
                 return extract(sol, ctxt);
             }
         }
@@ -67,11 +69,20 @@ fn run(ctxt: &mut Ctxt) -> Term {
 
     while let Some(WithOrd(x, _)) = ctxt.queue.pop() {
         if let Some(sol) = handle(x, ctxt) {
+            handle_sol(sol, ctxt);
             return extract(sol, ctxt);
         }
     }
 
     panic!("No term found!")
+}
+
+fn handle_sol(id: Id, ctxt: &mut Ctxt) {
+    ctxt.classes[id].prev_sol += 1;
+    let node = ctxt.classes[id].node.clone();
+    for c in node.children() {
+        handle_sol(*c, ctxt);
+    }
 }
 
 // makes "x" solid if it's not solid yet.
@@ -226,6 +237,7 @@ fn add_node(node: Node, ctxt: &mut Ctxt) -> Option<Id> {
             vals: vals.clone(),
             handled_size: None,
             satcount: 0, // will be set later!
+            prev_sol: 0,
         });
         ctxt.vals_lookup.insert(vals, i);
 
@@ -265,10 +277,14 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
         .unwrap_or_else(|| 0);
 
 
-    let tmp = c.satcount.saturating_sub(max_subterm_satcount / 2);
+    let tmp = c.satcount.saturating_sub(max_subterm_satcount + 4);
 
     for _ in tmp..ctxt.big_sigmas.len() {
         a /= 2;
+    }
+
+    for _ in 0..c.prev_sol+1 {
+        a/=2;
     }
 
     a / (c.size + 5)
