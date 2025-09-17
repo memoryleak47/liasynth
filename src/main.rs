@@ -23,7 +23,7 @@ pub type Map<K, V> = fxhash::FxHashMap<K, V>;
 pub use std::collections::BinaryHeap;
 
 fn main() {
-    let arg = std::env::args().nth(1).unwrap_or(String::from("examples/LIA/max3.sl"));
+    let arg = std::env::args().nth(1).unwrap_or(String::from("examples/LIA/max2.sl"));
     let problem = mk_sygus_problem(&arg);
 
     let term = cegis(&problem);

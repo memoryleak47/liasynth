@@ -1,6 +1,7 @@
 use crate::*;
 
 use itertools::Itertools;
+use std::collections::HashSet;
 
 type Score = usize;
 type Queue = BinaryHeap<WithOrd<Id, Score>>;
@@ -29,6 +30,7 @@ struct Ctxt<'a> {
     b_solids: Vec<Id>,
 }
 
+#[derive(Clone)]
 pub struct Class {
     node: Node,
     size: usize,
@@ -39,8 +41,19 @@ pub struct Class {
 
 fn run(ctxt: &mut Ctxt) -> Term {
 
-    for cls in ctxt.classes.drain(..).collect::<Vec<_>>() {
-        add_node_part(cls, ctxt);
+    // Need to ensure we add things in the correct order
+    //   => Will need to provide new ids for nodes that reference nodes added after itself
+    //     -> This can occur when a node is replaced by a smaller equivalent program during search
+    //     -> Happens since we are searching by 'best-first' so could first generate  "(> (+ id1 id2) id1)"
+    //        with id3, that evalutes to "True", and then generate "(> id4 id2)" which also evalutes to True
+    //        and hence replaces the node at id3.
+    //        - Clearly we cannot add_node_part id3 without first add_not_part id4
+    let pc = ctxt.classes.clone();
+    let mut seen: HashSet<usize> = HashSet::new();
+    for (id, cls) in pc.into_iter().enumerate() {
+        if seen.get(&id).is_none() {
+            add_node_part(id, ctxt, &mut seen);
+        }
     }
 
     for n in ctxt.problem.prod_rules() {
@@ -150,9 +163,15 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma], classes: Option<Vec<Class>
 }
 
 
-fn add_node_part(old_class: Class, ctxt: &mut Ctxt) -> (usize, Option<Id>) {
-    let node = old_class.node;
-    let new_sigmas = old_class.vals.len();
+fn add_node_part(id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<usize>) {
+    let node = ctxt.classes[id].node.clone();
+    let new_sigmas = ctxt.classes[id].vals.len();
+
+    for c in node.children() {
+       if seen.get(&id).is_none() {
+          add_node_part(*c, ctxt, seen);
+       }
+    }
 
     let new_vals: Vec<Value> = {
         let mut vals = Vec::new();
@@ -162,54 +181,38 @@ fn add_node_part(old_class: Class, ctxt: &mut Ctxt) -> (usize, Option<Id>) {
             } ;
             match node.eval(&f, sigma) {
                 Some(val) => vals.push(val),
-                None => return (0, None),
+                None => panic!("Why cannot evaluate?")
             }
         }
         vals
     };
 
-    let vals: Box<[Value]> = old_class.vals
-        .into_iter()
-        .chain(new_vals)
-        .collect();
+    let mut temp_vec = ctxt.classes[id].vals.clone().into_vec();
+    temp_vec.extend(new_vals);
+    ctxt.classes[id].vals = temp_vec.into_boxed_slice();
 
-    let i = ctxt.classes.len();
-
-    ctxt.classes.push(Class {
-        size: old_class.size,
-        node,
-        vals: vals.clone(),
-        handled_size: old_class.handled_size,
-        satcount: 0,
-    });
-    ctxt.vals_lookup.insert(vals, i);
+    ctxt.vals_lookup.insert(ctxt.classes[id].vals.clone(), id);
 
     let bs = ctxt.big_sigmas.len() - 1;
-    let satcount = if ctxt.classes[i].node.ty() != ctxt.problem.rettype {
-        old_class.satcount
+    ctxt.classes[id].satcount += if ctxt.classes[id].node.ty() != ctxt.problem.rettype {
+        0
     } else {
-        let b = local_sat(bs, i, ctxt);
-        old_class.satcount + b as usize
+        local_sat(bs, id, ctxt) as usize
     };
 
-    ctxt.classes[i].satcount = satcount;
+    seen.insert(id);
 
-    enqueue(i, ctxt);
-
-    (satcount, None)
+    enqueue(id, ctxt);
 }
 
 
 fn add_node(node: Node, ctxt: &mut Ctxt) -> Option<Id> {
-
     let Some(vals) = vals(&node, ctxt) else { return None };
 
     if let Some(&i) = ctxt.vals_lookup.get(&vals) {
         let newsize = minsize(&node, ctxt);
         let c = &mut ctxt.classes[i];
         if newsize < c.size {
-            println!("{:?}", c.node);
-            println!("{:?}", node);
             c.size = newsize;
             c.node = node.clone();
             enqueue(i, ctxt);
