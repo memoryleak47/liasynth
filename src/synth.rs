@@ -2,15 +2,16 @@ use crate::*;
 
 use itertools::Itertools;
 use std::collections::HashSet;
+use ordered_float::OrderedFloat;
 
-type Score = usize;
+type Score = OrderedFloat<f32>;
 type Queue = BinaryHeap<WithOrd<Id, Score>>;
 
 // SmallSigma has as many values as our synthfun has arguments.
 // BigSigma has as many values as our Sygus file declares.
 // HugeSigma is BigSigma extended by one variable per instantiation of the synthfun.
 
-struct Ctxt<'a> {
+pub struct Ctxt<'a> {
     queue: Queue, // contains ids of pending (i.e. not solidifed Ids), or solid Ids which got an updated size.
 
     big_sigmas: &'a [Sigma],
@@ -28,6 +29,8 @@ struct Ctxt<'a> {
 
     i_solids: Vec<Id>,
     b_solids: Vec<Id>,
+
+    perceptron: &'a Perceptron, // persistent learner through whole task
 }
 
 #[derive(Clone)]
@@ -38,20 +41,13 @@ pub struct Class {
     handled_size: Option<usize>, // what was the size when this class was handled last time.
     satcount: usize,
     prev_sol: usize,
+    features: Vec<f32>
 }
 
 fn run(ctxt: &mut Ctxt) -> Term {
 
-    // Need to ensure we add things in the correct order
-    //   => Will need to provide new ids for nodes that reference nodes added after itself
-    //     -> This can occur when a node is replaced by a smaller equivalent program during search
-    //     -> Happens since we are searching by 'best-first' so could first generate  "(> (+ id1 id2) id1)"
-    //        with id3, that evalutes to "True", and then generate "(> id4 id2)" which also evalutes to True
-    //        and hence replaces the node at id3.
-    //        - Clearly we cannot add_node_part id3 without first add_not_part id4
-    let pc = ctxt.classes.clone();
     let mut seen: HashSet<usize> = HashSet::new();
-    for (id, cls) in pc.into_iter().enumerate() {
+    for id in 0..ctxt.classes.len() {
         if seen.get(&id).is_none() {
             add_node_part(id, ctxt, &mut seen);
         }
@@ -60,15 +56,18 @@ fn run(ctxt: &mut Ctxt) -> Term {
     for n in ctxt.problem.prod_rules() {
         let n = n.clone();
         if n.children().is_empty() {
-            if let Some(sol) = add_node(n, ctxt) {
+            let (_sol, maxsat) = add_node(n, ctxt);
+            if let Some(sol) = _sol {
                 handle_sol(sol, ctxt);
                 return extract(sol, ctxt);
             }
+            ctxt.perceptron.train(ctxt.classes[n.ident].features, maxsat);
         }
     }
 
     while let Some(WithOrd(x, _)) = ctxt.queue.pop() {
-        if let Some(sol) = handle(x, ctxt) {
+        let (_sol, maxsat) = handle(x, ctxt);
+        if let Some(sol) = _sol {
             handle_sol(sol, ctxt);
             return extract(sol, ctxt);
         }
@@ -86,11 +85,11 @@ fn handle_sol(id: Id, ctxt: &mut Ctxt) {
 }
 
 // makes "x" solid if it's not solid yet.
-fn handle(x: Id, ctxt: &mut Ctxt) -> Option<Id> {
+fn handle(x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     let c = &mut ctxt.classes[x];
 
     // if the current size is the same size of the last "handle" call, nothing it to be done.
-    if c.handled_size == Some(c.size) { return None; }
+    if c.handled_size == Some(c.size) { return (None, 0); }
 
     if c.handled_size.is_none() {
         match c.node.ty() {
@@ -104,8 +103,9 @@ fn handle(x: Id, ctxt: &mut Ctxt) -> Option<Id> {
     grow(x, ctxt)
 }
 
-fn grow(x: Id, ctxt: &mut Ctxt) -> Option<Id> {
+fn grow(x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     let ty = ctxt.classes[x].node.ty();
+    let mut maxsat = 0;
 
     for rule in ctxt.problem.prod_rules() {
         let (in_types, out_type) = rule.signature();
@@ -126,16 +126,19 @@ fn grow(x: Id, ctxt: &mut Ctxt) -> Option<Id> {
                     .map(|(_, x)| x)
                     .zip(a.iter()).for_each(|(ptr, v)| { *ptr = *v; });
 
-                if let Some(sol) = add_node(rule.clone(), ctxt) {
-                    return Some(sol);
+                let (_sol, sc) = add_node(rule.clone(), ctxt);
+                if let Some(sol) = _sol {
+                    return (Some(sol), maxsat);
                 }
+                maxsat = std::cmp::max(maxsat, sc);
             }
         }
     }
-    None
+
+    (None, maxsat)
 }
 
-pub fn synth(problem: &Problem, big_sigmas: &[Sigma], classes: Option<Vec<Class>>) -> (Term, Vec<Class>) {
+pub fn synth(problem: &Problem, big_sigmas: &[Sigma], classes: Option<Vec<Class>>, perceptron: &Perceptron) -> (Term, Vec<Class>) {
     let mut small_sigmas: Vec<Sigma> = Vec::new();
     let mut sigma_indices: Vec<Box<[usize]>> = Vec::new();
     for bsigma in big_sigmas.iter() {
@@ -168,6 +171,7 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma], classes: Option<Vec<Class>
         classes: classes.unwrap_or(Vec::new()),
         i_solids: Vec::new(),
         b_solids: Vec::new(),
+        perceptron,
     };
 
     (run(&mut ctxt), ctxt.classes)
@@ -217,12 +221,14 @@ fn add_node_part(id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<usize>) {
 }
 
 
-fn add_node(node: Node, ctxt: &mut Ctxt) -> Option<Id> {
-    let Some(vals) = vals(&node, ctxt) else { return None };
+fn add_node(node: Node, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
+    let Some(vals) = vals(&node, ctxt) else { return (None, 0) };
+    let sc;
 
     if let Some(&i) = ctxt.vals_lookup.get(&vals) {
         let newsize = minsize(&node, ctxt);
         let c = &mut ctxt.classes[i];
+        sc = c.satcount;
         if newsize < c.size {
             c.size = newsize;
             c.node = node.clone();
@@ -243,18 +249,19 @@ fn add_node(node: Node, ctxt: &mut Ctxt) -> Option<Id> {
 
         let satcount = satcount(i, ctxt);
         ctxt.classes[i].satcount = satcount;
+        sc = satcount;
 
         // dbg!(extract(i, ctxt));
 
         // if this [Value] was successful, return it.
         if satcount == ctxt.big_sigmas.len() {
-            return Some(i);
+            return (Some(i), sc);
         }
 
         enqueue(i, ctxt);
     }
 
-    None
+    (None, sc)
 }
 
 fn enqueue(x: Id, ctxt: &mut Ctxt) {
@@ -262,10 +269,11 @@ fn enqueue(x: Id, ctxt: &mut Ctxt) {
     ctxt.queue.push(WithOrd(x, h));
 }
 
+#[cfg(feature = "heuristic_default")]
 fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
     if let Ty::Bool = c.node.ty() {
-        return 10000;
+        return OrderedFloat(10000 as f32);
     }
 
     let mut a = 100000;
@@ -287,7 +295,15 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
         a/=2;
     }
 
-    a / (c.size + 5)
+    OrderedFloat((a / (c.size + 5)) as f32)
+}
+
+#[cfg(feature = "heurisitc_perceptron")]
+fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
+    let feats = feature_set1(x, ctxt);
+    let score = ctxt.perceptron.predict(feats);
+
+    OrderedFloat(score)
 }
 
 fn vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {

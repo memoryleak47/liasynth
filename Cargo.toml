@@ -12,6 +12,13 @@ z3 = "0.13.3"
 fxhash = "0.2.1"
 lang = { path = "./lang" }
 indexmap = "2.10.0"
+serde = { version= "1.0.225", features= ["derive"] }
+ordered-float = "5.0.0"
 
 [profile.release]
 debug = true
+
+[features]
+default = ["heuristic_default"]
+heuristic_default = []
+heuristic_perceptron = []
