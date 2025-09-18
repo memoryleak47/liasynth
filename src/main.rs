@@ -19,6 +19,9 @@ pub use fmt::*;
 mod langdef;
 pub use langdef::*;
 
+mod perceptron;
+pub use perceptron::*;
+
 pub type Map<K, V> = fxhash::FxHashMap<K, V>;
 pub use std::collections::BinaryHeap;
 
