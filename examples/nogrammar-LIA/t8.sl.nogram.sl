@@ -1,0 +1,32 @@
+(set-logic LIA)
+
+(synth-fun f_143-17-143-55 ((x2 Int)
+     (x1 Int)
+     (parentNode Int)
+     (EMPTY_PARENT Int)
+    )
+   Bool)
+
+(declare-var x2_143-17-143-55 Int)
+
+(declare-var x1_143-17-143-55 Int)
+
+(declare-var parentNode_143-17-143-55 Int)
+
+(declare-var EMPTY_PARENT_143-17-143-55 Int)
+
+(constraint (=> (and (= parentNode_143-17-143-55 0)
+       (and (= EMPTY_PARENT_143-17-143-55 (- 1)
+          )
+         (and (= x2_143-17-143-55 1)
+           (= x1_143-17-143-55 1)
+          )
+        )
+      )
+     (= (f_143-17-143-55 x2_143-17-143-55 x1_143-17-143-55 parentNode_143-17-143-55 EMPTY_PARENT_143-17-143-55)
+       true)
+    )
+  )
+
+(check-synth)
+
