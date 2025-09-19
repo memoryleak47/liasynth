@@ -16,12 +16,11 @@ impl Perceptron {
         Perceptron{ weights: vec![0.0; n_feats + 1], s_weights: vec![0.0; n_feats + 1], n_examples: 0 }
     }
 
-    pub fn train(&self, example: Vec<f32>, label: f32) -> Option<Perceptron>
+    pub fn train(&self, example: Vec<f32>, flabel: f32) -> Option<Perceptron>
     {
         if example.len() + 1 == self.weights.len() {
             let pexample: Vec<f32> = example.into_iter().chain(vec!(1.0).into_iter()).collect();
             let pred: f32 = self.weights.iter().zip(pexample.iter()).map(|(w, e)| w * e).sum();
-            let flabel = if label {1.0} else {-1.0};
 
             if flabel * pred > 0.0 {
                 return Some(Perceptron{weights: self.weights.clone(), s_weights: self.s_weights.clone(), n_examples: self.n_examples+1})

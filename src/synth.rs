@@ -61,7 +61,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
                 handle_sol(sol, ctxt);
                 return extract(sol, ctxt);
             }
-            ctxt.perceptron.train(ctxt.classes[n.ident].features, maxsat);
+            // ctxt.perceptron.train(ctxt.classes[n.ident].features, maxsat);
         }
     }
 
@@ -71,6 +71,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
             handle_sol(sol, ctxt);
             return extract(sol, ctxt);
         }
+        // ctxt.perceptron.train(ctxt.classes[n.ident].features, maxsat);
     }
 
     panic!("No term found!")
@@ -244,6 +245,7 @@ fn add_node(node: Node, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
             handled_size: None,
             satcount: 0, // will be set later!
             prev_sol: 0,
+            features: Vec::new(),
         });
         ctxt.vals_lookup.insert(vals, i);
 
