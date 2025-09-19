@@ -35,7 +35,8 @@ pub struct Ctxt<'a> {
 
 #[derive(Clone)]
 pub struct Class {
-    node: Node,
+    cnode: Node,
+    nodes: Vec<Node>,
     size: usize,
     vals: Box<[Value]>,
     handled_size: Option<usize>, // what was the size when this class was handled last time.
@@ -49,7 +50,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
     let mut seen: HashSet<usize> = HashSet::new();
     for id in 0..ctxt.classes.len() {
         if seen.get(&id).is_none() {
-            add_node_part(id, ctxt, &mut seen);
+            add_nodes_part(id, ctxt, &mut seen);
         }
     }
 
@@ -79,7 +80,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
 
 fn handle_sol(id: Id, ctxt: &mut Ctxt) {
     ctxt.classes[id].prev_sol += 1;
-    let node = ctxt.classes[id].node.clone();
+    let node = ctxt.classes[id].cnode.clone();
     for c in node.children() {
         handle_sol(*c, ctxt);
     }
@@ -93,7 +94,7 @@ fn handle(x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     if c.handled_size == Some(c.size) { return (None, 0); }
 
     if c.handled_size.is_none() {
-        match c.node.ty() {
+        match c.cnode.ty() {
             Ty::Int => &mut ctxt.i_solids,
             Ty::Bool => &mut ctxt.b_solids,
         }.push(x);
@@ -105,7 +106,7 @@ fn handle(x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
 }
 
 fn grow(x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
-    let ty = ctxt.classes[x].node.ty();
+    let ty = ctxt.classes[x].cnode.ty();
     let mut maxsat = 0;
 
     for rule in ctxt.problem.prod_rules() {
@@ -179,21 +180,31 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma], classes: Option<Vec<Class>
 }
 
 
-fn add_node_part(id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<usize>) {
-    let node = ctxt.classes[id].node.clone();
+fn add_nodes_part(id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<usize>) {
     let new_sigmas = ctxt.classes[id].vals.len();
+    let prev_values = ctxt.classes[id].vals.clone().into_vec();
+
+    let nodes = ctxt.classes[id].nodes.clone().into_iter().collect::<Vec<_>>();
+    for (i, n) in nodes.iter().enumerate() {
+        add_node_part(new_sigmas, n, id, prev_values.clone(), ctxt, seen, i == 0);
+    }
+}
+
+
+fn add_node_part(ns: usize, n: &Node, id: Id, mut prev_vals: Vec<Value>, ctxt: &mut Ctxt, seen: &mut HashSet<usize>, cnode: bool) {
+    let node = n.clone();
 
     for c in node.children() {
-       if seen.get(&id).is_none() {
-          add_node_part(*c, ctxt, seen);
+       if seen.get(&c).is_none() {
+          add_nodes_part(*c as Id, ctxt, seen);
        }
     }
 
     let new_vals: Vec<Value> = {
         let mut vals = Vec::new();
-        for (i, sigma) in ctxt.small_sigmas[new_sigmas..].iter().enumerate() {
+        for (i, sigma) in ctxt.small_sigmas[ns..].iter().enumerate() {
             let f = |id: Id| {
-                Some(ctxt.classes[id].vals[new_sigmas + i].clone())
+                Some(ctxt.classes[id].vals[ns + i].clone())
             } ;
             match node.eval(&f, sigma) {
                 Some(val) => vals.push(val),
@@ -203,22 +214,55 @@ fn add_node_part(id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<usize>) {
         vals
     };
 
-    let mut temp_vec = ctxt.classes[id].vals.clone().into_vec();
-    temp_vec.extend(new_vals);
-    ctxt.classes[id].vals = temp_vec.into_boxed_slice();
+    let i;
 
-    ctxt.vals_lookup.insert(ctxt.classes[id].vals.clone(), id);
+    if cnode {
+        i = id;
+        prev_vals.extend(new_vals);
+        ctxt.vals_lookup.insert(ctxt.classes[i].vals.clone(), id);
 
-    let bs = ctxt.big_sigmas.len() - 1;
-    ctxt.classes[id].satcount += if ctxt.classes[id].node.ty() != ctxt.problem.rettype {
-        0
+        ctxt.classes[i].vals = prev_vals.into_boxed_slice();
+        ctxt.classes[i].nodes.clear();
+
+        let bs = ctxt.big_sigmas.len() - 1;
+        ctxt.classes[i].satcount += if ctxt.classes[i].cnode.ty() != ctxt.problem.rettype {
+            0
+        } else {
+            local_sat(bs, i, ctxt) as usize
+        };
     } else {
-        local_sat(bs, id, ctxt) as usize
-    };
+        prev_vals.extend(new_vals);
+        let prev_box = prev_vals.into_boxed_slice();
+        if let Some(o) = ctxt.vals_lookup.get(&prev_box) {
+            i = *o;
+            ctxt.classes[i].nodes.push(node);
+        } else {
+            i = ctxt.classes.len();
+            ctxt.classes.push(Class {
+                    size: minsize(&node, ctxt),
+                    cnode: node,
+                    nodes: Vec::new(),
+                    vals: prev_box.clone(),
+                    handled_size: None,
+                    satcount: 0, // will be set later!
+                    prev_sol: 0,
+                    features: Vec::new(),
+                });
 
-    seen.insert(id);
+            ctxt.vals_lookup.insert(ctxt.classes[i].vals.clone(), i);
 
-    enqueue(id, ctxt);
+            let bs = ctxt.big_sigmas.len() - 1;
+            ctxt.classes[i].satcount += if ctxt.classes[i].cnode.ty() != ctxt.problem.rettype {
+                0
+            } else {
+                local_sat(bs, i, ctxt) as usize
+            };
+        }
+    }
+
+    seen.insert(i);
+
+    enqueue(i, ctxt);
 }
 
 
@@ -232,15 +276,20 @@ fn add_node(node: Node, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
         sc = c.satcount;
         if newsize < c.size {
             c.size = newsize;
-            c.node = node.clone();
+            c.cnode = node.clone();
             enqueue(i, ctxt);
+
+            ctxt.classes[i].nodes.insert(0, node); // cnode always first
+        } else {
+            ctxt.classes[i].nodes.push(node);
         }
     } else {
         let i = ctxt.classes.len();
 
         ctxt.classes.push(Class {
             size: minsize(&node, ctxt),
-            node,
+            cnode: node,
+            nodes: Vec::new(),
             vals: vals.clone(),
             handled_size: None,
             satcount: 0, // will be set later!
@@ -274,12 +323,12 @@ fn enqueue(x: Id, ctxt: &mut Ctxt) {
 #[cfg(feature = "heuristic_default")]
 fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
-    if let Ty::Bool = c.node.ty() {
+    if let Ty::Bool = c.cnode.ty() {
         return OrderedFloat(10000 as f32);
     }
 
     let mut a = 100000;
-    let subterms = c.node.children();
+    let subterms = c.cnode.children();
     let max_subterm_satcount = subterms
         .iter()
         .map(|s| ctxt.classes[*s].satcount)
@@ -320,7 +369,7 @@ fn minsize(node: &Node, ctxt: &Ctxt) -> usize {
 }
 
 fn satcount(x: Id, ctxt: &mut Ctxt) -> usize {
-    if ctxt.classes[x].node.ty() != ctxt.problem.rettype {
+    if ctxt.classes[x].cnode.ty() != ctxt.problem.rettype {
         return 0;
     }
     // TODO type-chk for arguments.
@@ -349,7 +398,7 @@ fn local_sat(big_sigma_idx: usize, class: Id, ctxt: &Ctxt) -> bool {
 
 fn extract(x: Id, ctxt: &Ctxt) -> Term {
     let mut t = Term { elems: Vec::new() };
-    let f = &|c: Id| ctxt.classes[c].node.clone();
-    ctxt.classes[x].node.extract(f, &mut t.elems);
+    let f = &|c: Id| ctxt.classes[c].cnode.clone();
+    ctxt.classes[x].cnode.extract(f, &mut t.elems);
     t
 }
