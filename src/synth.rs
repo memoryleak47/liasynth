@@ -47,14 +47,21 @@ pub struct Class {
 
 fn run(ctxt: &mut Ctxt) -> Term {
 
-    let mut seen: HashMap<usize, Vec<Id>> = HashMap::new();
-    for id in 0..ctxt.classes.len() {
-        if seen.get(&id).is_none() {
-            add_nodes_part(id, ctxt, &mut seen);
+    if cfg!(any(
+        feature="incremental_simple",
+        feature="incremental_all"
+    )) {
+        let mut seen: HashMap<usize, Vec<Id>> = HashMap::new();
+        for id in 0..ctxt.classes.len() {
+            if seen.get(&id).is_none() {
+                add_nodes_part(id, ctxt, &mut seen);
+            }
         }
+        println!("Size: {}", ctxt.classes.len());
+    } else {
+        ctxt.classes.drain(..);
     }
 
-    println!("Size: {}", ctxt.classes.len());
 
     for n in ctxt.problem.prod_rules() {
         let n = n.clone();
@@ -212,10 +219,6 @@ fn add_node_part(ns: usize, n: &Node, id: Id, prev_vals: Vec<Value>, ctxt: &mut 
             *c = nc;
         }
         add_node_part_comb(ns, node, id, prev_vals.clone(), ctxt, seen, cnode);
-        println!("{:?}", n);
-        if let Some(c) = ctxt.classes.get(2) {
-            println!("{:?}", c.cnode);
-        }
     }
 }
 
