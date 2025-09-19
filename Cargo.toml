@@ -19,6 +19,8 @@ ordered-float = "5.0.0"
 debug = true
 
 [features]
-default = ["heuristic_default"]
+default = ["heuristic_default", "incremental_all"]
 heuristic_default = []
-heuristic_perceptron = []
+heurisitc_perceptron = []
+
+incremental_all = []

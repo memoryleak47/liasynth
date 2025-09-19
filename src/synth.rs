@@ -193,6 +193,7 @@ fn add_nodes_part(id: Id, ctxt: &mut Ctxt, seen: &mut HashMap<usize, Vec<Id>>) {
 }
 
 
+// BUG: infinte loops
 fn add_node_part(ns: usize, n: &Node, id: Id, prev_vals: Vec<Value>, ctxt: &mut Ctxt, seen: &mut HashMap<usize, Vec<Id>>, cnode: bool) {
     for c in n.children() {
         if seen.get(c).is_none() {
