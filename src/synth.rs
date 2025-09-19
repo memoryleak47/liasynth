@@ -1,7 +1,7 @@
 use crate::*;
 
 use itertools::Itertools;
-use std::collections::HashSet;
+use std::collections::HashMap;
 use ordered_float::OrderedFloat;
 
 type Score = OrderedFloat<f32>;
@@ -47,12 +47,14 @@ pub struct Class {
 
 fn run(ctxt: &mut Ctxt) -> Term {
 
-    let mut seen: HashSet<usize> = HashSet::new();
+    let mut seen: HashMap<usize, Vec<Id>> = HashMap::new();
     for id in 0..ctxt.classes.len() {
         if seen.get(&id).is_none() {
             add_nodes_part(id, ctxt, &mut seen);
         }
     }
+
+    println!("Size: {}", ctxt.classes.len());
 
     for n in ctxt.problem.prod_rules() {
         let n = n.clone();
@@ -180,7 +182,7 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma], classes: Option<Vec<Class>
 }
 
 
-fn add_nodes_part(id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<usize>) {
+fn add_nodes_part(id: Id, ctxt: &mut Ctxt, seen: &mut HashMap<usize, Vec<Id>>) {
     let new_sigmas = ctxt.classes[id].vals.len();
     let prev_values = ctxt.classes[id].vals.clone().into_vec();
 
@@ -191,21 +193,37 @@ fn add_nodes_part(id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<usize>) {
 }
 
 
-fn add_node_part(ns: usize, n: &Node, id: Id, mut prev_vals: Vec<Value>, ctxt: &mut Ctxt, seen: &mut HashSet<usize>, cnode: bool) {
-    let node = n.clone();
-
-    for c in node.children() {
-       if seen.get(&c).is_none() {
-          add_nodes_part(*c as Id, ctxt, seen);
-       }
+fn add_node_part(ns: usize, n: &Node, id: Id, prev_vals: Vec<Value>, ctxt: &mut Ctxt, seen: &mut HashMap<usize, Vec<Id>>, cnode: bool) {
+    for c in n.children() {
+        if seen.get(c).is_none() {
+            add_nodes_part(*c, ctxt, seen);
+        }
     }
 
+    for comb in n
+        .children()
+        .iter()
+        .map(|c| seen.get(c).unwrap().clone())
+        .multi_cartesian_product()
+    {
+        let mut node = n.clone();
+        for (c, nc) in node.children_mut().iter_mut().zip(comb.into_iter()) {
+            *c = nc;
+        }
+        add_node_part_comb(ns, node, id, prev_vals.clone(), ctxt, seen, cnode);
+        println!("{:?}", n);
+        if let Some(c) = ctxt.classes.get(2) {
+            println!("{:?}", c.cnode);
+        }
+    }
+}
+
+
+fn add_node_part_comb(ns: usize, node: Node, id: Id, mut prev_vals: Vec<Value>, ctxt: &mut Ctxt, seen: &mut HashMap<usize, Vec<Id>>, cnode: bool) -> Id {
     let new_vals: Vec<Value> = {
         let mut vals = Vec::new();
         for (i, sigma) in ctxt.small_sigmas[ns..].iter().enumerate() {
-            let f = |id: Id| {
-                Some(ctxt.classes[id].vals[ns + i].clone())
-            } ;
+            let f = |id: Id| Some(ctxt.classes[id].vals[ns + i].clone());
             match node.eval(&f, sigma) {
                 Some(val) => vals.push(val),
                 None => panic!("Why cannot evaluate?")
@@ -219,10 +237,9 @@ fn add_node_part(ns: usize, n: &Node, id: Id, mut prev_vals: Vec<Value>, ctxt: &
     if cnode {
         i = id;
         prev_vals.extend(new_vals);
-        ctxt.vals_lookup.insert(ctxt.classes[i].vals.clone(), id);
-
         ctxt.classes[i].vals = prev_vals.into_boxed_slice();
-        ctxt.classes[i].nodes.clear();
+        ctxt.vals_lookup.insert(ctxt.classes[i].vals.clone(), id);
+        ctxt.classes[i].nodes.truncate(1);
 
         let bs = ctxt.big_sigmas.len() - 1;
         ctxt.classes[i].satcount += if ctxt.classes[i].cnode.ty() != ctxt.problem.rettype {
@@ -240,11 +257,11 @@ fn add_node_part(ns: usize, n: &Node, id: Id, mut prev_vals: Vec<Value>, ctxt: &
             i = ctxt.classes.len();
             ctxt.classes.push(Class {
                     size: minsize(&node, ctxt),
-                    cnode: node,
-                    nodes: Vec::new(),
+                    cnode: node.clone(),
+                    nodes: vec![node],
                     vals: prev_box.clone(),
                     handled_size: None,
-                    satcount: 0, // will be set later!
+                    satcount: 0,
                     prev_sol: 0,
                     features: Vec::new(),
                 });
@@ -260,9 +277,11 @@ fn add_node_part(ns: usize, n: &Node, id: Id, mut prev_vals: Vec<Value>, ctxt: &
         }
     }
 
-    seen.insert(i);
+    seen.entry(id).and_modify(|v| v.push(i)).or_insert(vec![i]);
 
     enqueue(i, ctxt);
+
+    i
 }
 
 
@@ -279,17 +298,23 @@ fn add_node(node: Node, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
             c.cnode = node.clone();
             enqueue(i, ctxt);
 
-            ctxt.classes[i].nodes.insert(0, node); // cnode always first
+            if cfg!(feature="incremental_all") {
+                ctxt.classes[i].nodes.insert(0, node); // cnode always first
+            } else {
+                ctxt.classes[i].nodes = vec![node];
+            }
         } else {
-            ctxt.classes[i].nodes.push(node);
+            if cfg!(feature="incremental_all") {
+                ctxt.classes[i].nodes.push(node);
+            }
         }
     } else {
         let i = ctxt.classes.len();
 
         ctxt.classes.push(Class {
             size: minsize(&node, ctxt),
-            cnode: node,
-            nodes: Vec::new(),
+            cnode: node.clone(),
+            nodes: vec![node],
             vals: vals.clone(),
             handled_size: None,
             satcount: 0, // will be set later!
@@ -357,6 +382,7 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     OrderedFloat(score)
 }
 
+// Error here due to recursive eval call, need to find a way to short circuit when looking at self-loops
 fn vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
     ctxt.small_sigmas.iter().enumerate().map(|(i, sigma)| {
         let f = |id: Id| Some(ctxt.classes[id].vals[i].clone());
