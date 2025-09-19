@@ -34,5 +34,7 @@ define_language! {
         (Lt, [Ty::Int, Ty::Int], Ty::Bool, "<", Value::Bool(to_int(ev(0)?) < to_int(ev(1)?))),
         (Gte, [Ty::Int, Ty::Int], Ty::Bool, ">=", Value::Bool(to_int(ev(0)?) >= to_int(ev(1)?))),
         (Gt, [Ty::Int, Ty::Int], Ty::Bool, ">", Value::Bool(to_int(ev(0)?) > to_int(ev(1)?))),
+
+        (Tmp, [Ty::Int, Ty::Int],  Ty::Int, "ite (> x y)", Value::Int(if to_int(ev(0)?) > to_int(ev(1)?) { to_int(ev(0)?) } else { to_int(ev(1)? ) })),
     ]
 }

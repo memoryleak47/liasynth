@@ -41,7 +41,7 @@ fn as_ty(s: &str) -> Ty {
 
 // checks whether 'op' is an OP.
 fn valid_op(op: &str, arity: usize) -> bool {
-    let v: Box<[Id]> = (0..arity).collect();
+    let v: Box<[Node]> = (0..arity).map(|i| Node::PlaceHolder(i)).collect();
     Node::parse(op, &v).is_some()
 }
 
@@ -75,9 +75,7 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<Strin
 
             if valid_op(op, rst.len()) {
                 let rst = rst.iter().map(|x| {
-                    let SExpr::Ident(id) = x else { panic!() };
-                    assert!(nonterminals.contains_key(id));
-                    id.clone()
+                    as_rule(x, nonterminals, args, defs) // Recursively parse each argument
                 }).collect();
                 return GrammarTerm::Op(op.clone(), rst);
             }

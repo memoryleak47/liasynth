@@ -56,6 +56,7 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
     let out: TokenStream1 = quote! {
         #[derive(PartialEq, Eq, Hash, Clone, Debug, PartialOrd, Ord)]
         pub enum Node {
+            PlaceHolder(Id),
             ConstInt(Int),
             True,
             False,
@@ -67,6 +68,7 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
         impl Node {
             pub fn signature(&self) -> &'static (&'static [Ty], Ty) {
                 match self {
+                    Node::PlaceHolder(_) => &(&[], Ty::Int),
                     Node::ConstInt(i) => &(&[], Ty::Int),
                     Node::True => &(&[], Ty::Bool),
                     Node::False => &(&[], Ty::Bool),
@@ -78,20 +80,21 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
 
             pub fn children(&self) -> &[Id] {
                 match self {
-                    Node::ConstInt(_) | Node::True | Node::False | Node::VarInt(_) | Node::VarBool(_) => &[],
+                    Node::PlaceHolder(_) | Node::ConstInt(_) | Node::True | Node::False | Node::VarInt(_) | Node::VarBool(_) => &[],
                     #(#get_children_cases),*
                 }
             }
 
             pub fn children_mut(&mut self) -> &mut [Id] {
                 match self {
-                    Node::ConstInt(_) | Node::True | Node::False | Node::VarInt(_) | Node::VarBool(_) => &mut [],
+                    Node::PlaceHolder(_) | Node::ConstInt(_) | Node::True | Node::False | Node::VarInt(_) | Node::VarBool(_) => &mut [],
                     #(#get_children_mut_cases),*
                 }
             }
 
             pub fn eval(&self, ch: impl Fn(Id) -> Option<Value>, sigma: &Sigma) -> Option<Value> {
                 Some(match self {
+                    Node::PlaceHolder(_) => Value::Int(0),
                     Node::ConstInt(i) => Value::Int(*i),
                     Node::True => Value::Bool(true),
                     Node::False => Value::Bool(false),
@@ -102,12 +105,12 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
 
             pub fn extract(&self, ex: &impl Fn(Id) -> Node, out: &mut Vec<Node>) {
                 match self {
-                    a@(Node::ConstInt(_) | Node::True | Node::False | Node::VarInt(_) | Node::VarBool(_)) => out.push(a.clone()),
+                    a@(Node::PlaceHolder(_) | Node::ConstInt(_) | Node::True | Node::False | Node::VarInt(_) | Node::VarBool(_)) => out.push(a.clone()),
                     #(#extract_cases),*
                 }
             }
 
-            pub fn parse(op: &str, args: &[Id]) -> Option<Node> {
+            pub fn parse(op: &str, args: &[Node]) -> Option<Node> {
                 match (op, args) {
                     #(#parse_cases,)*
                     _ => None,
@@ -219,6 +222,7 @@ fn extract_cases(edef: &EnumDef) -> Vec<TokenStream2> {
     cases
 }
 
+// TODO: Fix this to work with nested ops and hard coded arguments/constants
 fn parse_cases(edef: &EnumDef) -> Vec<TokenStream2> {
     let mut cases: Vec<TokenStream2> = Vec::new();
     for c in edef.cases.iter() {
@@ -226,7 +230,16 @@ fn parse_cases(edef: &EnumDef) -> Vec<TokenStream2> {
         let symb = &c.symb;
         let n = c.argtys.len();
         let v = quote! {
-            (#symb, s) if s.len() == #n => Some(Node::#ident(s.iter().cloned().collect::<Vec<_>>().try_into().unwrap()))
+            (#symb, s) if s.len() == #n => {
+                let ids: Vec<Id> = s.iter().map(|node| match node {
+                    Node::PlaceHolder(i) => *i as Id,
+                    Node::VarInt(i) => *i as Id,
+                    Node::VarBool(i) => *i as Id,
+                    Node::Op(i) => *i as Id,
+                    _ => panic!("Expected PlaceHolder, got {:?}", node),
+                }).collect();
+                Some(Node::#ident(ids.try_into().unwrap()))
+            }
         };
         cases.push(v);
     }

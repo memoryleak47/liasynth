@@ -8,6 +8,7 @@ pub fn term_to_z3(t: &Term, vars: &[String]) -> String {
 
 fn term_to_z3_impl(i: usize, t: &Term, vars: &[String]) -> String {
     match &t.elems[i] {
+        Node::PlaceHolder(i) => format!("{i}"),
         Node::VarInt(v) | Node::VarBool(v) => vars.get(*v).cloned().unwrap_or_else(|| format!("v{v}")),
 
         &Node::Add([x, y]) => format!("(+ {} {})", term_to_z3_impl(x, t, vars), term_to_z3_impl(y, t, vars)),
@@ -34,6 +35,8 @@ fn term_to_z3_impl(i: usize, t: &Term, vars: &[String]) -> String {
         &Node::Distinct([x, y]) => format!("(distinct {} {})", term_to_z3_impl(x, t, vars), term_to_z3_impl(y, t, vars)),
 
         Node::ConstInt(i) => format!("{i}"),
+
+        &Node::Tmp([x, y]) => format!("(ite (> x y) {} {})", term_to_z3_impl(x, t, vars), term_to_z3_impl(y, t, vars)),
     }
 }
 

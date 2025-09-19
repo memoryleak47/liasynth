@@ -39,7 +39,7 @@ pub type SynthArg = String;
 #[derive(Debug, Clone)]
 pub enum GrammarTerm {
     NonTerminal(NonTerminal),
-    Op(Op, Vec<NonTerminal>),
+    Op(Op, Vec<GrammarTerm>),
     ConstInt(Int), // also covers negative numbers, like this: (- 3)
     ConstBool(bool),
     SynthArg(SynthArg),
