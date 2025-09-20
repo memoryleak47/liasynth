@@ -233,9 +233,6 @@ fn parse_cases(edef: &EnumDef) -> Vec<TokenStream2> {
             (#symb, s) if s.len() == #n => {
                 let ids: Vec<Id> = s.iter().map(|node| match node {
                     Node::PlaceHolder(i) => *i as Id,
-                    Node::VarInt(i) => *i as Id,
-                    Node::VarBool(i) => *i as Id,
-                    Node::Op(i) => *i as Id,
                     _ => panic!("Expected PlaceHolder, got {:?}", node),
                 }).collect();
                 Some(Node::#ident(ids.try_into().unwrap()))

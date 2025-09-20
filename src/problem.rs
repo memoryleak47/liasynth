@@ -1,6 +1,48 @@
 use crate::*;
 
 use indexmap::IndexMap;
+use std::hash::Hash;
+use std::collections::hash_map::Entry;
+use std::collections::HashMap;
+
+#[derive(Clone)]
+pub struct RevIndexMap<V>
+where
+    V: Eq
+{
+    map: HashMap<V, usize>,
+    inv_map: HashMap<usize, V>,
+    next: usize,
+}
+
+impl<V> RevIndexMap<V>
+where
+    V: Eq + Hash + Clone
+{
+    pub fn new() -> Self {
+        Self { map: HashMap::new(), inv_map: HashMap::new(), next: usize::MAX }
+    }
+
+    pub fn get_or_insert(&mut self, key: V) -> usize {
+        match self.map.entry(key.clone()) {  // key consumed here, no clone!
+            Entry::Occupied(entry) => *entry.get(),
+            Entry::Vacant(entry) => {
+                let value = self.next;
+                entry.insert(value);
+                self.next = self.next.wrapping_sub(1);
+
+                self.inv_map.insert(value, key);
+
+                value
+            }
+        }
+    }
+
+    pub fn get(&self, key: V) -> Option<&usize> {
+        self.map.get(&key)
+    }
+}
+
 
 #[derive(Clone)]
 pub struct Problem {
@@ -29,6 +71,8 @@ pub struct Problem {
     // with which it is called.
     // During sat checking, this synthfun call is replaced by a special variable -- an instvar.
     pub instvars: Vec<Box<[Id]>>,
+
+    pub reserved_id_map:  RevIndexMap<Node>,
 }
 
 // resolves "let" and "defined-funs"
@@ -113,7 +157,7 @@ pub fn mk_sygus_problem(f: &str) -> Problem {
     build_sygus(synth_problem)
 }
 
-fn parse_grammar_term(rule: &GrammarTerm, vars: &IndexMap<String, Ty>,) -> Node {
+fn parse_grammar_term(rule: &GrammarTerm, vars: &IndexMap<String, Ty>, ops: &mut RevIndexMap<Node>) -> Node {
     match rule {
         GrammarTerm::NonTerminal(_) => {
             // we'll iterate over the referenced non-terminal anyways.
@@ -122,11 +166,15 @@ fn parse_grammar_term(rule: &GrammarTerm, vars: &IndexMap<String, Ty>,) -> Node 
         },
         GrammarTerm::Op(op, nts) => {
             let args: Vec<_> = nts.iter().map(|n| {
-                parse_grammar_term(n, vars)
+                match n {
+                    GrammarTerm::Op(_, _) | GrammarTerm::SynthArg(_) => {
+                        let m = parse_grammar_term(n, vars, ops);
+                        Node::PlaceHolder(ops.get_or_insert(m))
+                    },
+                    _ => parse_grammar_term(n, vars, ops)
+                }
             }).collect();
-            // let args: Vec<_> = nts.iter().map(|_| 0).collect();
-            println!("op: {:?}", op);
-            println!("{:?}", args);
+
             Node::parse(&*op, &*args).expect("Could not parse prod rule")
         },
         GrammarTerm::ConstInt(i) => Node::ConstInt(*i),
@@ -135,10 +183,12 @@ fn parse_grammar_term(rule: &GrammarTerm, vars: &IndexMap<String, Ty>,) -> Node 
         GrammarTerm::SynthArg(v) => {
             let i = vars.get_index_of(&*v).unwrap();
             let ty = vars[v];
-            match ty {
+            let n = match ty {
                 Ty::Int => Node::VarInt(i),
                 Ty::Bool => Node::VarBool(i),
-            }
+            };
+            ops.get_or_insert(n.clone());
+            n
         },
         GrammarTerm::DefinedFunCall(f, args) => todo!("handle DefinedFunCalls in the grammar"),
     }
@@ -165,9 +215,10 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
     let constraint_str = constraint.to_string();
 
     let mut prod_rules = Vec::new();
+    let mut ops: RevIndexMap<Node> = RevIndexMap::new();
     for (_, ntdef) in synth_fun.nonterminal_defs.iter() {
         for rule in ntdef.prod_rules.iter() {
-            let node = parse_grammar_term(rule, &vars);
+            let node = parse_grammar_term(rule, &vars, &mut ops);
             println!("{:?}", node);
             prod_rules.push(node);
         }
@@ -202,6 +253,7 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
         context,
         context_vars,
         instvars,
+        reserved_id_map: ops,
     }
 }
 

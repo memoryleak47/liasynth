@@ -111,6 +111,9 @@ fn grow(x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     for rule in ctxt.problem.prod_rules() {
         let (in_types, out_type) = rule.signature();
         for i in 0..rule.children().len() {
+            if rule.children()[i] != 0 {
+                continue;
+            }
             let mut rule = rule.clone();
             if in_types[i] != ty { continue }
             rule.children_mut()[i] = x;
