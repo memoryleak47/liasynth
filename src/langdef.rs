@@ -1,6 +1,9 @@
 use crate::*;
 use lang::define_language;
 
+
+// TODO: Idea is to use the fourth element as a regex-like for how to parse and how to format
+// means we dont need the fmt implemented for language
 define_language! {
     [
         // https://smt-lib.org/theories-Core.shtml
@@ -35,6 +38,9 @@ define_language! {
         (Gte, [Ty::Int, Ty::Int], Ty::Bool, ">=", Value::Bool(to_int(ev(0)?) >= to_int(ev(1)?))),
         (Gt, [Ty::Int, Ty::Int], Ty::Bool, ">", Value::Bool(to_int(ev(0)?) > to_int(ev(1)?))),
 
+        // BUG: This is wrong
+        // The arguments in the condition are wrong as they should be hard coded as x and y
+        // Maybe this takes 4 arguments, two bound to x and y and two as free arguments
         (Tmp, [Ty::Int, Ty::Int],  Ty::Int, "ite (> x y)", Value::Int(if to_int(ev(0)?) > to_int(ev(1)?) { to_int(ev(0)?) } else { to_int(ev(1)? ) })),
     ]
 }
