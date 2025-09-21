@@ -1,5 +1,6 @@
 use crate::*;
 use crate::parser::*;
+use itertools::Itertools;
 
 pub fn build_synth(exprs: Vec<SExpr>) -> SynthProblem {
     let mut synth = SynthProblem::default();
@@ -45,6 +46,13 @@ fn valid_op(op: &str, arity: usize) -> bool {
     Node::parse(op, &v).is_some()
 }
 
+fn make_string(l: &SExpr) -> String {
+   match l {
+       SExpr::Ident(s) => format!("{}", s),
+       SExpr::List(l) => format!("({})", l.iter().map(|x| make_string(x)).join(" "))
+   }
+}
+
 fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<String, Ty>, defs: &IndexMap<String, DefinedFun>) -> GrammarTerm {
     match s {
         SExpr::Ident(id) => {
@@ -57,6 +65,21 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<Strin
             panic!("unknown ident: {id}")
         },
         SExpr::List(l) => {
+
+            println!("{:?}", l);
+            println!("{:?}", nonterminals);
+
+            let mut s = format!("({})", l.iter().map(|x| make_string(x)).join(" "));
+
+            for n in nonterminals.keys() {
+                let nt = format!("{:?}", n);
+                println!("{}", nt);
+                s = s.replace(&nt, "?");
+                println!("{:?}", s.contains(&nt));
+            }
+
+            println!("{:?}", s);
+
             let [SExpr::Ident(op), rst@..] = &l[..] else { panic!() };
 
             // special case for negative number constants:
