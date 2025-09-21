@@ -1,9 +1,7 @@
 use crate::*;
 
 use indexmap::IndexMap;
-use std::hash::Hash;
-use std::collections::hash_map::Entry;
-use std::collections::HashMap;
+
 
 #[derive(Clone)]
 pub struct Problem {
@@ -124,10 +122,7 @@ fn parse_grammar_term(rule: &GrammarTerm, vars: &IndexMap<String, Ty>) -> Node {
             Node::PlaceHolder(0)
         },
         GrammarTerm::Op(op, nts) => {
-            let args: Vec<_> = nts.iter().map(|n| {
-                parse_grammar_term(n, vars)
-            }).collect();
-
+            let args: Vec<_> = nts.iter().map(|_| Node::PlaceHolder(0)).collect();
             Node::parse(&*op, &*args).expect("Could not parse prod rule")
         },
         GrammarTerm::ConstInt(i) => Node::ConstInt(*i),

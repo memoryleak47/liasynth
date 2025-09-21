@@ -9,7 +9,7 @@ struct Case {
     ident: Expr,
     retty: Expr,
     argtys: Vec<Expr>,
-    symb: Expr,
+    template: Expr,
     compute: Expr,
 }
 
@@ -23,14 +23,14 @@ fn build_enum_def(input: TokenStream1) -> EnumDef {
     let mut cases: Vec<Case> = Vec::new();
     for x in arr.elems.iter() {
         let Expr::Tuple(tup) = x else { panic!() };
-        let [ident, argtys, retty, symb, compute] = &*tup.elems.iter().collect::<Box<[_]>>() else { panic!() };
+        let [ident, argtys, retty, template, compute] = &*tup.elems.iter().collect::<Box<[_]>>() else { panic!() };
         let Expr::Array(argtys) = argtys else { panic!() };
         let n = LitInt::new(&argtys.elems.len().to_string(), proc_macro2::Span::call_site());
         let case = Case {
             ident: (**ident).clone(),
             argtys: argtys.elems.iter().cloned().collect(),
             retty: (*retty).clone(),
-            symb: (*symb).clone(),
+            template: (*template).clone(),
             compute: (*compute).clone(),
         };
         cases.push(case);
@@ -222,15 +222,14 @@ fn extract_cases(edef: &EnumDef) -> Vec<TokenStream2> {
     cases
 }
 
-// TODO: Fix this to work with nested ops and hard coded arguments/constants
 fn parse_cases(edef: &EnumDef) -> Vec<TokenStream2> {
     let mut cases: Vec<TokenStream2> = Vec::new();
     for c in edef.cases.iter() {
         let ident = &c.ident;
-        let symb = &c.symb;
+        let template = &c.template;
         let n = c.argtys.len();
         let v = quote! {
-            (#symb, s) if s.len() == #n => {
+            (#template, s) if s.len() == #n => {
                 let ids: Vec<Id> = s.iter().map(|node| match node {
                     Node::PlaceHolder(i) => *i as Id,
                     _ => panic!("Expected PlaceHolder, got {:?}", node),
