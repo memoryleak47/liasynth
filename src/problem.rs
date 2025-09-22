@@ -164,7 +164,6 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
     for (_, ntdef) in synth_fun.nonterminal_defs.iter() {
         for rule in ntdef.prod_rules.iter() {
             let node = parse_grammar_term(rule, &vars);
-            println!("{:?}", node);
             prod_rules.push(node);
         }
     }

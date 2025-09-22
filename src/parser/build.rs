@@ -51,11 +51,23 @@ fn valid_prod(prod: &str, arity: usize) -> Option<Node> {
     Node::parse_prod(prod, &v)
 }
 
-fn make_string(l: &SExpr) -> String {
-   match l {
-       SExpr::Ident(s) => format!("{}", s),
-       SExpr::List(l) => format!("({})", l.iter().map(|x| make_string(x)).join(" "))
-   }
+fn make_string(l: &SExpr, nonterms: &IndexMap<String, Ty>) -> String {
+    match l {
+        SExpr::Ident(s) => {
+            if nonterms.contains_key(s) { "?".to_string() } else { s.to_string() }
+        }
+        SExpr::List(xs) => format!("({})", xs.iter().map(|x| make_string(x, nonterms)).join(" ")),
+    }
+}
+
+fn get_rst(l: &SExpr, nonterms: &IndexMap<String, Ty>) -> Vec<GrammarTerm> {
+    match l {
+        SExpr::Ident(s) => {
+            if nonterms.contains_key(s) { return vec![GrammarTerm::NonTerminal(s.clone())] ; }
+            else { vec![] }
+        }
+        SExpr::List(xs) => xs.iter().flat_map(|x| get_rst(x, nonterms)).collect::<Vec<GrammarTerm>>()
+    }
 }
 
 fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<String, Ty>, defs: &IndexMap<String, DefinedFun>) -> GrammarTerm {
@@ -87,30 +99,8 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<Strin
                 return GrammarTerm::DefinedFunCall(op.clone(), rst);
             }
 
-            let rst: Vec<GrammarTerm> = l
-                .iter()
-                .filter(|x| {
-                    if let SExpr::Ident(x) = x {
-                        nonterminals.contains_key(x)
-                    } else { false }
-                })
-                .map(|x| as_rule(x, nonterminals, args, defs))
-                .collect();
-
-            let s: Vec<SExpr> = l
-                .iter()
-                .cloned()
-                .map(|x| {
-                    match x {
-                        SExpr::Ident(ref name) if nonterminals.contains_key(name) => {
-                            SExpr::Ident("?".to_string())
-                        }
-                        _ => x,
-                    }
-                })
-                .collect();
-
-            let s = format!("({})", s.iter().map(|x| make_string(x)).join(" "));
+            let s = format!("({})", l.iter().map(|x| make_string(x, nonterminals)).join(" "));
+            let rst = l.iter().flat_map(|x| get_rst(x, nonterminals)).collect::<Vec<_>>();
 
             if valid_prod(&s, rst.len()).is_some() {
                 return GrammarTerm::Op(s, rst);
