@@ -37,6 +37,7 @@ fn term_to_z3_impl(i: usize, t: &Term, vars: &[String]) -> String {
         Node::ConstInt(i) => format!("{i}"),
 
         &Node::Tmp([x, y]) => format!("(ite (> x y) {} {})", term_to_z3_impl(x, t, vars), term_to_z3_impl(y, t, vars)),
+        &Node::Tmp2([x, y]) => format!("(+ (+ 10 {}) {})", term_to_z3_impl(x, t, vars), term_to_z3_impl(y, t, vars)),
     }
 }
 

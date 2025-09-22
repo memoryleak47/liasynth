@@ -163,8 +163,8 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
     let mut prod_rules = Vec::new();
     for (_, ntdef) in synth_fun.nonterminal_defs.iter() {
         for rule in ntdef.prod_rules.iter() {
-            println!("{:?}", rule);
             let node = parse_grammar_term(rule, &vars);
+            println!("{:?}", node);
             prod_rules.push(node);
         }
     }

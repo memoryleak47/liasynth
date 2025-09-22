@@ -41,6 +41,8 @@ define_language! {
         // BUG: This is wrong
         // The arguments in the condition are wrong as they should be hard coded as x and y
         // Maybe this takes 4 arguments, two bound to x and y and two as free arguments
+        // TODO: Now just to fix this
         (Tmp, [Ty::Int, Ty::Int],  Ty::Int, "tmp", "(ite (> x y) ? ?)", Value::Int(if to_int(ev(0)?) > to_int(ev(1)?) { to_int(ev(0)?) } else { to_int(ev(1)? ) })),
+        (Tmp2, [Ty::Int, Ty::Int],  Ty::Int, "tmp", "(+ (+ 10 ?) ?)", Value::Int(if to_int(ev(0)?) > to_int(ev(1)?) { to_int(ev(0)?) } else { to_int(ev(1)? ) })),
     ]
 }

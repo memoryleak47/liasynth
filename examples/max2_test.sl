@@ -2,7 +2,7 @@
 
 (synth-fun max2 ((x Int) (y Int)) Int
     ((Start Int) (StartBool Bool))
-    ((Start Int (x y 0 1 (+ Start Start) (- Start Start) (ite StartBool Start Start) (ite (> x y) Start Start)))
+    ((Start Int (x y 0 1 (+ Start Start) (- Start Start) (ite StartBool Start Start) (ite (> x y) Start Start) (+ (+ 10 x) y)))
     (StartBool Bool ((and StartBool StartBool) (or StartBool StartBool) (not StartBool) (<= Start Start) (= Start Start) (>= Start Start)))))
 
 (declare-var x Int)
