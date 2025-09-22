@@ -47,15 +47,12 @@ fn valid_op(op: &str, arity: usize) -> Option<Node> {
 }
 
 fn valid_prod(prod: &str, a: &Vec<GrammarTerm>, args: &IndexMap<String, Ty>) -> Option<Node> {
-    let mut count = 0;
     let v: Box<[Node]> = a
         .iter()
         .map(|n|
             match n {
                 GrammarTerm::NonTerminal(_) => {
-                    let n = Node::PlaceHolder(count);
-                    count += 1;
-                    n
+                    Node::PlaceHolder(0)
                 },
                 GrammarTerm::SynthArg(v) => {
                     if let Some(idx) =  args.get_index_of(v) {
@@ -123,9 +120,6 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<Strin
 
             let s = format!("({})", l.iter().map(|x| make_string(x, nonterminals)).join(" "));
             let rst = l.iter().flat_map(|x| get_rst(x, nonterminals, args)).collect::<Vec<_>>();
-
-            println!("s: {:?}", s);
-            println!("r: {:?}", rst);
 
             if valid_prod(&s, &rst, args).is_some() {
                 return GrammarTerm::Op(s, rst);

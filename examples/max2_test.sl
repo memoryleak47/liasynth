@@ -7,6 +7,6 @@
 
 (declare-var x Int)
 (declare-var y Int)
-(constraint (= (max2 x y) (+ (+ 10 x) y)))
+(constraint (= (max2 x y) (+ (+ 10 y) x)))
 
 (check-synth)

@@ -114,12 +114,13 @@ fn grow(x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     for rule in ctxt.problem.prod_rules() {
         let (in_types, out_type) = rule.signature();
         for i in 0..rule.children().len() {
-            if matches!(rule.children()[i], Child::VarInt(_) | Child::VarBool(_)) || rule.children()[i] != Child::Hole(0) {
+            if matches!(rule.children()[i], Child::VarInt(_) | Child::VarBool(_) | Child::Constant(_)) || rule.children()[i] != Child::Hole(0) {
                 continue;
             }
             let mut rule = rule.clone();
             if in_types[i] != ty { continue }
             rule.children_mut()[i] = Child::Hole(x);
+
             let mut in_types: Vec<_> = in_types.iter().cloned().collect();
             in_types.remove(i);
             let it = in_types.iter().map(|ty| match ty {
@@ -210,6 +211,11 @@ fn add_node_part(id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<usize>) {
         }
         vals
     };
+
+    match node.ty() {
+        Ty::Int => &mut ctxt.i_solids,
+        Ty::Bool => &mut ctxt.b_solids,
+    }.push(id);
 
     let mut temp_vec = ctxt.classes[id].vals.clone().into_vec();
     temp_vec.extend(new_vals);
