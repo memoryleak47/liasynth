@@ -40,10 +40,15 @@ fn as_ty(s: &str) -> Ty {
     }
 }
 
-// checks whether 'op' is an OP.
-fn valid_op(op: &str, arity: usize) -> bool {
+// checks whether 'op' is an OP
+fn valid_op(op: &str, arity: usize) -> Option<Node> {
     let v: Box<[Node]> = (0..arity).map(|i| Node::PlaceHolder(i)).collect();
-    Node::parse(op, &v).is_some()
+    Node::parse(op, &v)
+}
+
+fn valid_prod(prod: &str, arity: usize) -> Option<Node> {
+    let v: Box<[Node]> = (0..arity).map(|i| Node::PlaceHolder(i)).collect();
+    Node::parse_prod(prod, &v)
 }
 
 fn make_string(l: &SExpr) -> String {
@@ -66,20 +71,6 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<Strin
         },
         SExpr::List(l) => {
 
-            println!("{:?}", l);
-            println!("{:?}", nonterminals);
-
-            let mut s = format!("({})", l.iter().map(|x| make_string(x)).join(" "));
-
-            for n in nonterminals.keys() {
-                let nt = format!("{:?}", n);
-                println!("{}", nt);
-                s = s.replace(&nt, "?");
-                println!("{:?}", s.contains(&nt));
-            }
-
-            println!("{:?}", s);
-
             let [SExpr::Ident(op), rst@..] = &l[..] else { panic!() };
 
             // special case for negative number constants:
@@ -96,11 +87,33 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<Strin
                 return GrammarTerm::DefinedFunCall(op.clone(), rst);
             }
 
-            if valid_op(op, rst.len()) {
-                let rst = rst.iter().map(|x| {
-                    as_rule(x, nonterminals, args, defs) // Recursively parse each argument
-                }).collect();
-                return GrammarTerm::Op(op.clone(), rst);
+            let rst: Vec<GrammarTerm> = l
+                .iter()
+                .filter(|x| {
+                    if let SExpr::Ident(x) = x {
+                        nonterminals.contains_key(x)
+                    } else { false }
+                })
+                .map(|x| as_rule(x, nonterminals, args, defs))
+                .collect();
+
+            let s: Vec<SExpr> = l
+                .iter()
+                .cloned()
+                .map(|x| {
+                    match x {
+                        SExpr::Ident(ref name) if nonterminals.contains_key(name) => {
+                            SExpr::Ident("?".to_string())
+                        }
+                        _ => x,
+                    }
+                })
+                .collect();
+
+            let s = format!("({})", s.iter().map(|x| make_string(x)).join(" "));
+
+            if valid_prod(&s, rst.len()).is_some() {
+                return GrammarTerm::Op(s, rst);
             }
 
             panic!("unknown op: {op}")
@@ -129,7 +142,7 @@ fn as_expr(s: &SExpr, defined_funs: &IndexMap<String, DefinedFun>, synth_funs: &
                 }
                 let expr = as_expr(expr, defined_funs, synth_funs);
                 Expr::Let(bindings, Box::new(expr))
-            } else if valid_op(op, rst.len()) {
+            } else if valid_op(op, rst.len()).is_some() {
                 let rst = rst.iter().map(|x| as_expr(x, defined_funs, synth_funs)).collect();
                 Expr::Op(op.clone(), rst)
             } else if defined_funs.contains_key(op) {

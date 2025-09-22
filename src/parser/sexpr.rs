@@ -2,7 +2,7 @@ use indexmap::IndexMap;
 use std::fmt::*;
 use crate::Ty;
 
-#[derive(PartialEq, Eq)]
+#[derive(PartialEq, Eq, Clone)]
 pub enum SExpr {
     Ident(String),
     List(Vec<SExpr>),

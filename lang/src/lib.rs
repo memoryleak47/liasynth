@@ -9,6 +9,7 @@ struct Case {
     ident: Expr,
     retty: Expr,
     argtys: Vec<Expr>,
+    symb: Expr,
     template: Expr,
     compute: Expr,
 }
@@ -23,13 +24,14 @@ fn build_enum_def(input: TokenStream1) -> EnumDef {
     let mut cases: Vec<Case> = Vec::new();
     for x in arr.elems.iter() {
         let Expr::Tuple(tup) = x else { panic!() };
-        let [ident, argtys, retty, template, compute] = &*tup.elems.iter().collect::<Box<[_]>>() else { panic!() };
+        let [ident, argtys, retty, symb, template, compute] = &*tup.elems.iter().collect::<Box<[_]>>() else { panic!() };
         let Expr::Array(argtys) = argtys else { panic!() };
         let n = LitInt::new(&argtys.elems.len().to_string(), proc_macro2::Span::call_site());
         let case = Case {
             ident: (**ident).clone(),
             argtys: argtys.elems.iter().cloned().collect(),
             retty: (*retty).clone(),
+            symb: (*symb).clone(),
             template: (*template).clone(),
             compute: (*compute).clone(),
         };
@@ -52,6 +54,8 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
     let eval_cases = eval_cases(&edef);
     let extract_cases = extract_cases(&edef);
     let parse_cases = parse_cases(&edef);
+    let parse_prod_cases = parse_prod_cases(&edef);
+    let ident_cases = ident_cases(&edef);
 
     let out: TokenStream1 = quote! {
         #[derive(PartialEq, Eq, Hash, Clone, Debug, PartialOrd, Ord)]
@@ -114,6 +118,25 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
                 match (op, args) {
                     #(#parse_cases,)*
                     _ => None,
+                }
+            }
+
+            pub fn parse_prod(op: &str, args: &[Node]) -> Option<Node> {
+                match (op, args) {
+                    #(#parse_prod_cases,)*
+                    _ => None,
+                }
+            }
+
+            pub fn ident(&self) -> &'static str {
+                match self {
+                    Node::PlaceHolder(_) => "PlaceHolder",
+                    Node::ConstInt(_) => "ConstInt",
+                    Node::True => "True",
+                    Node::False => "False",
+                    Node::VarInt(_) => "VarInt",
+                    Node::VarBool(_) => "VarBool",
+                    #(#ident_cases),*
                 }
             }
         }
@@ -226,10 +249,10 @@ fn parse_cases(edef: &EnumDef) -> Vec<TokenStream2> {
     let mut cases: Vec<TokenStream2> = Vec::new();
     for c in edef.cases.iter() {
         let ident = &c.ident;
-        let template = &c.template;
+        let symb = &c.symb;
         let n = c.argtys.len();
         let v = quote! {
-            (#template, s) if s.len() == #n => {
+            (#symb, s) if s.len() == #n  => {
                 let ids: Vec<Id> = s.iter().map(|node| match node {
                     Node::PlaceHolder(i) => *i as Id,
                     _ => panic!("Expected PlaceHolder, got {:?}", node),
@@ -237,6 +260,36 @@ fn parse_cases(edef: &EnumDef) -> Vec<TokenStream2> {
                 Some(Node::#ident(ids.try_into().unwrap()))
             }
         };
+        cases.push(v);
+    }
+    cases
+}
+
+fn parse_prod_cases(edef: &EnumDef) -> Vec<TokenStream2> {
+    let mut cases: Vec<TokenStream2> = Vec::new();
+    for c in edef.cases.iter() {
+        let ident = &c.ident;
+        let template = &c.template;
+        let n = c.argtys.len();
+        let v = quote! {
+            (#template, s) if s.len() == #n && #template == op => {
+                let ids: Vec<Id> = s.iter().map(|node| match node {
+                    Node::PlaceHolder(i) => *i as Id,
+                    _ => panic!("Expected PlaceHolder, got {:?}", node),
+                }).collect();
+                Some(Node::#ident(ids.try_into().unwrap()))
+            }
+        };
+        cases.push(v);
+    }
+    cases
+}
+
+fn ident_cases(edef: &EnumDef) -> Vec<TokenStream2> {
+    let mut cases = Vec::new();
+    for c in edef.cases.iter() {
+        let ident = &c.ident;
+        let v = quote! { Node::#ident(_) => stringify!(#ident) };
         cases.push(v);
     }
     cases

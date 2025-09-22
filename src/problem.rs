@@ -123,7 +123,7 @@ fn parse_grammar_term(rule: &GrammarTerm, vars: &IndexMap<String, Ty>) -> Node {
         },
         GrammarTerm::Op(op, nts) => {
             let args: Vec<_> = nts.iter().map(|_| Node::PlaceHolder(0)).collect();
-            Node::parse(&*op, &*args).expect("Could not parse prod rule")
+            Node::parse_prod(&*op, &*args).expect("Could not parse prod rule")
         },
         GrammarTerm::ConstInt(i) => Node::ConstInt(*i),
         GrammarTerm::ConstBool(true) => Node::True,
@@ -163,8 +163,8 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
     let mut prod_rules = Vec::new();
     for (_, ntdef) in synth_fun.nonterminal_defs.iter() {
         for rule in ntdef.prod_rules.iter() {
+            println!("{:?}", rule);
             let node = parse_grammar_term(rule, &vars);
-            println!("{:?}", node);
             prod_rules.push(node);
         }
     }
