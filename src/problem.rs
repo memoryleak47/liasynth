@@ -168,7 +168,6 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
         }
     }
 
-
     let mut context: String = String::new();
     for (_, def) in synth_problem.defined_funs.iter() {
         context.push_str(&format!("{def}\n"));

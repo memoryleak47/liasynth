@@ -69,6 +69,15 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
             #(#enum_cases),*
         }
 
+
+        #[derive(PartialEq, Eq, Hash, Clone, Copy, Debug, PartialOrd, Ord)]
+        pub enum Child {
+            Hole(Id),
+            Constant(Int),
+            VarInt(Var),
+            VarBool(Var),
+        }
+
         impl Node {
             pub fn signature(&self) -> &'static (&'static [Ty], Ty) {
                 match self {
@@ -82,16 +91,26 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
                 }
             }
 
-            pub fn children(&self) -> &[Id] {
+            pub fn children(&self) -> &[Child] {
                 match self {
-                    Node::PlaceHolder(_) | Node::ConstInt(_) | Node::True | Node::False | Node::VarInt(_) | Node::VarBool(_) => &[],
+                    Node::PlaceHolder(_)
+                    | Node::ConstInt(_)
+                    | Node::True
+                    | Node::False
+                    | Node::VarInt(_)
+                    | Node::VarBool(_) => &[] as &[Child],
                     #(#get_children_cases),*
                 }
             }
 
-            pub fn children_mut(&mut self) -> &mut [Id] {
+            pub fn children_mut(&mut self) -> &mut [Child] {
                 match self {
-                    Node::PlaceHolder(_) | Node::ConstInt(_) | Node::True | Node::False | Node::VarInt(_) | Node::VarBool(_) => &mut [],
+                    Node::PlaceHolder(_)
+                    | Node::ConstInt(_)
+                    | Node::True
+                    | Node::False
+                    | Node::VarInt(_)
+                    | Node::VarBool(_) => &mut [] as &mut [Child],
                     #(#get_children_mut_cases),*
                 }
             }
@@ -124,7 +143,11 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
             pub fn parse_prod(op: &str, args: &[Node]) -> Option<Node> {
                 match (op, args) {
                     #(#parse_prod_cases,)*
-                    _ => None,
+                    other => {
+                        println!("parse_prod: unknown op '{:?}', args={:?}", other, args);
+                        None
+                    },
+
                 }
             }
 
@@ -159,7 +182,7 @@ fn enum_cases(edef: &EnumDef) -> Vec<TokenStream2> {
         let ident = &c.ident;
         let n = c.argtys.len();
         let v = quote! {
-            #ident([Id; #n])
+            #ident([Child; #n])
         };
         cases.push(v);
     }
@@ -185,102 +208,119 @@ fn signature_cases(edef: &EnumDef) -> Vec<TokenStream2> {
 }
 
 fn get_children_cases(edef: &EnumDef) -> Vec<TokenStream2> {
-    let mut cases: Vec<TokenStream2> = Vec::new();
-    for c in edef.cases.iter() {
+    edef.cases.iter().map(|c| {
         let ident = &c.ident;
-        let v = quote! {
-            Node::#ident(s) => s
-        };
-        cases.push(v);
-    }
-    cases
+        quote! { Node::#ident(s) => &s[..] }
+    }).collect()
 }
 
 fn get_children_mut_cases(edef: &EnumDef) -> Vec<TokenStream2> {
-    let mut cases: Vec<TokenStream2> = Vec::new();
-    for c in edef.cases.iter() {
+    edef.cases.iter().map(|c| {
         let ident = &c.ident;
-        let v = quote! {
-            Node::#ident(s) => s
-        };
-        cases.push(v);
-    }
-    cases
+        quote! { Node::#ident(s) => &mut s[..] }
+    }).collect()
 }
 
 fn eval_cases(edef: &EnumDef) -> Vec<TokenStream2> {
-    let mut cases: Vec<TokenStream2> = Vec::new();
+    let mut cases = Vec::new();
     for c in edef.cases.iter() {
         let ident = &c.ident;
         let compute = &c.compute;
-        let v = quote! {
+        cases.push(quote! {
             Node::#ident(s) => {
-                let ev = |x: usize| -> Option<Value> { ch(s[x]) };
+                let ev = |x: usize| -> Option<Value> {
+                    match s[x] {
+                        Child::Hole(i)   => ch(i),
+                        Child::Constant(c) => Some(Value::Int(c)),
+                        Child::VarInt(v) => Some(sigma.get(v).cloned().unwrap_or_else(|| panic!("sigma miss {v}"))),
+                        Child::VarBool(v)=> Some(sigma.get(v).cloned().unwrap_or_else(|| panic!("sigma miss {v}"))),
+                    }
+                };
                 #compute
             }
-        };
-        cases.push(v);
+        });
     }
     cases
 }
 
 fn extract_cases(edef: &EnumDef) -> Vec<TokenStream2> {
-    let mut cases: Vec<TokenStream2> = Vec::new();
+    let mut cases = Vec::new();
     for c in edef.cases.iter() {
         let ident = &c.ident;
-        let compute = &c.compute;
-        let v = quote! {
-            Node::#ident(s) => {
+        cases.push(quote! {
+            Node::#ident(_) => {
                 let mut a = self.clone();
-                for child in a.children_mut() {
-                    let child: &mut Id = child;
-                    ex(*child).extract(ex, out);
-                    *child = out.len() - 1;
+
+                for ch in a.children_mut() {
+                    match ch {
+                        Child::Hole(i) => {
+                            ex(*i).extract(ex, out);
+                            *ch = Child::Hole(out.len() - 1);
+                        }
+                        Child::Constant(c) => {
+                            out.push(Node::ConstInt(c.clone()));
+                            *ch = Child::Hole(out.len() - 1);
+                        }
+                        Child::VarInt(v) => {
+                            out.push(Node::VarInt(*v));
+                            *ch = Child::Hole(out.len() - 1);
+                        }
+                        Child::VarBool(v) => {
+                            out.push(Node::VarBool(*v));
+                            *ch = Child::Hole(out.len() - 1);
+                        }
+                    }
                 }
+
                 out.push(a);
             }
-        };
-        cases.push(v);
+        });
     }
     cases
 }
 
 fn parse_cases(edef: &EnumDef) -> Vec<TokenStream2> {
-    let mut cases: Vec<TokenStream2> = Vec::new();
+    let mut cases = Vec::new();
     for c in edef.cases.iter() {
         let ident = &c.ident;
-        let symb = &c.symb;
-        let n = c.argtys.len();
-        let v = quote! {
-            (#symb, s) if s.len() == #n  => {
-                let ids: Vec<Id> = s.iter().map(|node| match node {
-                    Node::PlaceHolder(i) => *i as Id,
-                    _ => panic!("Expected PlaceHolder, got {:?}", node),
+        let symb  = &c.symb;
+        let n     = c.argtys.len();
+        cases.push(quote! {
+            (#symb, s) if s.len() == #n => {
+                let refs: ::std::vec::Vec<Child> = s.iter().map(|node| match node {
+                    Node::PlaceHolder(i) => Child::Hole(*i),
+                    Node::ConstInt(c)      => Child::Constant(*c),
+                    Node::VarInt(v)      => Child::VarInt(*v),
+                    Node::VarBool(v)     => Child::VarBool(*v),
+                    _ => panic!("Expected PlaceHolder or Var*, got {:?}", node),
                 }).collect();
-                Some(Node::#ident(ids.try_into().unwrap()))
+                let refs: [Child; #n] = refs.try_into().unwrap();
+                Some(Node::#ident(refs))
             }
-        };
-        cases.push(v);
+        });
     }
     cases
 }
 
 fn parse_prod_cases(edef: &EnumDef) -> Vec<TokenStream2> {
-    let mut cases: Vec<TokenStream2> = Vec::new();
+    let mut cases = Vec::new();
     for c in edef.cases.iter() {
-        let ident = &c.ident;
+        let ident    = &c.ident;
         let template = &c.template;
-        let n = c.argtys.len();
-        let v = quote! {
+        let n        = c.argtys.len();
+        cases.push(quote! {
             (#template, s) if s.len() == #n && #template == op => {
-                let ids: Vec<Id> = s.iter().map(|node| match node {
-                    Node::PlaceHolder(i) => *i as Id,
-                    _ => panic!("Expected PlaceHolder, got {:?}", node),
+                let refs: ::std::vec::Vec<Child> = s.iter().map(|node| match node {
+                    Node::PlaceHolder(i) => Child::Hole(*i),
+                    Node::ConstInt(c) => Child::Constant(*c),
+                    Node::VarInt(v)      => Child::VarInt(*v),
+                    Node::VarBool(v)     => Child::VarBool(*v),
+                    _ => panic!("Expected PlaceHolder or Var*, got {:?}", node),
                 }).collect();
-                Some(Node::#ident(ids.try_into().unwrap()))
+                let refs: [Child; #n] = refs.try_into().unwrap();
+                Some(Node::#ident(refs))
             }
-        };
-        cases.push(v);
+        });
     }
     cases
 }

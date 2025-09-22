@@ -52,10 +52,15 @@ impl Term {
     }
 
     pub fn push_subterm(&mut self, t: Term) -> Id {
-        let i = self.elems.len();
-        for mut n in t.elems {
-            for x in n.children_mut() { *x += i; }
-            self.push(n);
+        let base = self.elems.len();
+
+        for mut n in t.elems.into_iter() {
+            for ch in n.children_mut().iter_mut() {
+                if let Child::Hole(ref mut idx) = *ch {
+                    *idx += base;
+                }
+            }
+            self.elems.push(n);
         }
 
         self.elems.len() - 1

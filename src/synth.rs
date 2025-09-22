@@ -81,7 +81,10 @@ fn handle_sol(id: Id, ctxt: &mut Ctxt) {
     ctxt.classes[id].prev_sol += 1;
     let node = ctxt.classes[id].node.clone();
     for c in node.children() {
-        handle_sol(*c, ctxt);
+        match c {
+            Child::Hole(i) =>  handle_sol(*i, ctxt),
+            _ => { },
+        }
     }
 }
 
@@ -111,12 +114,12 @@ fn grow(x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     for rule in ctxt.problem.prod_rules() {
         let (in_types, out_type) = rule.signature();
         for i in 0..rule.children().len() {
-            if rule.children()[i] != 0 {
+            if matches!(rule.children()[i], Child::VarInt(_) | Child::VarBool(_)) || rule.children()[i] != Child::Hole(0) {
                 continue;
             }
             let mut rule = rule.clone();
             if in_types[i] != ty { continue }
-            rule.children_mut()[i] = x;
+            rule.children_mut()[i] = Child::Hole(x);
             let mut in_types: Vec<_> = in_types.iter().cloned().collect();
             in_types.remove(i);
             let it = in_types.iter().map(|ty| match ty {
@@ -128,7 +131,7 @@ fn grow(x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
                 rule.children_mut().iter_mut().enumerate()
                     .filter(|(i2, _)| *i2 != i)
                     .map(|(_, x)| x)
-                    .zip(a.iter()).for_each(|(ptr, v)| { *ptr = *v; });
+                    .zip(a.iter()).for_each(|(ptr, v)| { *ptr = Child::Hole(*v); });
 
                 let (_sol, sc) = add_node(rule.clone(), ctxt);
                 if let Some(sol) = _sol {
@@ -187,8 +190,10 @@ fn add_node_part(id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<usize>) {
     let new_sigmas = ctxt.classes[id].vals.len();
 
     for c in node.children() {
-       if seen.get(&id).is_none() {
-          add_node_part(*c, ctxt, seen);
+        if seen.get(&id).is_none() {
+            if let Child::Hole(i) = c {
+                add_node_part(*i, ctxt, seen);
+            }
        }
     }
 
@@ -285,6 +290,9 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let subterms = c.node.children();
     let max_subterm_satcount = subterms
         .iter()
+        .filter_map(|s| {
+            if let Child::Hole(i) = s { Some(i) } else { None }
+        })
         .map(|s| ctxt.classes[*s].satcount)
         .max()
         .unwrap_or_else(|| 0);
@@ -319,7 +327,9 @@ fn vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
 }
 
 fn minsize(node: &Node, ctxt: &Ctxt) -> usize {
-    node.children().iter().map(|x| ctxt.classes[*x].size).sum::<usize>() + 1
+    node.children().iter()
+        .filter_map(|x| if let Child::Hole(i) = x { Some(i) } else { None })
+        .map(|x| ctxt.classes[*x].size).sum::<usize>() + 1
 }
 
 fn satcount(x: Id, ctxt: &mut Ctxt) -> usize {
