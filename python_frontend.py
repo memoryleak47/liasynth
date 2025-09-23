@@ -4,31 +4,56 @@ import sexpdata
 from functools import partial
 from dataclasses import dataclass
 from collections import namedtuple
+from itertools import chain
 from more_itertools import partition
 
 
-Arg = namedtuple('Arg', 'name, type')
+Arg = namedtuple('Arg', 'name, typ')
+splitter = re.compile(r'[\(\)\s+]')
 
 @dataclass
 class ProductionRule:
+    op  : str
     pr  : str
-    ret : str
+    _ret : str
 
-    def extract_args(self, nts):
-        ...
+    # yuck
+    def extract_ret(self, nts):
+        for n in nts:
+            if self._ret == n.name:
+                self.ret =  n.typ
+                return
+
+    # rough
+    def extract_args(self, nts, varis):
+        args = []
+        for tok in splitter.split(self.pr):
+            for n in chain(nts, varis):
+                if tok == n.name:
+                    args.append(n.typ)
+        return args
 
     def extract_template(self, nts):
-        ...
+        tmp = self.pr
+        for n in sorted(nts, key=lambda x: len(x.name), reverse=True):  # how ugly but needed
+            tmp = tmp.replace(n.name, '?')
+        return tmp
 
-    def extract_eval(self):
-        ...
+    def extract_eval(self, varis):
+        match self.ret:
+            case 'Ty::Int' : r = "Value::Int"
+            case 'Ty::Bool': r = "Value::Int"
+
+
+        return f"r({1})"
+
 
 @dataclass
 class SynthFun:
     name        : str
     args        : Arg
     ret         : str
-    nonterms    : Arg
+    nonterms    : list[Arg]
     terminals   : list[Arg]
     prodrules  : list[ProductionRule]
 
@@ -39,10 +64,23 @@ class DefineFun:
     ret         : str
     body        : ProductionRule
 
+def op_map(op, na):
+    match op, na:
+        case ('=>', _):  return 'Implies'
+        case ('=', _):   return 'Equals'
+        case ('-', 1):   return 'Neg'
+        case ('-', _):   return 'Sub'
+        case ('+', _):   return 'Add'
+        case ('*', _):   return 'Mul'
+        case ('<=', _):  return 'Lte'
+        case ('<', _):   return 'Lt'
+        case ('>=', _):  return 'Gte'
+        case ('>', _):   return 'Gt'
+        case _: return op.capitalize()
+
 consume = lambda x: x.pop(0)
 flat_map = lambda x: [a for a in x if a is not None]
 flatflat_map = lambda x: [a for b in x for a in flat_map(b)]
-splitter = re.compile(r'[\(\)\s+]')
 
 def unpack_arg(x):
     n, t = x
@@ -70,7 +108,7 @@ def get_prodrule(s, nt):
     if not isinstance(s, list):
         return Arg(s.value() if isinstance(s, sexpdata.Symbol) else s, nt.value())
     pr = get_pr(s)
-    return ProductionRule(pr, nt.value())
+    return ProductionRule(s[0].value(), pr, nt.value())
 
 def get_prodrules(s):
     ret = consume(s)
@@ -90,14 +128,7 @@ def parse_synth_fun(s):
 
     prodrules, terminals = partition(lambda x: isinstance(x, Arg), rules)
 
-    return SynthFun(
-        name,
-        args,
-        ret,
-        nonterms,
-        list(terminals),
-        list(prodrules),
-    )
+    return SynthFun(name, args, ret, nonterms, list(terminals), list(prodrules))
 
 def parse_define_fun(s):
     name = consume(s).value()
@@ -105,12 +136,7 @@ def parse_define_fun(s):
     ret = consume(s)
     body = get_prodrule(consume(s), ret)
 
-    return name, DefineFun(
-        name,
-        args,
-        ret.value(),
-        body
-    )
+    return name, DefineFun(name, args, ret.value(), body)
 
 def parse(sexprs):
     definefuns = {}
@@ -123,9 +149,41 @@ def parse(sexprs):
                 definefuns[name] = define_fun
     return synthfun, definefuns
 
-def get_custom_grammar(f=None):
+
+@dataclass
+class GrammarTerm:
+    name: str
+    args: list[str]
+    ret: str
+    op: str
+    tempalte: str
+    evl: str
+
+    def generate(self):
+        return f"{self.name}, [{', '.join(self.args)}], {self.ret}, {self.op}, {self.template}, {self.evl}"
+
+def extract_grammarterm(p, define_funs, nts, varis):
+    p.extract_ret(nts)  # vile
+    args     = p.extract_args(nts, varis)
+    name     = op_map(p.op, len(args))
+    ret      = p.ret
+    op       = p.op
+    template = p.extract_template(nts)
+    evl      = p.extract_eval(varis)
+
+    return GrammarTerm(name, args, ret, op, template, evl)
+
+def get_grammarterm(f=None):
+    terms = []
     file = f if f else 'examples/max2_test.sl'
     with open(file, 'r') as f:
         sexprs = sexpdata.loads(f"({f.read()})")
 
     synthfun, definefuns =  parse(sexprs)
+
+    for pr in synthfun.prodrules:
+        term = extract_grammarterm(pr, definefuns, synthfun.nonterms, synthfun.args)
+        print(term)
+        terms.append(term)
+
+get_grammarterm()
