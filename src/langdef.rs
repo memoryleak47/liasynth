@@ -38,7 +38,7 @@ define_language! {
         (Gte, [Ty::Int, Ty::Int], Ty::Bool, ">=", "(>= ? ?)", Value::Bool(to_int(ev(0)?) >= to_int(ev(1)?))),
         (Gt, [Ty::Int, Ty::Int], Ty::Bool, ">", "(> ? ?)", Value::Bool(to_int(ev(0)?) > to_int(ev(1)?))),
 
-        (Tmp, [Ty::Int, Ty::Int, Ty::Int, Ty::Int],  Ty::Int, "tmp", "(ite (> x y) ? ?)", Value::Int(if to_int(ev(0)?) > to_int(ev(1)?) { to_int(ev(2)?) } else { to_int(ev(3)? ) })),
-        (Tmp2, [Ty::Int, Ty::Int],  Ty::Int, "tmp", "(+ (+ 10 ?) ?)", Value::Int( (10 + to_int(ev(0)?)) + to_int(ev(1)?) )),
+        // (Tmp, [Ty::Int, Ty::Int, Ty::Int, Ty::Int],  Ty::Int, "tmp", "(ite (> x y) ? ?)", Value::Int(if to_int(ev(0)?) > to_int(ev(1)?) { to_int(ev(2)?) } else { to_int(ev(3)? ) })),
+        // (Tmp2, [Ty::Int, Ty::Int],  Ty::Int, "tmp", "(+ (+ 10 ?) ?)", Value::Int( (10 + to_int(ev(0)?)) + to_int(ev(1)?) )),
     ]
 }
