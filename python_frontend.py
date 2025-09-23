@@ -39,13 +39,25 @@ class ProductionRule:
             tmp = tmp.replace(n.name, '?')
         return tmp
 
-    def extract_eval(self, varis):
+    def extract_eval(self, nts, varis, template):
         match self.ret:
             case 'Ty::Int' : r = "Value::Int"
             case 'Ty::Bool': r = "Value::Int"
 
+        print(varis)
+        ars = []
+        count = 0
+        for tok in splitter.split(self.pr):
+            for x in chain(varis, nts):
+                if tok == x.name:
+                    match x.typ:
+                        case 'Ty::Int': ars.append(f'to_int(ev({count})?)')
+                        case 'Ty::Bool': ars.append(f'to_bool(ev({count})?)')
+                    count += 1
 
-        return f"r({1})"
+        # TODO: Need to find a way to translate the operators to rust, will use some dictionary/regex it'll be ugly but whatever
+
+        return f"{r}({' '.join(ars)})"
 
 
 @dataclass
@@ -169,7 +181,7 @@ def extract_grammarterm(p, define_funs, nts, varis):
     ret      = p.ret
     op       = p.op
     template = p.extract_template(nts)
-    evl      = p.extract_eval(varis)
+    evl      = p.extract_eval(nts, varis, template)
 
     return GrammarTerm(name, args, ret, op, template, evl)
 
