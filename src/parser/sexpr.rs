@@ -51,6 +51,10 @@ pub fn tokenize(s: &str) -> Vec<Token> {
         match s[0] {
             '(' => tokens.push(Token::LParen),
             ')' => tokens.push(Token::RParen),
+            ';' => {
+                let i = s.iter().position(|c| *c == '\n').unwrap();
+                s = &s[i+1..];
+            },
             x if x.is_whitespace() => {},
             x => {
                 let i = s.iter().position(|x| x.is_whitespace() || *x == '(' || *x == ')').unwrap();
