@@ -23,13 +23,6 @@
 
 (declare-var x4p Int)
 
-(synth-fun inv((l Int)) Bool
-((NTbool Bool)(NTInt Int))
-((NTbool Bool ((not NTbool) (and NTbool NTbool) (or NTbool NTbool) (ite NTbool NTbool NTbool) (= NTInt NTInt) (< NTInt NTInt) (> NTInt NTInt) ))
-(NTInt Int (l 0 1 (- NTInt) (+ NTInt NTInt) (- NTInt NTInt) (ite NTbool NTInt NTInt) ))
-)
-)
-
 (define-fun implies ((b1 Bool)(b2 Bool)) Bool
  (or (not b1) b2))
 
@@ -53,6 +46,13 @@
 
 (define-fun and6 ((b1 Bool)(b2 Bool)(b3 Bool)(b4 Bool)(b5 Bool)(b6 Bool)) Bool
  (and (and5 b1 b2 b3 b4 b5 ) b6))
+
+(synth-fun inv((l Int)) Bool
+((NTbool Bool)(NTInt Int))
+((NTbool Bool ((not NTbool) (and NTbool NTbool) (or NTbool NTbool) (ite NTbool NTbool NTbool) (= NTInt NTInt) (< NTInt NTInt) (> NTInt NTInt) ))
+(NTInt Int (l 0 1 (- NTInt) (+ NTInt NTInt) (- NTInt NTInt) (ite NTbool NTInt NTInt) ))
+)
+)
 
 (constraint (=> (and6 (= l 0) (or (= x0p (+ x0 1)) (= x0p (- x0 1))) (or (= x1p (+ x1 1)) (= x1p (- x1 1))) (or (= x2p (+ x2 1)) (= x2p (- x2 1))) (or (= x3p (+ x3 1)) (= x3p (- x3 1))) (or (= x4p (+ x4 1)) (= x4p (- x4 1))) ) (inv l )))
 (constraint (=> (and (inv l ) (not (= l 0))) false))

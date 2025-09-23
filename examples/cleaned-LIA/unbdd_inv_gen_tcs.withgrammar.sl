@@ -15,13 +15,6 @@
 
 (declare-var y1 Int)
 
-(synth-fun inv((x Int)(y Int)(i Int)(j Int)) Bool
-((NTbool Bool)(NTInt Int))
-((NTbool Bool ((not NTbool) (and NTbool NTbool) (or NTbool NTbool) (ite NTbool NTbool NTbool) (= NTInt NTInt) (< NTInt NTInt) (> NTInt NTInt) ))
-(NTInt Int (x y i j 0 1 (- NTInt) (+ NTInt NTInt) (- NTInt NTInt) (ite NTbool NTInt NTInt) ))
-)
-)
-
 (define-fun implies ((b1 Bool)(b2 Bool)) Bool
  (or (not b1) b2))
 
@@ -45,6 +38,13 @@
 
 (define-fun and6 ((b1 Bool)(b2 Bool)(b3 Bool)(b4 Bool)(b5 Bool)(b6 Bool)) Bool
  (and (and5 b1 b2 b3 b4 b5 ) b6))
+
+(synth-fun inv((x Int)(y Int)(i Int)(j Int)) Bool
+((NTbool Bool)(NTInt Int))
+((NTbool Bool ((not NTbool) (and NTbool NTbool) (or NTbool NTbool) (ite NTbool NTbool NTbool) (= NTInt NTInt) (< NTInt NTInt) (> NTInt NTInt) ))
+(NTInt Int (x y i j 0 1 (- NTInt) (+ NTInt NTInt) (- NTInt NTInt) (ite NTbool NTInt NTInt) ))
+)
+)
 
 (constraint (=> (and (= x i) (= y j)) (inv x y i j )))
 (constraint (=> (and4 (inv x y i j ) (not (= x 0)) (= x1 (- x 1)) (= y1 (- y 1)) ) (inv x1 y1 i j )))

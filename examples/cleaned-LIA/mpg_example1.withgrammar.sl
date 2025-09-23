@@ -5,36 +5,11 @@
 
 (declare-var y Int)
 
-(synth-fun ex((x Int)(y Int)) Int
-((NTInt Int)(NTbool Bool))
-((NTInt Int (x y 0 1 (- NTInt) (+ NTInt NTInt) (- NTInt NTInt) (ite NTbool NTInt NTInt) ))
-(NTbool Bool ((not NTbool) (and NTbool NTbool) (or NTbool NTbool) (ite NTbool NTbool NTbool) (= NTInt NTInt) (< NTInt NTInt) (> NTInt NTInt) ))
-)
-)
-
-(define-fun five-times ((b1 Int)) Int
- (plus5 b1 b1 b1 b1 b1 ))
-
 (define-fun minus ((b1 Int)) Int
  (- 0 b1))
 
-(define-fun nine-times ((b1 Int)) Int
- (plus9 b1 b1 b1 b1 b1 b1 b1 b1 b1 ))
-
 (define-fun one-times ((b1 Int)) Int
  b1)
-
-(define-fun seven-times ((b1 Int)) Int
- (plus7 b1 b1 b1 b1 b1 b1 b1 ))
-
-(define-fun six-times ((b1 Int)) Int
- (plus6 b1 b1 b1 b1 b1 b1 ))
-
-(define-fun three-times ((b1 Int)) Int
- (plus3 b1 b1 b1 ))
-
-(define-fun two-times ((b1 Int)) Int
- (plus2 b1 b1 ))
 
 (define-fun plus2 ((b1 Int)(b2 Int)) Int
  (+ b1 b2))
@@ -65,6 +40,31 @@
 
 (define-fun plus9 ((b1 Int)(b2 Int)(b3 Int)(b4 Int)(b5 Int)(b6 Int)(b7 Int)(b8 Int)(b9 Int)) Int
  (+ (plus8 b1 b2 b3 b4 b5 b6 b7 b8 ) b9))
+
+(define-fun five-times ((b1 Int)) Int
+ (plus5 b1 b1 b1 b1 b1 ))
+
+(define-fun nine-times ((b1 Int)) Int
+ (plus9 b1 b1 b1 b1 b1 b1 b1 b1 b1 ))
+
+(define-fun seven-times ((b1 Int)) Int
+ (plus7 b1 b1 b1 b1 b1 b1 b1 ))
+
+(define-fun six-times ((b1 Int)) Int
+ (plus6 b1 b1 b1 b1 b1 b1 ))
+
+(define-fun three-times ((b1 Int)) Int
+ (plus3 b1 b1 b1 ))
+
+(define-fun two-times ((b1 Int)) Int
+ (plus2 b1 b1 ))
+
+(synth-fun ex((x Int)(y Int)) Int
+((NTInt Int)(NTbool Bool))
+((NTInt Int (x y 0 1 (- NTInt) (+ NTInt NTInt) (- NTInt NTInt) (ite NTbool NTInt NTInt) ))
+(NTbool Bool ((not NTbool) (and NTbool NTbool) (or NTbool NTbool) (ite NTbool NTbool NTbool) (= NTInt NTInt) (< NTInt NTInt) (> NTInt NTInt) ))
+)
+)
 
 (constraint (iteB (>= x 5) (= (ex x y ) (plus3 (five-times x ) (three-times y ) 17 )) (= (ex x y ) (plus2 (three-times x ) 1 )) ))
 (check-synth)

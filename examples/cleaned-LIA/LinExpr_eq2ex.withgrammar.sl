@@ -7,15 +7,15 @@
 
 (declare-var z Int)
 
+(define-fun and3 ((b1 Bool)(b2 Bool)(b3 Bool)) Bool
+ (and (and b1 b2) b3))
+
 (synth-fun eq2((x Int)(y Int)(z Int)) Int
 ((NTInt Int)(NTbool Bool))
 ((NTInt Int (x y z 0 1 (- NTInt) (+ NTInt NTInt) (- NTInt NTInt) (ite NTbool NTInt NTInt) ))
 (NTbool Bool ((not NTbool) (and NTbool NTbool) (or NTbool NTbool) (ite NTbool NTbool NTbool) (= NTInt NTInt) (< NTInt NTInt) (> NTInt NTInt) ))
 )
 )
-
-(define-fun and3 ((b1 Bool)(b2 Bool)(b3 Bool)) Bool
- (and (and b1 b2) b3))
 
 (constraint (=> (and3 (= x 26) (= y 3) (= z 42) ) (= (eq2 x y z ) 15)))
 (constraint (=> (and3 (= x 31) (= y 35) (= z 6) ) (= (eq2 x y z ) (- 76))))
