@@ -1,4 +1,5 @@
 import sys
+import re
 import sexpdata
 
 from functools import partial
@@ -9,12 +10,20 @@ from more_itertools import partition
 
 
 Arg = namedtuple('Arg', 'name, typ')
-splitter = re.compile(r'[\(\)\s+]')
+splitter = re.compile(r'([\(\)\s+])')
+spaces = re.compile(r'\s+')
+consume = lambda x: x.pop(0)
+flat_map = lambda x: [a for a in x if a is not None]
+flatflat_map = lambda x: [a for b in x for a in flat_map(b)]
+apply_n = lambda f, x, n: [f(x) for _ in range(n)]
+compose = lambda f, g: lambda x: f(g(x))
+
 
 @dataclass
 class ProductionRule:
     op  : str
     pr  : str
+    sexp: list
     _ret : str
 
     # yuck
@@ -44,21 +53,71 @@ class ProductionRule:
             case 'Ty::Int' : r = "Value::Int"
             case 'Ty::Bool': r = "Value::Int"
 
-        print(varis)
-        ars = []
+        tmp = self.sexp
+        global count
         count = 0
-        for tok in splitter.split(self.pr):
-            for x in chain(varis, nts):
-                if tok == x.name:
-                    match x.typ:
-                        case 'Ty::Int': ars.append(f'to_int(ev({count})?)')
-                        case 'Ty::Bool': ars.append(f'to_bool(ev({count})?)')
-                    count += 1
+        tmp = replace(tmp, nts, varis)
+        return f"{r}{get_rust_eval(tmp)}"
 
-        # TODO: Need to find a way to translate the operators to rust, will use some dictionary/regex it'll be ugly but whatever
+count = 0
 
-        return f"{r}({' '.join(ars)})"
+def replace(tmp, nts, varis):
+    global count
+    for i, t in enumerate(tmp):
+        match t:
+            case [*ts]: tmp[i] = replace(ts, nts, varis)
+            case _ :
+                for x in chain(varis, nts):
+                    if t.strip() == x.name:
+                        rep = f"to_int(ev({count})?)" if x.typ == "Ty::Int" else f"to_bool(ev({count})?)"
+                        tmp[i] = rep
+                        count += 1
+                        break
+                else:
+                     tmp[i]  = t.value()
+    return tmp
 
+rust_diad = lambda o, x, y:  f"({x} {o} {y})"
+rust_mon = lambda o, x:  f"({o} {x})"
+rust_imply = lambda x, y: f"(!{x} || {y})"
+rust_ite = lambda c, x, y: f"(if {c} {{ {x} }} else {{ {y} }} )"
+rust_div = lambda n, x, y: f"({{let b = ev(1)?; if b== Value::Int(0) {{ return None }} else {{ {x} {n} to_int(b) }} }})"
+
+rust_boolean = {
+    'not'     : '!',
+    'and'     : '&&',
+    'or'      : '||',
+    'xor'     : '!=',
+    '='       : '==',
+    'distinct': '!=',
+}
+
+rust_div_mod = {
+    'div': '\\',
+    'div': r'%',
+}
+
+def get_rust_eval(s):
+    if not isinstance(s, list):
+        return s
+    match (n := consume(s)):
+        case [term]: return get_rust_eval(term)
+        case '-' if len(s) == 1:
+                return rust_mon(n, *apply_n(compose(get_rust_eval, consume), s, 1))
+        case '+' | '-' | '*' | '<=' | '<' | '>' | '>=':
+            return rust_diad(n, *apply_n(compose(get_rust_eval, consume), s, 2))
+        case 'not':
+            return rust_mon(rust_boolean[n], *apply_n(compose(get_rust_eval, consume), s, 1))
+        case 'and' | 'or' | 'xor' | '=':
+            return rust_diad(rust_boolean[n], *apply_n(compose(get_rust_eval, consume), s, 2))
+        case 'div' | 'mod':
+            return rust_div(rust_div_mod[n], *apply_n(compose(get_rust_eval, consume), s, 2))
+        case '=>':
+            return rust_imply(n, *apply_n(compose(get_rust_eval, consume), s, 2))
+        case 'ite':
+            return rust_ite( *apply_n(compose(get_rust_eval, consume), s, 3))
+        case _:
+            return n
 
 @dataclass
 class SynthFun:
@@ -90,10 +149,6 @@ def op_map(op, na):
         case ('>', _):   return 'Gt'
         case _: return op.capitalize()
 
-consume = lambda x: x.pop(0)
-flat_map = lambda x: [a for a in x if a is not None]
-flatflat_map = lambda x: [a for b in x for a in flat_map(b)]
-
 def unpack_arg(x):
     n, t = x
     return Arg(n.value(), f'Ty::{t.value()}')
@@ -120,7 +175,7 @@ def get_prodrule(s, nt):
     if not isinstance(s, list):
         return Arg(s.value() if isinstance(s, sexpdata.Symbol) else s, nt.value())
     pr = get_pr(s)
-    return ProductionRule(s[0].value(), pr, nt.value())
+    return ProductionRule(s[0].value(), pr, s, nt.value())
 
 def get_prodrules(s):
     ret = consume(s)
@@ -158,7 +213,7 @@ def parse(sexprs):
                 synthfun = parse_synth_fun(sxp[1:])
             case 'define-fun':
                 name, definefun = parse_define_fun(sxp[1:])
-                definefuns[name] = define_fun
+                definefuns[name] = definefun
     return synthfun, definefuns
 
 
@@ -183,6 +238,7 @@ def extract_grammarterm(p, define_funs, nts, varis):
     template = p.extract_template(nts)
     evl      = p.extract_eval(nts, varis, template)
 
+    print(evl)
     return GrammarTerm(name, args, ret, op, template, evl)
 
 def get_grammarterm(f=None):
@@ -195,7 +251,6 @@ def get_grammarterm(f=None):
 
     for pr in synthfun.prodrules:
         term = extract_grammarterm(pr, definefuns, synthfun.nonterms, synthfun.args)
-        print(term)
         terms.append(term)
 
 get_grammarterm()
