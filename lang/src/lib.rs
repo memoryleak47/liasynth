@@ -56,6 +56,7 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
     let parse_cases = parse_cases(&edef);
     let parse_prod_cases = parse_prod_cases(&edef);
     let ident_cases = ident_cases(&edef);
+    let template_cases = template_cases(&edef);
 
     let out: TokenStream1 = quote! {
         #[derive(PartialEq, Eq, Hash, Clone, Debug, PartialOrd, Ord)]
@@ -88,6 +89,18 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
                     Node::VarInt(v) => &(&[], Ty::Int),
                     Node::VarBool(v) => &(&[], Ty::Bool),
                     #(#signature_cases),*
+                }
+            }
+
+            pub fn template(&self) -> Option<&'static str> {
+                match self {
+                    Node::PlaceHolder(_)
+                    | Node::ConstInt(_)
+                    | Node::True
+                    | Node::False
+                    | Node::VarInt(_)
+                    | Node::VarBool(_) => None,
+                    #(#template_cases),*
                 }
             }
 
@@ -207,6 +220,19 @@ fn signature_cases(edef: &EnumDef) -> Vec<TokenStream2> {
     cases
 }
 
+fn template_cases(edef: &EnumDef) -> Vec<TokenStream2> {
+    let mut cases = Vec::new();
+    for c in edef.cases.iter() {
+        let ident    = &c.ident;
+        let template = &c.template;
+        cases.push(quote! {
+            Node::#ident(_) => Some(#template)
+        });
+    }
+    cases
+}
+
+
 fn get_children_cases(edef: &EnumDef) -> Vec<TokenStream2> {
     edef.cases.iter().map(|c| {
         let ident = &c.ident;
@@ -259,15 +285,15 @@ fn extract_cases(edef: &EnumDef) -> Vec<TokenStream2> {
                         }
                         Child::Constant(c) => {
                             out.push(Node::ConstInt(c.clone()));
-                            *ch = Child::Hole(out.len() - 1);
+                            *ch = Child::Constant(c.clone());
                         }
                         Child::VarInt(v) => {
                             out.push(Node::VarInt(*v));
-                            *ch = Child::Hole(out.len() - 1);
+                            *ch = Child::VarInt(v.clone());
                         }
                         Child::VarBool(v) => {
                             out.push(Node::VarBool(*v));
-                            *ch = Child::Hole(out.len() - 1);
+                            *ch = Child::VarBool(v.clone());
                         }
                     }
                 }

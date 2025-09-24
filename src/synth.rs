@@ -130,6 +130,7 @@ fn grow(x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
 
             for a in it.multi_cartesian_product() {
                 rule.children_mut().iter_mut().enumerate()
+                    .filter(|(_, c)| matches!(c, Child::Hole(_)))
                     .filter(|(i2, _)| *i2 != i)
                     .map(|(_, x)| x)
                     .zip(a.iter()).for_each(|(ptr, v)| { *ptr = Child::Hole(*v); });

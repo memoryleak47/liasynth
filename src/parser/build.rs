@@ -121,6 +121,8 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<Strin
             let s = format!("({})", l.iter().map(|x| make_string(x, nonterminals)).join(" "));
             let rst = l.iter().flat_map(|x| get_rst(x, nonterminals, args)).collect::<Vec<_>>();
 
+            println!("{:?}", s);
+            println!("{:?}", rst);
             if valid_prod(&s, &rst, args).is_some() {
                 return GrammarTerm::Op(s, rst);
             }
@@ -130,6 +132,7 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<Strin
     }
 }
 
+// BUG: Does not work with define-fun, why?
 fn as_expr(s: &SExpr, defined_funs: &IndexMap<String, DefinedFun>, synth_funs: &IndexMap<String, SynthFun>) -> Expr {
     match s {
         SExpr::Ident(id) => {
