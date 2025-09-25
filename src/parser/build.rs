@@ -132,7 +132,6 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<Strin
     }
 }
 
-// BUG: Does not work with define-fun, why?
 fn as_expr(s: &SExpr, defined_funs: &IndexMap<String, DefinedFun>, synth_funs: &IndexMap<String, SynthFun>) -> Expr {
     match s {
         SExpr::Ident(id) => {

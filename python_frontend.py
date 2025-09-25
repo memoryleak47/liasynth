@@ -1,10 +1,11 @@
 import sys
 import re
 import sexpdata
+import copy
 
 from functools import partial
 from dataclasses import dataclass
-from collections import namedtuple
+from collections import namedtuple, defaultdict
 from itertools import chain
 from more_itertools import partition
 
@@ -17,6 +18,30 @@ flat_map = lambda x: [a for a in x if a is not None]
 flatflat_map = lambda x: [a for b in x for a in flat_map(b)]
 apply_n = lambda f, x, n: [f(x) for _ in range(n)]
 compose = lambda f, g: lambda x: f(g(x))
+
+needed_terms = {
+    '(Not, [Ty::Bool], Ty::Bool, "not", "(not ?)", Value::Bool(!to_bool(ev(0)?)))',
+    '(Implies, [Ty::Bool, Ty::Bool], Ty::Bool, "=>", "(=> ? ?)", Value::Bool(!to_bool(ev(0)?) || to_bool(ev(1)?)))',
+    '(And, [Ty::Bool, Ty::Bool], Ty::Bool, "and", "(and ? ?)", Value::Bool(to_bool(ev(0)?) && to_bool(ev(1)?)))',
+    '(Or, [Ty::Bool, Ty::Bool], Ty::Bool, "or", "(or ? ?)", Value::Bool(to_bool(ev(0)?) || to_bool(ev(1)?)))',
+    '(Xor, [Ty::Bool, Ty::Bool], Ty::Bool, "xor", "(xor ? ?)", Value::Bool(to_bool(ev(0)?) != to_bool(ev(1)?)))',
+    '(Equals, [Ty::Int, Ty::Int], Ty::Bool, "=", "(= ? ?)", Value::Bool(ev(0)? == ev(1)?))',
+    '(Distinct, [Ty::Int, Ty::Int], Ty::Bool, "distinct", "(distinct ? ?)", Value::Bool(ev(0)? != ev(1)?))',
+    '(Ite, [Ty::Bool, Ty::Int, Ty::Int], Ty::Int, "ite", "(ite ? ? ?)", (if to_bool(ev(0)?) { ev(1)? } else { ev(2)? }))',
+
+    '(Neg, [Ty::Int], Ty::Int, "-", "(- ?)", Value::Int(-to_int(ev(0)?)))',
+    '(Sub, [Ty::Int, Ty::Int], Ty::Int, "-", "(- ? ?)", Value::Int(to_int(ev(0)?) - to_int(ev(1)?)))',
+    '(Add, [Ty::Int, Ty::Int], Ty::Int, "+", "(+ ? ?)", Value::Int(to_int(ev(0)?) + to_int(ev(1)?)))',
+    '(Mul, [Ty::Int, Ty::Int], Ty::Int, "*", "(* ? ?)", Value::Int(to_int(ev(0)?) * to_int(ev(1)?)))',
+    '(Div, [Ty::Int, Ty::Int], Ty::Int, "div", "(div ? ?)", {let b = ev(1)?; if b == Value::Int(0) { return None } else { Value::Int(to_int(ev(0)?) / to_int(b)) }})',
+    '(Mod, [Ty::Int, Ty::Int], Ty::Int, "mod", "(mod ?)", { let b = ev(1)?; if b == Value::Int(0) { return None } else { Value::Int(to_int(ev(0)?) % to_int(b)) }})',
+    '(Abs, [Ty::Int], Ty::Int, "abs", "(abs ?)", Value::Int(to_int(ev(0)?).abs()))',
+
+    '(Lte, [Ty::Int, Ty::Int], Ty::Bool, "<=", "(<= ? ?)", Value::Bool(to_int(ev(0)?) <= to_int(ev(1)?)))',
+    '(Lt, [Ty::Int, Ty::Int], Ty::Bool, "<", "(< ? ?)", Value::Bool(to_int(ev(0)?) < to_int(ev(1)?)))',
+    '(Gte, [Ty::Int, Ty::Int], Ty::Bool, ">=", "(>= ? ?)", Value::Bool(to_int(ev(0)?) >= to_int(ev(1)?)))',
+    '(Gt, [Ty::Int, Ty::Int], Ty::Bool, ">", "(> ? ?)", Value::Bool(to_int(ev(0)?) > to_int(ev(1)?)))',
+}
 
 
 @dataclass
@@ -31,50 +56,87 @@ class ProductionRule:
         for n in nts:
             if self._ret == n.name:
                 self.ret =  n.typ
-                return
+            match self._ret:
+                case 'Int': self.ret = "Ty::Int"
+                case 'Bool': self.ret = "Ty::Bool"
 
     # rough
-    def extract_args(self, nts, varis):
+    def extract_args(self, nts):
         args = []
+        self.a_idx = []
+        idx = 0
+        seen = {}
         for tok in splitter.split(self.pr):
-            for n in chain(nts, varis):
-                if tok == n.name:
+            for n in nts:
+                if tok.strip() == n.name:
                     args.append(n.typ)
+                    self.a_idx.append(idx)
+                    idx += 1
+            for v in self.varis:
+                if tok.strip() == v.name:
+                    if (i := seen.get(v.name)) is not None:
+                        self.a_idx.append(i)
+                    else:
+                        self.a_idx.append(idx)
+                        seen[v.name] = idx
+                        idx += 1
         return args
 
     def extract_template(self, nts):
         tmp = self.pr
         for n in sorted(nts, key=lambda x: len(x.name), reverse=True):  # how ugly but needed
             tmp = tmp.replace(n.name, '?')
+
         return tmp
 
-    def extract_eval(self, nts, varis, template):
+    def get_a_idx(self):
+        for tok in splitter.split(self.pr):
+            for n in chain(nts, varis):
+                if tok == n.name:
+                    args.append(n.typ)
+
+    def extract_eval(self, nts, template, deffuns):
         match self.ret:
             case 'Ty::Int' : r = "Value::Int"
-            case 'Ty::Bool': r = "Value::Int"
+            case 'Ty::Bool': r = "Value::Bool"
 
         tmp = self.sexp
-        global count
-        count = 0
-        tmp = replace(tmp, nts, varis)
+        tmp = replace(tmp, nts, self.varis, deffuns, self.a_idx)
         return f"{r}{get_rust_eval(tmp)}"
 
-count = 0
 
-def replace(tmp, nts, varis):
-    global count
-    for i, t in enumerate(tmp):
+def replace(tmp, nts, varis, deffuns, a_idx):
+    idxs = iter(range(len(tmp)))
+    for i in idxs:
+        t = tmp[i]
         match t:
-            case [*ts]: tmp[i] = replace(ts, nts, varis)
-            case _ :
+            case [*ts]:
+                tmp[i] = replace(ts, nts, varis, deffuns, a_idx)
+
+            case _ if (d := deffuns.get(t.strip())) is not None:
+                d = copy.deepcopy(d)
+                pr = d.body
+                pr.varis = d.args
+                d_aidx = apply_n(consume, a_idx, len(d.args))
+                pr.extract_args(nts)
+                a_idx = [d_aidx[j] for j in pr.a_idx]
+                t = replace(pr.sexp, nts, pr.varis, deffuns, a_idx)
+                tmp[i] = get_rust_eval(t)
+
+                for _ in range(len(d.args)):
+                    next(idxs, None)
+
+            case _:
                 for x in chain(varis, nts):
                     if t.strip() == x.name:
-                        rep = f"to_int(ev({count})?)" if x.typ == "Ty::Int" else f"to_bool(ev({count})?)"
+                        idx = consume(a_idx)
+                        rep = f"to_int(ev({idx})?)" if x.typ == "Ty::Int" else f"to_bool(ev({idx})?)"
                         tmp[i] = rep
-                        count += 1
                         break
                 else:
-                     tmp[i]  = t.value()
+                    match t:
+                        case sexpdata.Symbol(t): tmp[i] = t.value()
+                        case _: tmp[i] = t
     return tmp
 
 rust_diad = lambda o, x, y:  f"({x} {o} {y})"
@@ -93,7 +155,7 @@ rust_boolean = {
 }
 
 rust_div_mod = {
-    'div': '\\',
+    'div': r'/',
     'div': r'%',
 }
 
@@ -119,6 +181,7 @@ def get_rust_eval(s):
         case _:
             return n
 
+
 @dataclass
 class SynthFun:
     name        : str
@@ -131,7 +194,7 @@ class SynthFun:
 @dataclass
 class DefineFun:
     name        : str
-    args        : Arg
+    args        : list[Arg]
     ret         : str
     body        : ProductionRule
 
@@ -197,7 +260,7 @@ def parse_synth_fun(s):
 
     return SynthFun(name, args, ret, nonterms, list(terminals), list(prodrules))
 
-def parse_define_fun(s):
+def parse_define_fun(s, defnum):
     name = consume(s).value()
     args = get_args(consume(s))
     ret = consume(s)
@@ -207,12 +270,13 @@ def parse_define_fun(s):
 
 def parse(sexprs):
     definefuns = {}
+    defnum = 0
     for sxp in sexprs:
         match sxp[0].value():
             case 'synth-fun':
                 synthfun = parse_synth_fun(sxp[1:])
             case 'define-fun':
-                name, definefun = parse_define_fun(sxp[1:])
+                name, definefun = parse_define_fun(sxp[1:], defnum)
                 definefuns[name] = definefun
     return synthfun, definefuns
 
@@ -223,34 +287,60 @@ class GrammarTerm:
     args: list[str]
     ret: str
     op: str
-    tempalte: str
+    template: str
     evl: str
 
     def generate(self):
-        return f"{self.name}, [{', '.join(self.args)}], {self.ret}, {self.op}, {self.template}, {self.evl}"
+        return f'({self.name}, [{', '.join(self.args)}], {self.ret}, "{self.op}", "{self.template}", {self.evl})'
 
-def extract_grammarterm(p, define_funs, nts, varis):
+def extract_grammarterm(p, definefuns, nts, deffs={}):
     p.extract_ret(nts)  # vile
-    args     = p.extract_args(nts, varis)
+    args     = p.extract_args(nts)
     name     = op_map(p.op, len(args))
     ret      = p.ret
     op       = p.op
     template = p.extract_template(nts)
-    evl      = p.extract_eval(nts, varis, template)
+    evl      = p.extract_eval(nts, template, deffs)
 
-    print(evl)
     return GrammarTerm(name, args, ret, op, template, evl)
 
-def get_grammarterm(f=None):
-    terms = []
-    file = f if f else 'examples/max2_test.sl'
+def get_grammarterm(file=None):
     with open(file, 'r') as f:
         sexprs = sexpdata.loads(f"({f.read()})")
 
     synthfun, definefuns =  parse(sexprs)
+    defnum = 0
 
+    names = defaultdict(int)
     for pr in synthfun.prodrules:
-        term = extract_grammarterm(pr, definefuns, synthfun.nonterms, synthfun.args)
-        terms.append(term)
+        pr.varis = synthfun.args
+        term = extract_grammarterm(pr, definefuns, synthfun.nonterms, definefuns)
+        if (g := term.generate()) not in needed_terms:
+            if term.name.lower() in definefuns.keys():
+                term.name = 'Defun'+str(defnum)
+                defnum+=1
+            names[term.name] += 1
+            term.name += str(names[term.name])
+            needed_terms.add(term.generate())
 
-get_grammarterm()
+def langfile(f):
+    get_grammarterm(f)
+    sterms = ',\n\t\t'.join(needed_terms)
+
+    with open('src/langdef.rs', 'w') as f:
+        f.write(f"""use crate::*;
+use lang::define_language;
+
+define_language! {{
+    [
+        {sterms}
+    ]
+}}
+        """)
+
+
+if len(sys.argv) < 2:
+    f = 'examples/max2_test.sl'
+else:
+    f = sys.argv[1]
+langfile(f)
