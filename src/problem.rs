@@ -151,7 +151,7 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
     let synth_fun = synth_problem.synthfuns[0].clone();
 
     let progname = synth_problem.synthfuns.keys().next().unwrap().clone();
-    let rettype = synth_fun.ret;
+    let rettype = Ty::NonTerminal(0);
 
     let argtypes: Vec<Ty> = synth_fun.args.iter().map(|(_, x)| *x).collect();
 
@@ -219,7 +219,7 @@ impl Problem {
 
 impl Problem {
     pub fn verify(&self, term: &Term) -> Option<Sigma> {
-        let retty = term.elems.last().unwrap().ty();
+        let retty = Ty::NonTerminal(0);
         if retty != self.rettype {
             let mut ret = Vec::new();
             for (v, ty) in self.context_vars.iter() {

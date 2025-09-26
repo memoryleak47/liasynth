@@ -86,6 +86,7 @@ pub fn to_bool(v: Value) -> bool {
     }
 }
 
+// TODO: I think the error is here
 pub fn eval_term(term: &Term, sigma: &Sigma) -> Option<Value> {
     let mut vals: Vec<Value> = Vec::new();
     for n in &term.elems {

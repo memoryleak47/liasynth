@@ -348,6 +348,7 @@ fn satcount(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> usize {
         let b = local_sat(nt, i, x, ctxt);
         count += b as usize;
     }
+
     count
 }
 
@@ -360,7 +361,7 @@ fn local_sat(nt: NonTerminal, big_sigma_idx: usize, class: Id, ctxt: &Ctxt) -> b
     for idx in indices.iter() {
         huge_sigma.push(vals[*idx].clone());
     }
-
+    println!("{:?}", eval_term(&ctxt.problem.constraint, &huge_sigma));
     eval_term(&ctxt.problem.constraint, &huge_sigma).unwrap() == Value::Bool(true)
 }
 
