@@ -62,11 +62,11 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
         #[derive(PartialEq, Eq, Hash, Clone, Debug, PartialOrd, Ord)]
         pub enum Node {
             PlaceHolder(Id),
-            ConstInt(Int),
-            True,
-            False,
-            VarInt(Var),
-            VarBool(Var),
+            ConstInt(Int, Ty),
+            True(Ty),
+            False(Ty),
+            VarInt(Var, Ty),
+            VarBool(Var, Ty),
             #(#enum_cases),*
         }
 
@@ -80,14 +80,14 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
         }
 
         impl Node {
-            pub fn signature(&self) -> &'static (&'static [Ty], Ty) {
+            pub fn signature(&self) -> (&'static [Ty], Ty) {
                 match self {
-                    Node::PlaceHolder(_) => &(&[], Ty::Int),
-                    Node::ConstInt(i) => &(&[], Ty::Int),
-                    Node::True => &(&[], Ty::Bool),
-                    Node::False => &(&[], Ty::Bool),
-                    Node::VarInt(v) => &(&[], Ty::Int),
-                    Node::VarBool(v) => &(&[], Ty::Bool),
+                    Node::PlaceHolder(_)  => (&[], Ty::Int),
+                    Node::ConstInt(_, ty) => (&[], *ty),
+                    Node::True(ty)        => (&[], *ty),
+                    Node::False(ty)       => (&[], *ty),
+                    Node::VarInt(_, ty)   => (&[], *ty),
+                    Node::VarBool(_, ty)  => (&[], *ty),
                     #(#signature_cases),*
                 }
             }
@@ -95,11 +95,11 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
             pub fn template(&self) -> Option<&'static str> {
                 match self {
                     Node::PlaceHolder(_)
-                    | Node::ConstInt(_)
-                    | Node::True
-                    | Node::False
-                    | Node::VarInt(_)
-                    | Node::VarBool(_) => None,
+                    | Node::ConstInt(_, _)
+                    | Node::True(_)
+                    | Node::False(_)
+                    | Node::VarInt(_, _)
+                    | Node::VarBool(_, _) => None,
                     #(#template_cases),*
                 }
             }
@@ -107,11 +107,11 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
             pub fn children(&self) -> &[Child] {
                 match self {
                     Node::PlaceHolder(_)
-                    | Node::ConstInt(_)
-                    | Node::True
-                    | Node::False
-                    | Node::VarInt(_)
-                    | Node::VarBool(_) => &[] as &[Child],
+                    | Node::ConstInt(_, _)
+                    | Node::True(_)
+                    | Node::False(_)
+                    | Node::VarInt(_, _)
+                    | Node::VarBool(_, _) => &[] as &[Child],
                     #(#get_children_cases),*
                 }
             }
@@ -119,29 +119,29 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
             pub fn children_mut(&mut self) -> &mut [Child] {
                 match self {
                     Node::PlaceHolder(_)
-                    | Node::ConstInt(_)
-                    | Node::True
-                    | Node::False
-                    | Node::VarInt(_)
-                    | Node::VarBool(_) => &mut [] as &mut [Child],
+                    | Node::ConstInt(_, _)
+                    | Node::True(_)
+                    | Node::False(_)
+                    | Node::VarInt(_, _)
+                    | Node::VarBool(_, _) => &mut [] as &mut [Child],
                     #(#get_children_mut_cases),*
                 }
             }
 
-            pub fn eval(&self, ch: impl Fn(Id) -> Option<Value>, sigma: &Sigma) -> Option<Value> {
+            pub fn eval(&self, ch: impl Fn(usize, Id) -> Option<Value>, sigma: &Sigma) -> Option<Value> {
                 Some(match self {
                     Node::PlaceHolder(_) => Value::Int(0),
-                    Node::ConstInt(i) => Value::Int(*i),
-                    Node::True => Value::Bool(true),
-                    Node::False => Value::Bool(false),
-                    Node::VarInt(v) | Node::VarBool(v) => sigma.get(*v).unwrap_or_else(|| panic!("Failed {sigma:?} index with {v}")).clone(),
+                    Node::ConstInt(i, _) => Value::Int(*i),
+                    Node::True(_) => Value::Bool(true),
+                    Node::False(_) => Value::Bool(false),
+                    Node::VarInt(v, _) | Node::VarBool(v, _) => sigma.get(*v).unwrap_or_else(|| panic!("Failed {sigma:?} index with {v}")).clone(),
                     #(#eval_cases),*
                 })
             }
 
-            pub fn extract(&self, ex: &impl Fn(Id) -> Node, out: &mut Vec<Node>) {
+            pub fn extract(&self,  ex: &impl Fn(usize, Id) -> Node, out: &mut Vec<Node>) {
                 match self {
-                    a@(Node::PlaceHolder(_) | Node::ConstInt(_) | Node::True | Node::False | Node::VarInt(_) | Node::VarBool(_)) => out.push(a.clone()),
+                    a@(Node::PlaceHolder(_) | Node::ConstInt(_, _) | Node::True(_) | Node::False(_) | Node::VarInt(_, _) | Node::VarBool(_, _)) => out.push(a.clone()),
                     #(#extract_cases),*
                 }
             }
@@ -167,11 +167,11 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
             pub fn ident(&self) -> &'static str {
                 match self {
                     Node::PlaceHolder(_) => "PlaceHolder",
-                    Node::ConstInt(_) => "ConstInt",
-                    Node::True => "True",
-                    Node::False => "False",
-                    Node::VarInt(_) => "VarInt",
-                    Node::VarBool(_) => "VarBool",
+                    Node::ConstInt(_, _) => "ConstInt",
+                    Node::True(_) => "True",
+                    Node::False(_) => "False",
+                    Node::VarInt(_, _)  => "VarInt",
+                    Node::VarBool(_, _) => "VarBool",
                     #(#ident_cases),*
                 }
             }
@@ -203,19 +203,18 @@ fn enum_cases(edef: &EnumDef) -> Vec<TokenStream2> {
 }
 
 fn signature_cases(edef: &EnumDef) -> Vec<TokenStream2> {
-    let mut cases: Vec<TokenStream2> = Vec::new();
+    let mut cases = Vec::new();
     for c in edef.cases.iter() {
-        let ident = &c.ident;
-        let retty = &c.retty;
+        let ident  = &c.ident;
+        let retty  = &c.retty;
         let argtys = &c.argtys;
-        let args = quote! {
-            &[#(#argtys),*]
-        };
 
-        let v = quote! {
-            Node::#ident(_) => &(#args, #retty)
-        };
-        cases.push(v);
+        // rvalue promotion gives this a 'static lifetime
+        let args = quote! { &[#(#argtys),*] };
+
+        cases.push(quote! {
+            Node::#ident(_) => (#args, #retty)
+        });
     }
     cases
 }
@@ -254,12 +253,14 @@ fn eval_cases(edef: &EnumDef) -> Vec<TokenStream2> {
         let compute = &c.compute;
         cases.push(quote! {
             Node::#ident(s) => {
+                let (argtys, _) = self.signature();
                 let ev = |x: usize| -> Option<Value> {
-                    match s[x] {
-                        Child::Hole(i)   => ch(i),
-                        Child::Constant(c) => Some(Value::Int(c)),
-                        Child::VarInt(v) => Some(sigma.get(v).cloned().unwrap_or_else(|| panic!("sigma miss {v}"))),
-                        Child::VarBool(v)=> Some(sigma.get(v).cloned().unwrap_or_else(|| panic!("sigma miss {v}"))),
+                    match (&argtys[x], &s[x]) {
+                        (&Ty::NonTerminal(j), &Child::Hole(i)) => ch(j, i),
+                        (_,                   &Child::Hole(i)) => None,
+                        (_,                   &Child::Constant(c)) => Some(Value::Int(c)),
+                        (_,                   &Child::VarInt(v))   => Some(sigma.get(v).cloned().unwrap_or_else(|| panic!("sigma miss {v}"))),
+                        (_,                   &Child::VarBool(v))  => Some(sigma.get(v).cloned().unwrap_or_else(|| panic!("sigma miss {v}"))),
                     }
                 };
                 #compute
@@ -276,27 +277,28 @@ fn extract_cases(edef: &EnumDef) -> Vec<TokenStream2> {
         cases.push(quote! {
             Node::#ident(_) => {
                 let mut a = self.clone();
-
-                for ch in a.children_mut() {
-                    match ch {
-                        Child::Hole(i) => {
-                            ex(*i).extract(ex, out);
-                            *ch = Child::Hole(out.len() - 1);
-                        }
-                        Child::Constant(c) => {
-                            out.push(Node::ConstInt(c.clone()));
-                            *ch = Child::Constant(c.clone());
-                        }
-                        Child::VarInt(v) => {
-                            out.push(Node::VarInt(*v));
-                            *ch = Child::VarInt(v.clone());
-                        }
-                        Child::VarBool(v) => {
-                            out.push(Node::VarBool(*v));
-                            *ch = Child::VarBool(v.clone());
+                let (argtys, _) = a.signature();
+                {
+                    let chs = a.children_mut();
+                    for i in 0..chs.len() {
+                        match (&argtys[i], &mut chs[i]) {
+                            (&Ty::NonTerminal(j), &mut Child::Hole(ref mut idx)) => {
+                                ex(j, *idx).extract(ex, out);
+                                *idx = out.len() - 1; 
+                            }
+                            (_,  &mut Child::Hole(ref mut idx)) => {}
+                            (&ty, &mut Child::Constant(c)) => {
+                                out.push(Node::ConstInt(c, ty));
+                            }
+                            (&ty, &mut Child::VarInt(v)) => {
+                                out.push(Node::VarInt(v, ty));
+                            }
+                            (&ty, &mut Child::VarBool(v)) => {
+                                out.push(Node::VarBool(v, ty));
+                            }
                         }
                     }
-                }
+                } // <- mutable borrow of `a` ends here
 
                 out.push(a);
             }
@@ -315,9 +317,9 @@ fn parse_cases(edef: &EnumDef) -> Vec<TokenStream2> {
             (#symb, s) if s.len() == #n => {
                 let refs: ::std::vec::Vec<Child> = s.iter().map(|node| match node {
                     Node::PlaceHolder(i) => Child::Hole(*i),
-                    Node::ConstInt(c)      => Child::Constant(*c),
-                    Node::VarInt(v)      => Child::VarInt(*v),
-                    Node::VarBool(v)     => Child::VarBool(*v),
+                    Node::ConstInt(c, _)      => Child::Constant(*c),
+                    Node::VarInt(v, _)      => Child::VarInt(*v),
+                    Node::VarBool(v, _)     => Child::VarBool(*v),
                     _ => panic!("Expected PlaceHolder or Var*, got {:?}", node),
                 }).collect();
                 let refs: [Child; #n] = refs.try_into().unwrap();
@@ -338,9 +340,9 @@ fn parse_prod_cases(edef: &EnumDef) -> Vec<TokenStream2> {
             (#template, s) if s.len() == #n && #template == op => {
                 let refs: ::std::vec::Vec<Child> = s.iter().map(|node| match node {
                     Node::PlaceHolder(i) => Child::Hole(*i),
-                    Node::ConstInt(c)    => Child::Constant(*c),
-                    Node::VarInt(v)      => Child::VarInt(*v),
-                    Node::VarBool(v)     => Child::VarBool(*v),
+                    Node::ConstInt(c, _)    => Child::Constant(*c),
+                    Node::VarInt(v, _)      => Child::VarInt(*v),
+                    Node::VarBool(v, _)     => Child::VarBool(*v),
                     _ => panic!("Expected PlaceHolder or Var*, got {:?}", node),
                 }).collect();
                 let refs: [Child; #n] = refs.try_into().unwrap();

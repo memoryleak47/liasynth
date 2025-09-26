@@ -51,6 +51,7 @@ impl Display for Ty {
         match self {
             Ty::Int => write!(f, "Int"),
             Ty::Bool => write!(f, "Bool"),
+            Ty::NonTerminal(i) => write!(f, "NonTerminal {}", i),
         }
     }
 }

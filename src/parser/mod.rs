@@ -38,11 +38,11 @@ pub type SynthArg = String;
 // This grammar is built from the things we've observed in the sygus benchmark.
 #[derive(Debug, Clone)]
 pub enum GrammarTerm {
-    NonTerminal(NonTerminal),
+    NonTerminal(NonTerminal, Ty),
     Op(Op, Vec<GrammarTerm>),
-    ConstInt(Int), // also covers negative numbers, like this: (- 3)
-    ConstBool(bool),
-    SynthArg(SynthArg),
+    ConstInt(Int, Ty), // also covers negative numbers, like this: (- 3)
+    ConstBool(bool, Ty),
+    SynthArg(SynthArg, Ty),
     DefinedFunCall(String, String, Vec<GrammarTerm>), // GrammarTerm might be NonTerminal or SynthArg.
 }
 

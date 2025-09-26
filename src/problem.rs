@@ -21,7 +21,7 @@ pub struct Problem {
     pub constraint_str: String,
 
     // The ids of these Nodes will be nulled away.
-    pub prod_rules: Box<[Node]>,
+    pub prod_rules: Box<[(usize, Node)]>,
 
     pub context: String,
     pub context_vars: IndexMap<String, Ty>,
@@ -86,13 +86,14 @@ fn expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, t: &m
             let i = vars.iter().position(|x| *x.0 == *v).unwrap();
             let (_, ty) = vars.get_index(i).unwrap();
             match ty {
-                Ty::Int => t.push(Node::VarInt(i)),
-                Ty::Bool => t.push(Node::VarBool(i)),
+                Ty::Int => t.push(Node::VarInt(i, Ty::Int)),
+                Ty::Bool => t.push(Node::VarBool(i, Ty::Bool)),
+                Ty::NonTerminal(_) => panic!("should not happen")
             }
         },
-        Expr::ConstBool(true) => { t.push(Node::True) },
-        Expr::ConstBool(false) => { t.push(Node::False) },
-        Expr::ConstInt(i) => { t.push(Node::ConstInt(i)) },
+        Expr::ConstBool(true) => { t.push(Node::True(Ty::Bool)) },
+        Expr::ConstBool(false) => { t.push(Node::False(Ty::Bool)) },
+        Expr::ConstInt(i) => { t.push(Node::ConstInt(i, Ty::Int)) },
         Expr::Op(op, exprs) => {
             let exprs: Box<[Node]> = exprs.into_iter().map(|x| Node::PlaceHolder(expr_to_term_impl(x, vars, progname, t, instvars))).collect();
             let n = Node::parse(&*op, &*exprs).unwrap();
@@ -101,7 +102,7 @@ fn expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, t: &m
         Expr::SynthFunCall(_name, exprs) => {
             let exprs: Box<[Id]> = exprs.into_iter().map(|x| expr_to_term_impl(x, vars, progname, t, instvars)).collect();
             instvars.push(exprs.iter().cloned().collect());
-            t.push(Node::VarInt(vars.len() + instvars.len() - 1))
+            t.push(Node::VarInt(vars.len() + instvars.len() - 1, Ty::Int))
         },
         Expr::DefinedFunCall(..) => unreachable!("DefinedFunCalls should already be resolved!"),
         Expr::Let(..) => unreachable!("Lets should already be resolved!"),
@@ -116,13 +117,12 @@ pub fn mk_sygus_problem(f: &str) -> Problem {
 
 fn parse_grammar_term(rule: &GrammarTerm, vars: &IndexMap<String, Ty>) -> Option<Node> {
     match rule {
-        GrammarTerm::NonTerminal(_) => {
+        GrammarTerm::NonTerminal(_, _) => {
             // we'll iterate over the referenced non-terminal anyways.
             // Thus, no need to do it now again.
             Some(Node::PlaceHolder(0))
         },
         GrammarTerm::Op(op, nts) => {
-            println!("op: {:?}", op);
             let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(n, vars)).collect();
             Some(Node::parse_prod(&*op, &*args).expect("Could not parse prod rule"))
         },
@@ -131,15 +131,16 @@ fn parse_grammar_term(rule: &GrammarTerm, vars: &IndexMap<String, Ty>) -> Option
             Some(Node::parse_prod(&*template, &*args).expect("Could not parse prod rule"))
         },
 
-        GrammarTerm::ConstInt(i) => Some(Node::ConstInt(*i)),
-        GrammarTerm::ConstBool(true) => Some(Node::True),
-        GrammarTerm::ConstBool(false) => Some(Node::False),
-        GrammarTerm::SynthArg(v) => {
+        GrammarTerm::ConstInt(i, ty) => Some(Node::ConstInt(*i, *ty)),
+        GrammarTerm::ConstBool(true, ty) => Some(Node::True(*ty)),
+        GrammarTerm::ConstBool(false, ty) => Some(Node::False(*ty)),
+        GrammarTerm::SynthArg(v, tty) => {
             let i = vars.get_index_of(&*v).unwrap();
             let ty = vars[v];
             match ty {
-                Ty::Int => Some(Node::VarInt(i)),
-                Ty::Bool => Some(Node::VarBool(i)),
+                Ty::Int => Some(Node::VarInt(i, *tty)),
+                Ty::Bool => Some(Node::VarBool(i, *tty)),
+                _ => panic!("should never happen"),
             }
         },
     }
@@ -166,10 +167,10 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
     let constraint_str = constraint.to_string();
 
     let mut prod_rules = Vec::new();
-    for (_, ntdef) in synth_fun.nonterminal_defs.iter() {
+    for (n, (_, ntdef)) in synth_fun.nonterminal_defs.iter().enumerate() {
         for rule in ntdef.prod_rules.iter() {
             if let Some(node) = parse_grammar_term(rule, &vars) {
-                prod_rules.push(node);
+                prod_rules.push((n, node));
             };
         }
     }
@@ -213,7 +214,7 @@ fn show_val(v: &Value) -> String {
 }
 
 impl Problem {
-    pub fn prod_rules(&self) -> &[Node] { &self.prod_rules }
+    pub fn prod_rules(&self) -> &[(usize, Node)] { &self.prod_rules }
 }
 
 impl Problem {
@@ -225,6 +226,7 @@ impl Problem {
                 match ty {
                     Ty::Int => ret.push(Value::Int(0)),
                     Ty::Bool => ret.push(Value::Bool(true)),
+                    _ => panic!("should not happen"),
                 }
             }
             return Some(ret);

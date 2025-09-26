@@ -51,14 +51,15 @@ fn valid_prod(prod: &str, a: &Vec<GrammarTerm>, args: &IndexMap<String, Ty>) -> 
         .iter()
         .map(|n|
             match n {
-                GrammarTerm::NonTerminal(_) => {
+                GrammarTerm::NonTerminal(_, _) => {
                     Node::PlaceHolder(0)
                 },
-                GrammarTerm::SynthArg(v) => {
+                GrammarTerm::SynthArg(v, ty) => {
                     if let Some(idx) =  args.get_index_of(v) {
                         match &args[idx] {
-                            Ty::Int => Node::VarInt(idx),
-                            Ty::Bool => Node::VarBool(idx),
+                            Ty::Int => Node::VarInt(idx, *ty),
+                            Ty::Bool => Node::VarBool(idx, *ty),
+                            _ => panic!("should not happen")
                         }
                     } else {
                         panic!("that shouldnt happen")
@@ -81,22 +82,27 @@ fn make_string(l: &SExpr, nonterms: &IndexMap<String, Ty>) -> String {
 fn get_rst(l: &SExpr, nonterms: &IndexMap<String, Ty>, args: &IndexMap<String, Ty>) -> Vec<GrammarTerm> {
     match l {
         SExpr::Ident(s) => {
-            if nonterms.contains_key(s) { return vec![GrammarTerm::NonTerminal(s.clone())] ; }
-            else if args.contains_key(s) { return vec![GrammarTerm::SynthArg(s.clone())]; }
+            if nonterms.contains_key(s) {
+                let nt = nonterms.get(s).unwrap();
+                return vec![GrammarTerm::NonTerminal(s.clone(), *nt)] ; }
+            else if args.contains_key(s) {
+                let nt = args.get(s).unwrap();
+                return vec![GrammarTerm::SynthArg(s.clone(), *nt)];
+            }
             else { vec![] }
         }
         SExpr::List(xs) => xs.iter().flat_map(|x| get_rst(x, nonterms, args)).collect::<Vec<GrammarTerm>>()
     }
 }
 
-fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<String, Ty>, defs: &IndexMap<String, DefinedFun>) -> GrammarTerm {
+fn as_rule(nt: usize, s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<String, Ty>, defs: &IndexMap<String, DefinedFun>) -> GrammarTerm {
     match s {
         SExpr::Ident(id) => {
-            if nonterminals.contains_key(id) { return GrammarTerm::NonTerminal(id.clone()); }
-            if let Ok(i) = id.parse::<Int>() { return GrammarTerm::ConstInt(i); }
-            if id == "true" { return GrammarTerm::ConstBool(true); }
-            if id == "false" { return GrammarTerm::ConstBool(false); }
-            if args.contains_key(id) { return GrammarTerm::SynthArg(id.clone()); }
+            if nonterminals.contains_key(id) {return GrammarTerm::NonTerminal(id.clone(), Ty::NonTerminal(nt)); }
+            if let Ok(i) = id.parse::<Int>() { return GrammarTerm::ConstInt(i, Ty::NonTerminal(nt)); }
+            if id == "true" { return GrammarTerm::ConstBool(true, Ty::NonTerminal(nt)); }
+            if id == "false" { return GrammarTerm::ConstBool(false, Ty::NonTerminal(nt)); }
+            if args.contains_key(id) { return GrammarTerm::SynthArg(id.clone(), Ty::NonTerminal(nt)); }
 
             panic!("unknown ident: {id}")
         },
@@ -107,7 +113,7 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<Strin
             // special case for negative number constants:
             if let [SExpr::Ident(a)] = rst && op == "-" {
                 if let Ok(i) = a.parse::<Int>() {
-                    return GrammarTerm::ConstInt(-i);
+                    return GrammarTerm::ConstInt(-i, Ty::NonTerminal(nt));
                 }
             }
 
@@ -115,7 +121,7 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<Strin
 
             if defs.contains_key(op) {
                 let rst = rst.iter().map(|x| {
-                    as_rule(x, nonterminals, args, defs)
+                    as_rule(nt, x, nonterminals, args, defs)
                 }).collect();
                 return GrammarTerm::DefinedFunCall(op.clone(), s, rst);
             }
@@ -187,10 +193,10 @@ fn handle_synth_fun(l: &[SExpr], synth: &mut SynthProblem) {
     }
 
     let mut nonterminal_defs = IndexMap::new();
-    for a in nonterminal_defs_ {
+    for (nt, a) in nonterminal_defs_.iter().enumerate() {
         let SExpr::List(v) = a else { panic!() };
         let [SExpr::Ident(name), SExpr::Ident(ty), SExpr::List(rules)] = &v[..] else { panic!() };
-        let prod_rules = rules.iter().map(|x| as_rule(x, &nonterminals, &args, &synth.defined_funs)).collect();
+        let prod_rules = rules.iter().map(|x| as_rule(nt, x, &nonterminals, &args, &synth.defined_funs)).collect();
         nonterminal_defs.insert(name.clone(), NonterminalDef {
             ty: as_ty(ty),
             prod_rules,

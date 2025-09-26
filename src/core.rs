@@ -20,14 +20,16 @@ impl Value {
 pub type Var = usize;
 pub type Id = usize;
 
-#[derive(Clone, Copy, PartialEq, Eq, Debug, Hash)]
-pub enum Ty { Int, Bool }
+
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Hash, PartialOrd, Ord)]
+pub enum Ty { Int, Bool, NonTerminal(usize) }
 
 impl Ty {
     pub fn to_string(&self) -> &'static str {
         match self {
             Ty::Int => "Int",
             Ty::Bool => "Bool",
+            Ty::NonTerminal(s) => "",
         }
     }
 }
@@ -35,7 +37,7 @@ impl Ty {
 impl Node {
     pub fn ty(&self) -> Ty {
         let (args, ret) = self.signature();
-        *ret
+        ret
     }
 }
 
@@ -87,14 +89,14 @@ pub fn to_bool(v: Value) -> bool {
 pub fn eval_term(term: &Term, sigma: &Sigma) -> Option<Value> {
     let mut vals: Vec<Value> = Vec::new();
     for n in &term.elems {
-        let f = |i: usize| Some(vals[i].clone());
+        let f = |_: usize, i: usize| Some(vals[i].clone());
         vals.push(n.eval(&f, sigma)?);
     }
     Some(vals.last().unwrap().clone())
 }
 
 pub fn eval_term_partial(i: Id, term: &[Node], sigma: &Sigma) -> Option<Value> {
-    let f = |id: Id| eval_term_partial(id, term, sigma);
+    let f = |_: usize, id: Id| eval_term_partial(id, term, sigma);
     term[i].eval(&f, sigma)
 }
 
@@ -127,6 +129,7 @@ fn init_sigmas(problem: &Problem) -> Vec<Sigma> {
             match (i == i2, ty) {
                 (b, Ty::Bool) => Value::Bool(b),
                 (b, Ty::Int) => Value::Int(b as i64),
+                _ => panic!("Should not happen")
             }
         }).collect();
         sigmas.push(sigma);

@@ -10,8 +10,8 @@ fn term_to_z3_impl(i: usize, t: &Term, vars: &[String]) -> String {
     let n = &t.elems[i];
     match n {
         Node::PlaceHolder(id)               => id.to_string(),
-        Node::ConstInt(k)                   => k.to_string(),
-        Node::VarInt(v) | Node::VarBool(v)  => vars.get(*v).cloned().unwrap_or_else(|| format!("v{v}")),
+        Node::ConstInt(k, _)                   => k.to_string(),
+        Node::VarInt(v, _) | Node::VarBool(v, _)  => vars.get(*v).cloned().unwrap_or_else(|| format!("v{v}")),
         _ => {
             let tmpl = n.template().expect("node missing template");
             let args = n.children()

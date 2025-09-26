@@ -55,7 +55,7 @@ needed_terms = {
     GrammarTerm('Add',      ['Ty::Int', 'Ty::Int'], 'Int', "+", "(+ ? ?)", 'Value::Int(to_int(ev(0)?) + to_int(ev(1)?))'),
     GrammarTerm('Mul',      ['Ty::Int', 'Ty::Int'], 'Int', "*", "(* ? ?)", 'Value::Int(to_int(ev(0)?) * to_int(ev(1)?))'),
     GrammarTerm('Div',      ['Ty::Int', 'Ty::Int'], 'Int', "div", "(div ? ?)", '{let b = ev(1)?; if b == Value::Int(0) { return None } else { Value::Int(to_int(ev(0)?) / to_int(b)) }}'),
-    GrammarTerm('Mod',      ['Ty::Int', 'Ty::Int'], 'Int', "mod", "(mod ?)", '{ let b = ev(1)?; if b == Value::Int(0) { return None } else { Value::Int(to_int(ev(0)?) % to_int(b)) }}'),
+    GrammarTerm('Mod',      ['Ty::Int', 'Ty::Int'], 'Int', "mod", "(mod ? ?)", '{ let b = ev(1)?; if b == Value::Int(0) { return None } else { Value::Int(to_int(ev(0)?) % to_int(b)) }}'),
     GrammarTerm('Abs',      ['Ty::Int'], 'Int', "abs", "(abs ?)", 'Value::Int(to_int(ev(0)?).abs())'),
 
     GrammarTerm('Lte', ['Ty::Int', 'Ty::Int'], 'Bool', "<=", "(<= ? ?)", 'Value::Bool(to_int(ev(0)?) <= to_int(ev(1)?))'),
@@ -337,8 +337,7 @@ def langfile(f):
     sterms = ',\n\t\t'.join(t.generate() for t in terms)
 
     with open('src/langdef.rs', 'w') as f:
-        f.write(f"""use std::sync::Arc;
-use crate::*;
+        f.write(f"""use crate::*;
 use lang::define_language;
 
 define_language! {{
