@@ -111,23 +111,23 @@ fn as_rule(s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<Strin
                 }
             }
 
+            let s = format!("({})", l.iter().map(|x| make_string(x, nonterminals)).join(" "));
+
             if defs.contains_key(op) {
                 let rst = rst.iter().map(|x| {
                     as_rule(x, nonterminals, args, defs)
                 }).collect();
-                return GrammarTerm::DefinedFunCall(op.clone(), rst);
+                return GrammarTerm::DefinedFunCall(op.clone(), s, rst);
             }
 
             let s = format!("({})", l.iter().map(|x| make_string(x, nonterminals)).join(" "));
             let rst = l.iter().flat_map(|x| get_rst(x, nonterminals, args)).collect::<Vec<_>>();
 
-            println!("{:?}", s);
-            println!("{:?}", rst);
             if valid_prod(&s, &rst, args).is_some() {
                 return GrammarTerm::Op(s, rst);
             }
 
-            panic!("unknown op: {op}")
+            panic!("unknown op: {s}")
         }
     }
 }

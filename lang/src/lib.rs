@@ -338,7 +338,7 @@ fn parse_prod_cases(edef: &EnumDef) -> Vec<TokenStream2> {
             (#template, s) if s.len() == #n && #template == op => {
                 let refs: ::std::vec::Vec<Child> = s.iter().map(|node| match node {
                     Node::PlaceHolder(i) => Child::Hole(*i),
-                    Node::ConstInt(c) => Child::Constant(*c),
+                    Node::ConstInt(c)    => Child::Constant(*c),
                     Node::VarInt(v)      => Child::VarInt(*v),
                     Node::VarBool(v)     => Child::VarBool(*v),
                     _ => panic!("Expected PlaceHolder or Var*, got {:?}", node),

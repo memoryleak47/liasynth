@@ -74,6 +74,7 @@ class ProductionRule:
                     idx += 1
             for v in self.varis:
                 if tok.strip() == v.name:
+                    args.append(v.typ)
                     if (i := seen.get(v.name)) is not None:
                         self.a_idx.append(i)
                     else:
@@ -316,10 +317,7 @@ def get_grammarterm(file=None):
         pr.varis = synthfun.args
         term = extract_grammarterm(pr, definefuns, synthfun.nonterms, definefuns)
         if (g := term.generate()) not in needed_terms:
-            if term.name.lower() in definefuns.keys():
-                term.name = 'Defun'+str(defnum)
-                defnum+=1
-            names[term.name] += 1
+            term.name = term.name.replace('-', '')
             term.name += str(names[term.name])
             needed_terms.add(term.generate())
 

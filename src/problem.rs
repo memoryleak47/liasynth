@@ -114,29 +114,34 @@ pub fn mk_sygus_problem(f: &str) -> Problem {
     build_sygus(synth_problem)
 }
 
-fn parse_grammar_term(rule: &GrammarTerm, vars: &IndexMap<String, Ty>) -> Node {
+fn parse_grammar_term(rule: &GrammarTerm, vars: &IndexMap<String, Ty>) -> Option<Node> {
     match rule {
         GrammarTerm::NonTerminal(_) => {
             // we'll iterate over the referenced non-terminal anyways.
             // Thus, no need to do it now again.
-            Node::PlaceHolder(0)
+            Some(Node::PlaceHolder(0))
         },
         GrammarTerm::Op(op, nts) => {
-            let args: Vec<_> = nts.iter().map(|n| parse_grammar_term(n, vars)).collect();
-            Node::parse_prod(&*op, &*args).expect("Could not parse prod rule")
+            println!("op: {:?}", op);
+            let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(n, vars)).collect();
+            Some(Node::parse_prod(&*op, &*args).expect("Could not parse prod rule"))
         },
-        GrammarTerm::ConstInt(i) => Node::ConstInt(*i),
-        GrammarTerm::ConstBool(true) => Node::True,
-        GrammarTerm::ConstBool(false) => Node::False,
+        GrammarTerm::DefinedFunCall(op, template, nts) => {
+            let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(n, vars)).collect();
+            Some(Node::parse_prod(&*template, &*args).expect("Could not parse prod rule"))
+        },
+
+        GrammarTerm::ConstInt(i) => Some(Node::ConstInt(*i)),
+        GrammarTerm::ConstBool(true) => Some(Node::True),
+        GrammarTerm::ConstBool(false) => Some(Node::False),
         GrammarTerm::SynthArg(v) => {
             let i = vars.get_index_of(&*v).unwrap();
             let ty = vars[v];
             match ty {
-                Ty::Int => Node::VarInt(i),
-                Ty::Bool => Node::VarBool(i),
+                Ty::Int => Some(Node::VarInt(i)),
+                Ty::Bool => Some(Node::VarBool(i)),
             }
         },
-        GrammarTerm::DefinedFunCall(f, args) => todo!("handle DefinedFunCalls in the grammar"),
     }
 }
 
@@ -163,8 +168,9 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
     let mut prod_rules = Vec::new();
     for (_, ntdef) in synth_fun.nonterminal_defs.iter() {
         for rule in ntdef.prod_rules.iter() {
-            let node = parse_grammar_term(rule, &vars);
-            prod_rules.push(node);
+            if let Some(node) = parse_grammar_term(rule, &vars) {
+                prod_rules.push(node);
+            };
         }
     }
 

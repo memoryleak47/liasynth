@@ -4,7 +4,7 @@
 
 (synth-fun max2 ((x Int) (y Int)) Int
 ((Start Int))
-    ((Start Int (x y 0 1 (+ (max-f Start x) Start) (+ x x) (- Start Start) (max-f Start Start)))))
+    ((Start Int (x y 0 1  (+ x x) (- Start Start) (max-f Start Start)))))
 
 
 (declare-var x Int)
