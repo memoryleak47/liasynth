@@ -61,7 +61,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
         if n.children().is_empty() {
             let (_sol, maxsat) = add_node(*nt, n, ctxt);
             if let Some(sol) = _sol {
-                handle_sol(sol, ctxt);
+                handle_sol(0, sol, ctxt);
                 return extract(0, sol, ctxt);
             }
             // ctxt.perceptron.train(ctxt.classes[n.ident].features, maxsat);
@@ -71,7 +71,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
     while let Some(WithOrd((nt, x), _)) = ctxt.queue.pop() {
         let (_sol, maxsat) = handle(nt, x, ctxt);
         if let Some(sol) = _sol {
-            handle_sol(sol, ctxt);
+            handle_sol(0, sol, ctxt);
             return extract(0, sol, ctxt);
         }
         // ctxt.perceptron.train(ctxt.classes[n.ident].features, maxsat);
@@ -80,13 +80,12 @@ fn run(ctxt: &mut Ctxt) -> Term {
     panic!("No term found!")
 }
 
-fn handle_sol(id: Id, ctxt: &mut Ctxt) {
-    ctxt.classes[0][id].prev_sol += 1;
-    let node = ctxt.classes[0][id].node.clone();
-    for c in node.children() {
-        match c {
-            Child::Hole(i) =>  handle_sol(*i, ctxt),
-            _ => { },
+fn handle_sol(nt: NonTerminal, id: Id, ctxt: &mut Ctxt) {
+    ctxt.classes[nt][id].prev_sol += 1;
+    let node = ctxt.classes[nt][id].node.clone();
+    for (arg_ty, child) in node.signature().0.iter().zip(node.children()) {
+        if let (Ty::NonTerminal(j), Child::Hole(i)) = (arg_ty, child) {
+            handle_sol(*j, *i, ctxt);
         }
     }
 }
@@ -194,7 +193,7 @@ fn add_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<(N
 
     for (cnt, c) in node.signature().0.iter().zip(node.children()) {
         if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
-            if seen.get(&(nt, *i)).is_none() {
+            if seen.get(&(*j, *i)).is_none() {
                 add_node_part(*j, *i, ctxt, seen);
             }
        }
@@ -361,7 +360,6 @@ fn local_sat(nt: NonTerminal, big_sigma_idx: usize, class: Id, ctxt: &Ctxt) -> b
     for idx in indices.iter() {
         huge_sigma.push(vals[*idx].clone());
     }
-    println!("{:?}", eval_term(&ctxt.problem.constraint, &huge_sigma));
     eval_term(&ctxt.problem.constraint, &huge_sigma).unwrap() == Value::Bool(true)
 }
 
