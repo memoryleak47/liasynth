@@ -11,6 +11,7 @@ from more_itertools import partition
 
 
 Arg = namedtuple('Arg', 'name, typ')
+Nt = namedtuple('Nt', 'name, typ, t')
 splitter = re.compile(r'([\(\)\s+])')
 spaces = re.compile(r'\s+')
 consume = lambda x: x.pop(0)
@@ -19,28 +20,48 @@ flatflat_map = lambda x: [a for b in x for a in flat_map(b)]
 apply_n = lambda f, x, n: [f(x) for _ in range(n)]
 compose = lambda f, g: lambda x: f(g(x))
 
+
+@dataclass
+class GrammarTerm:
+    name: str
+    args: list[str]
+    ret: str
+    op: str
+    template: str
+    evl: str
+
+    def __hash__(self):
+        return hash(self.template)
+
+    def __eq__(self, other):
+        return self.template == other.template
+
+    def generate(self):
+        return f'({self.name}, [{', '.join(self.args)}], Ty::{self.ret}, "{self.op}", "{self.template}", {self.evl})'
+
+
 needed_terms = {
-    '(Not, [Ty::Bool], Ty::Bool, "not", "(not ?)", Value::Bool(!to_bool(ev(0)?)))',
-    '(Implies, [Ty::Bool, Ty::Bool], Ty::Bool, "=>", "(=> ? ?)", Value::Bool(!to_bool(ev(0)?) || to_bool(ev(1)?)))',
-    '(And, [Ty::Bool, Ty::Bool], Ty::Bool, "and", "(and ? ?)", Value::Bool(to_bool(ev(0)?) && to_bool(ev(1)?)))',
-    '(Or, [Ty::Bool, Ty::Bool], Ty::Bool, "or", "(or ? ?)", Value::Bool(to_bool(ev(0)?) || to_bool(ev(1)?)))',
-    '(Xor, [Ty::Bool, Ty::Bool], Ty::Bool, "xor", "(xor ? ?)", Value::Bool(to_bool(ev(0)?) != to_bool(ev(1)?)))',
-    '(Equals, [Ty::Int, Ty::Int], Ty::Bool, "=", "(= ? ?)", Value::Bool(ev(0)? == ev(1)?))',
-    '(Distinct, [Ty::Int, Ty::Int], Ty::Bool, "distinct", "(distinct ? ?)", Value::Bool(ev(0)? != ev(1)?))',
-    '(Ite, [Ty::Bool, Ty::Int, Ty::Int], Ty::Int, "ite", "(ite ? ? ?)", (if to_bool(ev(0)?) { ev(1)? } else { ev(2)? }))',
+    GrammarTerm('Not',      ['Ty::Bool'], 'Bool', "not", "(not ?)", 'Value::Bool(!to_bool(ev(0)?))'),
+    GrammarTerm('Implies',  ['Ty::Bool', 'Ty::Bool'], 'Bool', "=>", "(=> ? ?)", 'Value::Bool(!to_bool(ev(0)?) || to_bool(ev(1)?))'),
+    GrammarTerm('And',      ['Ty::Bool', 'Ty::Bool'], 'Bool', "and", "(and ? ?)", 'Value::Bool(to_bool(ev(0)?) && to_bool(ev(1)?))'),
+    GrammarTerm('Or',       ['Ty::Bool', 'Ty::Bool'], 'Bool', "or", "(or ? ?)", 'Value::Bool(to_bool(ev(0)?) || to_bool(ev(1)?))'),
+    GrammarTerm('Xor',      ['Ty::Bool', 'Ty::Bool'], 'Bool', "xor", "(xor ? ?)", 'Value::Bool(to_bool(ev(0)?) != to_bool(ev(1)?))'),
+    GrammarTerm('Equals',   ['Ty::Int', 'Ty::Int'], 'Bool', "=", "(= ? ?)", 'Value::Bool(ev(0)? == ev(1)?)'),
+    GrammarTerm('Distinct', ['Ty::Int', 'Ty::Int'], 'Bool', "distinct", "(distinct ? ?)", 'Value::Bool(ev(0)? != ev(1)?)'),
+    GrammarTerm('Ite',      ['Ty::Bool', 'Ty::Int', 'Int'], 'Ty::Int', "ite", "(ite ? ? ?)", 'Value::Int(if to_bool(ev(0)?) { ev(1)? } else { ev(2)? })'),
 
-    '(Neg, [Ty::Int], Ty::Int, "-", "(- ?)", Value::Int(-to_int(ev(0)?)))',
-    '(Sub, [Ty::Int, Ty::Int], Ty::Int, "-", "(- ? ?)", Value::Int(to_int(ev(0)?) - to_int(ev(1)?)))',
-    '(Add, [Ty::Int, Ty::Int], Ty::Int, "+", "(+ ? ?)", Value::Int(to_int(ev(0)?) + to_int(ev(1)?)))',
-    '(Mul, [Ty::Int, Ty::Int], Ty::Int, "*", "(* ? ?)", Value::Int(to_int(ev(0)?) * to_int(ev(1)?)))',
-    '(Div, [Ty::Int, Ty::Int], Ty::Int, "div", "(div ? ?)", {let b = ev(1)?; if b == Value::Int(0) { return None } else { Value::Int(to_int(ev(0)?) / to_int(b)) }})',
-    '(Mod, [Ty::Int, Ty::Int], Ty::Int, "mod", "(mod ?)", { let b = ev(1)?; if b == Value::Int(0) { return None } else { Value::Int(to_int(ev(0)?) % to_int(b)) }})',
-    '(Abs, [Ty::Int], Ty::Int, "abs", "(abs ?)", Value::Int(to_int(ev(0)?).abs()))',
+    GrammarTerm('Neg',      ['Ty::Int'], 'Int', "-", "(- ?)", 'Value::Int(-to_int(ev(0)?))'),
+    GrammarTerm('Sub',      ['Ty::Int', 'Ty::Int'], 'Int', "-", "(- ? ?)", 'Value::Int(to_int(ev(0)?) - to_int(ev(1)?))'),
+    GrammarTerm('Add',      ['Ty::Int', 'Ty::Int'], 'Int', "+", "(+ ? ?)", 'Value::Int(to_int(ev(0)?) + to_int(ev(1)?))'),
+    GrammarTerm('Mul',      ['Ty::Int', 'Ty::Int'], 'Int', "*", "(* ? ?)", 'Value::Int(to_int(ev(0)?) * to_int(ev(1)?))'),
+    GrammarTerm('Div',      ['Ty::Int', 'Ty::Int'], 'Int', "div", "(div ? ?)", '{let b = ev(1)?; if b == Value::Int(0) { return None } else { Value::Int(to_int(ev(0)?) / to_int(b)) }}'),
+    GrammarTerm('Mod',      ['Ty::Int', 'Ty::Int'], 'Int', "mod", "(mod ?)", '{ let b = ev(1)?; if b == Value::Int(0) { return None } else { Value::Int(to_int(ev(0)?) % to_int(b)) }}'),
+    GrammarTerm('Abs',      ['Ty::Int'], 'Int', "abs", "(abs ?)", 'Value::Int(to_int(ev(0)?).abs())'),
 
-    '(Lte, [Ty::Int, Ty::Int], Ty::Bool, "<=", "(<= ? ?)", Value::Bool(to_int(ev(0)?) <= to_int(ev(1)?)))',
-    '(Lt, [Ty::Int, Ty::Int], Ty::Bool, "<", "(< ? ?)", Value::Bool(to_int(ev(0)?) < to_int(ev(1)?)))',
-    '(Gte, [Ty::Int, Ty::Int], Ty::Bool, ">=", "(>= ? ?)", Value::Bool(to_int(ev(0)?) >= to_int(ev(1)?)))',
-    '(Gt, [Ty::Int, Ty::Int], Ty::Bool, ">", "(> ? ?)", Value::Bool(to_int(ev(0)?) > to_int(ev(1)?)))',
+    GrammarTerm('Lte', ['Ty::Int', 'Ty::Int'], 'Bool', "<=", "(<= ? ?)", 'Value::Bool(to_int(ev(0)?) <= to_int(ev(1)?))'),
+    GrammarTerm('Lt', ['Ty::Int', 'Ty::Int'], 'Bool', "<", "(< ? ?)", 'Value::Bool(to_int(ev(0)?) < to_int(ev(1)?))'),
+    GrammarTerm('Gte', ['Ty::Int', 'Ty::Int'], 'Bool', ">=", "(>= ? ?)", 'Value::Bool(to_int(ev(0)?) >= to_int(ev(1)?))'),
+    GrammarTerm('Gt', ['Ty::Int', 'Ty::Int'], 'Bool', ">", "(> ? ?)", 'Value::Bool(to_int(ev(0)?) > to_int(ev(1)?))'),
 }
 
 
@@ -49,16 +70,7 @@ class ProductionRule:
     op  : str
     pr  : str
     sexp: list
-    _ret : str
-
-    # yuck
-    def extract_ret(self, nts):
-        for n in nts:
-            if self._ret == n.name:
-                self.ret =  n.typ
-            match self._ret:
-                case 'Int': self.ret = "Ty::Int"
-                case 'Bool': self.ret = "Ty::Bool"
+    ret : Arg
 
     # rough
     def extract_args(self, nts):
@@ -98,8 +110,8 @@ class ProductionRule:
 
     def extract_eval(self, nts, template, deffuns):
         match self.ret:
-            case 'Ty::Int' : r = "Value::Int"
-            case 'Ty::Bool': r = "Value::Bool"
+            case (_, 'Int') : r = "Value::Int"
+            case (_, 'Bool'): r = "Value::Bool"
 
         tmp = self.sexp
         tmp = replace(tmp, nts, self.varis, deffuns, self.a_idx)
@@ -131,7 +143,7 @@ def replace(tmp, nts, varis, deffuns, a_idx):
                 for x in chain(varis, nts):
                     if t.strip() == x.name:
                         idx = consume(a_idx)
-                        rep = f"to_int(ev({idx})?)" if x.typ == "Ty::Int" else f"to_bool(ev({idx})?)"
+                        rep = f"to_int(ev({idx})?)" if x.t == "Int" else f"to_bool(ev({idx})?)"
                         tmp[i] = rep
                         break
                 else:
@@ -213,15 +225,19 @@ def op_map(op, na):
         case ('>', _):   return 'Gt'
         case _: return op.capitalize()
 
-def unpack_arg(x):
-    n, t = x
-    return Arg(n.value(), f'Ty::{t.value()}')
-
 def get_args(s):
     args = []
     for x in s:
-        args.append(unpack_arg(x))
+        n, t = x
+        args.append(Arg(n.value(), f'Ty::{t.value()}'))
     return args
+
+def get_nont(s):
+    nts = []
+    for i, x in enumerate(s):
+        n, t = x
+        nts.append(Nt(n.value(), f'Ty::NonTerminal({i})', t.value()))
+    return nts
 
 def get_pr(p):
     pr = "("
@@ -237,13 +253,12 @@ def get_pr(p):
 
 def get_prodrule(s, nt):
     if not isinstance(s, list):
-        return Arg(s.value() if isinstance(s, sexpdata.Symbol) else s, nt.value())
+        return Arg(s.value() if isinstance(s, sexpdata.Symbol) else s, nt)
     pr = get_pr(s)
-    return ProductionRule(s[0].value(), pr, s, nt.value())
+    return ProductionRule(s[0].value(), pr, s, nt)
 
 def get_prodrules(s):
-    ret = consume(s)
-    _ = consume(s)
+    ret = (consume(s).value(), consume(s).value())
 
     get_prodrule_nt = partial(get_prodrule, nt=ret)
     rules = map(get_prodrule_nt, consume(s))
@@ -254,7 +269,8 @@ def parse_synth_fun(s):
     name = consume(s).value()
     args = get_args(consume(s))
     ret = consume(s).value()
-    nonterms = get_args(consume(s))
+    nonterms = get_nont(consume(s))
+    ret = nonterms[0]
     rules = flatflat_map(map(get_prodrules, consume(s)))
 
     prodrules, terminals = partition(lambda x: isinstance(x, Arg), rules)
@@ -282,23 +298,10 @@ def parse(sexprs):
     return synthfun, definefuns
 
 
-@dataclass
-class GrammarTerm:
-    name: str
-    args: list[str]
-    ret: str
-    op: str
-    template: str
-    evl: str
-
-    def generate(self):
-        return f'({self.name}, [{', '.join(self.args)}], {self.ret}, "{self.op}", "{self.template}", {self.evl})'
-
 def extract_grammarterm(p, definefuns, nts, deffs={}):
-    p.extract_ret(nts)  # vile
     args     = p.extract_args(nts)
     name     = op_map(p.op, len(args))
-    ret      = p.ret
+    ret      = p.ret[0]
     op       = p.op
     template = p.extract_template(nts)
     evl      = p.extract_eval(nts, template, deffs)
@@ -312,21 +315,30 @@ def get_grammarterm(file=None):
     synthfun, definefuns =  parse(sexprs)
     defnum = 0
 
+    terms = set()
     names = defaultdict(int)
     for pr in synthfun.prodrules:
         pr.varis = synthfun.args
         term = extract_grammarterm(pr, definefuns, synthfun.nonterms, definefuns)
-        if (g := term.generate()) not in needed_terms:
-            term.name = term.name.replace('-', '')
+        term.name = term.name.replace('-', '')
+        if names.get(term.name) is not None:
             term.name += str(names[term.name])
-            needed_terms.add(term.generate())
+            names[term.name] += 1
+        if term.ret not in ['Int', 'Bool']:
+            idx ,= [i for i, n in enumerate(synthfun.nonterms) if n.name == term.ret]
+            term.ret = f'NonTerminal({idx})'
+        terms.add(term)
+
+    extra = needed_terms.difference(terms)
+    return terms.union(extra)
 
 def langfile(f):
-    get_grammarterm(f)
-    sterms = ',\n\t\t'.join(needed_terms)
+    terms = get_grammarterm(f)
+    sterms = ',\n\t\t'.join(t.generate() for t in terms)
 
     with open('src/langdef.rs', 'w') as f:
-        f.write(f"""use crate::*;
+        f.write(f"""use std::sync::Arc;
+use crate::*;
 use lang::define_language;
 
 define_language! {{
@@ -338,7 +350,7 @@ define_language! {{
 
 
 if len(sys.argv) < 2:
-    f = 'examples/max2_test.sl'
+    f = 'examples/LIA/max2.sl'
 else:
     f = sys.argv[1]
 langfile(f)
