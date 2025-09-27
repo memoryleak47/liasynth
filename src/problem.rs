@@ -243,7 +243,7 @@ impl Problem {
         let mut sat_count = 0;
         for ce in ces {
             let mut assumps = Vec::new();
-            for ((var, ty), val) in self.vars.iter().zip(ce.into_iter()) {
+            for ((var, ty), val) in self.context_vars.iter().zip(ce.into_iter()) {
                 let sym = z3::ast::Int::new_const(var.to_string());
                 let lit = match (ty, val) {
                     (Ty::Int, Value::Int(v)) => sym.eq(&z3::ast::Int::from_i64(*v)),
