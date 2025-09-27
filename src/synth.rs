@@ -1,7 +1,8 @@
 use crate::*;
 
+use indexmap::IndexSet;
 use itertools::Itertools;
-use std::collections::{HashSet, HashMap};
+use std::collections::HashSet;
 use ordered_float::OrderedFloat;
 
 type Score = OrderedFloat<f32>;
@@ -26,7 +27,6 @@ pub struct Ctxt<'a> {
     // indexed by small-sigma.
     vals_lookup: Map<(NonTerminal, Box<[Value]>), Id>,
 
-    // classes: HashMap<NonTerm, Class>,
     classes: Vec<Vec<Class>>,
 
     solids: Vec<Vec<Id>>,
@@ -47,11 +47,13 @@ pub struct Class {
 
 fn run(ctxt: &mut Ctxt) -> Term {
 
-    let mut seen: HashSet<(NonTerminal, Id)> = HashSet::new();
-    for nt in 0..ctxt.classes.len() {
-        for id in 0..ctxt.classes[nt].len() {
-            if seen.get(&(nt, id)).is_none() {
-                add_node_part(nt, id, ctxt, &mut seen);
+    if cfg!(feature = "simple_incremental") {
+        let mut seen: HashSet<(NonTerminal, Id)> = HashSet::new();
+        for nt in 0..ctxt.classes.len() {
+            for id in 0..ctxt.classes[nt].len() {
+                if seen.get(&(nt, id)).is_none() {
+                    add_node_part(nt, id, ctxt, &mut seen);
+                }
             }
         }
     }
@@ -147,30 +149,23 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
 }
 
 pub fn synth(problem: &Problem, big_sigmas: &[Sigma], classes: Option<Vec<Vec<Class>>>, perceptron: &Perceptron) -> (Term, Vec<Vec<Class>>) {
-    let mut small_sigmas: Vec<Sigma> = Vec::new();
+    let mut small_sigmas: IndexSet<Sigma> = IndexSet::new();
     let mut sigma_indices: Vec<Box<[usize]>> = Vec::new();
-    for bsigma in big_sigmas.iter() {
-        let mut indices: Vec<usize> = Vec::new();
-        for a in problem.instvars.iter() {
-            let ssigma: Sigma = a.iter().map(|i| eval_term_partial(*i, &problem.constraint.elems, &bsigma).unwrap()).collect();
-            small_sigmas.push(ssigma.clone());
-            let idx = match small_sigmas.iter().position(|sigma2| sigma2 == &ssigma) {
-                Some(i) => i,
-                None => {
-                    small_sigmas.push(ssigma);
-                    small_sigmas.len() - 1
-                },
-            };
+    for bsigma in big_sigmas {
+        let mut indices = Vec::new();
+        for a in &problem.instvars {
+            let ssigma: Sigma = a.iter()
+                .map(|i| eval_term_partial(*i, &problem.constraint.elems, bsigma).unwrap())
+                .collect();
+
+            let (idx, _) = small_sigmas.insert_full(ssigma);
             indices.push(idx);
         }
-        let indices: Box<[usize]> = indices.into();
-        sigma_indices.push(indices);
+        sigma_indices.push(indices.into_boxed_slice());
     }
-    let small_sigmas: Box<[Sigma]> = small_sigmas.into();
+    let small_sigmas: Box<[Sigma]> = small_sigmas.into_iter().collect();
     let sigma_indices: Box<[Box<[usize]>]> = sigma_indices.into();
-
     let no_nt = problem.synth_fun.nonterminal_defs.len();
-
     let mut ctxt = Ctxt {
         queue: Default::default(),
         big_sigmas,
@@ -225,7 +220,7 @@ fn add_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<(N
     ctxt.classes[nt][id].satcount += if ctxt.classes[nt][id].node.ty() != ctxt.problem.rettype {
         0
     } else {
-        local_sat(nt, bs, id, ctxt) as usize
+        satcount(nt, id, ctxt, true)
     };
 
     seen.insert((nt, id));
@@ -261,7 +256,7 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt) -> (Option<Id>, usize)
         ctxt.classes[nt].push(c);
         ctxt.vals_lookup.insert((nt, vals), i);
 
-        let satcount = satcount(nt, i, ctxt);
+        let satcount = satcount(nt, i, ctxt, false);
         ctxt.classes[nt][i].satcount = satcount;
         sc = satcount;
 
@@ -314,7 +309,7 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Score {
     OrderedFloat((a / (c.size + 5)) as f32)
 }
 
-#[cfg(feature = "heurisitc_perceptron")]
+#[cfg(feature = "heuristic_perceptron")]
 fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let feats = feature_set1(x, ctxt);
     let score = ctxt.perceptron.predict(feats);
@@ -335,32 +330,18 @@ fn minsize(nt: NonTerminal, node: &Node, ctxt: &Ctxt) -> usize {
         .map(|(cnt, x)| ctxt.classes[*cnt][*x].size).sum::<usize>() + 1
 }
 
-fn satcount(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> usize {
-    if ctxt.classes[nt][x].node.ty() != ctxt.problem.rettype {
+fn satcount(nt: NonTerminal, x: Id, ctxt: &mut Ctxt, part: bool) -> usize {
+    let ty = ctxt.classes[nt][x].node.ty();
+    if ctxt.problem.nt_mapping.get(&ty).expect("this never happens") != &ctxt.problem.rettype {
         return 0;
     }
-    // TODO type-chk for arguments.
-
-    // TODO re-add cx_value_cache.
-    let mut count = 0;
-    for i in 0..ctxt.big_sigmas.len() {
-        let b = local_sat(nt, i, x, ctxt);
-        count += b as usize;
+    let t = extract(nt, x, ctxt);
+    if part {
+        let new_ce = ctxt.big_sigmas.last().unwrap();
+        ctxt.problem.satisfy(&t, &[new_ce.to_vec()])
+    } else {
+        ctxt.problem.satisfy(&t, ctxt.big_sigmas)
     }
-
-    count
-}
-
-fn local_sat(nt: NonTerminal, big_sigma_idx: usize, class: Id, ctxt: &Ctxt) -> bool {
-    let mut huge_sigma = ctxt.big_sigmas[big_sigma_idx].clone();
-    let c = &ctxt.classes[nt][class];
-    let vals = &c.vals;
-
-    let indices = &ctxt.sigma_indices[big_sigma_idx];
-    for idx in indices.iter() {
-        huge_sigma.push(vals[*idx].clone());
-    }
-    eval_term(&ctxt.problem.constraint, &huge_sigma).unwrap() == Value::Bool(true)
 }
 
 fn extract(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Term {

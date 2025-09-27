@@ -8,7 +8,7 @@ thiserror = "2.0.12"
 winnow = "0.7.12"
 lazy_static = "1.5.0"
 itertools = "0.14.0"
-z3 = "0.13.3"
+z3 = "0.19.1"
 fxhash = "0.2.1"
 lang = { path = "./lang" }
 indexmap = "2.10.0"
@@ -22,3 +22,4 @@ debug = true
 default = ["heuristic_default"]
 heuristic_default = []
 heuristic_perceptron = []
+simple_incremental = []

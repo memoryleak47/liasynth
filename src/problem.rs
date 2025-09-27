@@ -1,6 +1,7 @@
 use crate::*;
 
 use indexmap::IndexMap;
+use std::collections::HashMap;
 
 
 #[derive(Clone)]
@@ -10,6 +11,7 @@ pub struct Problem {
 
     pub argtypes: Vec<Ty>,
     pub rettype: Ty,
+    pub nt_mapping: HashMap<Ty, Ty>,
 
     pub progname: String,
 
@@ -151,7 +153,7 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
     let synth_fun = synth_problem.synthfuns[0].clone();
 
     let progname = synth_problem.synthfuns.keys().next().unwrap().clone();
-    let rettype = Ty::NonTerminal(0);
+    let rettype = synth_fun.ret;
 
     let argtypes: Vec<Ty> = synth_fun.args.iter().map(|(_, x)| *x).collect();
 
@@ -166,8 +168,10 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
 
     let constraint_str = constraint.to_string();
 
+    let mut nt_mapping: HashMap<Ty, Ty> = HashMap::new();
     let mut prod_rules = Vec::new();
     for (n, (_, ntdef)) in synth_fun.nonterminal_defs.iter().enumerate() {
+        nt_mapping.insert(Ty::NonTerminal(n), ntdef.ty);
         for rule in ntdef.prod_rules.iter() {
             if let Some(node) = parse_grammar_term(rule, &vars) {
                 prod_rules.push((n, node));
@@ -196,6 +200,7 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
         progname,
         argtypes,
         rettype,
+        nt_mapping,
         vars,
         constraint,
         constraint_str,
@@ -218,22 +223,51 @@ impl Problem {
 }
 
 impl Problem {
-    pub fn verify(&self, term: &Term) -> Option<Sigma> {
-        let retty = Ty::NonTerminal(0);
-        if retty != self.rettype {
-            let mut ret = Vec::new();
-            for (v, ty) in self.context_vars.iter() {
-                match ty {
-                    Ty::Int => ret.push(Value::Int(0)),
-                    Ty::Bool => ret.push(Value::Bool(true)),
-                    _ => panic!("should not happen"),
-                }
+
+    pub fn satisfy(&self, term: &Term, ces: &[Vec<Value>]) -> usize {
+        let mut query = self.context.clone();
+        let retty = self.rettype.to_string();
+        let progname = &self.progname;
+        query.push_str(&format!("(define-fun {progname} ("));
+        for (var, ty) in self.vars.iter() {
+            query.push_str(&format!("({var} {}) ", ty.to_string()));
+        }
+        let term = term_to_z3(term, &self.vars.keys().cloned().collect::<Box<[_]>>());
+        query.push_str(&format!(") {retty} {term})\n"));
+        let constraint_str = &self.constraint_str;
+        query.push_str(&format!("(assert {constraint_str})\n"));
+
+        let solver = z3::Solver::new();
+        solver.from_string(query);
+
+        let mut sat_count = 0;
+        for ce in ces {
+            let mut assumps = Vec::new();
+            for ((var, ty), val) in self.vars.iter().zip(ce.into_iter()) {
+                let sym = z3::ast::Int::new_const(var.to_string());
+                let lit = match (ty, val) {
+                    (Ty::Int, Value::Int(v)) => sym.eq(&z3::ast::Int::from_i64(*v)),
+                    (Ty::Bool, Value::Bool(v)) => {
+                        let b = z3::ast::Bool::new_const(var.to_string());
+                        b.iff(&z3::ast::Bool::from_bool(*v))
+                    }
+                    _ => panic!("na")
+                };
+                assumps.push(lit);
             }
-            return Some(ret);
+
+            let assumps_refs: &[z3::ast::Bool] = assumps.as_slice();
+            if solver.check_assumptions(&assumps_refs) == z3::SatResult::Sat {
+                sat_count += 1;
+            }
         }
 
+        sat_count
+    }
+
+    pub fn verify(&self, term: &Term) -> Option<Sigma> {
         let mut query = self.context.clone();
-        let retty = retty.to_string();
+        let retty = self.rettype.to_string();
         let progname = &self.progname;
 
         query.push_str(&format!("(define-fun {progname} ("));
@@ -246,9 +280,7 @@ impl Problem {
         let constraint_str = &self.constraint_str;
         query.push_str(&format!("(assert (not {constraint_str}))\n"));
 
-        let config = z3::Config::new();
-        let ctxt = z3::Context::new(&config);
-        let mut solver = z3::Solver::new(&ctxt);
+        let mut solver = z3::Solver::new();
         // println!("VERIFY-QUERY: {}", &query);
         solver.from_string(query);
         // println!("VERIFY-SMT: {}", solver.to_smt2());
@@ -258,11 +290,11 @@ impl Problem {
             let mut sigma = Sigma::new();
             for (var, ty) in &self.context_vars {
                 if matches!(ty, Ty::Int) {
-                    let z3var = z3::ast::Int::new_const(&ctxt, var.to_string());
+                    let z3var = z3::ast::Int::new_const(var.to_string());
                     let z3val = ce.eval(&z3var, true);
                     sigma.push(Value::Int(z3val.unwrap().as_i64().unwrap()));
                 } else {
-                    let z3var = z3::ast::Bool::new_const(&ctxt, var.to_string());
+                    let z3var = z3::ast::Bool::new_const(var.to_string());
                     let z3val = ce.eval(&z3var, true);
                     sigma.push(Value::Bool(z3val.unwrap().as_bool().unwrap()));
                 };
