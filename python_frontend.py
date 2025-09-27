@@ -239,6 +239,7 @@ def get_nont(s):
         nts.append(Nt(n.value(), f'Ty::NonTerminal({i})', t.value()))
     return nts
 
+# BUG: This fails sometimes, need to sort
 def get_pr(p):
     pr = "("
     for i, e in enumerate(p):
