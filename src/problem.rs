@@ -261,7 +261,6 @@ impl Problem {
                 sat_count += 1;
             }
         }
-
         sat_count
     }
 

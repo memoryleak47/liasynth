@@ -1,29 +1,31 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-cargo b --release
-outfile=bench.txt
-if [[ -n "$1" ]]; then
-    outfile=$1
-fi
+outfile="${1:-bench.txt}"
 
-all=$(find "examples/LIA" | wc -l)
-function run() {
+all=$(find "examples/LIA" -type f | wc -l)
+
+run() {
     i=0
-    t=$(mktemp -d)
-    cp target/release/liasynth $t
-    for f in $(find "examples/LIA" -type f)
-    do
+    for f in $(find "examples/LIA" -type f | sort); do
         echo
-        echo ==========
+        echo "=========="
         echo "[$i/$all] $f:"
-        timeout 10s $t/liasynth "$f"
-        i=$(($i+1))
+
+        python3 python_frontend.py "$f"
+        if ! cargo b --release >/dev/null 2>&1; then
+            echo "[build failed] $f"
+            i=$((i+1))
+            continue
+        fi
+        timeout 10s target/release/liasynth "$f"
+
+        i=$((i+1))
     done
 
-    success=$(cat $outfile | grep Answer | wc -l)
+    success=$(grep -c "Answer" "$outfile" || true)
 
     echo
     echo "Completed $success/$all"
 }
 
-run 2>&1 | tee $outfile
+run 2>&1 | tee "$outfile"
