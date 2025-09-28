@@ -10,7 +10,7 @@ from itertools import chain
 from more_itertools import partition
 
 
-Arg = namedtuple('Arg', 'name, typ')
+Arg = namedtuple('Arg', 'name, typ, t')
 Nt = namedtuple('Nt', 'name, typ, t')
 splitter = re.compile(r'([\(\)\s+])')
 spaces = re.compile(r'\s+')
@@ -48,7 +48,7 @@ needed_terms = {
     GrammarTerm('Xor',      ['Ty::Bool', 'Ty::Bool'], 'Bool', "xor", "(xor ? ?)", 'Value::Bool(to_bool(ev(0)?) != to_bool(ev(1)?))'),
     GrammarTerm('Equals',   ['Ty::Int', 'Ty::Int'], 'Bool', "=", "(= ? ?)", 'Value::Bool(ev(0)? == ev(1)?)'),
     GrammarTerm('Distinct', ['Ty::Int', 'Ty::Int'], 'Bool', "distinct", "(distinct ? ?)", 'Value::Bool(ev(0)? != ev(1)?)'),
-    GrammarTerm('Ite',      ['Ty::Bool', 'Ty::Int', 'Int'], 'Ty::Int', "ite", "(ite ? ? ?)", 'Value::Int(if to_bool(ev(0)?) { ev(1)? } else { ev(2)? })'),
+    GrammarTerm('Ite',      ['Ty::Bool', 'Ty::Int', 'Ty::Int'], 'Int', "ite", "(ite ? ? ?)", 'Value::Int(if to_bool(ev(0)?) { to_int(ev(1)?) } else { to_int(ev(2)?) })'),
 
     GrammarTerm('Neg',      ['Ty::Int'], 'Int', "-", "(- ?)", 'Value::Int(-to_int(ev(0)?))'),
     GrammarTerm('Sub',      ['Ty::Int', 'Ty::Int'], 'Int', "-", "(- ? ?)", 'Value::Int(to_int(ev(0)?) - to_int(ev(1)?))'),
@@ -101,12 +101,6 @@ class ProductionRule:
             tmp = tmp.replace(n.name, '?')
 
         return tmp
-
-    def get_a_idx(self):
-        for tok in splitter.split(self.pr):
-            for n in chain(nts, varis):
-                if tok == n.name:
-                    args.append(n.typ)
 
     def extract_eval(self, nts, template, deffuns):
         match self.ret:
@@ -229,7 +223,7 @@ def get_args(s):
     args = []
     for x in s:
         n, t = x
-        args.append(Arg(n.value(), f'Ty::{t.value()}'))
+        args.append(Arg(n.value(), f'Ty::{t.value()}', t))
     return args
 
 def get_nont(s):
@@ -239,7 +233,6 @@ def get_nont(s):
         nts.append(Nt(n.value(), f'Ty::NonTerminal({i})', t.value()))
     return nts
 
-# BUG: This fails sometimes, need to sort
 def get_pr(p):
     pr = "("
     for i, e in enumerate(p):
@@ -248,13 +241,17 @@ def get_pr(p):
             pr += get_pr(e)
         else:
             if i != 0: pr += " "
-            pr += e.value()
+            match e:
+                case sexpdata.Symbol(v): pr += v
+                case _: pr += e
     pr += ")"
     return pr
 
 def get_prodrule(s, nt):
     if not isinstance(s, list):
-        return Arg(s.value() if isinstance(s, sexpdata.Symbol) else s, nt)
+        return Arg(s.value() if isinstance(s, sexpdata.Symbol) else s, nt, nt)
+    elif s[0] == sexpdata.Symbol('-') and len(s) == 2 and s[1].value() != nt[0]:
+        return Arg(f"-{s[1].value()}", nt, nt)
     pr = get_pr(s)
     return ProductionRule(s[0].value(), pr, s, nt)
 
@@ -309,12 +306,18 @@ def extract_grammarterm(p, definefuns, nts, deffs={}):
 
     return GrammarTerm(name, args, ret, op, template, evl)
 
+
+class AllSymbolsParser(sexpdata.Parser):
+    def atom(self, token):
+        return sexpdata.Symbol(token)
+
+
 def get_grammarterm(file=None):
     with open(file, 'r') as f:
-        sexprs = sexpdata.loads(f"({f.read()})")
+        # sexprs = sexpdata.loads(f"({f.read()})")
+        sexprs = AllSymbolsParser(f'{f.read()}').parse()
 
     synthfun, definefuns =  parse(sexprs)
-    defnum = 0
 
     terms = set()
     names = defaultdict(int)
@@ -350,7 +353,7 @@ define_language! {{
 
 
 if len(sys.argv) < 2:
-    f = 'examples/LIA/max2.sl'
+    f = 'examples/LIA/inv_gen_array.sl'
 else:
     f = sys.argv[1]
 langfile(f)
