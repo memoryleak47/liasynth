@@ -7,7 +7,7 @@ pub fn term_to_z3(t: &Term, vars: &[String]) -> String {
 fn term_to_z3_impl(i: usize, t: &Term, vars: &[String]) -> String {
     let n = &t.elems[i];
     match n {
-        Node::PlaceHolder(id)               => id.to_string(),
+        Node::PlaceHolder(id, _)               => id.to_string(),
         Node::ConstInt(k, _)                   => k.to_string(),
         Node::VarInt(v, _) | Node::VarBool(v, _)  => vars.get(*v).cloned().unwrap_or_else(|| format!("v{v}")),
         _ => {

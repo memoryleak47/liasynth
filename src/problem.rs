@@ -97,7 +97,7 @@ fn expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, t: &m
         Expr::ConstBool(false) => { t.push(Node::False(Ty::Bool)) },
         Expr::ConstInt(i) => { t.push(Node::ConstInt(i, Ty::Int)) },
         Expr::Op(op, exprs) => {
-            let exprs: Box<[Node]> = exprs.into_iter().map(|x| Node::PlaceHolder(expr_to_term_impl(x, vars, progname, t, instvars))).collect();
+            let exprs: Box<[Node]> = exprs.into_iter().map(|x| Node::PlaceHolder(expr_to_term_impl(x, vars, progname, t, instvars), Ty::Int)).collect();
             let n = Node::parse(&*op, &*exprs).unwrap();
             t.push(n)
         },
@@ -117,20 +117,21 @@ pub fn mk_sygus_problem(f: &str) -> Problem {
     build_sygus(synth_problem)
 }
 
-fn parse_grammar_term(rule: &GrammarTerm, vars: &IndexMap<String, Ty>) -> Option<Node> {
+fn parse_grammar_term(rule: &GrammarTerm, vars: &IndexMap<String, Ty>, nonterminals: &IndexMap<String, Ty>) -> Option<Node> {
     match rule {
-        GrammarTerm::NonTerminal(_, _) => {
+        GrammarTerm::NonTerminal(n, ty) => {
             // we'll iterate over the referenced non-terminal anyways.
             // Thus, no need to do it now again.
-            Some(Node::PlaceHolder(0))
+            let t = nonterminals.get_index_of(n).unwrap();
+            Some(Node::PlaceHolder(0, Ty::NonTerminal(t)))
         },
         GrammarTerm::Op(op, nts) => {
-            let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(n, vars)).collect();
+            let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(n, vars, nonterminals)).collect();
             Some(Node::parse_prod(&*op, &*args).expect("Could not parse prod rule"))
         },
         GrammarTerm::DefinedFunCall(op, template, nts) => {
-            let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(n, vars)).collect();
-            Some(Node::parse_prod(&*template, &*args).expect("Could not parse prod rule"))
+            let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(n, vars, nonterminals)).collect();
+            Some(Node::parse_prod(&*template, &*args).unwrap_or_else(|| panic!("Could not parse prod rule: template: {:?}, args: {:?}", template, args)))
         },
 
         GrammarTerm::ConstInt(i, ty) => Some(Node::ConstInt(*i, *ty)),
@@ -173,7 +174,7 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
     for (n, (_, ntdef)) in synth_fun.nonterminal_defs.iter().enumerate() {
         nt_mapping.insert(Ty::NonTerminal(n), ntdef.ty);
         for rule in ntdef.prod_rules.iter() {
-            if let Some(node) = parse_grammar_term(rule, &vars) {
+            if let Some(node) = parse_grammar_term(rule, &vars, &synth_fun.nonterminals) {
                 prod_rules.push((n, node));
             };
         }

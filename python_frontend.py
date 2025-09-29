@@ -93,6 +93,9 @@ class ProductionRule:
                         self.a_idx.append(idx)
                         seen[v.name] = idx
                         idx += 1
+        print(self.op)
+        print(args)
+        print()
         return args
 
     def extract_template(self, nts):
@@ -223,7 +226,7 @@ def get_args(s):
     args = []
     for x in s:
         n, t = x
-        args.append(Arg(n.value(), f'Ty::{t.value()}', t))
+        args.append(Arg(n.value(), f'Ty::{t.value()}', t.value()))
     return args
 
 def get_nont(s):
@@ -296,12 +299,17 @@ def parse(sexprs):
     return synthfun, definefuns
 
 
-def extract_grammarterm(p, definefuns, nts, deffs={}):
+def extract_grammarterm(p, nts, deffs={}, names={}):
     args     = p.extract_args(nts)
     name     = op_map(p.op, len(args))
     ret      = p.ret[0]
     op       = p.op
     template = p.extract_template(nts)
+    old_name = name
+    if (n := names[name]) != 0:
+        name += str(n)
+        op += str(n)
+    names[old_name] += 1
     evl      = p.extract_eval(nts, template, deffs)
 
     return GrammarTerm(name, args, ret, op, template, evl)
@@ -323,11 +331,8 @@ def get_grammarterm(file=None):
     names = defaultdict(int)
     for pr in synthfun.prodrules:
         pr.varis = synthfun.args
-        term = extract_grammarterm(pr, definefuns, synthfun.nonterms, definefuns)
+        term = extract_grammarterm(pr, synthfun.nonterms, definefuns, names)
         term.name = term.name.replace('-', '')
-        if names.get(term.name) is not None:
-            term.name += str(names[term.name])
-            names[term.name] += 1
         if term.ret not in ['Int', 'Bool']:
             idx ,= [i for i, n in enumerate(synthfun.nonterms) if n.name == term.ret]
             term.ret = f'NonTerminal({idx})'
@@ -338,7 +343,7 @@ def get_grammarterm(file=None):
 
 def langfile(f):
     terms = get_grammarterm(f)
-    sterms = ',\n\t\t'.join(t.generate() for t in terms)
+    sterms = ',\n\t'.join(t.generate() for t in terms)
 
     with open('src/langdef.rs', 'w') as f:
         f.write(f"""use crate::*;
@@ -353,7 +358,7 @@ define_language! {{
 
 
 if len(sys.argv) < 2:
-    f = 'examples/LIA/inv_gen_array.sl'
+    f = 'examples/LIA/MPwL_d1s3.sl'
 else:
     f = sys.argv[1]
 langfile(f)

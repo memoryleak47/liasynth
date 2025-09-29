@@ -42,7 +42,7 @@ fn as_ty(s: &str) -> Ty {
 
 // checks whether 'op' is an OP
 fn valid_op(op: &str, arity: usize) -> Option<Node> {
-    let v: Box<[Node]> = (0..arity).map(|i| Node::PlaceHolder(i)).collect();
+    let v: Box<[Node]> = (0..arity).map(|i| Node::PlaceHolder(i, Ty::Int)).collect();  
     Node::parse(op, &v)
 }
 
@@ -51,8 +51,8 @@ fn valid_prod(prod: &str, a: &Vec<GrammarTerm>, args: &IndexMap<String, Ty>) -> 
         .iter()
         .map(|n|
             match n {
-                GrammarTerm::NonTerminal(_, _) => {
-                    Node::PlaceHolder(0)
+                GrammarTerm::NonTerminal(_, t) => {
+                    Node::PlaceHolder(0, *t)
                 },
                 GrammarTerm::SynthArg(v, ty) => {
                     if let Some(idx) =  args.get_index_of(v) {
