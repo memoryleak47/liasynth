@@ -93,9 +93,6 @@ class ProductionRule:
                         self.a_idx.append(idx)
                         seen[v.name] = idx
                         idx += 1
-        print(self.op)
-        print(args)
-        print()
         return args
 
     def extract_template(self, nts):
