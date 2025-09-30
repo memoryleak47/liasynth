@@ -79,7 +79,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
         // ctxt.perceptron.train(ctxt.classes[n.ident].features, maxsat);
     }
 
-    panic!("No term found!")
+    panic!("infeasible")
 }
 
 fn handle_sol(nt: NonTerminal, id: Id, ctxt: &mut Ctxt) {
