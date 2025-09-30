@@ -72,9 +72,9 @@ fn run(ctxt: &mut Ctxt) -> Term {
 
     while let Some(WithOrd((nt, x), _)) = ctxt.queue.pop() {
         let (_sol, maxsat) = handle(nt, x, ctxt);
-        if let Some(sol) = _sol {
-            handle_sol(nt, sol, ctxt);
-            return extract(nt, sol, ctxt);
+        if let Some((ot, sol)) = _sol {
+            handle_sol(ot, sol, ctxt);
+            return extract(ot, sol, ctxt);
         }
         // ctxt.perceptron.train(ctxt.classes[n.ident].features, maxsat);
     }
@@ -93,7 +93,7 @@ fn handle_sol(nt: NonTerminal, id: Id, ctxt: &mut Ctxt) {
 }
 
 // makes "x" solid if it's not solid yet.
-fn handle(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
+fn handle(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
     let c = &mut ctxt.classes[nt][x];
 
     // if the current size is the same size of the last "handle" call, nothing it to be done.
@@ -108,7 +108,7 @@ fn handle(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     grow(nt, x, ctxt)
 }
 
-fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
+fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
     let ty = ctxt.classes[nt][x].node.ty();
     let mut maxsat = 0;
 
@@ -138,7 +138,7 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
 
                 let (_sol, sc) = add_node(out_type, rule.clone(), ctxt);
                 if let Some(sol) = _sol {
-                    return (Some(sol), maxsat);
+                    return (Some((out_type, sol)), maxsat);
                 }
                 maxsat = std::cmp::max(maxsat, sc);
             }
@@ -244,7 +244,6 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt) -> (Option<Id>, usize)
         }
     } else {
         let i = ctxt.classes[nt].len();
-        println!("{:?}", node);
         let c = Class {
             size: minsize(nt, &node, ctxt),
             node,
