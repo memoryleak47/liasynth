@@ -11,8 +11,10 @@ pub struct Problem {
 
     pub argtypes: Vec<Ty>,
     pub rettype: Ty,
+    // Vec of possible nonterminals that are valid
+    // Vec in cases of the 'start' nonterminal referencing other nonterminals
+    pub rettys: Vec<Ty>,
     pub nt_mapping: HashMap<Ty, Ty>,
-
     pub progname: String,
 
     // maps between the SyGuS named variables, and the
@@ -75,14 +77,14 @@ fn simplify_expr(e: Expr, defs: &IndexMap<String, DefinedFun>, varmap: &Map<Stri
     }
 }
 
-fn expr_to_term(e: Expr, vars: &IndexMap<String, Ty>, progname: &str) -> (Term, Vec<Box<[Id]>>) {
+fn expr_to_term(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, rettype: Ty) -> (Term, Vec<Box<[Id]>>) {
     let mut t = Term { elems: Vec::new() };
     let mut instvars = Vec::new();
-    expr_to_term_impl(e, vars, progname, &mut t, &mut instvars);
+    expr_to_term_impl(e, vars, progname, &mut t, &mut instvars, rettype);
     (t, instvars)
 }
 
-fn expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, t: &mut Term, instvars: &mut Vec<Box<[Id]>>) -> Id {
+fn expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, t: &mut Term, instvars: &mut Vec<Box<[Id]>>, rettype: Ty) -> Id {
     match e {
         Expr::Var(v) => {
             let i = vars.iter().position(|x| *x.0 == *v).unwrap();
@@ -97,14 +99,14 @@ fn expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, t: &m
         Expr::ConstBool(false) => { t.push(Node::False(Ty::Bool)) },
         Expr::ConstInt(i) => { t.push(Node::ConstInt(i, Ty::Int)) },
         Expr::Op(op, exprs) => {
-            let exprs: Box<[Node]> = exprs.into_iter().map(|x| Node::PlaceHolder(expr_to_term_impl(x, vars, progname, t, instvars), Ty::Int)).collect();
+            let exprs: Box<[Node]> = exprs.into_iter().map(|x| Node::PlaceHolder(expr_to_term_impl(x, vars, progname, t, instvars, rettype), Ty::Int)).collect();
             let n = Node::parse(&*op, &*exprs).unwrap();
             t.push(n)
         },
         Expr::SynthFunCall(_name, exprs) => {
-            let exprs: Box<[Id]> = exprs.into_iter().map(|x| expr_to_term_impl(x, vars, progname, t, instvars)).collect();
+            let exprs: Box<[Id]> = exprs.into_iter().map(|x| expr_to_term_impl(x, vars, progname, t, instvars, rettype)).collect();
             instvars.push(exprs.iter().cloned().collect());
-            t.push(Node::VarInt(vars.len() + instvars.len() - 1, Ty::Int))
+            t.push(Node::VarInt(vars.len() - 1, rettype))
         },
         Expr::DefinedFunCall(..) => unreachable!("DefinedFunCalls should already be resolved!"),
         Expr::Let(..) => unreachable!("Lets should already be resolved!"),
@@ -169,11 +171,21 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
 
     let constraint_str = constraint.to_string();
 
-    let mut nt_mapping: HashMap<Ty, Ty> = HashMap::new();
+    let mut nt_mapping = HashMap::new();
+    let mut rettys = Vec::new();
     let mut prod_rules = Vec::new();
     for (n, (_, ntdef)) in synth_fun.nonterminal_defs.iter().enumerate() {
         nt_mapping.insert(Ty::NonTerminal(n), ntdef.ty);
+        if n == 0 {
+            rettys.push(Ty::NonTerminal(0))
+        }
         for rule in ntdef.prod_rules.iter() {
+            if n == 0 {
+                if let GrammarTerm::NonTerminal(n, _) = rule {
+                    let m = synth_fun.nonterminal_defs.get_index_of(&n.clone()).unwrap();
+                    rettys.push(Ty::NonTerminal(m));
+                }
+            }
             if let Some(node) = parse_grammar_term(rule, &vars, &synth_fun.nonterminals) {
                 prod_rules.push((n, node));
             };
@@ -193,7 +205,7 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
     }
 
     let constraint = simplify_expr(constraint, &defs, &Map::default());
-    let (constraint, instvars) = expr_to_term(constraint, &context_vars, &progname);
+    let (constraint, instvars) = expr_to_term(constraint, &context_vars, &progname, rettype);
 
     Problem {
         synth_problem,
@@ -201,6 +213,7 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
         progname,
         argtypes,
         rettype,
+        rettys,
         nt_mapping,
         vars,
         constraint,
@@ -224,7 +237,6 @@ impl Problem {
 }
 
 impl Problem {
-
     pub fn satisfy(&self, term: &Term, ces: &[Vec<Value>]) -> usize {
         let mut query = self.context.clone();
         let retty = self.rettype.to_string();

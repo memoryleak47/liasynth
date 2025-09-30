@@ -63,8 +63,8 @@ fn run(ctxt: &mut Ctxt) -> Term {
         if n.children().is_empty() {
             let (_sol, maxsat) = add_node(*nt, n, ctxt);
             if let Some(sol) = _sol {
-                handle_sol(0, sol, ctxt);
-                return extract(0, sol, ctxt);
+                handle_sol(*nt, sol, ctxt);
+                return extract(*nt, sol, ctxt);
             }
             // ctxt.perceptron.train(ctxt.classes[n.ident].features, maxsat);
         }
@@ -73,8 +73,8 @@ fn run(ctxt: &mut Ctxt) -> Term {
     while let Some(WithOrd((nt, x), _)) = ctxt.queue.pop() {
         let (_sol, maxsat) = handle(nt, x, ctxt);
         if let Some(sol) = _sol {
-            handle_sol(0, sol, ctxt);
-            return extract(0, sol, ctxt);
+            handle_sol(nt, sol, ctxt);
+            return extract(nt, sol, ctxt);
         }
         // ctxt.perceptron.train(ctxt.classes[n.ident].features, maxsat);
     }
@@ -217,7 +217,7 @@ fn add_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<(N
     ctxt.vals_lookup.insert((nt, ctxt.classes[nt][id].vals.clone()), id);
 
     let bs = ctxt.big_sigmas.len() - 1;
-    ctxt.classes[nt][id].satcount += if ctxt.classes[nt][id].node.ty() != ctxt.problem.rettype {
+    ctxt.classes[nt][id].satcount += if ctxt.problem.rettys.contains(&ctxt.classes[nt][id].node.ty()) {
         0
     } else {
         satcount(nt, id, ctxt, true)
@@ -244,6 +244,7 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt) -> (Option<Id>, usize)
         }
     } else {
         let i = ctxt.classes[nt].len();
+        println!("{:?}", node);
         let c = Class {
             size: minsize(nt, &node, ctxt),
             node,
@@ -262,8 +263,7 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt) -> (Option<Id>, usize)
 
         // dbg!(extract(i, ctxt));
 
-        // if this [Value] was successful, return it.
-        if satcount == ctxt.big_sigmas.len() && nt == 0 { // Is it the start nonterminal
+        if satcount == ctxt.big_sigmas.len() && ctxt.problem.rettys.contains(&Ty::NonTerminal(nt)) { // ugly but ok
             return (Some(i), sc);
         }
 
