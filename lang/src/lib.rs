@@ -59,6 +59,24 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
     let template_cases = template_cases(&edef);
 
     let out: TokenStream1 = quote! {
+
+        #[derive(PartialEq, Eq, Hash, Clone, Copy, Debug, PartialOrd, Ord)]
+        pub enum Child {
+            Hole(Id),
+            Constant(Int),
+            VarInt(Var),
+            VarBool(Var),
+        }
+
+		impl Child {
+			pub fn into_id(&self) -> Option<Id> {
+				match self {
+					Self::Hole(id) => Some(*id),
+					_ => None
+				}
+			}
+		}
+
         #[derive(PartialEq, Eq, Hash, Clone, Debug, PartialOrd, Ord)]
         pub enum Node {
             PlaceHolder(Id, Ty),
@@ -68,15 +86,6 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
             VarInt(Var, Ty),
             VarBool(Var, Ty),
             #(#enum_cases),*
-        }
-
-
-        #[derive(PartialEq, Eq, Hash, Clone, Copy, Debug, PartialOrd, Ord)]
-        pub enum Child {
-            Hole(Id),
-            Constant(Int),
-            VarInt(Var),
-            VarBool(Var),
         }
 
         impl Node {

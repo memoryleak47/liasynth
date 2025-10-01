@@ -1,5 +1,6 @@
 import re
 import os
+import sys
 import signal
 import subprocess
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -43,15 +44,15 @@ def run_shell(cmd, timeout, env=None, cwd=None):
         p.wait()
         return "fail"
 
-def run_lia_cvc5(benchmark, results, timeout=10):
+def run_lia_cvc5(benchmark, results, incr_type, timeout=10):
     lia_path  = f"examples/LIA/{benchmark}"
     clen_path = f"examples/cleaned-LIA/{benchmark}"
 
     cmds = {
-        # "liasynth":       f'python python_frontend.py {lia_path} && RUSTFLAGS="-Awarnings" cargo run -j4 --release -- {lia_path}',
+        f"liasynth_{incr_type}":       f'python python_frontend.py {lia_path} && RUSTFLAGS="-Awarnings" cargo run --release --features {incr_type} -- {lia_path}',
         # "cvc5":           f'cvc5 --lang=sygus2 {lia_path}',
-        "liasynth_clean": f'python python_frontend.py {clen_path} && RUSTFLAGS="-Awarnings" cargo run -j4 --release -- {clen_path}',
-        "cvc5_clean":     f'cvc5 --lang=sygus2 {clen_path}',
+        # "liasynth_clean": f'python python_frontend.py {clen_path} && RUSTFLAGS="-Awarnings" cargo run -j4 --release -- {clen_path}',
+        # "cvc5_clean":     f'cvc5 --lang=sygus2 {clen_path}',
     }
 
     with ThreadPoolExecutor(max_workers=2) as ex:
@@ -85,23 +86,27 @@ def run_lia_cvc5(benchmark, results, timeout=10):
                 results[name]['status'].append(out)
             results[name]['solution'].append('-')
 
-def run_all(folder, *, timeout):
+def run_all(folder, *, incr_type, timeout):
     results = defaultdict(lambda: defaultdict(list))
-    l = len(os.listdir(folder)
+    l = len(os.listdir(folder))
     for i, fname in enumerate(os.listdir(folder), start=1):
-        run_lia_cvc5(fname, results, timeout)
+        run_lia_cvc5(fname, results, incr_type, timeout)
         print(
             f"[{i}/{l}]",
             fname,
             # f"\n\tcvc5: {results['cvc5']['status'][-1]}",
-            f"\n\tcvc5_clean: {results['cvc5_clean']['status'][-1]}",
-            # f"\n\tlia: {results['liasynth']['status'][-1]}",
-            f"\n\tlia_clean: {results['liasynth_clean']['status'][-1]}",
+            # f"\n\tcvc5_clean: {results['cvc5_clean']['status'][-1]}",
+            f"\n\tlia_{incr_type}: {results[f'liasynth_{incr_type}']['status'][-1]}",
+            # f"\n\tlia_clean: {results['liasynth_clean']['status'][-1]}",
         )
 
     # pd.DataFrame.from_dict(results['cvc5']).to_csv('cvc5_LIA_res.csv', index=False)
-    pd.DataFrame.from_dict(results['cvc5_clean']).to_csv('results/cvc5_cLIA_res.csv', index=False)
-    # pd.DataFrame.from_dict(results['liasynth']).to_csv('lia_LIA_res.csv', index=False)
-    pd.DataFrame.from_dict(results['liasynth_clean']).to_csv('results/lia_cLIA_res.csv', index=False)
+    # pd.DataFrame.from_dict(results['cvc5_clean']).to_csv('results/cvc5_cLIA_res.csv', index=False)
+    pd.DataFrame.from_dict(results[f'liasynth_{incr_type}']).to_csv(f'results/lia_{incr_type}.csv', index=False)
+    # pd.DataFrame.from_dict(results['liasynth_clean']).to_csv('results/lia_cLIA_res.csv', index=False)
 
-run_all('examples/LIA', timeout=10)
+incr_type = 'default'
+if len(sys.argv) == 2:
+    incr_type = sys.argv[1]
+
+run_all('examples/LIA', incr_type=incr_type, timeout=10)
