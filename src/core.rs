@@ -32,6 +32,13 @@ impl Ty {
             Ty::NonTerminal(s) => "",
         }
     }
+
+	pub fn into_nt(&self) -> Option<usize> {
+        match self {
+            Ty::NonTerminal(s) => Some(*s),
+			_ => None
+        }
+	}
 }
 
 impl Node {
@@ -102,11 +109,13 @@ pub fn eval_term_partial(i: Id, term: &[Node], sigma: &Sigma) -> Option<Value> {
 
 pub fn cegis(problem: &Problem) -> Term {
     let mut sigmas = Vec::new();
+    let mut cxs_cache = None;
     let mut classes = None;
     let perceptron = Perceptron::new(2);
     loop {
-        let (term, clss) = synth(problem, &sigmas, classes, &perceptron);
+        let (term, cxsc, clss) = synth(problem, &sigmas, cxs_cache, classes, &perceptron);
         classes = Some(clss);
+        cxs_cache = Some(cxsc);
         println!("Candidate: {}", term_to_z3(&term, &problem.vars.keys().cloned().collect::<Box<[_]>>()));
         // TODO check this later: assert!(problem.sat(&..., &sigmas));
 

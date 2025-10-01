@@ -237,7 +237,9 @@ impl Problem {
 }
 
 impl Problem {
-    pub fn satisfy(&self, term: &Term, ces: &[Vec<Value>]) -> usize {
+    pub fn satisfy<'a>(&self, term: &Term, ces: impl IntoIterator<Item = &'a [Value]>) -> Vec<bool> {
+        let mut results = Vec::new();
+
         let mut query = self.context.clone();
         let retty = self.rettype.to_string();
         let progname = &self.progname;
@@ -270,11 +272,9 @@ impl Problem {
             }
 
             let assumps_refs: &[z3::ast::Bool] = assumps.as_slice();
-            if solver.check_assumptions(&assumps_refs) == z3::SatResult::Sat {
-                sat_count += 1;
-            }
+            results.push(solver.check_assumptions(&assumps_refs) == z3::SatResult::Sat);
         }
-        sat_count
+        results
     }
 
     pub fn verify(&self, term: &Term) -> Option<Sigma> {

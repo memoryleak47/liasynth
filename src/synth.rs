@@ -2,7 +2,7 @@ use crate::*;
 
 use indexmap::IndexSet;
 use itertools::Itertools;
-use std::collections::HashSet;
+use std::collections::{HashSet, HashMap};
 use ordered_float::OrderedFloat;
 
 type Score = OrderedFloat<f32>;
@@ -26,6 +26,7 @@ pub struct Ctxt<'a> {
 
     // indexed by small-sigma.
     vals_lookup: Map<(NonTerminal, Box<[Value]>), Id>,
+    cxs_cache: Vec<HashMap<Box<[Value]>, bool>>,
 
     classes: Vec<Vec<Class>>,
 
@@ -51,7 +52,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
         let mut seen: HashSet<(NonTerminal, Id)> = HashSet::new();
         for nt in 0..ctxt.classes.len() {
             for id in 0..ctxt.classes[nt].len() {
-                if seen.get(&(nt, id)).is_none() {
+                if seen.insert((nt, id)) {
                     add_node_part(nt, id, ctxt, &mut seen);
                 }
             }
@@ -61,10 +62,10 @@ fn run(ctxt: &mut Ctxt) -> Term {
     if cfg!(feature = "winning_incremental") {
         let mut seen: HashSet<(NonTerminal, Id)> = HashSet::new();
         for nt in 0..ctxt.classes.len() {
-            for id in 0..ctxt.classes[nt].len() {
+            'cs: for id in 0..ctxt.classes[nt].len() {
                 if ctxt.classes[nt][id].prev_sol > 0 && seen.get(&(nt, id)).is_none() {
                     add_node_part(nt, id, ctxt, &mut seen);
-                }
+                } 
             }
         }
     }
@@ -159,7 +160,7 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
     (None, maxsat)
 }
 
-pub fn synth(problem: &Problem, big_sigmas: &[Sigma], classes: Option<Vec<Vec<Class>>>, perceptron: &Perceptron) -> (Term, Vec<Vec<Class>>) {
+pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<HashMap<Box<[Value]>, bool>>>, classes: Option<Vec<Vec<Class>>>, perceptron: &Perceptron) -> (Term, Vec<HashMap<Box<[Value]>, bool>>, Vec<Vec<Class>>) {
     let mut small_sigmas: IndexSet<Sigma> = IndexSet::new();
     let mut sigma_indices: Vec<Box<[usize]>> = Vec::new();
     for bsigma in big_sigmas {
@@ -177,6 +178,10 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma], classes: Option<Vec<Vec<Cl
     let small_sigmas: Box<[Sigma]> = small_sigmas.into_iter().collect();
     let sigma_indices: Box<[Box<[usize]>]> = sigma_indices.into();
     let no_nt = problem.synth_fun.nonterminal_defs.len();
+
+    let mut cxs_cache = cxs_cache.unwrap_or(Vec::new());
+    cxs_cache.push(HashMap::new());
+
     let mut ctxt = Ctxt {
         queue: Default::default(),
         big_sigmas,
@@ -184,12 +189,13 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma], classes: Option<Vec<Vec<Cl
         sigma_indices,
         problem,
         vals_lookup: Default::default(),
+        cxs_cache, 
         classes: classes.unwrap_or(vec![vec![]; no_nt]),
         solids: vec![vec![]; no_nt],
         perceptron,
     };
 
-    (run(&mut ctxt), ctxt.classes)
+    (run(&mut ctxt), ctxt.cxs_cache, ctxt.classes)
 }
 
 
@@ -199,7 +205,7 @@ fn add_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<(N
 
     for (cnt, c) in node.signature().0.iter().zip(node.children()) {
         if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
-            if seen.get(&(*j, *i)).is_none() {
+            if seen.insert((*j, *i)) {
                 add_node_part(*j, *i, ctxt, seen);
             }
        }
@@ -208,7 +214,7 @@ fn add_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<(N
     let new_vals: Vec<Value> = {
         let mut vals = Vec::new();
         for (i, sigma) in ctxt.small_sigmas[new_sigmas..].iter().enumerate() {
-            let f = |cnt: usize, id: Id| {
+            let f = |cnt: NonTerminal, id: Id| {
                 Some(ctxt.classes[cnt][id].vals[new_sigmas + i].clone())
             } ;
             match node.eval(&f, sigma) {
@@ -219,22 +225,18 @@ fn add_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<(N
         vals
     };
 
-    ctxt.solids[nt].push(id); // Not sure if we can do this
+    ctxt.solids[nt].push(id); 
 
-    let mut temp_vec = ctxt.classes[nt][id].vals.clone().into_vec();
-    temp_vec.extend(new_vals);
-    ctxt.classes[nt][id].vals = temp_vec.into_boxed_slice();
+    let mut vals = ctxt.classes[nt][id].vals.clone().into_vec(); 
+    vals.extend(new_vals);
+    let vals_boxed: Box<[Value]> = vals.into_boxed_slice();
+    ctxt.classes[nt][id].vals = vals_boxed.clone();
 
-    ctxt.vals_lookup.insert((nt, ctxt.classes[nt][id].vals.clone()), id);
+    ctxt.vals_lookup.insert((nt, vals_boxed), id);
 
-    let bs = ctxt.big_sigmas.len() - 1;
-    ctxt.classes[nt][id].satcount += if ctxt.problem.rettys.contains(&ctxt.classes[nt][id].node.ty()) {
-        0
-    } else {
-        satcount(nt, id, ctxt, true)
-    };
-
-    seen.insert((nt, id));
+    if ctxt.problem.rettys.contains(&ctxt.classes[nt][id].node.ty()) {
+        ctxt.classes[nt][id].satcount += satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
+    }
 
     enqueue(nt, id, ctxt);
 }
@@ -265,15 +267,37 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt) -> (Option<Id>, usize)
             features: Vec::new(),
         };
         ctxt.classes[nt].push(c);
-        ctxt.vals_lookup.insert((nt, vals), i);
 
-        let satcount = satcount(nt, i, ctxt, false);
-        ctxt.classes[nt][i].satcount = satcount;
-        sc = satcount;
+        if ctxt.big_sigmas.len() > 0 {
+            let no_vals = ctxt.small_sigmas.len() / ctxt.big_sigmas.len();
+
+            let mut satc= 0;
+            let mut to_check = Vec::new();
+            for (i , chunk) in vals.chunks_exact(no_vals).enumerate() {
+                if let Some(b) = ctxt.cxs_cache[i].get::<[core::Value]>(chunk) {
+                    satc += *b as usize;
+                } else {
+                    to_check.push(i);
+                }
+            }
+
+            let idxs = if to_check.is_empty() {
+                None
+            } else { Some(to_check) };
+
+            satc += satcount(nt, i, ctxt, idxs);
+            sc = satc;
+
+            ctxt.classes[nt][i].satcount = sc;
+        } else {
+            sc = 0
+        }
 
         // dbg!(extract(i, ctxt));
 
-        if satcount == ctxt.big_sigmas.len() && ctxt.problem.rettys.contains(&Ty::NonTerminal(nt)) { // ugly but ok
+        ctxt.vals_lookup.insert((nt, vals), i);
+
+        if sc == ctxt.big_sigmas.len() && ctxt.problem.rettys.contains(&Ty::NonTerminal(nt)) { // ugly but ok
             return (Some(i), sc);
         }
 
@@ -340,18 +364,34 @@ fn minsize(nt: NonTerminal, node: &Node, ctxt: &Ctxt) -> usize {
         .map(|(cnt, x)| ctxt.classes[*cnt][*x].size).sum::<usize>() + 1
 }
 
-fn satcount(nt: NonTerminal, x: Id, ctxt: &mut Ctxt, part: bool) -> usize {
+fn satcount(nt: NonTerminal, x: Id, ctxt: &mut Ctxt, idxs: Option<Vec<usize>>) -> usize {
     let ty = ctxt.classes[nt][x].node.ty();
     if ctxt.problem.nt_mapping.get(&ty).expect("this never happens") != &ctxt.problem.rettype {
         return 0;
     }
     let t = extract(nt, x, ctxt);
-    if part {
-        let new_ce = ctxt.big_sigmas.last().unwrap();
-        ctxt.problem.satisfy(&t, &[new_ce.to_vec()])
-    } else {
-        ctxt.problem.satisfy(&t, ctxt.big_sigmas)
+    let no_vals = ctxt.small_sigmas.len() / ctxt.big_sigmas.len();
+
+    if let Some(idxs) = idxs {
+        let r = ctxt.problem.satisfy(&t, idxs.iter().map(|&i| ctxt.big_sigmas[i].as_slice()));
+        for (pos, &i) in idxs.iter().enumerate() {
+            let start = i * no_vals;
+            let vchunk = &ctxt.classes[nt][x].vals[start .. start + no_vals];
+            ctxt.cxs_cache[i].insert(Box::<[Value]>::from(vchunk), r[pos]);
+        }
+        return r.iter().map(|x| *x as usize).sum();
     }
+
+    let r = ctxt.problem.satisfy(&t, ctxt.big_sigmas.iter().map(|v| v.as_slice()));
+    for (i, (vchunk, &res)) in ctxt.classes[nt][x]
+        .vals
+        .chunks_exact(no_vals)
+        .zip(r.iter())
+        .enumerate()
+    {
+        ctxt.cxs_cache[i].insert(Box::<[Value]>::from(vchunk), res);
+    }
+    r.iter().map(|x| *x as usize).sum()
 }
 
 fn extract(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Term {
