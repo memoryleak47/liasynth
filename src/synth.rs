@@ -58,6 +58,17 @@ fn run(ctxt: &mut Ctxt) -> Term {
         }
     }
 
+    if cfg!(feature = "winning_incremental") {
+        let mut seen: HashSet<(NonTerminal, Id)> = HashSet::new();
+        for nt in 0..ctxt.classes.len() {
+            for id in 0..ctxt.classes[nt].len() {
+                if ctxt.classes[nt][id].prev_sol > 0 && seen.get(&(nt, id)).is_none() {
+                    add_node_part(nt, id, ctxt, &mut seen);
+                }
+            }
+        }
+    }
+
     for (nt, n) in ctxt.problem.prod_rules() {
         let n = n.clone();
         if n.children().is_empty() {
