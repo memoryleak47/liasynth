@@ -270,6 +270,10 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt) -> (Option<Id>, usize)
 
         if ctxt.big_sigmas.len() > 0 {
             let no_vals = ctxt.small_sigmas.len() / ctxt.big_sigmas.len();
+            println!("{:?}", no_vals);
+            println!("{:?}", vals.len());
+            println!("{:?}", ctxt.big_sigmas.len());
+            println!("{:?}\n", ctxt.small_sigmas.len());
 
             let mut satc= 0;
             let mut to_check = Vec::new();
