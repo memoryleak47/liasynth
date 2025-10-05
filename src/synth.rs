@@ -281,11 +281,10 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt) -> (Option<Id>, usize)
                 }
             }
 
-            let idxs = if to_check.is_empty() {
-                None
-            } else { Some(to_check) };
 
-            satc += satcount(nt, i, ctxt, idxs);
+            if !to_check.is_empty() {
+                satc += satcount(nt, i, ctxt, Some(to_check));
+            };
             sc = satc;
 
             ctxt.classes[nt][i].satcount = sc;
