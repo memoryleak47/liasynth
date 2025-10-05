@@ -269,16 +269,11 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt) -> (Option<Id>, usize)
         ctxt.classes[nt].push(c);
 
         if ctxt.big_sigmas.len() > 0 {
-            let no_vals = ctxt.small_sigmas.len() / ctxt.big_sigmas.len();
-            println!("{:?}", no_vals);
-            println!("{:?}", vals.len());
-            println!("{:?}", ctxt.big_sigmas.len());
-            println!("{:?}\n", ctxt.small_sigmas.len());
-
             let mut satc= 0;
             let mut to_check = Vec::new();
-            for (i , chunk) in vals.chunks_exact(no_vals).enumerate() {
-                if let Some(b) = ctxt.cxs_cache[i].get::<[core::Value]>(chunk) {
+            for (i , chunk) in ctxt.sigma_indices.iter().enumerate() {
+                let vals_chunk = chunk.iter().map(|idx| vals[*idx].clone()).collect::<Vec<_>>();
+                if let Some(b) = ctxt.cxs_cache[i].get::<[core::Value]>(&vals_chunk) {
                     satc += *b as usize;
                 } else {
                     to_check.push(i);
