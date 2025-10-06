@@ -38,6 +38,7 @@ pub struct Ctxt<'a> {
 #[derive(Clone)]
 pub struct Class {
     node: Node,
+    nodes: Vec<Node>,
     size: usize,
     vals: Box<[Value]>,
     handled_size: Option<usize>, // what was the size when this class was handled last time.
@@ -53,7 +54,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
         for nt in 0..ctxt.classes.len() {
             for id in 0..ctxt.classes[nt].len() {
                 if seen.insert((nt, id)) {
-                    add_node_part(nt, id, ctxt, &mut seen);
+                    add_class_part(nt, id, ctxt, &mut seen);
                 }
             }
         }
@@ -64,7 +65,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
         for nt in 0..ctxt.classes.len() {
             'cs: for id in 0..ctxt.classes[nt].len() {
                 if ctxt.classes[nt][id].prev_sol > 0 && seen.get(&(nt, id)).is_none() {
-                    add_node_part(nt, id, ctxt, &mut seen);
+                    add_class_part(nt, id, ctxt, &mut seen);
                 } 
             }
         }
@@ -73,7 +74,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
     for (nt, n) in ctxt.problem.prod_rules() {
         let n = n.clone();
         if n.children().is_empty() {
-            let (_sol, maxsat) = add_node(*nt, n, ctxt);
+            let (_sol, maxsat) = add_node(*nt, n, ctxt, None);
             if let Some(sol) = _sol {
                 handle_sol(*nt, sol, ctxt);
                 return extract(*nt, sol, ctxt);
@@ -148,7 +149,7 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
                     .map(|(_, x)| x)
                     .zip(a.iter()).for_each(|(ptr, v)| { *ptr = Child::Hole(*v); });
 
-                let (_sol, sc) = add_node(out_type, rule.clone(), ctxt);
+                let (_sol, sc) = add_node(out_type, rule.clone(), ctxt, None);
                 if let Some(sol) = _sol {
                     return (Some((out_type, sol)), maxsat);
                 }
@@ -199,14 +200,50 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<Hash
 }
 
 
-fn add_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<(NonTerminal, Id)>) {
+fn add_class_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<(NonTerminal, Id)>) {
+    add_canon_node_part(nt, id, ctxt, seen);
+    let nodes = ctxt.classes[nt][id].nodes[1..].to_vec();
+    let vals = ctxt.classes[nt][id].vals.to_vec();
+    let new_sigmas = ctxt.classes[nt][id].vals.len();
+    for n in nodes {
+        add_nodes_part(nt, n, ctxt, seen, &vals, new_sigmas);
+    }
+}
+
+fn add_nodes_part(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, seen: &mut HashSet<(NonTerminal, Id)>, vals: &Vec<Value>, ns: usize) -> (Option<Id>, usize) {
+    for (cnt, c) in node.signature().0.iter().zip(node.children()) {
+        if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
+            if seen.insert((*j, *i)) {
+                add_class_part(*j, *i, ctxt, seen);
+            }
+       }
+    }
+
+    let new_vals: Vec<Value> = {
+        let mut vals = Vec::new();
+        for (i, sigma) in ctxt.small_sigmas[ns..].iter().enumerate() {
+            let f = |cnt: NonTerminal, id: Id| {
+                Some(ctxt.classes[cnt][id].vals[ns + i].clone())
+            } ;
+            match node.eval(&f, sigma) {
+                Some(val) => vals.push(val),
+                None => panic!("Why cannot evaluate?")
+            }
+        }
+        vals
+    };
+
+    add_node(nt, node, ctxt, Some(vals.clone().into_boxed_slice()))
+}
+
+fn add_canon_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<(NonTerminal, Id)>) {
     let node = ctxt.classes[nt][id].node.clone();
     let new_sigmas = ctxt.classes[nt][id].vals.len();
 
     for (cnt, c) in node.signature().0.iter().zip(node.children()) {
         if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
             if seen.insert((*j, *i)) {
-                add_node_part(*j, *i, ctxt, seen);
+                add_class_part(*j, *i, ctxt, seen);
             }
        }
     }
@@ -242,8 +279,14 @@ fn add_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<(N
 }
 
 
-fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
-    let Some(vals) = vals(nt, &node, ctxt) else { return (None, 0) };
+fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<Box<[Value]>>) -> (Option<Id>, usize) {
+    let vals = match provided_vals {
+        Some(v) => v,
+        None => match vals(nt, &node, ctxt) {
+            Some(v) => v,
+            None => return (None, 0),
+        },
+    };
     let sc;
 
     if let Some(&i) = ctxt.vals_lookup.get(&(nt, vals.clone())) {
@@ -253,13 +296,18 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt) -> (Option<Id>, usize)
         if newsize < c.size {
             c.size = newsize;
             c.node = node.clone();
+            c.node = node.clone();
+            c.nodes.insert(0, node);
             enqueue(nt, i, ctxt);
+        } else {
+            c.nodes.push(node);
         }
     } else {
         let i = ctxt.classes[nt].len();
         let c = Class {
             size: minsize(nt, &node, ctxt),
-            node,
+            node: node.clone(),
+            nodes: vec![node],
             vals: vals.clone(),
             handled_size: None,
             satcount: 0, // will be set later!
