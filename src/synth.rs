@@ -3,11 +3,30 @@ use crate::*;
 use indexmap::IndexSet;
 use itertools::Itertools;
 use std::collections::{HashSet, HashMap};
+use std::collections::hash_map::Entry;
 use ordered_float::OrderedFloat;
+
 
 type Score = OrderedFloat<f32>;
 type Queue = BinaryHeap<WithOrd<(usize, Id), Score>>;
 type NonTerminal = usize;
+
+pub struct Seen(HashMap<(NonTerminal, Id), Vec<Child>>);
+impl Seen {
+    pub fn new() -> Self {
+        Seen(HashMap::new())
+    }
+
+    pub fn contains_or_insert(&mut self, nt: NonTerminal, id: Id, c: Child) -> bool {
+        match self.0.entry((nt, id)) {
+            Entry::Vacant(e) => {
+                e.insert(vec![c]);
+                true
+            }
+            Entry::Occupied(_) => false,
+        }
+    }
+}
 
 // SmallSigma has as many values as our synthfun has arguments.
 // BigSigma has as many values as our Sygus file declares.
@@ -50,10 +69,10 @@ pub struct Class {
 fn run(ctxt: &mut Ctxt) -> Term {
 
     if cfg!(feature = "simple_incremental") {
-        let mut seen: HashSet<(NonTerminal, Id)> = HashSet::new();
+        let mut seen = Seen::new();
         for nt in 0..ctxt.classes.len() {
             for id in 0..ctxt.classes[nt].len() {
-                if seen.insert((nt, id)) {
+                if seen.contains_or_insert(nt, id) {
                     add_class_part(nt, id, ctxt, &mut seen);
                 }
             }
@@ -61,10 +80,10 @@ fn run(ctxt: &mut Ctxt) -> Term {
     }
 
     if cfg!(feature = "winning_incremental") {
-        let mut seen: HashSet<(NonTerminal, Id)> = HashSet::new();
+        let mut seen = Seen::new();
         for nt in 0..ctxt.classes.len() {
             'cs: for id in 0..ctxt.classes[nt].len() {
-                if ctxt.classes[nt][id].prev_sol > 0 && seen.get(&(nt, id)).is_none() {
+                if ctxt.classes[nt][id].prev_sol > 0  && seen.contains_or_insert(nt, id) {
                     add_class_part(nt, id, ctxt, &mut seen);
                 } 
             }
@@ -74,10 +93,10 @@ fn run(ctxt: &mut Ctxt) -> Term {
     for (nt, n) in ctxt.problem.prod_rules() {
         let n = n.clone();
         if n.children().is_empty() {
-            let (_sol, maxsat) = add_node(*nt, n, ctxt, None);
-            if let Some(sol) = _sol {
-                handle_sol(*nt, sol, ctxt);
-                return extract(*nt, sol, ctxt);
+            let (_sol, is_sol, maxsat) = add_node(*nt, n, ctxt, None);
+            if is_sol {
+                handle_sol(*nt, _sol, ctxt);
+                return extract(*nt, _sol, ctxt);
             }
             // ctxt.perceptron.train(ctxt.classes[n.ident].features, maxsat);
         }
@@ -149,9 +168,9 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
                     .map(|(_, x)| x)
                     .zip(a.iter()).for_each(|(ptr, v)| { *ptr = Child::Hole(*v); });
 
-                let (_sol, sc) = add_node(out_type, rule.clone(), ctxt, None);
-                if let Some(sol) = _sol {
-                    return (Some((out_type, sol)), maxsat);
+                let (_sol, is_sol, sc) = add_node(out_type, rule.clone(), ctxt, None);
+                if is_sol {
+                    return (Some((out_type, _sol)), maxsat);
                 }
                 maxsat = std::cmp::max(maxsat, sc);
             }
@@ -200,23 +219,34 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<Hash
 }
 
 
-fn add_class_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<(NonTerminal, Id)>) {
+fn add_class_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen) {
     add_canon_node_part(nt, id, ctxt, seen);
     let nodes = ctxt.classes[nt][id].nodes[1..].to_vec();
     let vals = ctxt.classes[nt][id].vals.to_vec();
     let new_sigmas = ctxt.classes[nt][id].vals.len();
     for n in nodes {
-        add_nodes_part(nt, n, ctxt, seen, &vals, new_sigmas);
+        add_nodes_part(nt, id, n, ctxt, seen, &vals, new_sigmas);
     }
 }
 
-fn add_nodes_part(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, seen: &mut HashSet<(NonTerminal, Id)>, vals: &Vec<Value>, ns: usize) -> (Option<Id>, usize) {
+fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mut Seen, vals: &Vec<Value>, ns: usize) -> (Id, bool, usize) {
     for (cnt, c) in node.signature().0.iter().zip(node.children()) {
         if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
-            if seen.insert((*j, *i)) {
+            if seen.contains_or_insert(*j, *i) {
                 add_class_part(*j, *i, ctxt, seen);
             }
        }
+    }
+
+
+    for comb in node.signature().0.iter().zip(node.children())
+        .map(|(cnt, c)| {
+            if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
+                seen.0[&(*j, *i)].clone()
+            } else { vec![c] }
+        })
+        .multi_cartesian_product() 
+    {
     }
 
     let new_vals: Vec<Value> = {
@@ -233,16 +263,20 @@ fn add_nodes_part(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, seen: &mut HashS
         vals
     };
 
-    add_node(nt, node, ctxt, Some(vals.clone().into_boxed_slice()))
+    let (nid, sol, sc) = add_node(nt, node, ctxt, Some(vals.clone().into_boxed_slice()));
+    seen.0.get_mut(&(nt, id)).unwrap().push(nid); 
+
+    (id, sol, sc)
+
 }
 
-fn add_canon_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut HashSet<(NonTerminal, Id)>) {
+fn add_canon_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen) {
     let node = ctxt.classes[nt][id].node.clone();
     let new_sigmas = ctxt.classes[nt][id].vals.len();
 
     for (cnt, c) in node.signature().0.iter().zip(node.children()) {
         if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
-            if seen.insert((*j, *i)) {
+            if seen.contains_or_insert(*j, *i) {
                 add_class_part(*j, *i, ctxt, seen);
             }
        }
@@ -279,31 +313,33 @@ fn add_canon_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Hash
 }
 
 
-fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<Box<[Value]>>) -> (Option<Id>, usize) {
+fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<Box<[Value]>>) -> (Id, bool, usize) {
     let vals = match provided_vals {
         Some(v) => v,
         None => match vals(nt, &node, ctxt) {
             Some(v) => v,
-            None => return (None, 0),
+            None => return (0, false, 0), //is this okay? i dunno for now
         },
     };
     let sc;
+    let i;
 
-    if let Some(&i) = ctxt.vals_lookup.get(&(nt, vals.clone())) {
+    if let Some(&j) = ctxt.vals_lookup.get(&(nt, vals.clone())) {
         let newsize = minsize(nt, &node, ctxt);
-        let c = &mut ctxt.classes[nt][i];
+        let c = &mut ctxt.classes[nt][j];
         sc = c.satcount;
         if newsize < c.size {
             c.size = newsize;
             c.node = node.clone();
             c.node = node.clone();
             c.nodes.insert(0, node);
-            enqueue(nt, i, ctxt);
+            enqueue(nt, j, ctxt);
         } else {
             c.nodes.push(node);
         }
+        i = j
     } else {
-        let i = ctxt.classes[nt].len();
+        i = ctxt.classes[nt].len();
         let c = Class {
             size: minsize(nt, &node, ctxt),
             node: node.clone(),
@@ -344,13 +380,13 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
         ctxt.vals_lookup.insert((nt, vals), i);
 
         if sc == ctxt.big_sigmas.len() && ctxt.problem.rettys.contains(&Ty::NonTerminal(nt)) { // ugly but ok
-            return (Some(i), sc);
+            return (i, true, sc);
         }
 
         enqueue(nt, i, ctxt);
     }
 
-    (None, sc)
+    (i, false, sc)
 }
 
 fn enqueue(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) {
