@@ -230,14 +230,15 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<Hash
 
 
 fn add_class_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen) -> Option<(NonTerminal, Id)> {
-    add_canon_node_part(nt, id, ctxt, seen);
     let vals = ctxt.classes[nt][id].vals.to_vec();
-    let new_sigmas = ctxt.classes[nt][id].vals.len();
+    let seen_sigmas = ctxt.classes[nt][id].vals.len();
+
     let class = &mut ctxt.classes[nt][id];
     let heap = std::mem::take(&mut class.nodes);
 
+    add_canon_node_part(nt, id, ctxt, seen);
     for WithOrd(n, _) in heap.into_sorted_vec().into_iter().skip(1) {
-        if let Some(id) = add_nodes_part(nt, id, n, ctxt, seen, &vals, new_sigmas) {
+        if let Some(id) = add_nodes_part(nt, id, n, ctxt, seen, &vals, seen_sigmas) {
             return Some((nt, id));
         }
     }
@@ -245,7 +246,7 @@ fn add_class_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen) -> 
     None
 }
 
-fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mut Seen, vals: &[Value], ns: usize) -> Option<Id> {
+fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mut Seen, vals: &[Value], seen_sigmas: usize) -> Option<Id> {
     for (cnt, c) in node.signature().0.iter().zip(node.children()) {
         if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
             if seen.contains_or_insert(*j, *i) {
@@ -254,8 +255,6 @@ fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &m
        }
     }
 
-
-    println!("\n{:?}", node);
     for comb in node.signature().0.iter().zip(node.children())
         .map(|(cnt, c)| {
             if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
@@ -271,8 +270,7 @@ fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &m
                 _ => { } 
             }
         }
-        println!("\n {:?}, {:?}", comb,  new_node);
-        let (idx, sol, sc) = add_node_part(nt, id, new_node, ctxt, seen, vals, ns);
+        let (idx, sol, sc) = add_node_part(nt, id, new_node, ctxt, seen, vals, seen_sigmas);
         if sol { 
             return Some(idx)
         }
@@ -282,10 +280,10 @@ fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &m
 
 }
 
-fn add_node_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mut Seen, vals: &[Value], ns: usize) -> (Id, bool, usize) {
+fn add_node_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mut Seen, vals: &[Value], seen_sigmas: usize) -> (Id, bool, usize) {
     let mut delta = Vec::new();
-    for (i, sigma) in ctxt.small_sigmas[ns..].iter().enumerate() {
-        let f = |cnt: NonTerminal, id: Id| Some(ctxt.classes[cnt][id].vals[ns + i].clone());
+    for (i, sigma) in ctxt.small_sigmas[seen_sigmas..].iter().enumerate() {
+        let f = |cnt: NonTerminal, id: Id| Some(ctxt.classes[cnt][id].vals[seen_sigmas+ i].clone());
         delta.push(node.eval(&f, sigma).expect("eval failed"));
     }
 
@@ -301,7 +299,7 @@ fn add_node_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mu
 
 fn add_canon_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen) {
     let node = ctxt.classes[nt][id].node.clone();
-    let ns = ctxt.classes[nt][id].vals.len();
+    let seen_sigmas = ctxt.classes[nt][id].vals.len();
 
     for (cnt, c) in node.signature().0.iter().zip(node.children()) {
         if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
@@ -312,8 +310,8 @@ fn add_canon_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen
     }
 
     let mut delta = Vec::new();
-    for (i, sigma) in ctxt.small_sigmas[ns..].iter().enumerate() {
-        let f = |cnt: NonTerminal, idx: Id| Some(ctxt.classes[cnt][idx].vals[ns + i].clone());
+    for (i, sigma) in ctxt.small_sigmas[seen_sigmas ..].iter().enumerate() {
+        let f = |cnt: NonTerminal, idx: Id| Some(ctxt.classes[cnt][idx].vals[seen_sigmas + i].clone());
         delta.push(node.eval(&f, sigma).expect("eval failed"));
     }
 
