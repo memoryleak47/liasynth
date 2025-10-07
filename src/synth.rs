@@ -12,7 +12,7 @@ type Queue = BinaryHeap<WithOrd<(usize, Id), Score>>;
 type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 type NonTerminal = usize;
 
-pub struct Seen(HashMap<(NonTerminal, Id), Vec<Id>>);
+pub struct Seen(HashMap<(NonTerminal, Id), HashSet<Id>>);
 impl Seen {
     pub fn new() -> Self {
         Seen(HashMap::new())
@@ -21,7 +21,7 @@ impl Seen {
     pub fn contains_or_insert(&mut self, nt: NonTerminal, id: Id) -> bool {
         match self.0.entry((nt, id)) {
             Entry::Vacant(e) => {
-                e.insert(vec![id]);
+                e.insert(HashSet::from([id]));
                 true
             }
             Entry::Occupied(_) => false,
@@ -235,11 +235,8 @@ fn add_class_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen) -> 
     let new_sigmas = ctxt.classes[nt][id].vals.len();
     let class = &mut ctxt.classes[nt][id];
     let heap = std::mem::take(&mut class.nodes);
-    let mut v = heap.into_sorted_vec();
-    let nodes: Vec<Node> = v.drain(1..)
-        .map(|WithOrd(n, _)| n)
-        .collect();
-    for n in nodes {
+
+    for WithOrd(n, _) in heap.into_sorted_vec().into_iter().skip(1) {
         if let Some(id) = add_nodes_part(nt, id, n, ctxt, seen, &vals, new_sigmas) {
             return Some((nt, id));
         }
@@ -261,7 +258,7 @@ fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &m
     for comb in node.signature().0.iter().zip(node.children())
         .map(|(cnt, c)| {
             if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
-                seen.0[&(*j, *i)].clone()
+                seen.0[&(*j, *i)].clone().into_iter().collect::<Vec<_>>()
             } else { vec![0] } // dummy id 
         })
         .multi_cartesian_product() 
@@ -294,7 +291,7 @@ fn add_node_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mu
     full_vals.extend(delta);
 
     let (nid, sol, sc) = add_node(nt, node, ctxt, Some(full_vals.clone().into_boxed_slice()));
-    seen.0.get_mut(&(nt, id)).unwrap().push(nid); 
+    seen.0.get_mut(&(nt, id)).unwrap().insert(nid); 
 
     (nid, sol, sc)
 }
@@ -362,7 +359,7 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
     } else {
         i = ctxt.classes[nt].len();
         let size = minsize(nt, &node, ctxt);
-        let mut nodes = NodeQueue::with_capacity(2);
+        let mut nodes = NodeQueue::with_capacity(5);
         nodes.push(WithOrd(node.clone(), size));
         let c = Class {
             size,
