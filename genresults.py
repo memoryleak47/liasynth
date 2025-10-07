@@ -9,12 +9,20 @@ from more_itertools import bucket
 from collections import defaultdict
 
 import pandas as pd
+import resource
+
+def _limit_mem(bytes_):
+    # Address space (virtual memory) limit
+    resource.setrlimit(resource.RLIMIT_AS, (bytes_, bytes_))
+    # Data segment (heap) limit (optional; some allocators respect this)
+    resource.setrlimit(resource.RLIMIT_DATA, (bytes_, bytes_))
 
 
 cvc5sol_pat = re.compile(r'(Int|Bool)\s(.*)\)')
 lias_pat     = re.compile(r'Answer:\s*(.*)')
 
-def run_shell(cmd, timeout, env=None, cwd=None):
+def run_shell(cmd, timeout, env=None, cwd=None, mem_bytes=None):
+    preexec = (lambda: _limit_mem(mem_bytes)) if mem_bytes is not None else None
     p = subprocess.Popen(
         cmd,
         stdout=subprocess.PIPE,
@@ -25,6 +33,7 @@ def run_shell(cmd, timeout, env=None, cwd=None):
         env=env,
         start_new_session=True,
         close_fds=True,
+        preexec_fn=preexec,
     )
     try:
         out, _ = p.communicate(timeout=timeout)
@@ -57,7 +66,7 @@ def run_lia_cvc5(benchmark, results, incr_type, timeout=10):
 
     with ThreadPoolExecutor(max_workers=2) as ex:
         futs = {
-            ex.submit(run_shell, cmd, timeout, os.environ.copy(), None): name
+            ex.submit(run_shell, cmd, timeout, os.environ.copy(), None, 1024**3): name
             for name, cmd in cmds.items()
         }
 
@@ -86,7 +95,7 @@ def run_lia_cvc5(benchmark, results, incr_type, timeout=10):
                 results[name]['status'].append(out)
             results[name]['solution'].append('-')
 
-def run_all(folder, *, incr_type, timeout):
+def run_all(folder, *, incr_type, additional_info, timeout):
     results = defaultdict(lambda: defaultdict(list))
     l = len(os.listdir(folder))
     for i, fname in enumerate(os.listdir(folder), start=1):
@@ -102,11 +111,12 @@ def run_all(folder, *, incr_type, timeout):
 
     # pd.DataFrame.from_dict(results['cvc5']).to_csv('cvc5_LIA_res.csv', index=False)
     # pd.DataFrame.from_dict(results['cvc5_clean']).to_csv('results/cvc5_cLIA_res.csv', index=False)
-    pd.DataFrame.from_dict(results[f'liasynth_{incr_type}']).to_csv(f'results/lia_{incr_type}.csv', index=False)
+    pd.DataFrame.from_dict(results[f'liasynth_{incr_type}']).to_csv(f'results/lia_{incr_type}_{additional_info}.csv', index=False)
     # pd.DataFrame.from_dict(results['liasynth_clean']).to_csv('results/lia_cLIA_res.csv', index=False)
 
 incr_type = 'default'
-if len(sys.argv) == 2:
+if len(sys.argv) == 3:
     incr_type = sys.argv[1]
+    additional_info= sys.argv[2]
 
-run_all('examples/LIA', incr_type=incr_type, timeout=10)
+run_all('examples/LIA', incr_type=incr_type, additional_info=additional_info, timeout=10)
