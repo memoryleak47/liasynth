@@ -9,6 +9,7 @@ use ordered_float::OrderedFloat;
 
 type Score = OrderedFloat<f32>;
 type Queue = BinaryHeap<WithOrd<(usize, Id), Score>>;
+type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 type NonTerminal = usize;
 
 pub struct Seen(HashMap<(NonTerminal, Id), Vec<Id>>);
@@ -54,10 +55,9 @@ pub struct Ctxt<'a> {
     perceptron: &'a Perceptron, // persistent learner through whole task
 }
 
-#[derive(Clone)]
 pub struct Class {
     node: Node,
-    nodes: Vec<Node>,
+    nodes: NodeQueue,
     size: usize,
     vals: Box<[Value]>,
     handled_size: Option<usize>, // what was the size when this class was handled last time.
@@ -216,7 +216,11 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<Hash
         problem,
         vals_lookup: Default::default(),
         cxs_cache, 
-        classes: classes.unwrap_or(vec![vec![]; no_nt]),
+        classes: classes.unwrap_or_else(|| {
+            std::iter::repeat_with(|| Vec::<Class>::new())
+                .take(no_nt)
+                .collect::<Vec<Vec<Class>>>()
+        }),
         solids: vec![vec![]; no_nt],
         perceptron,
     };
@@ -227,9 +231,14 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<Hash
 
 fn add_class_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen) -> Option<(NonTerminal, Id)> {
     add_canon_node_part(nt, id, ctxt, seen);
-    let nodes = ctxt.classes[nt][id].nodes[1..].to_vec();
     let vals = ctxt.classes[nt][id].vals.to_vec();
     let new_sigmas = ctxt.classes[nt][id].vals.len();
+    let class = &mut ctxt.classes[nt][id];
+    let heap = std::mem::take(&mut class.nodes);
+    let mut v = heap.into_sorted_vec();
+    let nodes: Vec<Node> = v.drain(1..)
+        .map(|WithOrd(n, _)| n)
+        .collect();
     for n in nodes {
         if let Some(id) = add_nodes_part(nt, id, n, ctxt, seen, &vals, new_sigmas) {
             return Some((nt, id));
@@ -346,18 +355,19 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
             c.size = newsize;
             c.node = node.clone();
             c.node = node.clone();
-            c.nodes.insert(0, node);
             enqueue(nt, j, ctxt);
-        } else {
-            c.nodes.push(node);
-        }
+        } 
+        ctxt.classes[nt][j].nodes.push(WithOrd(node, newsize));
         i = j
     } else {
         i = ctxt.classes[nt].len();
+        let size = minsize(nt, &node, ctxt);
+        let mut nodes = NodeQueue::with_capacity(2);
+        nodes.push(WithOrd(node.clone(), size));
         let c = Class {
-            size: minsize(nt, &node, ctxt),
-            node: node.clone(),
-            nodes: vec![node],
+            size,
+            node,
+            nodes,
             vals: vals.clone(),
             handled_size: None,
             satcount: 0, // will be set later!
