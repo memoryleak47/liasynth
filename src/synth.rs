@@ -2,7 +2,7 @@ use crate::*;
 
 use indexmap::IndexSet;
 use itertools::Itertools;
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashSet, HashMap, VecDeque};
 use std::collections::hash_map::Entry;
 use ordered_float::OrderedFloat;
 
@@ -11,6 +11,15 @@ type Score = OrderedFloat<f32>;
 type Queue = BinaryHeap<WithOrd<(usize, Id), Score>>;
 type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 type NonTerminal = usize;
+
+const MAXSIZE: usize = 5;
+
+fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
+    heap.push(val);
+    if heap.len() > MAXSIZE {
+        heap.pop(); 
+    }
+}
 
 pub struct Seen(HashMap<(NonTerminal, Id), HashSet<Id>>);
 impl Seen {
@@ -70,10 +79,11 @@ fn run(ctxt: &mut Ctxt) -> Term {
 
     if cfg!(feature = "simple_incremental") {
         let mut seen = Seen::new();
+        let mut todo: VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)> = VecDeque::new();
         for nt in 0..ctxt.classes.len() {
             for id in 0..ctxt.classes[nt].len() {
                 if seen.contains_or_insert(nt, id) {
-                    if let Some((nt, _sol)) = add_class_part(nt, id, ctxt, &mut seen) {
+                    if let Some((nt, _sol)) = add_class_part(nt, id, ctxt, &mut seen, &mut todo) {
                         handle_sol(nt, _sol, ctxt);
                         return extract(nt, _sol, ctxt);
                     }
@@ -84,16 +94,35 @@ fn run(ctxt: &mut Ctxt) -> Term {
 
     if cfg!(feature = "winning_incremental") {
         let mut seen = Seen::new();
+        let mut todo: VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)> = VecDeque::new();
         for nt in 0..ctxt.classes.len() {
             'cs: for id in 0..ctxt.classes[nt].len() {
                 if ctxt.classes[nt][id].prev_sol > 0  && seen.contains_or_insert(nt, id) {
-                    if let Some((nt, _sol)) = add_class_part(nt, id, ctxt, &mut seen) {
+                    if let Some((nt, _sol)) = add_class_part(nt, id, ctxt, &mut seen, &mut todo) {
                         handle_sol(nt, _sol, ctxt);
                         return extract(nt, _sol, ctxt);
                     }
                 } 
             }
         }
+        let mut len = todo.len();
+        let mut count = 0;
+        while let Some((nt, id, n, vals, seen_sigmas)) = todo.pop_front() {
+            if let Some((idx, _sol, sc)) = add_node_part(nt, id, n, ctxt, &mut seen, &vals, seen_sigmas, &mut todo) {
+                if _sol {
+                    handle_sol(nt, idx, ctxt);
+                    return extract(nt, idx, ctxt);
+                } else {
+                    count = 0;
+                    len -= 1;
+                }
+            }
+            count += 1;
+            if len == count {
+                break
+            } 
+        }
+
     }
 
     for (nt, n) in ctxt.problem.prod_rules() {
@@ -229,16 +258,16 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<Hash
 }
 
 
-fn add_class_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen) -> Option<(NonTerminal, Id)> {
+fn add_class_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen, todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>) -> Option<(NonTerminal, Id)> {
     let vals = ctxt.classes[nt][id].vals.to_vec();
     let seen_sigmas = ctxt.classes[nt][id].vals.len();
 
     let class = &mut ctxt.classes[nt][id];
     let heap = std::mem::take(&mut class.nodes);
 
-    add_canon_node_part(nt, id, ctxt, seen);
+    add_canon_node_part(nt, id, ctxt, seen, todo);
     for WithOrd(n, _) in heap.into_sorted_vec().into_iter().skip(1) {
-        if let Some(id) = add_nodes_part(nt, id, n, ctxt, seen, &vals, seen_sigmas) {
+        if let Some(id) = add_nodes_part(nt, id, n, ctxt, seen, &vals, seen_sigmas, todo) {
             return Some((nt, id));
         }
     }
@@ -246,11 +275,11 @@ fn add_class_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen) -> 
     None
 }
 
-fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mut Seen, vals: &[Value], seen_sigmas: usize) -> Option<Id> {
+fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mut Seen, vals: &[Value], seen_sigmas: usize, todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>) -> Option<Id> {
     for (cnt, c) in node.signature().0.iter().zip(node.children()) {
         if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
             if seen.contains_or_insert(*j, *i) {
-                add_class_part(*j, *i, ctxt, seen);
+                add_class_part(*j, *i, ctxt, seen, todo);
             }
        }
     }
@@ -270,9 +299,10 @@ fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &m
                 _ => { } 
             }
         }
-        let (idx, sol, sc) = add_node_part(nt, id, new_node, ctxt, seen, vals, seen_sigmas);
-        if sol { 
-            return Some(idx)
+        if let Some((idx, sol, sc)) = add_node_part(nt, id, new_node, ctxt, seen, vals, seen_sigmas, todo) {
+            if sol { 
+                return Some(idx)
+            }
         }
     }
 
@@ -280,11 +310,19 @@ fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &m
 
 }
 
-fn add_node_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mut Seen, vals: &[Value], seen_sigmas: usize) -> (Id, bool, usize) {
+fn add_node_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mut Seen, vals: &[Value], seen_sigmas: usize, todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>) -> Option<(Id, bool, usize)> {
     let mut delta = Vec::new();
     for (i, sigma) in ctxt.small_sigmas[seen_sigmas..].iter().enumerate() {
-        let f = |cnt: NonTerminal, id: Id| Some(ctxt.classes[cnt][id].vals[seen_sigmas+ i].clone());
-        delta.push(node.eval(&f, sigma).expect("eval failed"));
+        let f = |cnt: NonTerminal, idx: Id| {
+            if ctxt.classes[cnt][idx].vals.len() <= (seen_sigmas + i) {  return None; }
+            Some(ctxt.classes[cnt][idx].vals[seen_sigmas + i].clone())
+        };
+        if let Some(res) = node.eval(&f, sigma) {
+            delta.push(res);
+        } else { 
+            todo.push_back((nt, id, node.clone(), vals.to_vec(), seen_sigmas)); 
+            return None;
+        }
     }
 
     let mut full_vals = vals.clone().to_vec();
@@ -293,26 +331,34 @@ fn add_node_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mu
     let (nid, sol, sc) = add_node(nt, node, ctxt, Some(full_vals.clone().into_boxed_slice()));
     seen.0.get_mut(&(nt, id)).unwrap().insert(nid); 
 
-    (nid, sol, sc)
+    Some((nid, sol, sc))
 }
 
 
-fn add_canon_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen) {
+fn add_canon_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen, todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>) {
     let node = ctxt.classes[nt][id].node.clone();
     let seen_sigmas = ctxt.classes[nt][id].vals.len();
 
     for (cnt, c) in node.signature().0.iter().zip(node.children()) {
         if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
             if seen.contains_or_insert(*j, *i) {
-                add_class_part(*j, *i, ctxt, seen);
+                add_class_part(*j, *i, ctxt, seen, todo);
             }
        }
     }
 
     let mut delta = Vec::new();
     for (i, sigma) in ctxt.small_sigmas[seen_sigmas ..].iter().enumerate() {
-        let f = |cnt: NonTerminal, idx: Id| Some(ctxt.classes[cnt][idx].vals[seen_sigmas + i].clone());
-        delta.push(node.eval(&f, sigma).expect("eval failed"));
+        let f = |cnt: NonTerminal, idx: Id| {
+            if ctxt.classes[cnt][idx].vals.len() <= (seen_sigmas + i) {  return None; }
+            Some(ctxt.classes[cnt][idx].vals[seen_sigmas + i].clone())
+        };
+        if let Some(res) = node.eval(&f, sigma) {
+            delta.push(res);
+        } else { 
+            todo.push_back((nt, id, node.clone(), ctxt.classes[nt][id].vals.to_vec(), seen_sigmas));
+            return;
+        }
     }
 
     let mut full_vals = ctxt.classes[nt][id].vals.clone().to_vec();
@@ -354,12 +400,12 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
             c.node = node.clone();
             enqueue(nt, j, ctxt);
         } 
-        ctxt.classes[nt][j].nodes.push(WithOrd(node, newsize));
-        i = j
+        push_bounded(&mut ctxt.classes[nt][j].nodes, WithOrd(node, newsize));
+        i = j;
     } else {
         i = ctxt.classes[nt].len();
         let size = minsize(nt, &node, ctxt);
-        let mut nodes = NodeQueue::with_capacity(4);
+        let mut nodes = NodeQueue::new();
         nodes.push(WithOrd(node.clone(), size));
         let c = Class {
             size,
