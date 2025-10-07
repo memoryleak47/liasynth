@@ -255,6 +255,7 @@ fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &m
     }
 
 
+    println!("\n{:?}", node);
     for comb in node.signature().0.iter().zip(node.children())
         .map(|(cnt, c)| {
             if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
@@ -270,9 +271,10 @@ fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &m
                 _ => { } 
             }
         }
-        let (id, sol, sc) = add_node_part(nt, id, new_node, ctxt, seen, vals, ns);
+        println!("\n {:?}, {:?}", comb,  new_node);
+        let (idx, sol, sc) = add_node_part(nt, id, new_node, ctxt, seen, vals, ns);
         if sol { 
-            return Some(id)
+            return Some(idx)
         }
     }
 
@@ -311,7 +313,7 @@ fn add_canon_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen
 
     let mut delta = Vec::new();
     for (i, sigma) in ctxt.small_sigmas[ns..].iter().enumerate() {
-        let f = |cnt: NonTerminal, id: Id| Some(ctxt.classes[cnt][id].vals[ns + i].clone());
+        let f = |cnt: NonTerminal, idx: Id| Some(ctxt.classes[cnt][idx].vals[ns + i].clone());
         delta.push(node.eval(&f, sigma).expect("eval failed"));
     }
 
@@ -359,7 +361,7 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
     } else {
         i = ctxt.classes[nt].len();
         let size = minsize(nt, &node, ctxt);
-        let mut nodes = NodeQueue::with_capacity(5);
+        let mut nodes = NodeQueue::with_capacity(4);
         nodes.push(WithOrd(node.clone(), size));
         let c = Class {
             size,
