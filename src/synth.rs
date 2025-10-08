@@ -12,7 +12,9 @@ type Queue = BinaryHeap<WithOrd<(usize, Id), Score>>;
 type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 type NonTerminal = usize;
 
-const MAXSIZE: usize = 5;
+// If this is set to 1 we have 'normal' incremental
+// Set to 1 when doing non-incremental
+const MAXSIZE: usize = 7;
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
     heap.push(val);
@@ -464,32 +466,20 @@ fn enqueue(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) {
 #[cfg(feature = "heuristic_default")]
 fn heuristic(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[nt][x];
-    if nt != 0 {
-        return OrderedFloat(10000 as f32);
+    if *ctxt.problem.nt_mapping.get(&Ty::NonTerminal(nt)).unwrap() != ctxt.problem.rettype {
+        // let divisor = 2_usize.pow((ctxt.big_sigmas.len() / 2) as u32);
+        // return OrderedFloat((100000 / divisor) as f32);
+        return OrderedFloat(90000 as f32);
     }
 
+
     let mut a = 100000;
-    let subterms = c.node.signature().0.iter().zip(c.node.children());
-    let max_subterm_satcount = subterms
-        .filter_map(|(cnt, s)| {
-            if let Child::Hole(i) = s && let Ty::NonTerminal(j) = cnt { Some((j, i)) } else { None }
-        })
-        .map(|(cnt, s)| ctxt.classes[*cnt][*s].satcount)
-        .max()
-        .unwrap_or_else(|| 0);
-
-
-    let tmp = c.satcount.saturating_sub(max_subterm_satcount + 4);
-
-    for _ in tmp..ctxt.big_sigmas.len() {
+    let sat = c.satcount;
+    for _ in 0..sat {
         a /= 2;
     }
 
-    for _ in 0..c.prev_sol+1 {
-        a/=2;
-    }
-
-    OrderedFloat((a / (c.size + 5)) as f32)
+    OrderedFloat((a / (c.size.pow(4))) as f32)
 }
 
 #[cfg(feature = "heuristic_perceptron")]
