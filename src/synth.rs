@@ -469,17 +469,16 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Score {
     if *ctxt.problem.nt_mapping.get(&Ty::NonTerminal(nt)).unwrap() != ctxt.problem.rettype {
         // let divisor = 2_usize.pow((ctxt.big_sigmas.len() / 2) as u32);
         // return OrderedFloat((100000 / divisor) as f32);
-        return OrderedFloat(90000 as f32);
+        return OrderedFloat(30000 as f32);
     }
 
 
     let mut a = 100000;
-    let sat = c.satcount;
-    for _ in 0..sat {
+    for _ in c.satcount..ctxt.big_sigmas.len() {
         a /= 2;
     }
 
-    OrderedFloat((a / (c.size.pow(4))) as f32)
+    OrderedFloat((a / (c.size /2 + 1)) as f32)
 }
 
 #[cfg(feature = "heuristic_perceptron")]
