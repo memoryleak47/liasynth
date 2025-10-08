@@ -14,7 +14,7 @@ function run() {
         echo
         echo ==========
         echo "[$i/$all] $f:"
-        timeout 10s cvc4 "$f"
+        timeout 10s cvc5 "$f"
         i=$(($i+1))
     done
 
