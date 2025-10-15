@@ -22,23 +22,47 @@ pub type Id = usize;
 
 
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Hash, PartialOrd, Ord)]
-pub enum Ty { Int, Bool, NonTerminal(usize) }
+pub enum Ty { Int, Bool, NonTerminal(usize), PRule(usize) }
 
 impl Ty {
     pub fn to_string(&self) -> &'static str {
         match self {
             Ty::Int => "Int",
             Ty::Bool => "Bool",
-            Ty::NonTerminal(s) => "",
+            Ty::NonTerminal(_) => "",
+            Ty::PRule(_) => "",
         }
     }
 
-	pub fn into_nt(&self) -> Option<usize> {
+    pub fn into_nt(&self) -> Option<usize> {
         match self {
             Ty::NonTerminal(s) => Some(*s),
-			_ => None
+            _ => None
         }
-	}
+    }
+    pub fn captures_ty(&self, other: &Ty) -> bool {
+        match (self, other) {
+            (Ty::NonTerminal(mask), Ty::NonTerminal(n)) => (mask & (1usize << n)) != 0,
+            _ => false,
+        }
+    }
+
+    pub fn nt_indices(&self) -> Vec<usize> {
+        match self {
+            Ty::PRule(mask) => {
+                let mut bits = *mask;
+                let mut out = Vec::new();
+                while bits != 0 {
+                    let i = bits.trailing_zeros() as usize;
+                    out.push(i);
+                    bits &= bits - 1; // clear the lowest set bit
+                }
+                out
+            }
+            _ => Vec::new(),
+        }
+    }
+
 }
 
 impl Node {

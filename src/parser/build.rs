@@ -95,10 +95,13 @@ fn get_rst(l: &SExpr, nonterms: &IndexMap<String, Ty>, args: &IndexMap<String, T
     }
 }
 
-fn as_rule(nt: usize, s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<String, Ty>, defs: &IndexMap<String, DefinedFun>) -> GrammarTerm {
+fn as_rule(nt: usize, s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &IndexMap<String, Ty>, defs: &IndexMap<String, DefinedFun>, refs: &mut IndexMap<usize, Vec<String>>) -> GrammarTerm {
     match s {
         SExpr::Ident(id) => {
-            if nonterminals.contains_key(id) {return GrammarTerm::NonTerminal(id.clone(), Ty::NonTerminal(nt)); }
+            if nonterminals.contains_key(id) {
+                refs.entry(nt).or_default().push(id.clone());
+                return GrammarTerm::NonTerminal(id.clone(), Ty::NonTerminal(nt));
+            }
             if let Ok(i) = id.parse::<Int>() { return GrammarTerm::ConstInt(i, Ty::NonTerminal(nt)); }
             if id == "true" { return GrammarTerm::ConstBool(true, Ty::NonTerminal(nt)); }
             if id == "false" { return GrammarTerm::ConstBool(false, Ty::NonTerminal(nt)); }
@@ -121,7 +124,7 @@ fn as_rule(nt: usize, s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &Ind
 
             if defs.contains_key(op) {
                 let rst = rst.iter().map(|x| {
-                    as_rule(nt, x, nonterminals, args, defs)
+                    as_rule(nt, x, nonterminals, args, defs, refs)
                 }).collect();
                 return GrammarTerm::DefinedFunCall(op.clone(), s, rst);
             }
@@ -193,10 +196,11 @@ fn handle_synth_fun(l: &[SExpr], synth: &mut SynthProblem) {
     }
 
     let mut nonterminal_defs = IndexMap::new();
+    let mut nonterminal_refs = IndexMap::new();
     for (nt, a) in nonterminal_defs_.iter().enumerate() {
         let SExpr::List(v) = a else { panic!() };
         let [SExpr::Ident(name), SExpr::Ident(ty), SExpr::List(rules)] = &v[..] else { panic!() };
-        let prod_rules = rules.iter().map(|x| as_rule(nt, x, &nonterminals, &args, &synth.defined_funs)).collect();
+        let prod_rules = rules.iter().map(|x| as_rule(nt, x, &nonterminals, &args, &synth.defined_funs, &mut nonterminal_refs)).collect();
         nonterminal_defs.insert(name.clone(), NonterminalDef {
             ty: as_ty(ty),
             prod_rules,
@@ -208,6 +212,7 @@ fn handle_synth_fun(l: &[SExpr], synth: &mut SynthProblem) {
         args,
         nonterminals,
         nonterminal_defs,
+        nonterminal_refs,
     });
 }
 

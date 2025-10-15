@@ -14,7 +14,14 @@ type NonTerminal = usize;
 
 // If this is set to 1 we have 'normal' incremental
 // Set to 1 when doing non-incremental
-const MAXSIZE: usize = 0;
+// TODO: compiler flag
+#[cfg(feature = "total-incremental")]
+    const MAXSIZE: usize = 5;
+
+#[cfg(not(feature = "total-incremental"))]
+    const MAXSIZE: usize = 0;
+
+
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
     heap.push(val);
@@ -79,7 +86,7 @@ pub struct Class {
 
 fn run(ctxt: &mut Ctxt) -> Term {
 
-    if cfg!(feature = "simple_incremental") {
+    if cfg!(feature = "simple-incremental") {
         let mut seen = Seen::new();
         let mut todo: VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)> = VecDeque::new();
         for nt in 0..ctxt.classes.len() {
@@ -94,7 +101,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
         }
     }
 
-    if cfg!(feature = "winning_incremental") {
+    if cfg!(feature = "winning-incremental") {
         let mut seen = Seen::new();
         let mut todo: VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)> = VecDeque::new();
         for nt in 0..ctxt.classes.len() {
@@ -129,7 +136,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
 
     for (nt, n) in ctxt.problem.prod_rules() {
         let n = n.clone();
-        if n.children().is_empty() {
+        if n.children().is_empty() && ! matches!(n, Node::PlaceHolder(_, _)) {
             let (_sol, is_sol, maxsat) = add_node(*nt, n, ctxt, None);
             if is_sol {
                 handle_sol(*nt, _sol, ctxt);
@@ -177,26 +184,48 @@ fn handle(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usiz
     grow(nt, x, ctxt)
 }
 
+
+// TODO:
+// To handle grammars such as:
+//       (synth-fun move ((currPoint Int) (o0 Int) (o1 Int)) Int
+//           ((Start Int) (MoveId Int) (CondInt Int) (StartBool Bool))
+//           ((Start Int (MoveId (ite StartBool Start Start)))
+//           (MoveId Int (0 1 2 3 4))
+//           (CondInt Int ((get-y currPoint) (get-x currPoint) (get-y o0) (get-x o0) (get-y o1) (get-x o1) (+ CondInt CondInt) (- CondInt CondInt) (- 1) 0 1 2 3 4 5 6 7 8 9))
+//           (StartBool Bool ((and StartBool StartBool) (or StartBool StartBool) (not StartBool) (<= CondInt CondInt) (= CondInt CondInt) (>= CondInt CondInt)))))
+//
+// We make intypes be a special Ty that captures multiple types based on bitflags that we can test 'captures_ty'.
+// BUT this does not work
+//
+// This does not work because having signature be decided at compile time and NonTerminal only capturing a usize means we cannot have
+// production rules that can take multiple nonterminals (as in the case where Start references another nonterminal)
+// In these cases when we try evaluate we look at the signature to give the nt for classes which cannot be changed at runtime
+// Can we scuff it and change at runtime? i dunno. Done for today.
+//
+// Solution would be a massive change in nonterminals and how we parse/build
 fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
     let ty = ctxt.classes[nt][x].node.ty();
     let mut maxsat = 0;
 
     for (nt, rule) in ctxt.problem.prod_rules() {
-        let (in_types, Ty::NonTerminal(out_type)) = rule.signature() else { panic!("what is happening: rule: {:?}  sig: {:?}", rule, rule.signature()) };
+        let (in_types, _) = rule.signature();
         for i in 0..rule.children().len() {
             if matches!(rule.children()[i], Child::VarInt(_) | Child::VarBool(_) | Child::Constant(_)) || rule.children()[i] != Child::Hole(0) {
                 continue;
             }
             let mut rule = rule.clone();
-            if in_types[i] != ty { continue }
+            if !in_types[i].captures_ty(&ty) { continue }
             rule.children_mut()[i] = Child::Hole(x);
 
             let mut in_types: Vec<_> = in_types.iter().cloned().collect();
             in_types.remove(i);
             let it = in_types.iter().map(|ty| match ty {
-                Ty::NonTerminal(i) => ctxt.solids[*i].clone().into_iter(),
+                Ty::NonTerminal(_) => ty.nt_indices().iter().flat_map(|j| ctxt.solids[*j].clone().into_iter()).collect::<Vec<_>>(),
                 _ => panic!("should not happen"),
             });
+
+
+            println!("{:?}", it);
 
             for a in it.multi_cartesian_product() {
                 rule.children_mut().iter_mut().enumerate()
@@ -205,9 +234,9 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
                     .map(|(_, x)| x)
                     .zip(a.iter()).for_each(|(ptr, v)| { *ptr = Child::Hole(*v); });
 
-                let (_sol, is_sol, sc) = add_node(out_type, rule.clone(), ctxt, None);
+                let (_sol, is_sol, sc) = add_node(*nt, rule.clone(), ctxt, None);
                 if is_sol {
-                    return (Some((out_type, _sol)), maxsat);
+                    return (Some((*nt, _sol)), maxsat);
                 }
                 maxsat = std::cmp::max(maxsat, sc);
             }
@@ -333,6 +362,7 @@ fn add_node_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mu
     let (nid, sol, sc) = add_node(nt, node, ctxt, Some(full_vals.clone().into_boxed_slice()));
     seen.0.get_mut(&(nt, id)).unwrap().insert(nid); 
 
+
     Some((nid, sol, sc))
 }
 
@@ -448,8 +478,15 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
 
         ctxt.vals_lookup.insert((nt, vals), i);
 
+        // TODO: compiler flag
         // if sc == ctxt.big_sigmas.len() && ctxt.problem.rettys.contains(&Ty::NonTerminal(nt)) { // ugly but ok
-        if sc == ctxt.big_sigmas.len() && ctxt.problem.rettype == *ctxt.problem.nt_mapping.get(&Ty::NonTerminal(nt)).unwrap() {
+        let is_valid_return = if cfg!(feature = "ignore-grammar") {
+            ctxt.problem.rettype == *ctxt.problem.nt_mapping.get(&Ty::NonTerminal(nt)).unwrap()
+        } else {
+            ctxt.problem.rettys.contains(&Ty::NonTerminal(nt))
+        };
+
+        if sc == ctxt.big_sigmas.len() && is_valid_return {
             return (i, true, sc);
         }
 
@@ -464,7 +501,7 @@ fn enqueue(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) {
     ctxt.queue.push(WithOrd((nt, x), h));
 }
 
-#[cfg(feature = "heuristic_default")]
+#[cfg(feature = "heuristic-default")]
 fn heuristic(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[nt][x];
     if nt != 0 {
@@ -491,8 +528,8 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Score {
     OrderedFloat((a / (c.size + 5)) as f32)
 }
 
-#[cfg(feature = "heuristic_perceptron")]
-fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
+#[cfg(feature = "heuristic-perceptron")]
+fn heuristic(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Score {
     let feats = feature_set1(x, ctxt);
     let score = ctxt.perceptron.predict(feats);
 

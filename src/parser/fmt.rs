@@ -52,6 +52,7 @@ impl Display for Ty {
             Ty::Int => write!(f, "Int"),
             Ty::Bool => write!(f, "Bool"),
             Ty::NonTerminal(i) => write!(f, "NonTerminal {}", i),
+            Ty::PRule(i) => write!(f, "Rule {}", i),
         }
     }
 }

@@ -92,7 +92,7 @@ fn expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, t: &m
             match ty {
                 Ty::Int => t.push(Node::VarInt(i, Ty::Int)),
                 Ty::Bool => t.push(Node::VarBool(i, Ty::Bool)),
-                Ty::NonTerminal(_) => panic!("should not happen")
+                _ => panic!("should not happen")
             }
         },
         Expr::ConstBool(true) => { t.push(Node::True(Ty::Bool)) },
@@ -119,20 +119,29 @@ pub fn mk_sygus_problem(f: &str) -> Problem {
     build_sygus(synth_problem)
 }
 
-fn parse_grammar_term(rule: &GrammarTerm, vars: &IndexMap<String, Ty>, nonterminals: &IndexMap<String, Ty>) -> Option<Node> {
+fn parse_grammar_term(rule: &GrammarTerm, vars: &IndexMap<String, Ty>, nonterminals: &IndexMap<String, Ty>, refs: &IndexMap<usize, Vec<String>>) -> Option<Node> {
     match rule {
         GrammarTerm::NonTerminal(n, ty) => {
             // we'll iterate over the referenced non-terminal anyways.
             // Thus, no need to do it now again.
-            let t = nonterminals.get_index_of(n).unwrap();
-            Some(Node::PlaceHolder(0, Ty::NonTerminal(t)))
+            let t = nonterminals.get_index_of(n)?;
+            let mut valids: usize = 1usize << t;
+
+            if let Some(vs) = refs.get(&t) {
+                for v in vs {
+                    let f = nonterminals.get_index_of(v)?;
+                    valids |= 1usize << f;
+                }
+            }
+
+            Some(Node::PlaceHolder(0, Ty::PRule(valids)))
         },
         GrammarTerm::Op(op, nts) => {
-            let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(n, vars, nonterminals)).collect();
+            let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(n, vars, nonterminals, refs)).collect();
             Some(Node::parse_prod(&*op, &*args).expect("Could not parse prod rule"))
         },
         GrammarTerm::DefinedFunCall(op, template, nts) => {
-            let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(n, vars, nonterminals)).collect();
+            let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(n, vars, nonterminals, refs)).collect();
             Some(Node::parse_prod(&*template, &*args).unwrap_or_else(|| panic!("Could not parse prod rule: template: {:?}, args: {:?}", template, args)))
         },
 
@@ -186,7 +195,7 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
                     rettys.push(Ty::NonTerminal(m));
                 }
             }
-            if let Some(node) = parse_grammar_term(rule, &vars, &synth_fun.nonterminals) {
+            if let Some(node) = parse_grammar_term(rule, &vars, &synth_fun.nonterminals, &synth_fun.nonterminal_refs) {
                 prod_rules.push((n, node));
             };
         }

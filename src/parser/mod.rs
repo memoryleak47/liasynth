@@ -21,6 +21,7 @@ pub struct SynthFun {
     pub ret: Ty,
     pub nonterminals: IndexMap<String, Ty>,
     pub nonterminal_defs: IndexMap<String, NonterminalDef>,
+    pub nonterminal_refs: IndexMap<usize, Vec<String>>,
 }
 
 // NonTerminals defined in `nonterminals` in the SynthFun.
