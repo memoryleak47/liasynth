@@ -247,6 +247,7 @@ impl Problem {
 
 impl Problem {
     pub fn satisfy<'a>(&self, term: &Term, ces: impl IntoIterator<Item = &'a [Value]>) -> Vec<bool> {
+        time_block!("problem.satisfy"); 
         let mut results = Vec::new();
 
         let mut query = self.context.clone();
@@ -287,6 +288,7 @@ impl Problem {
     }
 
     pub fn verify(&self, term: &Term) -> Option<Sigma> {
+        time_block!("problem.verify"); 
         let mut query = self.context.clone();
         let retty = self.rettype.to_string();
         let progname = &self.progname;

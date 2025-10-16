@@ -1,5 +1,44 @@
 use crate::*;
 
+use once_cell::sync::Lazy;
+use std::sync::Mutex;
+
+
+pub struct Stats {
+    pub programs_generated: usize,
+    pub new_programs_generated: usize,
+    pub programs_checked: usize,
+    pub counterexamples: usize,
+}
+
+impl Stats {
+    pub fn print(&self) {
+        eprintln!(
+            "\n== Synthesis stats ==\n\
+             programs_generated:     {}\n\
+             new_programs_generated: {}\n\
+             programs_checked:       {}\n\
+             counterexamples:        {}",
+            self.programs_generated,
+            self.new_programs_generated,
+            self.programs_checked,
+            self.counterexamples
+        );
+    }
+}
+impl Default for Stats {
+    fn default() -> Self {
+        Self {
+            programs_generated: 0,
+            new_programs_generated: 0,
+            programs_checked: 0,
+            counterexamples: 0,
+        }
+    }
+}
+
+pub static GLOBAL_STATS: Lazy<Mutex<Stats>> = Lazy::new(|| Mutex::new(Stats::default()));
+
 pub type Int = i64; // TODO add bigint.
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
@@ -142,8 +181,9 @@ pub fn cegis(problem: &Problem) -> Term {
         classes = Some(clss);
         cxs_cache = Some(cxsc);
         println!("Candidate: {}", term_to_z3(&term, &problem.vars.keys().cloned().collect::<Box<[_]>>()));
-        // TODO check this later: assert!(problem.sat(&..., &sigmas));
 
+        GLOBAL_STATS.lock().unwrap().counterexamples+= 1;
+        // TODO check this later: assert!(problem.sat(&..., &sigmas));
         if let Some(sigma) = problem.verify(&term) {
             // println!("CE: {:?}", &sigma);
             if sigmas.contains(&sigma) {

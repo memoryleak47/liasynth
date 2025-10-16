@@ -19,6 +19,10 @@ pub use fmt::*;
 mod langdef;
 pub use langdef::*;
 
+#[macro_use]
+mod phase_timing; 
+use phase_timing::{init_timing_hooks, ReportOnDrop};
+
 mod perceptron;
 pub use perceptron::*;
 
@@ -27,6 +31,9 @@ pub use std::collections::BinaryHeap;
 
 
 fn main() {
+    init_timing_hooks();
+    let _report = ReportOnDrop; 
+
     let arg = std::env::args().nth(1).unwrap_or(String::from("examples/LIA/MPwL_d4s3.sl"));
     let problem = mk_sygus_problem(&arg);
 

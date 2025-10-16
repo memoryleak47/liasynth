@@ -84,6 +84,7 @@ pub struct Class {
 }
 
 fn run(ctxt: &mut Ctxt) -> Term {
+    time_block!("synth.run"); // <— add this line
 
     if cfg!(feature = "simple-incremental") {
         let mut seen = Seen::new();
@@ -410,6 +411,8 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
     let sc;
     let i;
 
+    GLOBAL_STATS.lock().unwrap().programs_generated+= 1;
+
     if let Some(&j) = ctxt.vals_lookup.get(&(nt, vals.clone())) {
         let newsize = minsize(nt, &node, ctxt);
         let c = &mut ctxt.classes[nt][j];
@@ -423,6 +426,7 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
         push_bounded(&mut ctxt.classes[nt][j].nodes, WithOrd(node, newsize));
         i = j;
     } else {
+        GLOBAL_STATS.lock().unwrap().new_programs_generated+= 1;
         i = ctxt.classes[nt].len();
         let size = minsize(nt, &node, ctxt);
         let mut nodes = NodeQueue::new();
@@ -536,6 +540,8 @@ fn minsize(nt: NonTerminal, node: &Node, ctxt: &Ctxt) -> usize {
 }
 
 fn satcount(nt: NonTerminal, x: Id, ctxt: &mut Ctxt, idxs: Option<Vec<usize>>) -> usize {
+
+    GLOBAL_STATS.lock().unwrap().programs_checked+= 1;
     let ty = ctxt.classes[nt][x].node.ty();
     if ctxt.problem.nt_mapping.get(&ty).expect("this never happens") != &ctxt.problem.rettype {
         return 0;
