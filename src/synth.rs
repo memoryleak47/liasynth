@@ -194,8 +194,6 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
     let mut maxsat = 0;
 
     for (nt, rule) in ctxt.problem.prod_rules() {
-        if rule.ident() == "Sub" { continue }
-        if rule.ident() == "Add" { continue }
         let (in_types, _) = rule.signature();
         for i in 0..rule.children().len() {
             if !matches!(rule.children()[i], Child::Hole(_, 0)) {
