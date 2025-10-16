@@ -14,7 +14,6 @@ type NonTerminal = usize;
 
 // If this is set to 1 we have 'normal' incremental
 // Set to 1 when doing non-incremental
-// TODO: compiler flag
 #[cfg(feature = "total-incremental")]
     const MAXSIZE: usize = 5;
 
@@ -136,8 +135,13 @@ fn run(ctxt: &mut Ctxt) -> Term {
 
     for (nt, n) in ctxt.problem.prod_rules() {
         let n = n.clone();
-        if n.children().is_empty() && ! matches!(n, Node::PlaceHolder(_, _)) {
+        let is_placeholder = matches!(n, Node::PlaceHolder(_, _));
+        let has_children = !n.children().is_empty();
+        let has_holes = n.children().iter().any(|c| matches!(c, Child::Hole(_, _)));
+
+        if (!has_children || !has_holes) && !is_placeholder {
             let (_sol, is_sol, maxsat) = add_node(*nt, n, ctxt, None);
+            ctxt.solids[*nt].push(_sol);
             if is_sol {
                 handle_sol(*nt, _sol, ctxt);
                 return extract(*nt, _sol, ctxt);
@@ -162,7 +166,7 @@ fn handle_sol(nt: NonTerminal, id: Id, ctxt: &mut Ctxt) {
     ctxt.classes[nt][id].prev_sol += 1;
     let node = ctxt.classes[nt][id].node.clone();
     for (arg_ty, child) in node.signature().0.iter().zip(node.children()) {
-        if let (Ty::NonTerminal(j), Child::Hole(i)) = (arg_ty, child) {
+        if let Child::Hole(j, i) = child {
             handle_sol(*j, *i, ctxt);
         }
     }
@@ -184,57 +188,40 @@ fn handle(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usiz
     grow(nt, x, ctxt)
 }
 
-
-// TODO:
-// To handle grammars such as:
-//       (synth-fun move ((currPoint Int) (o0 Int) (o1 Int)) Int
-//           ((Start Int) (MoveId Int) (CondInt Int) (StartBool Bool))
-//           ((Start Int (MoveId (ite StartBool Start Start)))
-//           (MoveId Int (0 1 2 3 4))
-//           (CondInt Int ((get-y currPoint) (get-x currPoint) (get-y o0) (get-x o0) (get-y o1) (get-x o1) (+ CondInt CondInt) (- CondInt CondInt) (- 1) 0 1 2 3 4 5 6 7 8 9))
-//           (StartBool Bool ((and StartBool StartBool) (or StartBool StartBool) (not StartBool) (<= CondInt CondInt) (= CondInt CondInt) (>= CondInt CondInt)))))
-//
-// We make intypes be a special Ty that captures multiple types based on bitflags that we can test 'captures_ty'.
-// BUT this does not work
-//
-// This does not work because having signature be decided at compile time and NonTerminal only capturing a usize means we cannot have
-// production rules that can take multiple nonterminals (as in the case where Start references another nonterminal)
-// In these cases when we try evaluate we look at the signature to give the nt for classes which cannot be changed at runtime
-// Can we scuff it and change at runtime? i dunno. Done for today.
-//
-// Solution would be a massive change in nonterminals and how we parse/build
-fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
-    let ty = ctxt.classes[nt][x].node.ty();
+fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
+    let ty = ctxt.classes[nnt][x].node.ty();
     let mut maxsat = 0;
 
     for (nt, rule) in ctxt.problem.prod_rules() {
+        if rule.ident() == "Sub" { continue }
+        if rule.ident() == "Add" { continue }
         let (in_types, _) = rule.signature();
         for i in 0..rule.children().len() {
-            if matches!(rule.children()[i], Child::VarInt(_) | Child::VarBool(_) | Child::Constant(_)) || rule.children()[i] != Child::Hole(0) {
+            if !matches!(rule.children()[i], Child::Hole(_, 0)) {
                 continue;
             }
             let mut rule = rule.clone();
             if !in_types[i].captures_ty(&ty) { continue }
-            rule.children_mut()[i] = Child::Hole(x);
+            rule.children_mut()[i] = Child::Hole(ty.into_nt().unwrap(), x);
 
             let mut in_types: Vec<_> = in_types.iter().cloned().collect();
             in_types.remove(i);
             let it = in_types.iter().map(|ty| match ty {
-                Ty::NonTerminal(_) => ty.nt_indices().iter().flat_map(|j| ctxt.solids[*j].clone().into_iter()).collect::<Vec<_>>(),
+                Ty::PRule(_)=> ty.nt_indices().iter().flat_map(|j| ctxt.solids[*j].clone().into_iter().map(|id| (j.clone(), id))).collect::<Vec<_>>(),
                 _ => panic!("should not happen"),
             });
 
-
-            println!("{:?}", it);
-
             for a in it.multi_cartesian_product() {
                 rule.children_mut().iter_mut().enumerate()
-                    .filter(|(_, c)| matches!(c, Child::Hole(_)))
+                    .filter(|(_, c)| matches!(c, Child::Hole(_, _)))
                     .filter(|(i2, _)| *i2 != i)
                     .map(|(_, x)| x)
-                    .zip(a.iter()).for_each(|(ptr, v)| { *ptr = Child::Hole(*v); });
+                    .zip(a.iter()).for_each(|(ptr, (j, v))| { 
+                        *ptr = Child::Hole(*j, *v); 
+                    });
 
                 let (_sol, is_sol, sc) = add_node(*nt, rule.clone(), ctxt, None);
+                let term = extract(*nt, _sol, ctxt);
                 if is_sol {
                     return (Some((*nt, _sol)), maxsat);
                 }
@@ -307,17 +294,18 @@ fn add_class_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen, tod
 }
 
 fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mut Seen, vals: &[Value], seen_sigmas: usize, todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>) -> Option<Id> {
-    for (cnt, c) in node.signature().0.iter().zip(node.children()) {
-        if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
+    for c in node.children() {
+        if let Child::Hole(j, i) = c {
             if seen.contains_or_insert(*j, *i) {
                 add_class_part(*j, *i, ctxt, seen, todo);
             }
        }
     }
 
-    for comb in node.signature().0.iter().zip(node.children())
-        .map(|(cnt, c)| {
-            if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
+    for comb in node.children()
+        .iter()
+        .map(|c| {
+            if let Child::Hole(j, i) = c {
                 seen.0[&(*j, *i)].clone().into_iter().collect::<Vec<_>>()
             } else { vec![0] } // dummy id 
         })
@@ -326,7 +314,7 @@ fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &m
         let mut new_node = node.clone();
         for (idx, c) in new_node.children_mut().iter_mut().enumerate() {
             match c {
-                Child::Hole(i) => *c = Child::Hole(comb[idx]),
+                Child::Hole(j, i) => *c = Child::Hole(*j, comb[idx]),
                 _ => { } 
             }
         }
@@ -371,8 +359,8 @@ fn add_canon_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen
     let node = ctxt.classes[nt][id].node.clone();
     let seen_sigmas = ctxt.classes[nt][id].vals.len();
 
-    for (cnt, c) in node.signature().0.iter().zip(node.children()) {
-        if let (Ty::NonTerminal(j), Child::Hole(i)) = (cnt, c) {
+    for c in node.children() {
+        if let Child::Hole(j, i) = c {
             if seen.contains_or_insert(*j, *i) {
                 add_class_part(*j, *i, ctxt, seen, todo);
             }
@@ -478,8 +466,6 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
 
         ctxt.vals_lookup.insert((nt, vals), i);
 
-        // TODO: compiler flag
-        // if sc == ctxt.big_sigmas.len() && ctxt.problem.rettys.contains(&Ty::NonTerminal(nt)) { // ugly but ok
         let is_valid_return = if cfg!(feature = "ignore-grammar") {
             ctxt.problem.rettype == *ctxt.problem.nt_mapping.get(&Ty::NonTerminal(nt)).unwrap()
         } else {
@@ -509,10 +495,10 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Score {
     }
 
     let mut a = 100000;
-    let subterms = c.node.signature().0.iter().zip(c.node.children());
-    let max_subterm_satcount = subterms
-        .filter_map(|(cnt, s)| {
-            if let Child::Hole(i) = s && let Ty::NonTerminal(j) = cnt { Some((j, i)) } else { None }
+    let max_subterm_satcount = c.node.children()
+        .iter()
+        .filter_map(|c| {
+            if let Child::Hole(j, i) = c { Some((j, i)) } else { None }
         })
         .map(|(cnt, s)| ctxt.classes[*cnt][*s].satcount)
         .max()
@@ -545,7 +531,7 @@ fn vals(nt: NonTerminal, node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
 
 fn minsize(nt: NonTerminal, node: &Node, ctxt: &Ctxt) -> usize {
     node.signature().0.iter().zip(node.children())
-        .filter_map(|(cnt, x)| if let Child::Hole(i) = x && let Ty::NonTerminal(j) = cnt { Some((j, i)) } else { None })
+        .filter_map(|(cnt, x)| if let Child::Hole(j, i) = x { Some((j, i)) } else { None })
         .map(|(cnt, x)| ctxt.classes[*cnt][*x].size).sum::<usize>() + 1
 }
 

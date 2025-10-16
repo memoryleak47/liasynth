@@ -14,15 +14,15 @@ lang = { path = "./lang" }
 indexmap = "2.10.0"
 serde = { version= "1.0.225", features= ["derive"] }
 ordered-float = "5.0.0"
-slotmap = "1.0.7"
 
 [profile.release]
 debug = true
 
 [features]
-default = ["heuristic_default"]
-heuristic_default = []
-heuristic_perceptron = []
-simple_incremental = []
-winning_incremental = []
-total_incremental = []
+default = ["heuristic-default"]
+ignore-grammar = []
+heuristic-default = []
+heuristic-perceptron = []
+simple-incremental = []
+winning-incremental = []
+total-incremental = []

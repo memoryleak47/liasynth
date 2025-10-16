@@ -37,12 +37,13 @@ impl Ty {
     pub fn into_nt(&self) -> Option<usize> {
         match self {
             Ty::NonTerminal(s) => Some(*s),
+            Ty::PRule(s) => Some(s.trailing_zeros() as usize),
             _ => None
         }
     }
     pub fn captures_ty(&self, other: &Ty) -> bool {
         match (self, other) {
-            (Ty::NonTerminal(mask), Ty::NonTerminal(n)) => (mask & (1usize << n)) != 0,
+            (Ty::PRule(mask), Ty::NonTerminal(n)) => (mask & (1usize << n)) != 0,
             _ => false,
         }
     }
@@ -89,7 +90,7 @@ impl Term {
 
         for mut n in t.elems.into_iter() {
             for ch in n.children_mut().iter_mut() {
-                if let Child::Hole(ref mut idx) = *ch {
+                if let Child::Hole(j, ref mut idx) = *ch {
                     *idx += base;
                 }
             }

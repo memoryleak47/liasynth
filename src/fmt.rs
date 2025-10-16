@@ -14,7 +14,7 @@ fn term_to_z3_impl(i: usize, t: &Term, vars: &[String]) -> String {
             let tmpl = n.template().expect("node missing template");
             let args = n.children()
                 .iter()
-                .filter(|c| matches!(c, Child::Hole(_)))
+                .filter(|c| matches!(c, Child::Hole(_, _)))
                 .map(|c| {
                         child_to_z3(c, t, vars)
                 })
@@ -26,7 +26,7 @@ fn term_to_z3_impl(i: usize, t: &Term, vars: &[String]) -> String {
 
 fn child_to_z3(c: &Child, t: &Term, vars: &[String]) -> String {
     match *c {
-        Child::Hole(id)    => term_to_z3_impl(id, t, vars),
+        Child::Hole(_, id)    => term_to_z3_impl(id, t, vars),
         Child::Constant(c) => c.to_string(),
         Child::VarInt(v)   => vars.get(v).cloned().unwrap_or_else(|| format!("v{v}")),
         Child::VarBool(v)  => vars.get(v).cloned().unwrap_or_else(|| format!("b{v}")),

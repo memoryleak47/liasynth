@@ -73,17 +73,24 @@ class ProductionRule:
     ret : Arg
 
     # rough
-    def extract_args(self, nts):
+    def extract_args(self, nts, nt_refs = {}):
         args = []
         self.a_idx = []
         idx = 0
         seen = {}
         for tok in splitter.split(self.pr):
-            for n in nts:
+            nt_v = 0
+            for i, n in enumerate(nts):
                 if tok.strip() == n.name:
-                    args.append(n.typ)
+                    nt_v |= 1 << i
+                    for o in nt_refs[n.name]:
+                        for i, p in enumerate(nts):
+                            if p.name == o:
+                                nt_v |= 1 << i
                     self.a_idx.append(idx)
                     idx += 1
+            if nt_v != 0:
+                args.append(f"Ty::PRule({nt_v})")
             for v in self.varis:
                 if tok.strip() == v.name:
                     args.append(v.typ)
@@ -196,7 +203,8 @@ class SynthFun:
     ret         : str
     nonterms    : list[Arg]
     terminals   : list[Arg]
-    prodrules  : list[ProductionRule]
+    prodrules   : list[ProductionRule]
+    nt_map      : dict
 
 @dataclass
 class DefineFun:
@@ -247,18 +255,19 @@ def get_pr(p):
     pr += ")"
     return pr
 
-def get_prodrule(s, nt):
+def get_prodrule(s, nt, nt_refs):
     if not isinstance(s, list):
+        nt_refs[nt[0]].append(s.value())
         return Arg(s.value() if isinstance(s, sexpdata.Symbol) else s, nt, nt)
     elif s[0] == sexpdata.Symbol('-') and len(s) == 2 and s[1].value() != nt[0]:
         return Arg(f"-{s[1].value()}", nt, nt)
     pr = get_pr(s)
     return ProductionRule(s[0].value(), pr, s, nt)
 
-def get_prodrules(s):
+def get_prodrules(s, nt_refs):
     ret = (consume(s).value(), consume(s).value())
 
-    get_prodrule_nt = partial(get_prodrule, nt=ret)
+    get_prodrule_nt = partial(get_prodrule, nt=ret, nt_refs=nt_refs)
     rules = map(get_prodrule_nt, consume(s))
 
     return rules
@@ -269,17 +278,19 @@ def parse_synth_fun(s):
     ret = consume(s).value()
     nonterms = get_nont(consume(s))
     ret = nonterms[0]
-    rules = flatflat_map(map(get_prodrules, consume(s)))
+    nt_refs = defaultdict(list)
+    rules = flatflat_map(map(partial(get_prodrules, nt_refs=nt_refs), consume(s)))
 
     prodrules, terminals = partition(lambda x: isinstance(x, Arg), rules)
 
-    return SynthFun(name, args, ret, nonterms, list(terminals), list(prodrules))
+
+    return SynthFun(name, args, ret, nonterms, list(terminals), list(prodrules), nt_refs)
 
 def parse_define_fun(s, defnum):
     name = consume(s).value()
     args = get_args(consume(s))
     ret = consume(s)
-    body = get_prodrule(consume(s), ret)
+    body = get_prodrule(consume(s), ret, {})
 
     return name, DefineFun(name, args, ret.value(), body)
 
@@ -296,8 +307,8 @@ def parse(sexprs):
     return synthfun, definefuns
 
 
-def extract_grammarterm(p, nts, deffs={}, names={}):
-    args     = p.extract_args(nts)
+def extract_grammarterm(p, nts, deffs={}, names={}, nt_refs = {}):
+    args     = p.extract_args(nts, nt_refs)
     name     = op_map(p.op, len(args))
     ret      = p.ret[0]
     op       = p.op
@@ -328,7 +339,7 @@ def get_grammarterm(file=None):
     names = defaultdict(int)
     for pr in synthfun.prodrules:
         pr.varis = synthfun.args
-        term = extract_grammarterm(pr, synthfun.nonterms, definefuns, names)
+        term = extract_grammarterm(pr, synthfun.nonterms, definefuns, names, synthfun.nt_map)
         term.name = term.name.replace('-', '')
         if term.ret not in ['Int', 'Bool']:
             idx ,= [i for i, n in enumerate(synthfun.nonterms) if n.name == term.ret]
@@ -355,7 +366,7 @@ define_language! {{
 
 
 if len(sys.argv) < 2:
-    f = 'examples/LIA/MPwL_d1s3.sl'
+    f = 'examples/LIA/MPwL_d4s3.sl'
 else:
     f = sys.argv[1]
 langfile(f)

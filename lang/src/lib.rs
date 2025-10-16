@@ -62,20 +62,20 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
 
         #[derive(PartialEq, Eq, Hash, Clone, Copy, Debug, PartialOrd, Ord)]
         pub enum Child {
-            Hole(Id),
+            Hole(usize, Id),
             Constant(Int),
             VarInt(Var),
             VarBool(Var),
         }
 
-		impl Child {
-			pub fn into_id(&self) -> Option<Id> {
-				match self {
-					Self::Hole(id) => Some(*id),
-					_ => None
-				}
-			}
-		}
+        impl Child {
+            pub fn into_id(&self) -> Option<Id> {
+                match self {
+                    Self::Hole(_, id) => Some(*id),
+                    _ => None
+                }
+            }
+        }
 
         #[derive(PartialEq, Eq, Hash, Clone, Debug, PartialOrd, Ord)]
         pub enum Node {
@@ -265,8 +265,8 @@ fn eval_cases(edef: &EnumDef) -> Vec<TokenStream2> {
                 let (argtys, _) = self.signature();
                 let ev = |x: usize| -> Option<Value> {
                     match (&argtys[x], &s[x]) {
-                        (&Ty::NonTerminal(j), &Child::Hole(i)) => ch(j, i),
-                        (_,                   &Child::Hole(i)) => None,
+                        (_, &Child::Hole(j, i)) => ch(j, i),
+                        (_,                   &Child::Hole(_, i)) => None,
                         (_,                   &Child::Constant(c)) => Some(Value::Int(c)),
                         (_,                   &Child::VarInt(v))   => Some(sigma.get(v).cloned().unwrap_or_else(|| panic!("sigma miss {v}"))),
                         (_,                   &Child::VarBool(v))  => Some(sigma.get(v).cloned().unwrap_or_else(|| panic!("sigma miss {v}"))),
@@ -291,11 +291,10 @@ fn extract_cases(edef: &EnumDef) -> Vec<TokenStream2> {
                     let chs = a.children_mut();
                     for i in 0..chs.len() {
                         match (&argtys[i], &mut chs[i]) {
-                            (&Ty::NonTerminal(j), &mut Child::Hole(ref mut idx)) => {
+                            (_, &mut Child::Hole(j, ref mut idx)) => {
                                 ex(j, *idx).extract(ex, out);
                                 *idx = out.len() - 1; 
                             }
-                            (_,  &mut Child::Hole(ref mut idx)) => {}
                             (&ty, &mut Child::Constant(c)) => {
                                 out.push(Node::ConstInt(c, ty));
                             }
@@ -325,7 +324,10 @@ fn parse_cases(edef: &EnumDef) -> Vec<TokenStream2> {
         cases.push(quote! {
             (#symb, s) if s.len() == #n => {
                 let refs: ::std::vec::Vec<Child> = s.iter().map(|node| match node {
-                    Node::PlaceHolder(i, _) => Child::Hole(*i),
+                    Node::PlaceHolder(i, ty) => {
+                        let j = ty.into_nt().unwrap_or(0);
+                        Child::Hole(j, *i)
+                    },
                     Node::ConstInt(c, _)      => Child::Constant(*c),
                     Node::VarInt(v, _)      => Child::VarInt(*v),
                     Node::VarBool(v, _)     => Child::VarBool(*v),
@@ -348,7 +350,10 @@ fn parse_prod_cases(edef: &EnumDef) -> Vec<TokenStream2> {
         cases.push(quote! {
             (#template, s) if s.len() == #n && #template == op => {
                 let refs: ::std::vec::Vec<Child> = s.iter().map(|node| match node {
-                    Node::PlaceHolder(i, _) => Child::Hole(*i),
+                    Node::PlaceHolder(i, ty) => {
+                        let j = ty.into_nt().unwrap_or(0);
+                        Child::Hole(j, *i)
+                    },
                     Node::ConstInt(c, _)    => Child::Constant(*c),
                     Node::VarInt(v, _)      => Child::VarInt(*v),
                     Node::VarBool(v, _)     => Child::VarBool(*v),
