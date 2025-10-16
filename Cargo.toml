@@ -14,6 +14,9 @@ lang = { path = "./lang" }
 indexmap = "2.10.0"
 serde = { version= "1.0.225", features= ["derive"] }
 ordered-float = "5.0.0"
+once_cell = "1"
+dashmap   = "6"
+signal-hook = "0.3"
 
 [profile.release]
 debug = true
