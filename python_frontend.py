@@ -257,7 +257,8 @@ def get_pr(p):
 
 def get_prodrule(s, nt, nt_refs):
     if not isinstance(s, list):
-        nt_refs[nt[0]].append(s.value())
+        if isinstance(s, tuple):
+            nt_refs[nt[0]].append(s.value())
         return Arg(s.value() if isinstance(s, sexpdata.Symbol) else s, nt, nt)
     elif s[0] == sexpdata.Symbol('-') and len(s) == 2 and s[1].value() != nt[0]:
         return Arg(f"-{s[1].value()}", nt, nt)
