@@ -7,7 +7,7 @@ use std::collections::hash_map::Entry;
 use ordered_float::OrderedFloat;
 
 
-type Score = OrderedFloat<f32>;
+type Score = OrderedFloat<f64>;
 type Queue = BinaryHeap<WithOrd<(usize, Id), Score>>;
 type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 type NonTerminal = usize;
@@ -69,7 +69,8 @@ pub struct Ctxt<'a> {
 
     solids: Vec<Vec<Id>>,
 
-    perceptron: &'a Perceptron, // persistent learner through whole task
+    olinr: &'a mut OnlineLinearRegression,
+    flinr: &'a mut OnlineLinearRegression,
 }
 
 pub struct Class {
@@ -80,7 +81,7 @@ pub struct Class {
     handled_size: Option<usize>, // what was the size when this class was handled last time.
     satcount: usize,
     prev_sol: usize,
-    features: Vec<f32>
+    features: Vec<f64>
 }
 
 fn run(ctxt: &mut Ctxt) -> Term {
@@ -114,7 +115,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
             let mut count = 0;
 
             while let Some((nt, id, n, vals, seen_sigmas)) = todo.pop_front() {
-                if let Some((idx, _sol, sc)) = add_node_part(nt, id, n, ctxt, &mut seen, &vals, seen_sigmas, &mut todo) {
+                if let Some((idx, _sol, sc)) = add_node_part(nt, id, n, ctxt, &mut seen, &vals, seen_sigmas, &mut todo, ctxt.classes[nt][id].prev_sol) {
                     if _sol {
                         handle_sol(nt, idx, ctxt);
                         return extract(nt, idx, ctxt);
@@ -147,7 +148,6 @@ fn run(ctxt: &mut Ctxt) -> Term {
                 handle_sol(*nt, _sol, ctxt);
                 return extract(*nt, _sol, ctxt);
             }
-            // ctxt.perceptron.train(ctxt.classes[n.ident].features, maxsat);
         }
     }
 
@@ -157,7 +157,13 @@ fn run(ctxt: &mut Ctxt) -> Term {
             handle_sol(ot, sol, ctxt);
             return extract(ot, sol, ctxt);
         }
-        // ctxt.perceptron.train(ctxt.classes[n.ident].features, maxsat);
+        if cfg!(feature = "heuristic-linr"){
+            if *ctxt.problem.nt_mapping.get(&Ty::NonTerminal(nt)).unwrap() == ctxt.problem.rettype {
+                ctxt.olinr.partial_fit(ctxt.classes[nt][x].features.as_slice(), maxsat as f64); 
+            } else {
+                ctxt.flinr.partial_fit(ctxt.classes[nt][x].features.as_slice(), maxsat as f64); 
+            }
+        }
     }
 
     panic!("infeasible")
@@ -195,11 +201,11 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
 
     for (nt, rule) in ctxt.problem.prod_rules() {
         let (in_types, _) = rule.signature();
-
         for (i, child) in rule.children().iter().enumerate() {
             if !matches!(child, Child::Hole(_, 0)) {
                 continue;
             }
+
 
             if !in_types[i].captures_ty(&ty) {
                 continue;
@@ -239,6 +245,7 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
                 }
 
                 let (_sol, is_sol, sc) = add_node(*nt, new_rule.clone(), ctxt, None);
+                let term = extract(*nt, _sol, ctxt);
                 max_sat = max_sat.max(sc);
                 if is_sol {
                     return (Some((*nt, _sol)), max_sat);
@@ -251,7 +258,7 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
     (None, max_sat)
 }
 
-pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<HashMap<Box<[Value]>, bool>>>, classes: Option<Vec<Vec<Class>>>, perceptron: &Perceptron) -> (Term, Vec<HashMap<Box<[Value]>, bool>>, Vec<Vec<Class>>) {
+pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<HashMap<Box<[Value]>, bool>>>, classes: Option<Vec<Vec<Class>>>, olinr: &mut OnlineLinearRegression, flinr: &mut OnlineLinearRegression) -> (Term, Vec<HashMap<Box<[Value]>, bool>>, Vec<Vec<Class>>) {
     let mut small_sigmas: IndexSet<Sigma> = IndexSet::new();
     let mut sigma_indices: Vec<Box<[usize]>> = Vec::new();
     for bsigma in big_sigmas {
@@ -287,7 +294,8 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<Hash
                 .collect::<Vec<Vec<Class>>>()
         }),
         solids: vec![vec![]; no_nt],
-        perceptron,
+        olinr,
+        flinr,
     };
 
     (run(&mut ctxt), ctxt.cxs_cache, ctxt.classes)
@@ -303,7 +311,7 @@ fn add_class_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen, tod
 
     add_canon_node_part(nt, id, ctxt, seen, todo);
     for WithOrd(n, _) in heap.into_sorted_vec().into_iter().skip(1) {
-        if let Some(id) = add_nodes_part(nt, id, n, ctxt, seen, &vals, seen_sigmas, todo) {
+        if let Some(id) = add_nodes_part(nt, id, n, ctxt, seen, &vals, seen_sigmas, todo, ctxt.classes[nt][id].prev_sol) {
             return Some((nt, id));
         }
     }
@@ -311,7 +319,7 @@ fn add_class_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen, tod
     None
 }
 
-fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mut Seen, vals: &[Value], seen_sigmas: usize, todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>) -> Option<Id> {
+fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mut Seen, vals: &[Value], seen_sigmas: usize, todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>, prev_sol: usize) -> Option<Id> {
     for c in node.children() {
         if let Child::Hole(j, i) = c {
             if seen.contains_or_insert(*j, *i) {
@@ -341,7 +349,7 @@ fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &m
                 *c = Child::Hole(*j, new_id);
             }
         }
-        if let Some((idx, sol, sc)) = add_node_part(nt, id, new_node, ctxt, seen, vals, seen_sigmas, todo) {
+        if let Some((idx, sol, sc)) = add_node_part(nt, id, new_node, ctxt, seen, vals, seen_sigmas, todo, prev_sol) {
             if sol { 
                 return Some(idx)
             }
@@ -352,7 +360,7 @@ fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &m
 
 }
 
-fn add_node_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mut Seen, vals: &[Value], seen_sigmas: usize, todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>) -> Option<(Id, bool, usize)> {
+fn add_node_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mut Seen, vals: &[Value], seen_sigmas: usize, todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>, prev_sol: usize) -> Option<(Id, bool, usize)> {
     let mut delta = Vec::new();
     for (i, sigma) in ctxt.small_sigmas[seen_sigmas..].iter().enumerate() {
         let f = |cnt: NonTerminal, idx: Id| {
@@ -372,6 +380,8 @@ fn add_node_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mu
 
     let (nid, sol, sc) = add_node(nt, node, ctxt, Some(full_vals.clone().into_boxed_slice()));
     seen.0.get_mut(&(nt, id)).unwrap().insert(nid); 
+
+    ctxt.classes[nt][nid].prev_sol = prev_sol;
 
     Some((nid, sol, sc))
 }
@@ -514,7 +524,7 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[nt][x];
     let ty = ctxt.classes[nt][x].node.ty();
     if ctxt.problem.nt_mapping.get(&ty).expect("this never happens") != &ctxt.problem.rettype {
-        return OrderedFloat(10000 as f32);
+        return OrderedFloat(10000 as f64);
     }
 
     let mut a = 100000;
@@ -534,13 +544,49 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Score {
         a /= 2;
     }
 
-    OrderedFloat((a / (c.size + 5)) as f32)
+    OrderedFloat((a / (c.size + 5)) as f64)
 }
 
-#[cfg(feature = "heuristic-perceptron")]
-fn heuristic(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Score {
-    let feats = feature_set1(x, ctxt);
-    let score = ctxt.perceptron.predict(feats);
+fn feature_set(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Vec<f64> {
+    let c = &ctxt.classes[nt][x];
+
+    let sc = c.satcount;
+    let max_subterm_sc = c.node.children()
+        .iter()
+        .filter_map(|c| if let Child::Hole(j, i) = c { Some((j, i)) } else { None })
+        .map(|(cnt, s)| ctxt.classes[*cnt][*s].satcount)
+        .max()
+        .unwrap_or(0);
+
+    vec![
+        1.0, 
+        c.prev_sol as f64,
+        c.size as f64,
+        sc.saturating_sub(max_subterm_sc) as f64,
+    ]
+}
+
+#[cfg(feature = "heuristic-linr")]
+fn heuristic(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> Score {
+    let ty = ctxt.classes[nt][x].node.ty();
+    let ret = &ctxt.problem.rettype;
+    let is_off = ctxt.problem
+        .nt_mapping
+        .get(&ty)
+        .map(|t| t != ret)
+        .unwrap_or(true);
+
+    let feats = feature_set(nt, x, ctxt);
+
+    let score = if is_off {
+        let s = ctxt.flinr.predict(feats.as_slice());
+        ctxt.classes[nt][x].features = feats.clone();
+        s 
+    } else {
+        let s = ctxt.olinr.predict(feats.as_slice());
+        ctxt.classes[nt][x].features = feats.clone();
+        s
+    };
 
     OrderedFloat(score)
 }
