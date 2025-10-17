@@ -206,13 +206,12 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
                 continue;
             }
 
-
             if !in_types[i].captures_ty(&ty) {
                 continue;
             }
 
             let mut new_rule = rule.clone();
-            new_rule.children_mut()[i] = Child::Hole(ty.into_nt().unwrap(), x);
+            new_rule.children_mut()[i] = Child::Hole(in_types[i].into_nt().unwrap(), x);
 
             let remaining_types: Vec<_> = in_types.iter()
                 .enumerate()
@@ -483,7 +482,6 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
                 }
             }
 
-
             if !to_check.is_empty() {
                 satc += satcount(nt, i, ctxt, Some(to_check));
             };
@@ -524,7 +522,7 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[nt][x];
     let ty = ctxt.classes[nt][x].node.ty();
     if ctxt.problem.nt_mapping.get(&ty).expect("this never happens") != &ctxt.problem.rettype {
-        return OrderedFloat(10000 as f64);
+        return OrderedFloat(1000 as f64);
     }
 
     let mut a = 100000;
@@ -605,7 +603,6 @@ fn minsize(nt: NonTerminal, node: &Node, ctxt: &Ctxt) -> usize {
 }
 
 fn satcount(nt: NonTerminal, x: Id, ctxt: &mut Ctxt, idxs: Option<Vec<usize>>) -> usize {
-
     GLOBAL_STATS.lock().unwrap().programs_checked+= 1;
     let ty = ctxt.classes[nt][x].node.ty();
     if ctxt.problem.nt_mapping.get(&ty).expect("this never happens") != &ctxt.problem.rettype {

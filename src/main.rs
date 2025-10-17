@@ -19,12 +19,12 @@ pub use fmt::*;
 mod langdef;
 pub use langdef::*;
 
+mod linearreg;
+pub use linearreg::OnlineLinearRegression;
+
 #[macro_use]
 mod phase_timing; 
 use phase_timing::{init_timing_hooks, ReportOnDrop};
-
-mod perceptron;
-pub use perceptron::*;
 
 pub type Map<K, V> = fxhash::FxHashMap<K, V>;
 pub use std::collections::BinaryHeap;
@@ -34,7 +34,7 @@ fn main() {
     init_timing_hooks();
     let _report = ReportOnDrop; 
 
-    let arg = std::env::args().nth(1).unwrap_or(String::from("examples/LIA/MPwL_d4s3.sl"));
+    let arg = std::env::args().nth(1).unwrap_or(String::from("examples/LIA/unbdd_inv_gen_array.sl"));
     let problem = mk_sygus_problem(&arg);
 
     let term = cegis(&problem);

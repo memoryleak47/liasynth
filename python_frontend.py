@@ -318,7 +318,6 @@ def extract_grammarterm(p, nts, deffs={}, names={}, nt_refs = {}):
     old_name = name
     if (n := names[name]) != 0:
         name += str(n)
-        op += str(n)
     names[old_name] += 1
     evl      = p.extract_eval(nts, template, deffs)
 

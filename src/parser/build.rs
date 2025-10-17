@@ -46,7 +46,7 @@ fn valid_op(op: &str, arity: usize) -> Option<Node> {
     Node::parse(op, &v)
 }
 
-fn valid_prod(prod: &str, a: &Vec<GrammarTerm>, args: &IndexMap<String, Ty>) -> Option<Node> {
+fn valid_prod(prod: &str, a: &Vec<GrammarTerm>, args: &IndexMap<String, Ty>, expected_ret: Ty) -> Option<Node> {
     let v: Box<[Node]> = a
         .iter()
         .map(|n|
@@ -67,7 +67,7 @@ fn valid_prod(prod: &str, a: &Vec<GrammarTerm>, args: &IndexMap<String, Ty>) -> 
                 }
                 _ => panic!("that shouldnt happen")
             }).collect();
-    Node::parse_prod(prod, &v)
+    Node::parse_prod(prod, &v, expected_ret)
 }
 
 fn make_string(l: &SExpr, nonterms: &IndexMap<String, Ty>) -> String {
@@ -132,7 +132,7 @@ fn as_rule(nt: usize, s: &SExpr, nonterminals: &IndexMap<String, Ty>, args: &Ind
             let s = format!("({})", l.iter().map(|x| make_string(x, nonterminals)).join(" "));
             let rst = l.iter().flat_map(|x| get_rst(x, nonterminals, args)).collect::<Vec<_>>();
 
-            if valid_prod(&s, &rst, args).is_some() {
+            if valid_prod(&s, &rst, args, Ty::NonTerminal(nt)).is_some() {
                 return GrammarTerm::Op(s, rst);
             }
 
@@ -201,6 +201,7 @@ fn handle_synth_fun(l: &[SExpr], synth: &mut SynthProblem) {
         let SExpr::List(v) = a else { panic!() };
         let [SExpr::Ident(name), SExpr::Ident(ty), SExpr::List(rules)] = &v[..] else { panic!() };
         let prod_rules = rules.iter().map(|x| as_rule(nt, x, &nonterminals, &args, &synth.defined_funs, &mut nonterminal_refs)).collect();
+
         nonterminal_defs.insert(name.clone(), NonterminalDef {
             ty: as_ty(ty),
             prod_rules,

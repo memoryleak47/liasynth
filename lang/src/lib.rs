@@ -162,14 +162,13 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
                 }
             }
 
-            pub fn parse_prod(op: &str, args: &[Node]) -> Option<Node> {
+            pub fn parse_prod(op: &str, args: &[Node], expected_ret: Ty) -> Option<Node> {
                 match (op, args) {
                     #(#parse_prod_cases,)*
                     other => {
                         println!("parse_prod: unknown op {:?}, args={:?}", op, args);
                         None
                     },
-
                 }
             }
 
@@ -345,9 +344,10 @@ fn parse_prod_cases(edef: &EnumDef) -> Vec<TokenStream2> {
     for c in edef.cases.iter() {
         let ident    = &c.ident;
         let template = &c.template;
+        let retty    = &c.retty;
         let n        = c.argtys.len();
         cases.push(quote! {
-            (#template, s) if s.len() == #n && #template == op => {
+            (#template, s) if s.len() == #n && #template == op && #retty == expected_ret => {
                 let refs: ::std::vec::Vec<Child> = s.iter().map(|node| match node {
                     Node::PlaceHolder(i, ty) => {
                         let j = ty.into_nt().unwrap_or(0);

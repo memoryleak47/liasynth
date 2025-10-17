@@ -119,7 +119,7 @@ pub fn mk_sygus_problem(f: &str) -> Problem {
     build_sygus(synth_problem)
 }
 
-fn parse_grammar_term(rule: &GrammarTerm, vars: &IndexMap<String, Ty>, nonterminals: &IndexMap<String, Ty>, refs: &IndexMap<usize, Vec<String>>) -> Option<Node> {
+fn parse_grammar_term(nt: usize, rule: &GrammarTerm, vars: &IndexMap<String, Ty>, nonterminals: &IndexMap<String, Ty>, refs: &IndexMap<usize, Vec<String>>) -> Option<Node> {
     match rule {
         GrammarTerm::NonTerminal(n, ty) => {
             // we'll iterate over the referenced non-terminal anyways.
@@ -137,12 +137,12 @@ fn parse_grammar_term(rule: &GrammarTerm, vars: &IndexMap<String, Ty>, nontermin
             Some(Node::PlaceHolder(0, Ty::PRule(valids)))
         },
         GrammarTerm::Op(op, nts) => {
-            let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(n, vars, nonterminals, refs)).collect();
-            Some(Node::parse_prod(&*op, &*args).expect("Could not parse prod rule"))
+            let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(nt, n, vars, nonterminals, refs)).collect();
+            Some(Node::parse_prod(&*op, &*args, Ty::NonTerminal(nt)).expect("Could not parse prod rule"))
         },
         GrammarTerm::DefinedFunCall(op, template, nts) => {
-            let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(n, vars, nonterminals, refs)).collect();
-            Some(Node::parse_prod(&*template, &*args).unwrap_or_else(|| panic!("Could not parse prod rule: template: {:?}, args: {:?}", template, args)))
+            let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(nt, n, vars, nonterminals, refs)).collect();
+            Some(Node::parse_prod(&*template, &*args, Ty::NonTerminal(nt)).unwrap_or_else(|| panic!("Could not parse prod rule: template: {:?}, args: {:?}", template, args)))
         },
 
         GrammarTerm::ConstInt(i, ty) => Some(Node::ConstInt(*i, *ty)),
@@ -195,7 +195,7 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
                     rettys.push(Ty::NonTerminal(m));
                 }
             }
-            if let Some(node) = parse_grammar_term(rule, &vars, &synth_fun.nonterminals, &synth_fun.nonterminal_refs) {
+            if let Some(node) = parse_grammar_term(n, rule, &vars, &synth_fun.nonterminals, &synth_fun.nonterminal_refs) {
                 prod_rules.push((n, node));
             };
         }
