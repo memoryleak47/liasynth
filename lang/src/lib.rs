@@ -265,8 +265,7 @@ fn eval_cases(edef: &EnumDef) -> Vec<TokenStream2> {
                 let (argtys, _) = self.signature();
                 let ev = |x: usize| -> Option<Value> {
                     match (&argtys[x], &s[x]) {
-                        (_, &Child::Hole(j, i)) => ch(j, i),
-                        (_,                   &Child::Hole(_, i)) => None,
+                        (_,                   &Child::Hole(j, i)) => ch(j, i),
                         (_,                   &Child::Constant(c)) => Some(Value::Int(c)),
                         (_,                   &Child::VarInt(v))   => Some(sigma.get(v).cloned().unwrap_or_else(|| panic!("sigma miss {v}"))),
                         (_,                   &Child::VarBool(v))  => Some(sigma.get(v).cloned().unwrap_or_else(|| panic!("sigma miss {v}"))),

@@ -19,6 +19,7 @@ flat_map = lambda x: [a for a in x if a is not None]
 flatflat_map = lambda x: [a for b in x for a in flat_map(b)]
 apply_n = lambda f, x, n: [f(x) for _ in range(n)]
 compose = lambda f, g: lambda x: f(g(x))
+consume_all = lambda x: [consume(x) for _ in range(len(x))]
 
 
 @dataclass
@@ -31,10 +32,10 @@ class GrammarTerm:
     evl: str
 
     def __hash__(self):
-        return hash(self.template)
+        return hash((self.name, self.template))
 
     def __eq__(self, other):
-        return self.template == other.template
+        return (self.name, self.template) == (other.name, other.template)
 
     def generate(self):
         return f'({self.name}, [{', '.join(self.args)}], Ty::{self.ret}, "{self.op}", "{self.template}", {self.evl})'
@@ -280,7 +281,7 @@ def parse_synth_fun(s):
     nonterms = get_nont(consume(s))
     ret = nonterms[0]
     nt_refs = defaultdict(list)
-    rules = flatflat_map(map(partial(get_prodrules, nt_refs=nt_refs), consume(s)))
+    rules = flatflat_map(map(partial(get_prodrules, nt_refs=nt_refs), consume_all(consume(s))))
 
     prodrules, terminals = partition(lambda x: isinstance(x, Arg), rules)
 
@@ -367,7 +368,7 @@ define_language! {{
 
 
 if len(sys.argv) < 2:
-    f = 'examples/LIA/MPwL_d4s3.sl'
+    f = 'examples/LIA/unbdd_inv_gen_array.sl'
 else:
     f = sys.argv[1]
 langfile(f)

@@ -84,14 +84,23 @@ pub struct Class {
 }
 
 fn run(ctxt: &mut Ctxt) -> Term {
-    time_block!("synth.run"); // <— add this line
+    time_block!("synth.run"); 
 
-    if cfg!(feature = "simple-incremental") {
+    if cfg!(feature = "simple-incremental") || cfg!(feature = "winning-incremental") {
         let mut seen = Seen::new();
         let mut todo: VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)> = VecDeque::new();
+
+        let use_winning = cfg!(feature = "winning-incremental");
+
         for nt in 0..ctxt.classes.len() {
             for id in 0..ctxt.classes[nt].len() {
-                if seen.contains_or_insert(nt, id) {
+                let should_process = if use_winning {
+                    ctxt.classes[nt][id].prev_sol > 0 && seen.contains_or_insert(nt, id)
+                } else {
+                    seen.contains_or_insert(nt, id)
+                };
+
+                if should_process {
                     if let Some((nt, _sol)) = add_class_part(nt, id, ctxt, &mut seen, &mut todo) {
                         handle_sol(nt, _sol, ctxt);
                         return extract(nt, _sol, ctxt);
@@ -99,39 +108,28 @@ fn run(ctxt: &mut Ctxt) -> Term {
                 }
             }
         }
-    }
 
-    if cfg!(feature = "winning-incremental") {
-        let mut seen = Seen::new();
-        let mut todo: VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)> = VecDeque::new();
-        for nt in 0..ctxt.classes.len() {
-            'cs: for id in 0..ctxt.classes[nt].len() {
-                if ctxt.classes[nt][id].prev_sol > 0  && seen.contains_or_insert(nt, id) {
-                    if let Some((nt, _sol)) = add_class_part(nt, id, ctxt, &mut seen, &mut todo) {
-                        handle_sol(nt, _sol, ctxt);
-                        return extract(nt, _sol, ctxt);
+        if use_winning {
+            let mut len = todo.len();
+            let mut count = 0;
+
+            while let Some((nt, id, n, vals, seen_sigmas)) = todo.pop_front() {
+                if let Some((idx, _sol, sc)) = add_node_part(nt, id, n, ctxt, &mut seen, &vals, seen_sigmas, &mut todo) {
+                    if _sol {
+                        handle_sol(nt, idx, ctxt);
+                        return extract(nt, idx, ctxt);
                     }
-                } 
-            }
-        }
-        let mut len = todo.len();
-        let mut count = 0;
-        while let Some((nt, id, n, vals, seen_sigmas)) = todo.pop_front() {
-            if let Some((idx, _sol, sc)) = add_node_part(nt, id, n, ctxt, &mut seen, &vals, seen_sigmas, &mut todo) {
-                if _sol {
-                    handle_sol(nt, idx, ctxt);
-                    return extract(nt, idx, ctxt);
-                } else {
                     count = 0;
                     len -= 1;
                 }
+                count += 1;
+                if len == count {
+                    break;
+                }
             }
-            count += 1;
-            if len == count {
-                break
-            } 
         }
-
+    } else {
+        ctxt.classes.iter_mut().for_each(|c| { c.drain(..); } );
     }
 
     for (nt, n) in ctxt.problem.prod_rules() {
@@ -140,9 +138,11 @@ fn run(ctxt: &mut Ctxt) -> Term {
         let has_children = !n.children().is_empty();
         let has_holes = n.children().iter().any(|c| matches!(c, Child::Hole(_, _)));
 
+
         if (!has_children || !has_holes) && !is_placeholder {
             let (_sol, is_sol, maxsat) = add_node(*nt, n, ctxt, None);
             ctxt.solids[*nt].push(_sol);
+            ctxt.classes[*nt][_sol].handled_size = Some(0);
             if is_sol {
                 handle_sol(*nt, _sol, ctxt);
                 return extract(*nt, _sol, ctxt);
@@ -178,7 +178,7 @@ fn handle(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usiz
     let c = &mut ctxt.classes[nt][x];
 
     // if the current size is the same size of the last "handle" call, nothing it to be done.
-    if c.handled_size == Some(c.size) { return (None, 0); }
+    if c.handled_size == Some(c.size) {  return (None, 0); }
 
     if c.handled_size.is_none() {
         ctxt.solids[nt].push(x);
@@ -191,45 +191,64 @@ fn handle(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usiz
 
 fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
     let ty = ctxt.classes[nnt][x].node.ty();
-    let mut maxsat = 0;
+    let mut max_sat = 0;
 
     for (nt, rule) in ctxt.problem.prod_rules() {
         let (in_types, _) = rule.signature();
-        for i in 0..rule.children().len() {
-            if !matches!(rule.children()[i], Child::Hole(_, 0)) {
+
+        for (i, child) in rule.children().iter().enumerate() {
+            if !matches!(child, Child::Hole(_, 0)) {
                 continue;
             }
-            let mut rule = rule.clone();
-            if !in_types[i].captures_ty(&ty) { continue }
-            rule.children_mut()[i] = Child::Hole(ty.into_nt().unwrap(), x);
 
-            let mut in_types: Vec<_> = in_types.iter().cloned().collect();
-            in_types.remove(i);
-            let it = in_types.iter().map(|ty| match ty {
-                Ty::PRule(_)=> ty.nt_indices().iter().flat_map(|j| ctxt.solids[*j].clone().into_iter().map(|id| (j.clone(), id))).collect::<Vec<_>>(),
-                _ => panic!("should not happen"),
+            if !in_types[i].captures_ty(&ty) {
+                continue;
+            }
+
+            let mut new_rule = rule.clone();
+            new_rule.children_mut()[i] = Child::Hole(ty.into_nt().unwrap(), x);
+
+            let remaining_types: Vec<_> = in_types.iter()
+                .enumerate()
+                .filter(|(idx, _)| *idx != i)
+                .map(|(_, ty)| ty)
+                .cloned()
+                .collect();
+
+
+            let solid_combinations = remaining_types.iter().map(|ty| {
+                match ty {
+                    Ty::PRule(_) => ty.nt_indices()
+                        .iter()
+                        .flat_map(|j| {
+                            ctxt.solids[*j].iter().map(move |id| (*j, *id))
+                        })
+                        .collect::<Vec<_>>(),
+                    _ => panic!("Expected PRule type, got: {:?}", ty),
+                }
             });
 
-            for a in it.multi_cartesian_product() {
-                rule.children_mut().iter_mut().enumerate()
-                    .filter(|(_, c)| matches!(c, Child::Hole(_, _)))
-                    .filter(|(i2, _)| *i2 != i)
-                    .map(|(_, x)| x)
-                    .zip(a.iter()).for_each(|(ptr, (j, v))| { 
-                        *ptr = Child::Hole(*j, *v); 
-                    });
-
-                let (_sol, is_sol, sc) = add_node(*nt, rule.clone(), ctxt, None);
-                let term = extract(*nt, _sol, ctxt);
-                if is_sol {
-                    return (Some((*nt, _sol)), maxsat);
+            for combination in solid_combinations.multi_cartesian_product() {
+                let mut hole_idx = 0;
+                for (pos, child) in new_rule.children_mut().iter_mut().enumerate() {
+                    if pos != i && matches!(child, Child::Hole(_, _)) {
+                        let (nt_idx, val_id) = combination[hole_idx];
+                        *child = Child::Hole(nt_idx, val_id);
+                        hole_idx += 1;
+                    }
                 }
-                maxsat = std::cmp::max(maxsat, sc);
+
+                let (_sol, is_sol, sc) = add_node(*nt, new_rule.clone(), ctxt, None);
+                max_sat = max_sat.max(sc);
+                if is_sol {
+                    return (Some((*nt, _sol)), max_sat);
+                }
+
             }
         }
     }
 
-    (None, maxsat)
+    (None, max_sat)
 }
 
 pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<HashMap<Box<[Value]>, bool>>>, classes: Option<Vec<Vec<Class>>>, perceptron: &Perceptron) -> (Term, Vec<HashMap<Box<[Value]>, bool>>, Vec<Vec<Class>>) {
@@ -305,16 +324,21 @@ fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &m
         .iter()
         .map(|c| {
             if let Child::Hole(j, i) = c {
-                seen.0[&(*j, *i)].clone().into_iter().collect::<Vec<_>>()
-            } else { vec![0] } // dummy id 
+                seen.0[&(*j, *i)]
+                    .clone()
+                    .into_iter()
+                    .map(Some)
+                    .collect::<Vec<_>>()
+            } else { 
+                vec![None] 
+            }
         })
-        .multi_cartesian_product() 
+        .multi_cartesian_product()
     {
         let mut new_node = node.clone();
         for (idx, c) in new_node.children_mut().iter_mut().enumerate() {
-            match c {
-                Child::Hole(j, i) => *c = Child::Hole(*j, comb[idx]),
-                _ => { } 
+            if let (Child::Hole(j, _), Some(new_id)) = (&*c, comb[idx]) {
+                *c = Child::Hole(*j, new_id);
             }
         }
         if let Some((idx, sol, sc)) = add_node_part(nt, id, new_node, ctxt, seen, vals, seen_sigmas, todo) {
@@ -348,7 +372,6 @@ fn add_node_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mu
 
     let (nid, sol, sc) = add_node(nt, node, ctxt, Some(full_vals.clone().into_boxed_slice()));
     seen.0.get_mut(&(nt, id)).unwrap().insert(nid); 
-
 
     Some((nid, sol, sc))
 }
@@ -385,10 +408,7 @@ fn add_canon_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen
 
     let full_boxed: Box<[Value]> = full_vals.into_boxed_slice();
     ctxt.classes[nt][id].vals = full_boxed.clone();
-
     ctxt.vals_lookup.insert((nt, full_boxed), id);
-
-    ctxt.solids[nt].push(id); 
 
     if ctxt.problem.rettys.contains(&ctxt.classes[nt][id].node.ty()) {
         ctxt.classes[nt][id].satcount += satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
@@ -403,7 +423,7 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
         Some(v) => v,
         None => match vals(nt, &node, ctxt) {
             Some(v) => v,
-            None => return (0, false, 0), //is this okay? i dunno for now
+            None => Box::new([]),
         },
     };
     let sc;
@@ -492,7 +512,8 @@ fn enqueue(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) {
 #[cfg(feature = "heuristic-default")]
 fn heuristic(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[nt][x];
-    if nt != 0 {
+    let ty = ctxt.classes[nt][x].node.ty();
+    if ctxt.problem.nt_mapping.get(&ty).expect("this never happens") != &ctxt.problem.rettype {
         return OrderedFloat(10000 as f32);
     }
 
