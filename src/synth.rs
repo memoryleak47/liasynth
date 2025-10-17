@@ -195,6 +195,7 @@ fn handle(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usiz
     grow(nt, x, ctxt)
 }
 
+// BUG: there is a bug on some benchmarks, eg. inv_gen_array.sl, will fix...
 fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
     let ty = ctxt.classes[nnt][x].node.ty();
     let mut max_sat = 0;
