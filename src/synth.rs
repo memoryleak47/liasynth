@@ -610,10 +610,7 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> Score {
     };
 
     ctxt.classes[nt][x].features = feats;
-    // OrderedFloat(score)
-
-    let mut rng = rand::rng();
-    OrderedFloat(rng.random::<f64>())
+    OrderedFloat(score)
 }
 
 fn vals(nt: NonTerminal, node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {

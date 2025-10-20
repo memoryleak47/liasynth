@@ -258,6 +258,7 @@ impl Problem {
             query.push_str(&format!("({var} {}) ", ty.to_string()));
         }
         let term = term_to_z3(term, &self.vars.keys().cloned().collect::<Box<[_]>>());
+        // println!("testing {term}");
         query.push_str(&format!(") {retty} {term})\n"));
         let constraint_str = &self.constraint_str;
         query.push_str(&format!("(assert {constraint_str})\n"));
