@@ -34,7 +34,7 @@ fn main() {
     init_timing_hooks();
     let _report = ReportOnDrop; 
 
-    let arg = std::env::args().nth(1).unwrap_or(String::from("examples/LIA/unbdd_inv_gen_array.sl"));
+    let arg = std::env::args().nth(1).unwrap_or(String::from("examples/LIA/max3.sl"));
     let problem = mk_sygus_problem(&arg);
 
     let term = cegis(&problem);

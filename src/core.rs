@@ -175,8 +175,9 @@ pub fn cegis(problem: &Problem) -> Term {
     let mut sigmas = Vec::new();
     let mut cxs_cache = None;
     let mut classes = None;
-    let mut olinr = OnlineLinearRegression::new(4, 1e-2);
-    let mut flinr = OnlineLinearRegression::new(4, 1e-2);
+    let fs = problem.prod_rules.len() + 4;
+    let mut olinr = OnlineLinearRegression::new(fs, 1e-2);
+    let mut flinr = OnlineLinearRegression::new(fs, 1e-2);
     loop {
         let (term, cxsc, clss) = synth(problem, &sigmas, cxs_cache, classes, &mut olinr, &mut flinr);
         classes = Some(clss);

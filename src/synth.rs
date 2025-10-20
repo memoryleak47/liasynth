@@ -159,9 +159,11 @@ fn run(ctxt: &mut Ctxt) -> Term {
         }
         if cfg!(feature = "heuristic-linr"){
             if *ctxt.problem.nt_mapping.get(&Ty::NonTerminal(nt)).unwrap() == ctxt.problem.rettype {
-                ctxt.olinr.partial_fit(ctxt.classes[nt][x].features.as_slice(), maxsat as f64); 
+                ctxt.olinr.partial_fit(ctxt.classes[nt][x].features.as_slice(), (maxsat.saturating_sub(ctxt.classes[nt][x].satcount) as f64) / (ctxt.classes[nt][x].size as f64 + 2.0)); 
+                // ctxt.olinr.partial_fit(ctxt.classes[nt][x].features.as_slice(), maxsat as f64 / ctxt.classes[nt][x].size as f64); 
             } else {
-                ctxt.flinr.partial_fit(ctxt.classes[nt][x].features.as_slice(), maxsat as f64); 
+                ctxt.flinr.partial_fit(ctxt.classes[nt][x].features.as_slice(), (maxsat.saturating_sub(ctxt.classes[nt][x].satcount) as f64) / (ctxt.classes[nt][x].size as f64 + 2.0)); 
+                // ctxt.flinr.partial_fit(ctxt.classes[nt][x].features.as_slice(), maxsat as f64 / ctxt.classes[nt][x].size as f64);
             }
         }
     }
@@ -195,13 +197,13 @@ fn handle(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usiz
     grow(nt, x, ctxt)
 }
 
-// BUG: there is a bug on some benchmarks, eg. inv_gen_array.sl, will fix...
 fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
     let ty = ctxt.classes[nnt][x].node.ty();
     let mut max_sat = 0;
 
     for (nt, rule) in ctxt.problem.prod_rules() {
         let (in_types, _) = rule.signature();
+
         for (i, child) in rule.children().iter().enumerate() {
             if !matches!(child, Child::Hole(_, 0)) {
                 continue;
@@ -245,7 +247,6 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
                 }
 
                 let (_sol, is_sol, sc) = add_node(*nt, new_rule.clone(), ctxt, None);
-                let term = extract(*nt, _sol, ctxt);
                 max_sat = max_sat.max(sc);
                 if is_sol {
                     return (Some((*nt, _sol)), max_sat);
@@ -546,8 +547,33 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Score {
     OrderedFloat((a / (c.size + 5)) as f64)
 }
 
+fn matches_rule(n: &Node, r: &Node) -> bool {
+    use std::mem::discriminant;
+
+    match (n, r) {
+        (Node::VarInt(i, _),  Node::VarInt(j, _))  => i == j,
+        (Node::VarBool(i, _), Node::VarBool(j, _)) => i == j,
+        (Node::ConstInt(a, _),  Node::ConstInt(b, _))  => a == b,
+        _ => {
+            let dn = discriminant(n);
+            let dr = discriminant(r);
+            dn == dr
+        }
+    }
+}
+
 fn feature_set(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Vec<f64> {
     let c = &ctxt.classes[nt][x];
+    let term = extract(nt, x, ctxt);
+
+    let bog: Vec<f64> = ctxt.problem.prod_rules
+        .iter()
+        .map(|(_, rule)| {
+            term.elems.iter()
+                .filter(|n| matches_rule(*n, rule))
+                .count() as f64
+        })
+        .collect();
 
     let sc = c.satcount;
     let max_subterm_sc = c.node.children()
@@ -558,11 +584,14 @@ fn feature_set(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Vec<f64> {
         .unwrap_or(0);
 
     vec![
-        1.0, 
+        1.0,
         c.prev_sol as f64,
         c.size as f64,
-        sc.saturating_sub(max_subterm_sc) as f64,
+        sc as f64,
     ]
+    .into_iter()
+    .chain(bog)
+    .collect()
 }
 
 #[cfg(feature = "heuristic-linr")]
@@ -575,18 +604,16 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> Score {
         .map(|t| t != ret)
         .unwrap_or(true);
 
-    let feats = feature_set(nt, x, ctxt);
+    let mut feats = feature_set(nt, x, ctxt);
 
     let score = if is_off {
-        let s = ctxt.flinr.predict(feats.as_slice());
-        ctxt.classes[nt][x].features = feats.clone();
-        s 
+        feats[3] = (ctxt.big_sigmas.len() as f64) / 2.0;
+        ctxt.flinr.predict(feats.as_slice()) + 1e-6
     } else {
-        let s = ctxt.olinr.predict(feats.as_slice());
-        ctxt.classes[nt][x].features = feats.clone();
-        s
+        ctxt.olinr.predict(feats.as_slice())
     };
 
+    ctxt.classes[nt][x].features = feats;
     OrderedFloat(score)
 }
 
