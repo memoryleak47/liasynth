@@ -20,7 +20,10 @@ mod langdef;
 pub use langdef::*;
 
 mod linearreg;
-pub use linearreg::OnlineLinearRegression;
+pub use linearreg::BayesianLinearRegression;
+
+mod termembed;
+pub use termembed::TermEmbedder;
 
 #[macro_use]
 mod phase_timing; 

@@ -175,11 +175,11 @@ pub fn cegis(problem: &Problem) -> Term {
     let mut sigmas = Vec::new();
     let mut cxs_cache = None;
     let mut classes = None;
-    let fs = problem.prod_rules.len() + 4;
-    let mut olinr = OnlineLinearRegression::new(fs, 1e-2);
-    let mut flinr = OnlineLinearRegression::new(fs, 1e-2);
+    let mut term_embed = TermEmbedder::new(4);
+    let mut olinr = BayesianLinearRegression::with_default_prior(7);
+    let mut flinr = BayesianLinearRegression::with_default_prior(7);
     loop {
-        let (term, cxsc, clss) = synth(problem, &sigmas, cxs_cache, classes, &mut olinr, &mut flinr);
+        let (term, cxsc, clss) = synth(problem, &sigmas, cxs_cache, classes, &mut term_embed, &mut olinr, &mut flinr);
         classes = Some(clss);
         cxs_cache = Some(cxsc);
         println!("Candidate: {}", term_to_z3(&term, &problem.vars.keys().cloned().collect::<Box<[_]>>()));

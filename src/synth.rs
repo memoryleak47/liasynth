@@ -5,6 +5,7 @@ use itertools::Itertools;
 use std::collections::{HashSet, HashMap, VecDeque};
 use std::collections::hash_map::Entry;
 use ordered_float::OrderedFloat;
+use rand::Rng;
 
 
 type Score = OrderedFloat<f64>;
@@ -69,8 +70,9 @@ pub struct Ctxt<'a> {
 
     solids: Vec<Vec<Id>>,
 
-    olinr: &'a mut OnlineLinearRegression,
-    flinr: &'a mut OnlineLinearRegression,
+    temb: &'a mut TermEmbedder,
+    olinr: &'a mut BayesianLinearRegression,
+    flinr: &'a mut BayesianLinearRegression,
 }
 
 pub struct Class {
@@ -159,11 +161,9 @@ fn run(ctxt: &mut Ctxt) -> Term {
         }
         if cfg!(feature = "heuristic-linr"){
             if *ctxt.problem.nt_mapping.get(&Ty::NonTerminal(nt)).unwrap() == ctxt.problem.rettype {
-                ctxt.olinr.partial_fit(ctxt.classes[nt][x].features.as_slice(), (maxsat.saturating_sub(ctxt.classes[nt][x].satcount) as f64) / (ctxt.classes[nt][x].size as f64 + 2.0)); 
-                // ctxt.olinr.partial_fit(ctxt.classes[nt][x].features.as_slice(), maxsat as f64 / ctxt.classes[nt][x].size as f64); 
+                ctxt.olinr.update(ctxt.classes[nt][x].features.as_slice(), maxsat as f64);
             } else {
-                ctxt.flinr.partial_fit(ctxt.classes[nt][x].features.as_slice(), (maxsat.saturating_sub(ctxt.classes[nt][x].satcount) as f64) / (ctxt.classes[nt][x].size as f64 + 2.0)); 
-                // ctxt.flinr.partial_fit(ctxt.classes[nt][x].features.as_slice(), maxsat as f64 / ctxt.classes[nt][x].size as f64);
+                ctxt.flinr.update(ctxt.classes[nt][x].features.as_slice(), maxsat as f64);
             }
         }
     }
@@ -259,7 +259,7 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
     (None, max_sat)
 }
 
-pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<HashMap<Box<[Value]>, bool>>>, classes: Option<Vec<Vec<Class>>>, olinr: &mut OnlineLinearRegression, flinr: &mut OnlineLinearRegression) -> (Term, Vec<HashMap<Box<[Value]>, bool>>, Vec<Vec<Class>>) {
+pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<HashMap<Box<[Value]>, bool>>>, classes: Option<Vec<Vec<Class>>>, temb: &mut TermEmbedder, olinr: &mut BayesianLinearRegression, flinr: &mut BayesianLinearRegression) -> (Term, Vec<HashMap<Box<[Value]>, bool>>, Vec<Vec<Class>>) {
     let mut small_sigmas: IndexSet<Sigma> = IndexSet::new();
     let mut sigma_indices: Vec<Box<[usize]>> = Vec::new();
     for bsigma in big_sigmas {
@@ -294,6 +294,7 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<Hash
                 .take(no_nt)
                 .collect::<Vec<Vec<Class>>>()
         }),
+        temb, 
         solids: vec![vec![]; no_nt],
         olinr,
         flinr,
@@ -562,18 +563,11 @@ fn matches_rule(n: &Node, r: &Node) -> bool {
     }
 }
 
-fn feature_set(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Vec<f64> {
+fn feature_set(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     let c = &ctxt.classes[nt][x];
     let term = extract(nt, x, ctxt);
 
-    let bog: Vec<f64> = ctxt.problem.prod_rules
-        .iter()
-        .map(|(_, rule)| {
-            term.elems.iter()
-                .filter(|n| matches_rule(*n, rule))
-                .count() as f64
-        })
-        .collect();
+    let w2v: Vec<f64> = ctxt.temb.embed(&term);
 
     let sc = c.satcount;
     let max_subterm_sc = c.node.children()
@@ -585,12 +579,12 @@ fn feature_set(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Vec<f64> {
 
     vec![
         1.0,
-        c.prev_sol as f64,
-        c.size as f64,
+        // c.prev_sol as f64,
+        max_subterm_sc as f64,
         sc as f64,
     ]
     .into_iter()
-    .chain(bog)
+    .chain(w2v)
     .collect()
 }
 
@@ -608,13 +602,18 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> Score {
 
     let score = if is_off {
         feats[3] = (ctxt.big_sigmas.len() as f64) / 2.0;
-        ctxt.flinr.predict(feats.as_slice()) + 1e-6
+        let (s, _)  = ctxt.flinr.predict(feats.as_slice());
+        s + 1e-6
     } else {
-        ctxt.olinr.predict(feats.as_slice())
+        let (s, _)  = ctxt.olinr.predict(feats.as_slice());
+        s
     };
 
     ctxt.classes[nt][x].features = feats;
-    OrderedFloat(score)
+    // OrderedFloat(score)
+
+    let mut rng = rand::rng();
+    OrderedFloat(rng.random::<f64>())
 }
 
 fn vals(nt: NonTerminal, node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
