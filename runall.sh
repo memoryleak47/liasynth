@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-outfile="${1:-bench.txt}"
+feature="${1:-}"
+outfile="${2:-bench.txt}"
 
 all=$(find "examples/LIA" -type f | wc -l)
 
@@ -12,13 +13,14 @@ run() {
         echo "[$i/$all] $f:"
 
         python3 python_frontend.py "$f"
-        if ! cargo b --release >/dev/null 2>&1; then
+
+        if ! cargo b --release --features "$feature" >/dev/null 2>&1; then
             echo "[build failed] $f"
             i=$((i+1))
             continue
         fi
-        timeout 10s target/release/liasynth "$f"
 
+        timeout 10s target/release/liasynth "$f"
         i=$((i+1))
     done
 

@@ -172,13 +172,13 @@ fn run(ctxt: &mut Ctxt) -> Term {
 }
 
 fn handle_sol(nt: NonTerminal, id: Id, ctxt: &mut Ctxt) {
-    ctxt.classes[nt][id].prev_sol += 1;
-    let node = ctxt.classes[nt][id].node.clone();
-    for (arg_ty, child) in node.signature().0.iter().zip(node.children()) {
-        if let Child::Hole(j, i) = child {
-            handle_sol(*j, *i, ctxt);
-        }
-    }
+    ctxt.classes[nt][id].prev_sol = ctxt.big_sigmas.len();
+    // let node = ctxt.classes[nt][id].node.clone();
+    // for (arg_ty, child) in node.signature().0.iter().zip(node.children()) {
+    //     if let Child::Hole(j, i) = child {
+    //         handle_sol(*j, *i, ctxt);
+    //     }
+    // }
 }
 
 // makes "x" solid if it's not solid yet.
@@ -579,7 +579,7 @@ fn feature_set(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
 
     vec![
         1.0,
-        // c.prev_sol as f64,
+        c.prev_sol as f64,
         max_subterm_sc as f64,
         sc as f64,
     ]
@@ -603,14 +603,42 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> Score {
     let score = if is_off {
         feats[3] = (ctxt.big_sigmas.len() as f64) / 2.0;
         let (s, _)  = ctxt.flinr.predict(feats.as_slice());
-        s + 1e-6
+        s 
     } else {
         let (s, _)  = ctxt.olinr.predict(feats.as_slice());
         s
     };
 
     ctxt.classes[nt][x].features = feats;
-    OrderedFloat(score)
+
+    if ctxt.classes.iter().map(|c| c.len()).sum::<usize>() < 1000 {
+        let c = &ctxt.classes[nt][x];
+        let ty = ctxt.classes[nt][x].node.ty();
+        if ctxt.problem.nt_mapping.get(&ty).expect("this never happens") != &ctxt.problem.rettype {
+            return OrderedFloat(7 as f64);
+        }
+
+        let mut a = 65;
+        let max_subterm_satcount = c.node.children()
+            .iter()
+            .filter_map(|c| {
+                if let Child::Hole(j, i) = c { Some((j, i)) } else { None }
+            })
+            .map(|(cnt, s)| ctxt.classes[*cnt][*s].satcount)
+            .max()
+            .unwrap_or_else(|| 0);
+
+
+        let tmp = c.satcount.saturating_sub(max_subterm_satcount + 4);
+
+        for _ in tmp..ctxt.big_sigmas.len() {
+            a /= 2;
+        }
+
+        OrderedFloat((a / (c.size + 5)) as f64)
+    } else {
+        OrderedFloat(score)
+    }
 }
 
 fn vals(nt: NonTerminal, node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
