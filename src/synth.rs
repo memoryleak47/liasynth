@@ -637,7 +637,7 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> Score {
 
         OrderedFloat((a / (c.size + 5)) as f64)
     } else {
-        OrderedFloat(score)
+        OrderedFloat(score / ((c.size + 5) as f64))
     }
 }
 

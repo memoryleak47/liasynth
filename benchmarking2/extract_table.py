@@ -109,9 +109,10 @@ def create_heatmap_and_performance(df, title="All Benchmarks"):
                                color=color, fontsize=7, fontweight='bold')
 
     # === METHOD PERFORMANCE BARS ===
+    # FIX: Use df_sorted instead of df for counting
     method_counts = []
     for method in methods:
-        solved = df[method].sum()
+        solved = df_sorted[method].sum()  # Changed from df[method] to df_sorted[method]
         method_counts.append(solved)
 
     # Sort by performance
@@ -124,8 +125,8 @@ def create_heatmap_and_performance(df, title="All Benchmarks"):
     y_pos = np.arange(len(methods))
 
     # Color bars by performance
-    colors_perf = ['#10b981' if c/len(df) > 0.7 else
-                   '#f59e0b' if c/len(df) > 0.4 else
+    colors_perf = ['#10b981' if c/len(df_sorted) > 0.7 else
+                   '#f59e0b' if c/len(df_sorted) > 0.4 else
                    '#ef4444' for c in sorted_counts]
 
     ax_method.barh(y_pos, sorted_counts, color=colors_perf, alpha=0.7, edgecolor='black', linewidth=1.5)
@@ -135,16 +136,17 @@ def create_heatmap_and_performance(df, title="All Benchmarks"):
     ax_method.set_title('Individual Method Performance (sorted by performance)',
                        fontsize=12, fontweight='bold')
     ax_method.grid(axis='x', alpha=0.3, linestyle='--')
-    ax_method.set_xlim(0, len(df) * 1.2)
+    ax_method.set_xlim(0, len(df_sorted) * 1.2)
 
-    # Add detailed labels on bars
+    # Add detailed labels on bars - FIX: use df_sorted
     for i, (count, method) in enumerate(zip(sorted_counts, sorted_methods)):
-        percentage = 100 * count / len(df)
-        ax_method.text(count + len(df)*0.01, i,
-                      f'{count}/{len(df)} ({percentage:.1f}%)',
+        percentage = 100 * count / len(df_sorted)  # Changed from len(df)
+        ax_method.text(count + len(df_sorted)*0.01, i,  # Changed from len(df)
+                      f'{count}/{len(df_sorted)} ({percentage:.1f}%)',  # Changed from len(df)
                       va='center', fontsize=10, fontweight='bold')
 
     plt.tight_layout()
+    plt.savefig(title, format='pdf')
     return fig, df_sorted
 
 # Assuming your dataframe is called 'df'
