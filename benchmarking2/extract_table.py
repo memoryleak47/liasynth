@@ -1,44 +1,41 @@
 import os
 import re
 import pandas as pd
-
-b_pat = re.compile(r'.*examples\/LIA\/(.*).sl')
-t_pat = re.compile(r'\(synth-fun .*\) (.*)')
-
-def get_type(file):
-    file = f"../examples/LIA/{file}.sl"
-    with open(file, 'r') as f:
-        content = f.read()
-
-
-    return t_pat.search(content).group(1)
-
-bens = {}
-for file in os.listdir("."):
-    if file.endswith(".txt"):
-        with open(os.path.join("", file), 'r') as f:
-            content = f.read()
-            benchs = content.split('==========')[1:]
-
-            bs = [b_pat.search(b).group(1) for b in benchs]
-            typs = [get_type(b) for b in bs]
-            sol = ["Answer" in b or "define-fun" in b for b in benchs]
-            bens[file[:-4]] = sol
-
-df = pd.DataFrame.from_dict(bens)
-df['type'] = typs
-df.index = bs
-
-import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.patches import Rectangle
+
+b_pat = re.compile(r'.*examples\/LIA\/(.*).sl')
+
+def get_type(bench):
+    with open(f"../examples/LIA/{bench}.sl", "r") as f:
+        m = re.search(r'\(synth-fun .*?\)\s+(\w+)', f.read())
+    return m.group(1) if m else None
+
+bens = {}
+all_benchmarks = set()
+
+for file in os.listdir("."):
+    if not file.endswith(".txt"):
+        continue
+    method = file[:-4]
+    with open(file, "r") as f:
+        benchs = f.read().split("==========")[1:]
+    bs = [b_pat.search(b).group(1) for b in benchs]
+    sols = [("Answer" in b or "define-fun" in b) for b in benchs]
+    all_benchmarks.update(bs)
+    bens[method] = {b: int(s) for b, s in zip(bs, sols)}
+
+df = pd.DataFrame.from_dict(bens, orient="columns").fillna(0).astype(int)
+df.index.name = "benchmark"
+
+df["type"] = pd.Series({b: get_type(b) for b in df.index})
+
 
 def create_heatmap_and_performance(df, title="All Benchmarks"):
     """
     Create a heatmap showing which methods solve which benchmarks + performance bars
     """
-    methods = df.columns[:-1]
+    methods = [c for c in df.columns if c != "type"]
 
     # Sort benchmarks by number of methods that solve them (ascending)
     df_sorted = df.copy()
@@ -153,75 +150,12 @@ def create_heatmap_and_performance(df, title="All Benchmarks"):
 # df = your_dataframe
 
 # Create plots for each type
-print("Generating plots...")
 fig_all, sorted_all = create_heatmap_and_performance(df, "All Benchmarks")
-print("✓ Saved: heatmap_all.png")
 
 fig_int, sorted_int = create_heatmap_and_performance(
     df[df['type'] == 'Int'], "Int Benchmarks")
-print("✓ Saved: heatmap_int.png")
 
 fig_bool, sorted_bool = create_heatmap_and_performance(
     df[df['type'] == 'Bool'], "Bool Benchmarks")
-print("✓ Saved: heatmap_bool.png")
 
 plt.show()
-
-# Print detailed statistics
-print("\n" + "="*70)
-print("BENCHMARK COVERAGE ANALYSIS")
-print("="*70)
-
-methods = df.columns[:-1]
-
-for type_filter, type_name in [(None, "All"), ("Int", "Int"), ("Bool", "Bool")]:
-    if type_filter:
-        subset = df[df['type'] == type_filter]
-    else:
-        subset = df
-
-    print(f"\n{'='*70}")
-    print(f"{type_name} Benchmarks - Total: {len(subset)}")
-    print('='*70)
-
-    # Method performance
-    print("\nMethod Performance:")
-    print("-"*70)
-    for method in methods:
-        solved = subset[method].sum()
-        print(f"{method:20s}: {solved:4d}/{len(subset):4d} ({100*solved/len(subset):5.1f}%)")
-
-    # Coverage statistics
-    subset_copy = subset.copy()
-    subset_copy['n_solved'] = subset_copy[methods].sum(axis=1)
-
-    print("\nCoverage Distribution:")
-    print("-"*70)
-    for n in range(7):
-        count = (subset_copy['n_solved'] == n).sum()
-        if count > 0:
-            label = f"Solved by {n} methods" if n > 0 else "UNSOLVED"
-            print(f"{label:25s}: {count:4d} ({100*count/len(subset):5.1f}%)")
-
-    # Show unsolved benchmarks
-    unsolved = subset[subset[methods].sum(axis=1) == 0]
-    if len(unsolved) > 0:
-        print(f"\nUnsolved Benchmarks ({len(unsolved)}):")
-        print("-"*70)
-        for name in unsolved.index[:10]:
-            print(f"  • {name}")
-        if len(unsolved) > 10:
-            print(f"  ... and {len(unsolved) - 10} more")
-
-    # Show only solved by one method
-    solved_by_one = subset[subset[methods].sum(axis=1) == 1]
-    if len(solved_by_one) > 0:
-        print(f"\nSolved by Only ONE Method ({len(solved_by_one)}):")
-        print("-"*70)
-        for name in solved_by_one.index[:5]:
-            which = [m for m in methods if solved_by_one.loc[name, m]]
-            print(f"  • {name:40s} → {which[0].replace('grammar_', '')}")
-        if len(solved_by_one) > 5:
-            print(f"  ... and {len(solved_by_one) - 5} more")
-
-print("\n" + "="*70)
