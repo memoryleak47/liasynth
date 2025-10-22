@@ -1,3 +1,4 @@
 f=examples/LIA/array_search_10.sl
 python3 python_frontend.py "$f"
-RUSTFLAGS="-C force-frame-pointers=yes" cargo flamegraph -- "$f"
+RUSTFLAGS="-C force-frame-pointers=yes" cargo flamegraph --features heuristic-default -- "$f"
+firefox flamegraph.svg
