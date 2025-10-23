@@ -7,7 +7,7 @@ g2 = ["heuristic-default", "heuristic-linr"]
 g3 = [None, "winning-incremental", "winning-incremental, total-incremental"]
 
 def grammar_tag(v):
-    return "ignor-grammar" if v == "ignore_" else ""
+    return "ignore-grammar" if v == "ignore_" else ""
 
 def heur_tag(v):
     return "d" if v == "heuristic-default" else "l"

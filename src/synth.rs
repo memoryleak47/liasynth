@@ -611,8 +611,9 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> Score {
 
     ctxt.classes[nt][x].features = feats;
 
+    let c = &ctxt.classes[nt][x];
+
     if ctxt.classes.iter().map(|c| c.len()).sum::<usize>() < 1000 {
-        let c = &ctxt.classes[nt][x];
         let ty = ctxt.classes[nt][x].node.ty();
         if ctxt.problem.nt_mapping.get(&ty).expect("this never happens") != &ctxt.problem.rettype {
             return OrderedFloat(7 as f64);
