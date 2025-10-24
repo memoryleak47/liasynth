@@ -1,11 +1,13 @@
 use crate::*;
 
 pub fn satcount2(nt: usize, id: Id, ctxt: &mut Ctxt) -> usize {
-    let vals = &ctxt.classes[nt][id].vals;
+    time_block!("satcount2");
 
-    if vals.first().unwrap().ty() != ctxt.problem.rettype {
+    if ctxt.problem.nt_mapping[&Ty::NonTerminal(nt)] != ctxt.problem.rettype {
         return 0
     }
+
+    let vals = &ctxt.classes[nt][id].vals;
 
     let mut sum = 0;
 
