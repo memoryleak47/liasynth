@@ -1,6 +1,10 @@
 use crate::*;
 
 pub fn satcount2(nt: usize, id: Id, ctxt: &mut Ctxt) -> usize {
+    if ctxt.problem.rettype != ctxt.problem.synth_fun.ret {
+        return 0
+    }
+
     let vals = &ctxt.classes[nt][id].vals;
 
     let mut sum = 0;
