@@ -106,7 +106,7 @@ fn expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, t: &m
         Expr::SynthFunCall(_name, exprs) => {
             let exprs: Box<[Id]> = exprs.into_iter().map(|x| expr_to_term_impl(x, vars, progname, t, instvars, rettype)).collect();
             instvars.push(exprs.iter().cloned().collect());
-            t.push(Node::VarInt(vars.len() - 1, rettype))
+            t.push(Node::VarInt(vars.len() + instvars.len() - 1, rettype))
         },
         Expr::DefinedFunCall(..) => unreachable!("DefinedFunCalls should already be resolved!"),
         Expr::Let(..) => unreachable!("Lets should already be resolved!"),
