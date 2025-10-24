@@ -187,7 +187,7 @@ pub fn cegis(problem: &Problem) -> Term {
         GLOBAL_STATS.lock().unwrap().counterexamples+= 1;
         // TODO check this later: assert!(problem.sat(&..., &sigmas));
         if let Some(sigma) = problem.verify(&term) {
-            // println!("CE: {:?}", &sigma);
+            println!("CE: {:?}", &sigma);
             if sigmas.contains(&sigma) {
                 panic!("This is broken!");
             }
