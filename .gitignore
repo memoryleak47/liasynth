@@ -3,3 +3,4 @@ perf.data*
 flamegraph.svg
 bench.txt
 cvc_bench.txt
+src/langdef.rs
