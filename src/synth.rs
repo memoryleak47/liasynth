@@ -54,19 +54,19 @@ impl Seen {
 pub struct Ctxt<'a> {
     queue: Queue, // contains ids of pending (i.e. not solidifed Ids), or solid Ids which got an updated size.
 
-    big_sigmas: &'a [Sigma],
+    pub big_sigmas: &'a [Sigma],
     small_sigmas: Box<[Sigma]>,
 
     // for each big_sigma, thisreturns the list of small_sigmas corresponding to the instantiations of the synthfun.
-    sigma_indices: Box<[Box<[usize]>]>,
+    pub sigma_indices: Box<[Box<[usize]>]>,
 
-    problem: &'a Problem,
+    pub problem: &'a Problem,
 
     // indexed by small-sigma.
     vals_lookup: Map<(NonTerminal, Box<[Value]>), Id>,
     cxs_cache: Vec<HashMap<Box<[Value]>, bool>>,
 
-    classes: Vec<Vec<Class>>,
+    pub classes: Vec<Vec<Class>>,
 
     solids: Vec<Vec<Id>>,
 
@@ -79,7 +79,7 @@ pub struct Class {
     node: Node,
     nodes: NodeQueue,
     size: usize,
-    vals: Box<[Value]>,
+    pub vals: Box<[Value]>,
     handled_size: Option<usize>, // what was the size when this class was handled last time.
     satcount: usize,
     prev_sol: usize,
@@ -423,7 +423,7 @@ fn add_canon_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen
     ctxt.vals_lookup.insert((nt, full_boxed), id);
 
     if ctxt.problem.rettys.contains(&ctxt.classes[nt][id].node.ty()) {
-        ctxt.classes[nt][id].satcount += satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
+        ctxt.classes[nt][id].satcount += satcount2(nt, id, ctxt);
     }
 
     enqueue(nt, id, ctxt);
@@ -486,7 +486,7 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
             }
 
             if !to_check.is_empty() {
-                satc += satcount(nt, i, ctxt, Some(to_check));
+                satc += satcount2(nt, i, ctxt);
             };
             sc = satc;
 
@@ -655,7 +655,7 @@ fn minsize(nt: NonTerminal, node: &Node, ctxt: &Ctxt) -> usize {
         .map(|(cnt, x)| ctxt.classes[*cnt][*x].size).sum::<usize>() + 1
 }
 
-fn satcount(nt: NonTerminal, x: Id, ctxt: &mut Ctxt, idxs: Option<Vec<usize>>) -> usize {
+pub fn satcount(nt: NonTerminal, x: Id, ctxt: &mut Ctxt, idxs: Option<Vec<usize>>) -> usize {
     GLOBAL_STATS.lock().unwrap().programs_checked+= 1;
     let ty = ctxt.classes[nt][x].node.ty();
     if ctxt.problem.nt_mapping.get(&ty).expect("this never happens") != &ctxt.problem.rettype {

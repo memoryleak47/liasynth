@@ -4,6 +4,9 @@ pub use core::*;
 mod synth;
 pub use synth::*;
 
+mod satcount;
+pub use satcount::*;
+
 mod with_ord;
 pub use with_ord::*;
 
