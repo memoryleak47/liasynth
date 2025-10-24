@@ -473,27 +473,8 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
         };
         ctxt.classes[nt].push(c);
 
-        if ctxt.big_sigmas.len() > 0 {
-            let mut satc= 0;
-            let mut to_check = Vec::new();
-            for (i , chunk) in ctxt.sigma_indices.iter().enumerate() {
-                let vals_chunk = chunk.iter().map(|idx| vals[*idx].clone()).collect::<Vec<_>>();
-                if let Some(b) = ctxt.cxs_cache[i].get::<[core::Value]>(&vals_chunk) {
-                    satc += *b as usize;
-                } else {
-                    to_check.push(i);
-                }
-            }
-
-            if !to_check.is_empty() {
-                satc += satcount2(nt, i, ctxt);
-            };
-            sc = satc;
-
-            ctxt.classes[nt][i].satcount = sc;
-        } else {
-            sc = 0
-        }
+        sc = satcount2(nt, i, ctxt);
+        ctxt.classes[nt][i].satcount = sc;
 
         // dbg!(extract(i, ctxt));
 
