@@ -201,7 +201,7 @@ fn handle(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usiz
 fn prune(rule: &Node, childs: Vec<(usize, Id)>, ctxt: &Ctxt) -> bool {
     match rule.ident() {
         "Ite" => {
-            if ctxt.classes[childs[0].0][childs[0].1].vals.windows(2).all(|w| w[0] == w[1]) { return true; }
+            if ctxt.classes[childs[0].0][childs[0].1].vals.iter().all(|v| v == &ctxt.classes[childs[0].0][childs[0].1].vals[0]) { return true }
             if ctxt.classes[childs[1].0][childs[1].1].satcount == 0 || ctxt.classes[childs[2].0][childs[2].1].satcount == 0 { return true; }
             if childs[1] == childs[2] { return true; }
         },
@@ -216,7 +216,7 @@ fn prune(rule: &Node, childs: Vec<(usize, Id)>, ctxt: &Ctxt) -> bool {
     }
 
     match rule.signature() {
-        (_, Ty::Bool) if rule.children().len() > 1 =>  return childs.windows(2).all(|w| w[0] == w[1]),
+        (_, Ty::Bool) if rule.children().len() > 1 =>  return childs.iter().all(|c| *c == childs[0]),
         _             => { },
     }
 
