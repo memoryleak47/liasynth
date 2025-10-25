@@ -197,6 +197,32 @@ fn handle(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usiz
     grow(nt, x, ctxt)
 }
 
+
+fn prune(rule: &Node, childs: Vec<(usize, Id)>, ctxt: &Ctxt) -> bool {
+    match rule.ident() {
+        "Ite" => {
+            if ctxt.classes[childs[0].0][childs[0].1].vals.windows(2).all(|w| w[0] == w[1]) { return true; }
+            if ctxt.classes[childs[1].0][childs[1].1].satcount == 0 || ctxt.classes[childs[2].0][childs[2].1].satcount == 0 { return true; }
+            if childs[1] == childs[2] { return true; }
+        },
+        "Add" => { 
+            if childs.iter().any(|c| matches!(ctxt.classes[c.0][c.1].node, Node::ConstInt(0, _))) { return true; }
+        },
+        "Mul" => { 
+            if childs.iter().any(|c| matches!(ctxt.classes[c.0][c.1].node, Node::ConstInt(0, _))) { return true; }
+            if childs.iter().any(|c| matches!(ctxt.classes[c.0][c.1].node, Node::ConstInt(1, _))) { return true; }
+        }
+        _ => { },
+    }
+
+    match rule.signature() {
+        (_, Ty::Bool) if rule.children().len() > 1 =>  return childs.windows(2).all(|w| w[0] == w[1]),
+        _             => { },
+    }
+
+    return false;
+}
+
 fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
     let ty = ctxt.classes[nnt][x].node.ty();
     let mut max_sat = 0;
@@ -237,21 +263,24 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
             });
 
             for combination in solid_combinations.multi_cartesian_product() {
-                let mut hole_idx = 0;
-                for (pos, child) in new_rule.children_mut().iter_mut().enumerate() {
-                    if pos != i && matches!(child, Child::Hole(_, _)) {
-                        let (nt_idx, val_id) = combination[hole_idx];
-                        *child = Child::Hole(nt_idx, val_id);
-                        hole_idx += 1;
+                let mut childs = combination.clone();
+                childs.insert(i, (nnt, x));
+                if !prune(rule, childs, ctxt) {
+                    let mut hole_idx = 0;
+                    for (pos, child) in new_rule.children_mut().iter_mut().enumerate() {
+                        if pos != i && matches!(child, Child::Hole(_, _)) {
+                            let (nt_idx, val_id) = combination[hole_idx];
+                            *child = Child::Hole(nt_idx, val_id);
+                            hole_idx += 1;
+                        }
                     }
-                }
 
-                let (_sol, is_sol, sc) = add_node(*nt, new_rule.clone(), ctxt, None);
-                max_sat = max_sat.max(sc);
-                if is_sol {
-                    return (Some((*nt, _sol)), max_sat);
-                }
-
+                    let (_sol, is_sol, sc) = add_node(*nt, new_rule.clone(), ctxt, None);
+                    max_sat = max_sat.max(sc);
+                    if is_sol {
+                        return (Some((*nt, _sol)), max_sat);
+                    }
+                } 
             }
         }
     }
