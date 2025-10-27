@@ -49,7 +49,7 @@ needed_terms = {
     GrammarTerm('Xor',      ['Ty::Bool', 'Ty::Bool'], 'Bool', "xor", "(xor ? ?)", 'Value::Bool(to_bool(ev(0)?) != to_bool(ev(1)?))'),
     GrammarTerm('Equals',   ['Ty::Int', 'Ty::Int'], 'Bool', "=", "(= ? ?)", 'Value::Bool(ev(0)? == ev(1)?)'),
     GrammarTerm('Distinct', ['Ty::Int', 'Ty::Int'], 'Bool', "distinct", "(distinct ? ?)", 'Value::Bool(ev(0)? != ev(1)?)'),
-    GrammarTerm('Ite',      ['Ty::Bool', 'Ty::Int', 'Ty::Int'], 'Int', "ite", "(ite ? ? ?)", 'Value::Int(if to_bool(ev(0)?) { ev(1)? } else { ev(2)? })'),
+    GrammarTerm('Ite',      ['Ty::Bool', 'Ty::Int', 'Ty::Int'], 'Int', "ite", "(ite ? ? ?)", 'if to_bool(ev(0)?) { ev(1)? } else { ev(2)? })'),
 
     GrammarTerm('Neg',      ['Ty::Int'], 'Int', "-", "(- ?)", 'Value::Int(-to_int(ev(0)?))'),
     GrammarTerm('Sub',      ['Ty::Int', 'Ty::Int'], 'Int', "-", "(- ? ?)", 'Value::Int(to_int(ev(0)?) - to_int(ev(1)?))'),
@@ -111,9 +111,12 @@ class ProductionRule:
         return tmp
 
     def extract_eval(self, nts, template, deffuns):
-        match self.ret:
-            case (_, 'Int') : r = "Value::Int"
-            case (_, 'Bool'): r = "Value::Bool"
+        if "ite" in self.op:
+            r = ""
+        else:
+            match self.ret:
+                case (_, 'Int') : r = "Value::Int"
+                case (_, 'Bool'): r = "Value::Bool"
 
         tmp = self.sexp
         tmp = replace(tmp, nts, self.varis, deffuns, self.a_idx)
@@ -144,8 +147,9 @@ def replace(tmp, nts, varis, deffuns, a_idx):
             case _:
                 for x in chain(varis, nts):
                     if t.strip() == x.name:
+                        tmp
                         idx = consume(a_idx)
-                        if tmp[0] in ['ite', '=']:
+                        if ("ite" in tmp[0] or "=" in tmp[0]) and idx > 0:
                             rep = f"ev({idx})?" 
                         else:
                             rep = f"to_int(ev({idx})?)" if x.t == "Int" else f"to_bool(ev({idx})?)"
@@ -370,7 +374,7 @@ define_language! {{
 
 
 if len(sys.argv) < 2:
-    f = 'examples/LIA/t2.sl'
+    f = 'examples/LIA/max2.sl'
 else:
     f = sys.argv[1]
 langfile(f)
