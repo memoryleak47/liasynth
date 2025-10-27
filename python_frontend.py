@@ -149,7 +149,7 @@ def replace(tmp, nts, varis, deffuns, a_idx):
                     if t.strip() == x.name:
                         tmp
                         idx = consume(a_idx)
-                        if ("ite" in tmp[0] or "=" in tmp[0]) and idx > 0:
+                        if tmp[0] in ['ite', '='] and idx > 0:
                             rep = f"ev({idx})?" 
                         else:
                             rep = f"to_int(ev({idx})?)" if x.t == "Int" else f"to_bool(ev({idx})?)"
