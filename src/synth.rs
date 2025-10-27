@@ -201,26 +201,34 @@ fn handle(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usiz
 fn prune(rule: &Node, childs: Vec<(usize, Id)>, ctxt: &Ctxt) -> bool {
     match rule.ident() {
         "Ite" => {
-            if ctxt.classes[childs[0].0][childs[0].1].vals.iter().all(|v| v == &ctxt.classes[childs[0].0][childs[0].1].vals[0]) { return true }
-            if ctxt.classes[childs[1].0][childs[1].1].satcount == 0 || ctxt.classes[childs[2].0][childs[2].1].satcount == 0 { return true; }
-            if childs[1] == childs[2] { return true; }
+            let [cond, then_branch, else_branch] = &childs[..] else { unreachable!() };
+
+            if then_branch.1 > else_branch.1 { return true; }
+
+            let cond_class = &ctxt.classes[cond.0][cond.1];
+            if cond_class.vals.windows(2).all(|w| w[0] == w[1]) { return true; }
+
+            let then_class = &ctxt.classes[then_branch.0][then_branch.1];
+            let else_class = &ctxt.classes[else_branch.0][else_branch.1];
+            if then_class.satcount == 0 || else_class.satcount == 0 { return true; }
+
+            then_branch == else_branch
         },
-        "Add" => { 
-            if childs.iter().any(|c| matches!(ctxt.classes[c.0][c.1].node, Node::ConstInt(0, _))) { return true; }
-        },
-        "Mul" => { 
-            if childs.iter().any(|c| matches!(ctxt.classes[c.0][c.1].node, Node::ConstInt(0, _))) { return true; }
-            if childs.iter().any(|c| matches!(ctxt.classes[c.0][c.1].node, Node::ConstInt(1, _))) { return true; }
+        "Add" => childs.iter().any(|&c| {
+            let class = &ctxt.classes[c.0][c.1];
+            matches!(class.node, Node::ConstInt(0, _)) 
+                || class.vals.iter().all(|&v| v == Value::Int(0))
+        }),
+        "Mul" => childs.iter().any(|&c| {
+            matches!(ctxt.classes[c.0][c.1].node, Node::ConstInt(0 | 1, _))
+        }),
+        _ => match rule.signature() {
+            (_, Ty::Bool) if rule.children().len() > 1 => {
+                childs.windows(2).all(|w| w[0] == w[1])
+            }
+            _ => false,
         }
-        _ => { },
     }
-
-    match rule.signature() {
-        (_, Ty::Bool) if rule.children().len() > 1 =>  return childs.iter().all(|c| *c == childs[0]),
-        _             => { },
-    }
-
-    return false;
 }
 
 fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
