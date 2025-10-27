@@ -35,15 +35,17 @@ impl Seen {
     pub fn new() -> Self {
         Seen(HashMap::new())
     }
-
     pub fn contains_or_insert(&mut self, nt: NonTerminal, id: Id) -> bool {
         match self.0.entry((nt, id)) {
             Entry::Vacant(e) => {
-                e.insert(HashSet::from([id]));
-                true
+                e.insert(HashSet::new());
+                true  
             }
-            Entry::Occupied(_) => false,
+            Entry::Occupied(_) => false  
         }
+    }
+    pub fn add_result(&mut self, nt: NonTerminal, id: Id, result_id: Id) {
+        self.0.get_mut(&(nt, id)).unwrap().insert(result_id);
     }
 }
 
@@ -462,10 +464,11 @@ fn add_node_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mu
     full_vals.extend(delta);
 
     let (nid, sol, sc) = add_node(nt, node, ctxt, Some(full_vals.clone().into_boxed_slice()));
-    seen.0.get_mut(&(nt, id)).unwrap().insert(nid); 
+    seen.add_result(nt, id, nid);
 
     ctxt.classes[nt][nid].prev_sol = prev_sol;
 
+    ctxt.solids[nt].push(nid); 
     Some((nid, sol, sc))
 }
 
@@ -502,6 +505,9 @@ fn add_canon_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen
     let full_boxed: Box<[Value]> = full_vals.into_boxed_slice();
     ctxt.classes[nt][id].vals = full_boxed.clone();
     ctxt.vals_lookup.insert((nt, full_boxed), id);
+
+    seen.add_result(nt, id, id);
+    ctxt.solids[nt].push(id); 
 
     if ctxt.problem.rettys.contains(&ctxt.classes[nt][id].node.ty()) {
         ctxt.classes[nt][id].satcount += satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
