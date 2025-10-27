@@ -83,6 +83,7 @@ pub struct Class {
     handled_size: Option<usize>, // what was the size when this class was handled last time.
     satcount: usize,
     prev_sol: usize,
+    in_sol: bool,
     features: Vec<f64>
 }
 
@@ -98,7 +99,7 @@ fn run(ctxt: &mut Ctxt) -> Term {
         for nt in 0..ctxt.classes.len() {
             for id in 0..ctxt.classes[nt].len() {
                 let should_process = if use_winning {
-                    ctxt.classes[nt][id].prev_sol > 0 && seen.contains_or_insert(nt, id)
+                    (ctxt.classes[nt][id].prev_sol > 0 || ctxt.classes[nt][id].in_sol) && seen.contains_or_insert(nt, id)
                 } else {
                     seen.contains_or_insert(nt, id)
                 };
@@ -173,12 +174,22 @@ fn run(ctxt: &mut Ctxt) -> Term {
 
 fn handle_sol(nt: NonTerminal, id: Id, ctxt: &mut Ctxt) {
     ctxt.classes[nt][id].prev_sol = ctxt.big_sigmas.len();
-    // let node = ctxt.classes[nt][id].node.clone();
-    // for (arg_ty, child) in node.signature().0.iter().zip(node.children()) {
-    //     if let Child::Hole(j, i) = child {
-    //         handle_sol(*j, *i, ctxt);
-    //     }
-    // }
+    let node = ctxt.classes[nt][id].node.clone();
+    for (arg_ty, child) in node.signature().0.iter().zip(node.children()) {
+        if let Child::Hole(j, i) = child {
+            handle_sub_sol(*j, *i, ctxt);
+        }
+    }
+}
+
+fn handle_sub_sol(nt: NonTerminal, id: Id, ctxt: &mut Ctxt) {
+    ctxt.classes[nt][id].in_sol = true;
+    let node = ctxt.classes[nt][id].node.clone();
+    for (arg_ty, child) in node.signature().0.iter().zip(node.children()) {
+        if let Child::Hole(j, i) = child {
+            handle_sub_sol(*j, *i, ctxt);
+        }
+    }
 }
 
 // makes "x" solid if it's not solid yet.
@@ -217,7 +228,7 @@ fn prune(rule: &Node, childs: Vec<(usize, Id)>, ctxt: &Ctxt) -> bool {
         "Add" => childs.iter().any(|&c| {
             let class = &ctxt.classes[c.0][c.1];
             matches!(class.node, Node::ConstInt(0, _)) 
-                || class.vals.iter().all(|&v| v == Value::Int(0))
+                || class.vals.iter().all(|v| *v == Value::Int(0))
         }),
         "Mul" => childs.iter().any(|&c| {
             matches!(ctxt.classes[c.0][c.1].node, Node::ConstInt(0 | 1, _))
@@ -506,6 +517,7 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
             handled_size: None,
             satcount: 0, // will be set later!
             prev_sol: 0,
+            in_sol: false,
             features: Vec::new(),
         };
         ctxt.classes[nt].push(c);
