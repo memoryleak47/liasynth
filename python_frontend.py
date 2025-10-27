@@ -47,11 +47,9 @@ needed_terms = {
     GrammarTerm('And',      ['Ty::Bool', 'Ty::Bool'], 'Bool', "and", "(and ? ?)", 'Value::Bool(to_bool(ev(0)?) && to_bool(ev(1)?))'),
     GrammarTerm('Or',       ['Ty::Bool', 'Ty::Bool'], 'Bool', "or", "(or ? ?)", 'Value::Bool(to_bool(ev(0)?) || to_bool(ev(1)?))'),
     GrammarTerm('Xor',      ['Ty::Bool', 'Ty::Bool'], 'Bool', "xor", "(xor ? ?)", 'Value::Bool(to_bool(ev(0)?) != to_bool(ev(1)?))'),
-    GrammarTerm('EqualsI',   ['Ty::Int', 'Ty::Int'], 'Bool', "=", "(= ? ?)", 'Value::Bool(ev(0)? == ev(1)?)'),
-    GrammarTerm('EqualsB',   ['Ty::Bool', 'Ty::Bool'], 'Bool', "=", "(= ? ?)", 'Value::Bool(ev(0)? == ev(1)?)'),
+    GrammarTerm('Equals',   ['Ty::Int', 'Ty::Int'], 'Bool', "=", "(= ? ?)", 'Value::Bool(ev(0)? == ev(1)?)'),
     GrammarTerm('Distinct', ['Ty::Int', 'Ty::Int'], 'Bool', "distinct", "(distinct ? ?)", 'Value::Bool(ev(0)? != ev(1)?)'),
-    GrammarTerm('IteI',      ['Ty::Bool', 'Ty::Int', 'Ty::Int'], 'Int', "ite", "(ite ? ? ?)", 'Value::Int(if to_bool(ev(0)?) { to_int(ev(1)?) } else { to_int(ev(2)?) })'),
-    GrammarTerm('IteB',      ['Ty::Bool', 'Ty::Bool', 'Ty::Bool'], 'Bool', "ite", "(ite ? ? ?)", 'Value::Bool(if to_bool(ev(0)?) { to_bool(ev(1)?) } else { to_bool(ev(2)?) })'),
+    GrammarTerm('Ite',      ['Ty::Bool', 'Ty::Int', 'Ty::Int'], 'Int', "ite", "(ite ? ? ?)", 'Value::Int(if to_bool(ev(0)?) { ev(1)? } else { ev(2)? })'),
 
     GrammarTerm('Neg',      ['Ty::Int'], 'Int', "-", "(- ?)", 'Value::Int(-to_int(ev(0)?))'),
     GrammarTerm('Sub',      ['Ty::Int', 'Ty::Int'], 'Int', "-", "(- ? ?)", 'Value::Int(to_int(ev(0)?) - to_int(ev(1)?))'),
@@ -147,7 +145,10 @@ def replace(tmp, nts, varis, deffuns, a_idx):
                 for x in chain(varis, nts):
                     if t.strip() == x.name:
                         idx = consume(a_idx)
-                        rep = f"to_int(ev({idx})?)" if x.t == "Int" else f"to_bool(ev({idx})?)"
+                        if tmp[0] in ['ite', '=']:
+                            rep = f"ev({idx})?" 
+                        else:
+                            rep = f"to_int(ev({idx})?)" if x.t == "Int" else f"to_bool(ev({idx})?)"
                         tmp[i] = rep
                         break
                 else:
