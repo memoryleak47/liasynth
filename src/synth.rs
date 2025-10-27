@@ -209,30 +209,63 @@ fn handle(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usiz
 }
 
 
-fn prune(rule: &Node, childs: Vec<(usize, Id)>, ctxt: &Ctxt) -> bool {
+fn prune(nt: &usize, rule: &Node, childs: Vec<(usize, Id)>, ctxt: &Ctxt) -> bool {
+    let get_class = |c: &(usize, Id)| &ctxt.classes[c.0][c.1];
+    let get_node = |c: &(usize, Id)| &get_class(c).node;
+
     match rule.ident() {
         "Ite" => {
             let [cond, then_branch, else_branch] = &childs[..] else { unreachable!() };
-
-            if then_branch.1 > else_branch.1 { return true; }
-
+            if then_branch.1 > else_branch.1 {
+                return true;
+            }
             let cond_class = &ctxt.classes[cond.0][cond.1];
-            if cond_class.vals.windows(2).all(|w| w[0] == w[1]) { return true; }
-
+            if cond_class.vals.windows(2).all(|w| w[0] == w[1]) {
+                return true;
+            }
             let then_class = &ctxt.classes[then_branch.0][then_branch.1];
             let else_class = &ctxt.classes[else_branch.0][else_branch.1];
-            if then_class.satcount == 0 || else_class.satcount == 0 { return true; }
+            then_class.satcount == 0 || else_class.satcount == 0
+        }
 
-            then_branch == else_branch
-        },
-        "Add" => childs.iter().any(|&c| {
-            let class = &ctxt.classes[c.0][c.1];
-            matches!(class.node, Node::ConstInt(0, _)) 
-                || class.vals.iter().all(|v| *v == Value::Int(0))
-        }),
-        "Mul" => childs.iter().any(|&c| {
-            matches!(ctxt.classes[c.0][c.1].node, Node::ConstInt(0 | 1, _))
-        }),
+        _ if childs.len() == 2 && matches!(rule.ident() , "Add" | "Mul" | "Equals" | "And" | "Xor" | "Distinct" | "Or") =>  {
+            childs[0].0 == childs[1].0 && childs[0].1 > childs[1].1
+        }
+
+        "Add" => {
+            match childs.as_slice() {
+                [a, b] => match (get_node(a), get_node(b)) {
+                    (Node::ConstInt(0, _), _) => b.1 == *nt,
+                    (_, Node::ConstInt(0, _)) => a.1 == *nt,
+                    _ => childs.iter().any(|c| {
+                        get_class(c).vals.iter().all(|v| *v == Value::Int(0))
+                    }),
+                },
+                _ => childs.iter().any(|c| {
+                    get_class(c).vals.iter().all(|v| *v == Value::Int(0))
+                }),
+            }
+        }
+
+        "Mul" => {
+            match childs.as_slice() {
+                [a, b] => match (get_node(a), get_node(b)) {
+                    (Node::ConstInt(0 | 1, _), _) => b.1 == *nt,
+                    (_, Node::ConstInt(0 | 1, _)) => a.1 == *nt,
+                    _ => childs.iter().any(|c| {
+                        let vals = &get_class(c).vals;
+                        vals.iter().all(|v| *v == Value::Int(0))
+                            || vals.iter().all(|v| *v == Value::Int(1))
+                    }),
+                },
+                _ => childs.iter().any(|c| {
+                    let vals = &get_class(c).vals;
+                    vals.iter().all(|v| *v == Value::Int(0))
+                        || vals.iter().all(|v| *v == Value::Int(1))
+                }),
+            }
+        }
+
         _ => match rule.signature() {
             (_, Ty::Bool) if rule.children().len() > 1 => {
                 childs.windows(2).all(|w| w[0] == w[1])
@@ -284,7 +317,7 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
             for combination in solid_combinations.multi_cartesian_product() {
                 let mut childs = combination.clone();
                 childs.insert(i, (nnt, x));
-                if !prune(rule, childs, ctxt) {
+                if !prune(nt, rule, childs, ctxt) {
                     let mut hole_idx = 0;
                     for (pos, child) in new_rule.children_mut().iter_mut().enumerate() {
                         if pos != i && matches!(child, Child::Hole(_, _)) {
