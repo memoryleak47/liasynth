@@ -3,7 +3,6 @@ use crate::*;
 use indexmap::IndexMap;
 use std::collections::HashMap;
 
-
 #[derive(Clone)]
 pub struct Problem {
     pub synth_problem: SynthProblem,
@@ -106,7 +105,7 @@ fn expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, t: &m
         Expr::SynthFunCall(_name, exprs) => {
             let exprs: Box<[Id]> = exprs.into_iter().map(|x| expr_to_term_impl(x, vars, progname, t, instvars, rettype)).collect();
             instvars.push(exprs.iter().cloned().collect());
-            t.push(Node::VarInt(vars.len() - 1, rettype))
+            t.push(Node::VarInt(instvars.len() + vars.len() - 1, rettype))
         },
         Expr::DefinedFunCall(..) => unreachable!("DefinedFunCalls should already be resolved!"),
         Expr::Let(..) => unreachable!("Lets should already be resolved!"),
@@ -246,48 +245,6 @@ impl Problem {
 }
 
 impl Problem {
-    pub fn satisfy<'a>(&self, term: &Term, ces: impl IntoIterator<Item = &'a [Value]>) -> Vec<bool> {
-        time_block!("problem.satisfy"); 
-        let mut results = Vec::new();
-
-        let mut query = self.context.clone();
-        let retty = self.rettype.to_string();
-        let progname = &self.progname;
-        query.push_str(&format!("(define-fun {progname} ("));
-        for (var, ty) in self.vars.iter() {
-            query.push_str(&format!("({var} {}) ", ty.to_string()));
-        }
-        let term = term_to_z3(term, &self.vars.keys().cloned().collect::<Box<[_]>>());
-        // println!("testing {term}");
-        query.push_str(&format!(") {retty} {term})\n"));
-        let constraint_str = &self.constraint_str;
-        query.push_str(&format!("(assert {constraint_str})\n"));
-
-        let solver = z3::Solver::new();
-        solver.from_string(query);
-
-        let mut sat_count = 0;
-        for ce in ces {
-            let mut assumps = Vec::new();
-            for ((var, ty), val) in self.context_vars.iter().zip(ce.into_iter()) {
-                let sym = z3::ast::Int::new_const(var.to_string());
-                let lit = match (ty, val) {
-                    (Ty::Int, Value::Int(v)) => sym.eq(&z3::ast::Int::from_i64(*v)),
-                    (Ty::Bool, Value::Bool(v)) => {
-                        let b = z3::ast::Bool::new_const(var.to_string());
-                        b.iff(&z3::ast::Bool::from_bool(*v))
-                    }
-                    _ => panic!("na")
-                };
-                assumps.push(lit);
-            }
-
-            let assumps_refs: &[z3::ast::Bool] = assumps.as_slice();
-            results.push(solver.check_assumptions(&assumps_refs) == z3::SatResult::Sat);
-        }
-        results
-    }
-
     pub fn verify(&self, term: &Term) -> Option<Sigma> {
         time_block!("problem.verify"); 
         let mut query = self.context.clone();

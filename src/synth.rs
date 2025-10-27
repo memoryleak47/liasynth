@@ -54,39 +54,39 @@ impl Seen {
 // HugeSigma is BigSigma extended by one variable per instantiation of the synthfun.
 
 pub struct Ctxt<'a> {
-    queue: Queue, // contains ids of pending (i.e. not solidifed Ids), or solid Ids which got an updated size.
+    pub queue: Queue, // contains ids of pending (i.e. not solidifed Ids), or solid Ids which got an updated size.
 
-    big_sigmas: &'a [Sigma],
-    small_sigmas: Box<[Sigma]>,
+    pub big_sigmas: &'a [Sigma],
+    pub small_sigmas: Box<[Sigma]>,
 
     // for each big_sigma, thisreturns the list of small_sigmas corresponding to the instantiations of the synthfun.
-    sigma_indices: Box<[Box<[usize]>]>,
+    pub sigma_indices: Box<[Box<[usize]>]>,
 
-    problem: &'a Problem,
+    pub problem: &'a Problem,
 
     // indexed by small-sigma.
-    vals_lookup: Map<(NonTerminal, Box<[Value]>), Id>,
-    cxs_cache: Vec<HashMap<Box<[Value]>, bool>>,
+    pub vals_lookup: Map<(NonTerminal, Box<[Value]>), Id>,
+    pub cxs_cache: Vec<HashMap<Box<[Value]>, bool>>,
 
-    classes: Vec<Vec<Class>>,
+    pub classes: Vec<Vec<Class>>,
 
-    solids: Vec<Vec<Id>>,
+    pub solids: Vec<Vec<Id>>,
 
-    temb: &'a mut TermEmbedder,
-    olinr: &'a mut BayesianLinearRegression,
-    flinr: &'a mut BayesianLinearRegression,
+    pub temb: &'a mut TermEmbedder,
+    pub olinr: &'a mut BayesianLinearRegression,
+    pub flinr: &'a mut BayesianLinearRegression,
 }
 
 pub struct Class {
-    node: Node,
-    nodes: NodeQueue,
-    size: usize,
-    vals: Box<[Value]>,
-    handled_size: Option<usize>, // what was the size when this class was handled last time.
-    satcount: usize,
-    prev_sol: usize,
-    in_sol: bool,
-    features: Vec<f64>
+    pub node: Node,
+    pub nodes: NodeQueue,
+    pub size: usize,
+    pub vals: Box<[Value]>,
+    pub handled_size: Option<usize>, // what was the size when this class was handled last time.
+    pub satcount: usize,
+    pub prev_sol: usize,
+    pub in_sol: bool,
+    pub features: Vec<f64>
 }
 
 fn run(ctxt: &mut Ctxt) -> Term {
@@ -743,38 +743,7 @@ fn minsize(nt: NonTerminal, node: &Node, ctxt: &Ctxt) -> usize {
         .map(|(cnt, x)| ctxt.classes[*cnt][*x].size).sum::<usize>() + 1
 }
 
-fn satcount(nt: NonTerminal, x: Id, ctxt: &mut Ctxt, idxs: Option<Vec<usize>>) -> usize {
-    GLOBAL_STATS.lock().unwrap().programs_checked+= 1;
-    let ty = ctxt.classes[nt][x].node.ty();
-    if ctxt.problem.nt_mapping.get(&ty).expect("this never happens") != &ctxt.problem.rettype {
-        return 0;
-    }
-    let t = extract(nt, x, ctxt);
-    let no_vals = ctxt.small_sigmas.len() / ctxt.big_sigmas.len();
-
-    if let Some(idxs) = idxs {
-        let r = ctxt.problem.satisfy(&t, idxs.iter().map(|&i| ctxt.big_sigmas[i].as_slice()));
-        for (pos, &i) in idxs.iter().enumerate() {
-            let start = i * no_vals;
-            let vchunk = &ctxt.classes[nt][x].vals[start .. start + no_vals];
-            ctxt.cxs_cache[i].insert(Box::<[Value]>::from(vchunk), r[pos]);
-        }
-        return r.iter().map(|x| *x as usize).sum();
-    }
-
-    let r = ctxt.problem.satisfy(&t, ctxt.big_sigmas.iter().map(|v| v.as_slice()));
-    for (i, (vchunk, &res)) in ctxt.classes[nt][x]
-        .vals
-        .chunks_exact(no_vals)
-        .zip(r.iter())
-        .enumerate()
-    {
-        ctxt.cxs_cache[i].insert(Box::<[Value]>::from(vchunk), res);
-    }
-    r.iter().map(|x| *x as usize).sum()
-}
-
-fn extract(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Term {
+pub fn extract(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Term {
     let mut t = Term { elems: Vec::new() };
     let f = &|cnt: NonTerminal, c: Id| ctxt.classes[cnt][c].node.clone();
     ctxt.classes[nt][x].node.extract(f, &mut t.elems);

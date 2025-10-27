@@ -49,7 +49,7 @@ needed_terms = {
     GrammarTerm('Xor',      ['Ty::Bool', 'Ty::Bool'], 'Bool', "xor", "(xor ? ?)", 'Value::Bool(to_bool(ev(0)?) != to_bool(ev(1)?))'),
     GrammarTerm('Equals',   ['Ty::Int', 'Ty::Int'], 'Bool', "=", "(= ? ?)", 'Value::Bool(ev(0)? == ev(1)?)'),
     GrammarTerm('Distinct', ['Ty::Int', 'Ty::Int'], 'Bool', "distinct", "(distinct ? ?)", 'Value::Bool(ev(0)? != ev(1)?)'),
-    GrammarTerm('Ite',      ['Ty::Bool', 'Ty::Int', 'Ty::Int'], 'Int', "ite", "(ite ? ? ?)", 'if to_bool(ev(0)?) { ev(1)? } else { ev(2)? })'),
+    GrammarTerm('Ite',      ['Ty::Bool', 'Ty::Int', 'Ty::Int'], 'Int', "ite", "(ite ? ? ?)", 'if to_bool(ev(0)?) { ev(1)? } else { ev(2)? }'),
 
     GrammarTerm('Neg',      ['Ty::Int'], 'Int', "-", "(- ?)", 'Value::Int(-to_int(ev(0)?))'),
     GrammarTerm('Sub',      ['Ty::Int', 'Ty::Int'], 'Int', "-", "(- ? ?)", 'Value::Int(to_int(ev(0)?) - to_int(ev(1)?))'),
