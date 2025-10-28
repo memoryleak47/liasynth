@@ -525,7 +525,7 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
             None => Box::new([]),
         },
     };
-    let sc;
+    let mut sc = 0;
     let i;
 
     GLOBAL_STATS.lock().unwrap().programs_generated+= 1;
@@ -533,7 +533,7 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
     if let Some(&j) = ctxt.vals_lookup.get(&(nt, vals.clone())) {
         let newsize = minsize(nt, &node, ctxt);
         let c = &mut ctxt.classes[nt][j];
-        sc = c.satcount;
+        // sc = c.satcount;
         if newsize < c.size {
             c.size = newsize;
             c.node = node.clone();
