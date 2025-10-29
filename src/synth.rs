@@ -533,11 +533,11 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
     if let Some(&j) = ctxt.vals_lookup.get(&(nt, vals.clone())) {
         let newsize = minsize(nt, &node, ctxt);
         let c = &mut ctxt.classes[nt][j];
-        // sc = c.satcount;
         if newsize < c.size {
             c.size = newsize;
             c.node = node.clone();
             c.node = node.clone();
+            sc = c.satcount;
             enqueue(nt, j, ctxt);
         } 
         push_bounded(&mut ctxt.classes[nt][j].nodes, WithOrd(node, newsize));
