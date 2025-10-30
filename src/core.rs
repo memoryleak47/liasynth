@@ -176,8 +176,8 @@ pub fn cegis(problem: &Problem) -> Term {
     let mut cxs_cache = None;
     let mut classes = None;
     let mut term_embed = TermEmbedder::new(4);
-    let mut olinr = BayesianLinearRegression::with_default_prior(8);
-    let mut flinr = BayesianLinearRegression::with_default_prior(8);
+    let mut olinr = BayesianLinearRegression::with_default_prior(9);
+    let mut flinr = BayesianLinearRegression::with_default_prior(9);
     loop {
         let (term, cxsc, clss) = synth(problem, &sigmas, cxs_cache, classes, &mut term_embed, &mut olinr, &mut flinr);
         classes = Some(clss);

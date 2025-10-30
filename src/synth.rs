@@ -658,17 +658,24 @@ fn feature_set(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     let w2v: Vec<f64> = ctxt.temb.embed(&term);
 
     let sc = c.satcount;
-    let max_subterm_sc = c.node.children()
+    let mut iter = c.node.children()
         .iter()
-        .filter_map(|c| if let Child::Hole(j, i) = c { Some((j, i)) } else { None })
-        .map(|(cnt, s)| ctxt.classes[*cnt][*s].satcount)
-        .max()
-        .unwrap_or(0);
+        .filter_map(|c| match c {
+            Child::Hole(j, i) => Some(ctxt.classes[*j][*i].satcount),
+            _ => None,
+        });
+
+    let (min_subterm_sc, max_subterm_sc) = if let Some(first) = iter.next() {
+        iter.fold((first, first), |(min, max), ssc| (min.min(ssc), max.max(ssc)))
+    } else {
+        (0, 0)
+    };
 
     vec![
         1.0,
         c.prev_sol as f64,
         max_subterm_sc as f64,
+        min_subterm_sc as f64,
         sc as f64,
     ]
     .into_iter()
