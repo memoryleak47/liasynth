@@ -1,0 +1,646 @@
+
+==========
+[0/161] examples/LIA/LinExpr_eq1ex.sl:
+[build failed] examples/LIA/LinExpr_eq1ex.sl
+
+==========
+[1/161] examples/LIA/LinExpr_eq2ex.sl:
+[build failed] examples/LIA/LinExpr_eq2ex.sl
+
+==========
+[2/161] examples/LIA/LinExpr_inv1.sl:
+[build failed] examples/LIA/LinExpr_inv1.sl
+
+==========
+[3/161] examples/LIA/LinExpr_inv1_ex.sl:
+[build failed] examples/LIA/LinExpr_inv1_ex.sl
+
+==========
+[4/161] examples/LIA/MPwL_d1s3.sl:
+[build failed] examples/LIA/MPwL_d1s3.sl
+
+==========
+[5/161] examples/LIA/MPwL_d1s7.sl:
+[build failed] examples/LIA/MPwL_d1s7.sl
+
+==========
+[6/161] examples/LIA/MPwL_d4s3.sl:
+[build failed] examples/LIA/MPwL_d4s3.sl
+
+==========
+[7/161] examples/LIA/MPwL_d4s7.sl:
+[build failed] examples/LIA/MPwL_d4s7.sl
+
+==========
+[8/161] examples/LIA/MPwL_d5s3.sl:
+[build failed] examples/LIA/MPwL_d5s3.sl
+
+==========
+[9/161] examples/LIA/MPwL_d5s7.sl:
+[build failed] examples/LIA/MPwL_d5s7.sl
+
+==========
+[10/161] examples/LIA/MPwoL_d1s3.sl:
+[build failed] examples/LIA/MPwoL_d1s3.sl
+
+==========
+[11/161] examples/LIA/MPwoL_d1s7.sl:
+[build failed] examples/LIA/MPwoL_d1s7.sl
+
+==========
+[12/161] examples/LIA/MPwoL_d4s3.sl:
+[build failed] examples/LIA/MPwoL_d4s3.sl
+
+==========
+[13/161] examples/LIA/MPwoL_d4s7.sl:
+[build failed] examples/LIA/MPwoL_d4s7.sl
+
+==========
+[14/161] examples/LIA/MPwoL_d5s3.sl:
+[build failed] examples/LIA/MPwoL_d5s3.sl
+
+==========
+[15/161] examples/LIA/MPwoL_d5s7.sl:
+[build failed] examples/LIA/MPwoL_d5s7.sl
+
+==========
+[16/161] examples/LIA/array_search_10.sl:
+[build failed] examples/LIA/array_search_10.sl
+
+==========
+[17/161] examples/LIA/array_search_11.sl:
+[build failed] examples/LIA/array_search_11.sl
+
+==========
+[18/161] examples/LIA/array_search_12.sl:
+[build failed] examples/LIA/array_search_12.sl
+
+==========
+[19/161] examples/LIA/array_search_13.sl:
+[build failed] examples/LIA/array_search_13.sl
+
+==========
+[20/161] examples/LIA/array_search_14.sl:
+[build failed] examples/LIA/array_search_14.sl
+
+==========
+[21/161] examples/LIA/array_search_15.sl:
+[build failed] examples/LIA/array_search_15.sl
+
+==========
+[22/161] examples/LIA/array_search_2.sl:
+[build failed] examples/LIA/array_search_2.sl
+
+==========
+[23/161] examples/LIA/array_search_3.sl:
+[build failed] examples/LIA/array_search_3.sl
+
+==========
+[24/161] examples/LIA/array_search_4.sl:
+[build failed] examples/LIA/array_search_4.sl
+
+==========
+[25/161] examples/LIA/array_search_5.sl:
+[build failed] examples/LIA/array_search_5.sl
+
+==========
+[26/161] examples/LIA/array_search_6.sl:
+[build failed] examples/LIA/array_search_6.sl
+
+==========
+[27/161] examples/LIA/array_search_7.sl:
+[build failed] examples/LIA/array_search_7.sl
+
+==========
+[28/161] examples/LIA/array_search_8.sl:
+[build failed] examples/LIA/array_search_8.sl
+
+==========
+[29/161] examples/LIA/array_search_9.sl:
+[build failed] examples/LIA/array_search_9.sl
+
+==========
+[30/161] examples/LIA/commutative.sl:
+[build failed] examples/LIA/commutative.sl
+
+==========
+[31/161] examples/LIA/constant.sl:
+[build failed] examples/LIA/constant.sl
+
+==========
+[32/161] examples/LIA/inv_gen_array.sl:
+[build failed] examples/LIA/inv_gen_array.sl
+
+==========
+[33/161] examples/LIA/inv_gen_cegar2.sl:
+[build failed] examples/LIA/inv_gen_cegar2.sl
+
+==========
+[34/161] examples/LIA/inv_gen_cgr1.sl:
+[build failed] examples/LIA/inv_gen_cgr1.sl
+
+==========
+[35/161] examples/LIA/inv_gen_ex14.sl:
+[build failed] examples/LIA/inv_gen_ex14.sl
+
+==========
+[36/161] examples/LIA/inv_gen_ex23.sl:
+[build failed] examples/LIA/inv_gen_ex23.sl
+
+==========
+[37/161] examples/LIA/inv_gen_ex7.sl:
+[build failed] examples/LIA/inv_gen_ex7.sl
+
+==========
+[38/161] examples/LIA/inv_gen_fig1.sl:
+[build failed] examples/LIA/inv_gen_fig1.sl
+
+==========
+[39/161] examples/LIA/inv_gen_fig3.sl:
+[build failed] examples/LIA/inv_gen_fig3.sl
+
+==========
+[40/161] examples/LIA/inv_gen_fig6.sl:
+[build failed] examples/LIA/inv_gen_fig6.sl
+
+==========
+[41/161] examples/LIA/inv_gen_fig8.sl:
+[build failed] examples/LIA/inv_gen_fig8.sl
+
+==========
+[42/161] examples/LIA/inv_gen_fig9.sl:
+[build failed] examples/LIA/inv_gen_fig9.sl
+
+==========
+[43/161] examples/LIA/inv_gen_finf1.sl:
+[build failed] examples/LIA/inv_gen_finf1.sl
+
+==========
+[44/161] examples/LIA/inv_gen_finf2.sl:
+[build failed] examples/LIA/inv_gen_finf2.sl
+
+==========
+[45/161] examples/LIA/inv_gen_n_c11.sl:
+[build failed] examples/LIA/inv_gen_n_c11.sl
+
+==========
+[46/161] examples/LIA/inv_gen_sum1.sl:
+[build failed] examples/LIA/inv_gen_sum1.sl
+
+==========
+[47/161] examples/LIA/inv_gen_sum3.sl:
+[build failed] examples/LIA/inv_gen_sum3.sl
+
+==========
+[48/161] examples/LIA/inv_gen_sum4.sl:
+[build failed] examples/LIA/inv_gen_sum4.sl
+
+==========
+[49/161] examples/LIA/inv_gen_tcs.sl:
+[build failed] examples/LIA/inv_gen_tcs.sl
+
+==========
+[50/161] examples/LIA/inv_gen_term2.sl:
+[build failed] examples/LIA/inv_gen_term2.sl
+
+==========
+[51/161] examples/LIA/inv_gen_term3.sl:
+[build failed] examples/LIA/inv_gen_term3.sl
+
+==========
+[52/161] examples/LIA/inv_gen_trex1.sl:
+[build failed] examples/LIA/inv_gen_trex1.sl
+
+==========
+[53/161] examples/LIA/inv_gen_trex2.sl:
+[build failed] examples/LIA/inv_gen_trex2.sl
+
+==========
+[54/161] examples/LIA/inv_gen_trex4.sl:
+[build failed] examples/LIA/inv_gen_trex4.sl
+
+==========
+[55/161] examples/LIA/inv_gen_vmail.sl:
+[build failed] examples/LIA/inv_gen_vmail.sl
+
+==========
+[56/161] examples/LIA/inv_gen_w1.sl:
+[build failed] examples/LIA/inv_gen_w1.sl
+
+==========
+[57/161] examples/LIA/inv_gen_w2.sl:
+[build failed] examples/LIA/inv_gen_w2.sl
+
+==========
+[58/161] examples/LIA/inv_gen_winf1.sl:
+[build failed] examples/LIA/inv_gen_winf1.sl
+
+==========
+[59/161] examples/LIA/inv_gen_winf2.sl:
+[build failed] examples/LIA/inv_gen_winf2.sl
+
+==========
+[60/161] examples/LIA/max10.sl:
+[build failed] examples/LIA/max10.sl
+
+==========
+[61/161] examples/LIA/max12.sl:
+[build failed] examples/LIA/max12.sl
+
+==========
+[62/161] examples/LIA/max13.sl:
+[build failed] examples/LIA/max13.sl
+
+==========
+[63/161] examples/LIA/max14.sl:
+[build failed] examples/LIA/max14.sl
+
+==========
+[64/161] examples/LIA/max15.sl:
+[build failed] examples/LIA/max15.sl
+
+==========
+[65/161] examples/LIA/max2.sl:
+[build failed] examples/LIA/max2.sl
+
+==========
+[66/161] examples/LIA/max3.sl:
+[build failed] examples/LIA/max3.sl
+
+==========
+[67/161] examples/LIA/max4.sl:
+[build failed] examples/LIA/max4.sl
+
+==========
+[68/161] examples/LIA/max5.sl:
+[build failed] examples/LIA/max5.sl
+
+==========
+[69/161] examples/LIA/max6.sl:
+[build failed] examples/LIA/max6.sl
+
+==========
+[70/161] examples/LIA/max7.sl:
+[build failed] examples/LIA/max7.sl
+
+==========
+[71/161] examples/LIA/max8.sl:
+[build failed] examples/LIA/max8.sl
+
+==========
+[72/161] examples/LIA/max9.sl:
+[build failed] examples/LIA/max9.sl
+
+==========
+[73/161] examples/LIA/max_11.sl:
+[build failed] examples/LIA/max_11.sl
+
+==========
+[74/161] examples/LIA/mpg_example1.sl:
+[build failed] examples/LIA/mpg_example1.sl
+
+==========
+[75/161] examples/LIA/mpg_example2.sl:
+[build failed] examples/LIA/mpg_example2.sl
+
+==========
+[76/161] examples/LIA/mpg_example3.sl:
+[build failed] examples/LIA/mpg_example3.sl
+
+==========
+[77/161] examples/LIA/mpg_example4.sl:
+[build failed] examples/LIA/mpg_example4.sl
+
+==========
+[78/161] examples/LIA/mpg_example5.sl:
+[build failed] examples/LIA/mpg_example5.sl
+
+==========
+[79/161] examples/LIA/mpg_guard1.sl:
+[build failed] examples/LIA/mpg_guard1.sl
+
+==========
+[80/161] examples/LIA/mpg_guard2.sl:
+[build failed] examples/LIA/mpg_guard2.sl
+
+==========
+[81/161] examples/LIA/mpg_guard3.sl:
+[build failed] examples/LIA/mpg_guard3.sl
+
+==========
+[82/161] examples/LIA/mpg_guard4.sl:
+[build failed] examples/LIA/mpg_guard4.sl
+
+==========
+[83/161] examples/LIA/mpg_ite1.sl:
+[build failed] examples/LIA/mpg_ite1.sl
+
+==========
+[84/161] examples/LIA/mpg_ite2.sl:
+[build failed] examples/LIA/mpg_ite2.sl
+
+==========
+[85/161] examples/LIA/mpg_plane1.sl:
+[build failed] examples/LIA/mpg_plane1.sl
+
+==========
+[86/161] examples/LIA/mpg_plane2.sl:
+[build failed] examples/LIA/mpg_plane2.sl
+
+==========
+[87/161] examples/LIA/mpg_plane3.sl:
+[build failed] examples/LIA/mpg_plane3.sl
+
+==========
+[88/161] examples/LIA/qm_area_sel_2.sl:
+[build failed] examples/LIA/qm_area_sel_2.sl
+
+==========
+[89/161] examples/LIA/qm_choose_01.sl:
+[build failed] examples/LIA/qm_choose_01.sl
+
+==========
+[90/161] examples/LIA/qm_choose_yz.sl:
+[build failed] examples/LIA/qm_choose_yz.sl
+
+==========
+[91/161] examples/LIA/qm_in_range.sl:
+[build failed] examples/LIA/qm_in_range.sl
+
+==========
+[92/161] examples/LIA/qm_loop_1.sl:
+[build failed] examples/LIA/qm_loop_1.sl
+
+==========
+[93/161] examples/LIA/qm_loop_2.sl:
+[build failed] examples/LIA/qm_loop_2.sl
+
+==========
+[94/161] examples/LIA/qm_loop_3.sl:
+[build failed] examples/LIA/qm_loop_3.sl
+
+==========
+[95/161] examples/LIA/qm_max2.sl:
+[build failed] examples/LIA/qm_max2.sl
+
+==========
+[96/161] examples/LIA/qm_max3.sl:
+[build failed] examples/LIA/qm_max3.sl
+
+==========
+[97/161] examples/LIA/qm_max4.sl:
+[build failed] examples/LIA/qm_max4.sl
+
+==========
+[98/161] examples/LIA/qm_max5.sl:
+[build failed] examples/LIA/qm_max5.sl
+
+==========
+[99/161] examples/LIA/qm_neg_1.sl:
+[build failed] examples/LIA/qm_neg_1.sl
+
+==========
+[100/161] examples/LIA/qm_neg_2.sl:
+[build failed] examples/LIA/qm_neg_2.sl
+
+==========
+[101/161] examples/LIA/qm_neg_3.sl:
+[build failed] examples/LIA/qm_neg_3.sl
+
+==========
+[102/161] examples/LIA/qm_neg_4.sl:
+[build failed] examples/LIA/qm_neg_4.sl
+
+==========
+[103/161] examples/LIA/qm_neg_5.sl:
+[build failed] examples/LIA/qm_neg_5.sl
+
+==========
+[104/161] examples/LIA/qm_neg_eq_1.sl:
+[build failed] examples/LIA/qm_neg_eq_1.sl
+
+==========
+[105/161] examples/LIA/qm_neg_eq_2.sl:
+[build failed] examples/LIA/qm_neg_eq_2.sl
+
+==========
+[106/161] examples/LIA/qm_neg_eq_3.sl:
+[build failed] examples/LIA/qm_neg_eq_3.sl
+
+==========
+[107/161] examples/LIA/qm_neg_eq_4.sl:
+[build failed] examples/LIA/qm_neg_eq_4.sl
+
+==========
+[108/161] examples/LIA/qm_neg_eq_5.sl:
+[build failed] examples/LIA/qm_neg_eq_5.sl
+
+==========
+[109/161] examples/LIA/s0.sl:
+[build failed] examples/LIA/s0.sl
+
+==========
+[110/161] examples/LIA/s0_d0.sl:
+[build failed] examples/LIA/s0_d0.sl
+
+==========
+[111/161] examples/LIA/s0_d1.sl:
+[build failed] examples/LIA/s0_d1.sl
+
+==========
+[112/161] examples/LIA/s0_d2.sl:
+[build failed] examples/LIA/s0_d2.sl
+
+==========
+[113/161] examples/LIA/s1.sl:
+[build failed] examples/LIA/s1.sl
+
+==========
+[114/161] examples/LIA/s2.sl:
+[build failed] examples/LIA/s2.sl
+
+==========
+[115/161] examples/LIA/s3.sl:
+[build failed] examples/LIA/s3.sl
+
+==========
+[116/161] examples/LIA/t1.sl:
+[build failed] examples/LIA/t1.sl
+
+==========
+[117/161] examples/LIA/t10.sl:
+[build failed] examples/LIA/t10.sl
+
+==========
+[118/161] examples/LIA/t11.sl:
+[build failed] examples/LIA/t11.sl
+
+==========
+[119/161] examples/LIA/t12.sl:
+[build failed] examples/LIA/t12.sl
+
+==========
+[120/161] examples/LIA/t14.sl:
+[build failed] examples/LIA/t14.sl
+
+==========
+[121/161] examples/LIA/t15.sl:
+[build failed] examples/LIA/t15.sl
+
+==========
+[122/161] examples/LIA/t17.sl:
+[build failed] examples/LIA/t17.sl
+
+==========
+[123/161] examples/LIA/t18.sl:
+[build failed] examples/LIA/t18.sl
+
+==========
+[124/161] examples/LIA/t2.sl:
+[build failed] examples/LIA/t2.sl
+
+==========
+[125/161] examples/LIA/t20.sl:
+[build failed] examples/LIA/t20.sl
+
+==========
+[126/161] examples/LIA/t3.sl:
+[build failed] examples/LIA/t3.sl
+
+==========
+[127/161] examples/LIA/t4.sl:
+[build failed] examples/LIA/t4.sl
+
+==========
+[128/161] examples/LIA/t5.sl:
+[build failed] examples/LIA/t5.sl
+
+==========
+[129/161] examples/LIA/t6.sl:
+[build failed] examples/LIA/t6.sl
+
+==========
+[130/161] examples/LIA/t7.sl:
+[build failed] examples/LIA/t7.sl
+
+==========
+[131/161] examples/LIA/t8.sl:
+[build failed] examples/LIA/t8.sl
+
+==========
+[132/161] examples/LIA/t9.sl:
+[build failed] examples/LIA/t9.sl
+
+==========
+[133/161] examples/LIA/unbdd_inv_gen_array.sl:
+[build failed] examples/LIA/unbdd_inv_gen_array.sl
+
+==========
+[134/161] examples/LIA/unbdd_inv_gen_cegar2.sl:
+[build failed] examples/LIA/unbdd_inv_gen_cegar2.sl
+
+==========
+[135/161] examples/LIA/unbdd_inv_gen_cgr1.sl:
+[build failed] examples/LIA/unbdd_inv_gen_cgr1.sl
+
+==========
+[136/161] examples/LIA/unbdd_inv_gen_ex14.sl:
+[build failed] examples/LIA/unbdd_inv_gen_ex14.sl
+
+==========
+[137/161] examples/LIA/unbdd_inv_gen_ex23.sl:
+[build failed] examples/LIA/unbdd_inv_gen_ex23.sl
+
+==========
+[138/161] examples/LIA/unbdd_inv_gen_ex7.sl:
+[build failed] examples/LIA/unbdd_inv_gen_ex7.sl
+
+==========
+[139/161] examples/LIA/unbdd_inv_gen_fig1.sl:
+[build failed] examples/LIA/unbdd_inv_gen_fig1.sl
+
+==========
+[140/161] examples/LIA/unbdd_inv_gen_fig3.sl:
+[build failed] examples/LIA/unbdd_inv_gen_fig3.sl
+
+==========
+[141/161] examples/LIA/unbdd_inv_gen_fig6.sl:
+[build failed] examples/LIA/unbdd_inv_gen_fig6.sl
+
+==========
+[142/161] examples/LIA/unbdd_inv_gen_fig8.sl:
+[build failed] examples/LIA/unbdd_inv_gen_fig8.sl
+
+==========
+[143/161] examples/LIA/unbdd_inv_gen_fig9.sl:
+[build failed] examples/LIA/unbdd_inv_gen_fig9.sl
+
+==========
+[144/161] examples/LIA/unbdd_inv_gen_finf1.sl:
+[build failed] examples/LIA/unbdd_inv_gen_finf1.sl
+
+==========
+[145/161] examples/LIA/unbdd_inv_gen_finf2.sl:
+[build failed] examples/LIA/unbdd_inv_gen_finf2.sl
+
+==========
+[146/161] examples/LIA/unbdd_inv_gen_n_c11.sl:
+[build failed] examples/LIA/unbdd_inv_gen_n_c11.sl
+
+==========
+[147/161] examples/LIA/unbdd_inv_gen_sum1.sl:
+[build failed] examples/LIA/unbdd_inv_gen_sum1.sl
+
+==========
+[148/161] examples/LIA/unbdd_inv_gen_sum3.sl:
+[build failed] examples/LIA/unbdd_inv_gen_sum3.sl
+
+==========
+[149/161] examples/LIA/unbdd_inv_gen_sum4.sl:
+[build failed] examples/LIA/unbdd_inv_gen_sum4.sl
+
+==========
+[150/161] examples/LIA/unbdd_inv_gen_tcs.sl:
+[build failed] examples/LIA/unbdd_inv_gen_tcs.sl
+
+==========
+[151/161] examples/LIA/unbdd_inv_gen_term2.sl:
+[build failed] examples/LIA/unbdd_inv_gen_term2.sl
+
+==========
+[152/161] examples/LIA/unbdd_inv_gen_term3.sl:
+[build failed] examples/LIA/unbdd_inv_gen_term3.sl
+
+==========
+[153/161] examples/LIA/unbdd_inv_gen_trex1.sl:
+[build failed] examples/LIA/unbdd_inv_gen_trex1.sl
+
+==========
+[154/161] examples/LIA/unbdd_inv_gen_trex2.sl:
+[build failed] examples/LIA/unbdd_inv_gen_trex2.sl
+
+==========
+[155/161] examples/LIA/unbdd_inv_gen_trex4.sl:
+[build failed] examples/LIA/unbdd_inv_gen_trex4.sl
+
+==========
+[156/161] examples/LIA/unbdd_inv_gen_vmail.sl:
+[build failed] examples/LIA/unbdd_inv_gen_vmail.sl
+
+==========
+[157/161] examples/LIA/unbdd_inv_gen_w1.sl:
+[build failed] examples/LIA/unbdd_inv_gen_w1.sl
+
+==========
+[158/161] examples/LIA/unbdd_inv_gen_w2.sl:
+[build failed] examples/LIA/unbdd_inv_gen_w2.sl
+
+==========
+[159/161] examples/LIA/unbdd_inv_gen_winf1.sl:
+[build failed] examples/LIA/unbdd_inv_gen_winf1.sl
+
+==========
+[160/161] examples/LIA/unbdd_inv_gen_winf2.sl:
+[build failed] examples/LIA/unbdd_inv_gen_winf2.sl
+
+Completed 0/161
