@@ -2,11 +2,10 @@ use crate::*;
 
 use indexmap::IndexSet;
 use itertools::Itertools;
-use std::collections::{HashSet, HashMap, VecDeque};
-use std::collections::hash_map::Entry;
 use ordered_float::OrderedFloat;
 use rand::Rng;
-
+use std::collections::hash_map::Entry;
+use std::collections::{HashMap, HashSet, VecDeque};
 
 type Score = OrderedFloat<f64>;
 type Queue = BinaryHeap<WithOrd<(usize, Id), Score>>;
@@ -16,17 +15,15 @@ type NonTerminal = usize;
 // If this is set to 1 we have 'normal' incremental
 // Set to 1 when doing non-incremental
 #[cfg(feature = "total-incremental")]
-    const MAXSIZE: usize = 5;
+const MAXSIZE: usize = 5;
 
 #[cfg(not(feature = "total-incremental"))]
-    const MAXSIZE: usize = 0;
-
-
+const MAXSIZE: usize = 0;
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
     heap.push(val);
     if heap.len() > MAXSIZE {
-        heap.pop(); 
+        heap.pop();
     }
 }
 
@@ -39,9 +36,9 @@ impl Seen {
         match self.0.entry((nt, id)) {
             Entry::Vacant(e) => {
                 e.insert(HashSet::new());
-                true  
+                true
             }
-            Entry::Occupied(_) => false  
+            Entry::Occupied(_) => false,
         }
     }
     pub fn add_result(&mut self, nt: NonTerminal, id: Id, result_id: Id) {
@@ -86,11 +83,11 @@ pub struct Class {
     pub satcount: usize,
     pub prev_sol: usize,
     pub in_sol: bool,
-    pub features: Vec<f64>
+    pub features: Vec<f64>,
 }
 
 fn run(ctxt: &mut Ctxt) -> Term {
-    time_block!("synth.run"); 
+    time_block!("synth.run");
 
     if cfg!(feature = "simple-incremental") || cfg!(feature = "winning-incremental") {
         let mut seen = Seen::new();
@@ -101,7 +98,8 @@ fn run(ctxt: &mut Ctxt) -> Term {
         for nt in 0..ctxt.classes.len() {
             for id in 0..ctxt.classes[nt].len() {
                 let should_process = if use_winning {
-                    (ctxt.classes[nt][id].prev_sol > 0 || ctxt.classes[nt][id].in_sol) && seen.contains_or_insert(nt, id)
+                    (ctxt.classes[nt][id].prev_sol > 0 || ctxt.classes[nt][id].in_sol)
+                        && seen.contains_or_insert(nt, id)
                 } else {
                     seen.contains_or_insert(nt, id)
                 };
@@ -120,7 +118,17 @@ fn run(ctxt: &mut Ctxt) -> Term {
             let mut count = 0;
 
             while let Some((nt, id, n, vals, seen_sigmas)) = todo.pop_front() {
-                if let Some((idx, _sol, sc)) = add_node_part(nt, id, n, ctxt, &mut seen, &vals, seen_sigmas, &mut todo, ctxt.classes[nt][id].prev_sol) {
+                if let Some((idx, _sol, sc)) = add_node_part(
+                    nt,
+                    id,
+                    n,
+                    ctxt,
+                    &mut seen,
+                    &vals,
+                    seen_sigmas,
+                    &mut todo,
+                    ctxt.classes[nt][id].prev_sol,
+                ) {
                     if _sol {
                         handle_sol(nt, idx, ctxt);
                         return extract(nt, idx, ctxt);
@@ -135,7 +143,9 @@ fn run(ctxt: &mut Ctxt) -> Term {
             }
         }
     } else {
-        ctxt.classes.iter_mut().for_each(|c| { c.drain(..); } );
+        ctxt.classes.iter_mut().for_each(|c| {
+            c.drain(..);
+        });
     }
 
     for (nt, n) in ctxt.problem.prod_rules() {
@@ -144,14 +154,15 @@ fn run(ctxt: &mut Ctxt) -> Term {
         let has_children = !n.children().is_empty();
         let has_holes = n.children().iter().any(|c| matches!(c, Child::Hole(_, _)));
 
-
         if (!has_children || !has_holes) && !is_placeholder {
-            let (_sol, is_sol, maxsat) = add_node(*nt, n, ctxt, None);
-            ctxt.solids[*nt].push(_sol);
-            ctxt.classes[*nt][_sol].handled_size = Some(0);
-            if is_sol {
-                handle_sol(*nt, _sol, ctxt);
-                return extract(*nt, _sol, ctxt);
+            for ont in ctxt.problem.nt_tc.reached_by(*nt) {
+                let (_sol, is_sol, maxsat) = add_node(*ont, n.clone(), ctxt, None);
+                ctxt.solids[*ont].push(_sol);
+                ctxt.classes[*ont][_sol].handled_size = Some(0);
+                if is_sol {
+                    handle_sol(*ont, _sol, ctxt);
+                    return extract(*ont, _sol, ctxt);
+                }
             }
         }
     }
@@ -162,11 +173,13 @@ fn run(ctxt: &mut Ctxt) -> Term {
             handle_sol(ot, sol, ctxt);
             return extract(ot, sol, ctxt);
         }
-        if cfg!(feature = "heuristic-linr"){
+        if cfg!(feature = "heuristic-linr") {
             if *ctxt.problem.nt_mapping.get(&Ty::NonTerminal(nt)).unwrap() == ctxt.problem.rettype {
-                ctxt.olinr.update(ctxt.classes[nt][x].features.as_slice(), maxsat as f64);
+                ctxt.olinr
+                    .update(ctxt.classes[nt][x].features.as_slice(), maxsat as f64);
             } else {
-                ctxt.flinr.update(ctxt.classes[nt][x].features.as_slice(), maxsat as f64);
+                ctxt.flinr
+                    .update(ctxt.classes[nt][x].features.as_slice(), maxsat as f64);
             }
         }
     }
@@ -199,7 +212,9 @@ fn handle(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usiz
     let c = &mut ctxt.classes[nt][x];
 
     // if the current size is the same size of the last "handle" call, nothing it to be done.
-    if c.handled_size == Some(c.size) {  return (None, 0); }
+    if c.handled_size == Some(c.size) {
+        return (None, 0);
+    }
 
     if c.handled_size.is_none() {
         ctxt.solids[nt].push(x);
@@ -210,14 +225,15 @@ fn handle(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usiz
     grow(nt, x, ctxt)
 }
 
-
 fn prune(nt: &usize, rule: &Node, childs: Vec<(usize, Id)>, ctxt: &Ctxt) -> bool {
     let get_class = |c: &(usize, Id)| &ctxt.classes[c.0][c.1];
     let get_node = |c: &(usize, Id)| &get_class(c).node;
 
     match rule.ident() {
         "Ite" => {
-            let [cond, then_branch, else_branch] = &childs[..] else { unreachable!() };
+            let [cond, then_branch, else_branch] = &childs[..] else {
+                unreachable!()
+            };
             if then_branch.1 > else_branch.1 {
                 return true;
             }
@@ -230,50 +246,48 @@ fn prune(nt: &usize, rule: &Node, childs: Vec<(usize, Id)>, ctxt: &Ctxt) -> bool
             then_class.satcount == 0 || else_class.satcount == 0
         }
 
-        _ if childs.len() == 2 && matches!(rule.ident() , "Add" | "Mul" | "Equals" | "And" | "Xor" | "Distinct" | "Or") =>  {
+        _ if childs.len() == 2
+            && matches!(
+                rule.ident(),
+                "Add" | "Mul" | "Equals" | "And" | "Xor" | "Distinct" | "Or"
+            ) =>
+        {
             childs[0].0 == childs[1].0 && childs[0].1 > childs[1].1
         }
 
-        "Add" => {
-            match childs.as_slice() {
-                [a, b] => match (get_node(a), get_node(b)) {
-                    (Node::ConstInt(0, _), _) => b.1 == *nt,
-                    (_, Node::ConstInt(0, _)) => a.1 == *nt,
-                    _ => childs.iter().any(|c| {
-                        get_class(c).vals.iter().all(|v| *v == Value::Int(0))
-                    }),
-                },
-                _ => childs.iter().any(|c| {
-                    get_class(c).vals.iter().all(|v| *v == Value::Int(0))
-                }),
-            }
-        }
+        "Add" => match childs.as_slice() {
+            [a, b] => match (get_node(a), get_node(b)) {
+                (Node::ConstInt(0, _), _) => b.1 == *nt,
+                (_, Node::ConstInt(0, _)) => a.1 == *nt,
+                _ => childs
+                    .iter()
+                    .any(|c| get_class(c).vals.iter().all(|v| *v == Value::Int(0))),
+            },
+            _ => childs
+                .iter()
+                .any(|c| get_class(c).vals.iter().all(|v| *v == Value::Int(0))),
+        },
 
-        "Mul" => {
-            match childs.as_slice() {
-                [a, b] => match (get_node(a), get_node(b)) {
-                    (Node::ConstInt(0 | 1, _), _) => b.1 == *nt,
-                    (_, Node::ConstInt(0 | 1, _)) => a.1 == *nt,
-                    _ => childs.iter().any(|c| {
-                        let vals = &get_class(c).vals;
-                        vals.iter().all(|v| *v == Value::Int(0))
-                            || vals.iter().all(|v| *v == Value::Int(1))
-                    }),
-                },
+        "Mul" => match childs.as_slice() {
+            [a, b] => match (get_node(a), get_node(b)) {
+                (Node::ConstInt(0 | 1, _), _) => b.1 == *nt,
+                (_, Node::ConstInt(0 | 1, _)) => a.1 == *nt,
                 _ => childs.iter().any(|c| {
                     let vals = &get_class(c).vals;
                     vals.iter().all(|v| *v == Value::Int(0))
                         || vals.iter().all(|v| *v == Value::Int(1))
                 }),
-            }
-        }
+            },
+            _ => childs.iter().any(|c| {
+                let vals = &get_class(c).vals;
+                vals.iter().all(|v| *v == Value::Int(0)) || vals.iter().all(|v| *v == Value::Int(1))
+            }),
+        },
 
         _ => match rule.signature() {
-            (_, Ty::Bool) if rule.children().len() > 1 => {
-                childs.windows(2).all(|w| w[0] == w[1])
-            }
+            (_, Ty::Bool) if rule.children().len() > 1 => childs.windows(2).all(|w| w[0] == w[1]),
             _ => false,
-        }
+        },
     }
 }
 
@@ -296,24 +310,21 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
             let mut new_rule = rule.clone();
             new_rule.children_mut()[i] = Child::Hole(in_types[i].into_nt().unwrap(), x);
 
-            let remaining_types: Vec<_> = in_types.iter()
+            let remaining_types: Vec<_> = in_types
+                .iter()
                 .enumerate()
                 .filter(|(idx, _)| *idx != i)
                 .map(|(_, ty)| ty)
                 .cloned()
                 .collect();
 
-
-            let solid_combinations = remaining_types.iter().map(|ty| {
-                match ty {
-                    Ty::PRule(_) => ty.nt_indices()
-                        .iter()
-                        .flat_map(|j| {
-                            ctxt.solids[*j].iter().map(move |id| (*j, *id))
-                        })
-                        .collect::<Vec<_>>(),
-                    _ => panic!("Expected PRule type, got: {:?}", ty),
-                }
+            let solid_combinations = remaining_types.iter().map(|ty| match ty {
+                Ty::PRule(_) => ty
+                    .nt_indices()
+                    .iter()
+                    .flat_map(|j| ctxt.solids[*j].iter().map(move |id| (*j, *id)))
+                    .collect::<Vec<_>>(),
+                _ => panic!("Expected PRule type, got: {:?}", ty),
             });
 
             for combination in solid_combinations.multi_cartesian_product() {
@@ -334,7 +345,7 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
                     if is_sol {
                         return (Some((*nt, _sol)), max_sat);
                     }
-                } 
+                }
             }
         }
     }
@@ -342,13 +353,22 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
     (None, max_sat)
 }
 
-pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<HashMap<Box<[Value]>, bool>>>, classes: Option<Vec<Vec<Class>>>, temb: &mut TermEmbedder, olinr: &mut BayesianLinearRegression, flinr: &mut BayesianLinearRegression) -> (Term, Vec<HashMap<Box<[Value]>, bool>>, Vec<Vec<Class>>) {
+pub fn synth(
+    problem: &Problem,
+    big_sigmas: &[Sigma],
+    cxs_cache: Option<Vec<HashMap<Box<[Value]>, bool>>>,
+    classes: Option<Vec<Vec<Class>>>,
+    temb: &mut TermEmbedder,
+    olinr: &mut BayesianLinearRegression,
+    flinr: &mut BayesianLinearRegression,
+) -> (Term, Vec<HashMap<Box<[Value]>, bool>>, Vec<Vec<Class>>) {
     let mut small_sigmas: IndexSet<Sigma> = IndexSet::new();
     let mut sigma_indices: Vec<Box<[usize]>> = Vec::new();
     for bsigma in big_sigmas {
         let mut indices = Vec::new();
         for a in &problem.instvars {
-            let ssigma: Sigma = a.iter()
+            let ssigma: Sigma = a
+                .iter()
                 .map(|i| eval_term_partial(*i, &problem.constraint.elems, bsigma).unwrap())
                 .collect();
 
@@ -371,13 +391,13 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<Hash
         sigma_indices,
         problem,
         vals_lookup: Default::default(),
-        cxs_cache, 
+        cxs_cache,
         classes: classes.unwrap_or_else(|| {
             std::iter::repeat_with(|| Vec::<Class>::new())
                 .take(no_nt)
                 .collect::<Vec<Vec<Class>>>()
         }),
-        temb, 
+        temb,
         solids: vec![vec![]; no_nt],
         olinr,
         flinr,
@@ -386,8 +406,13 @@ pub fn synth(problem: &Problem, big_sigmas: &[Sigma], cxs_cache: Option<Vec<Hash
     (run(&mut ctxt), ctxt.cxs_cache, ctxt.classes)
 }
 
-
-fn add_class_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen, todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>) -> Option<(NonTerminal, Id)> {
+fn add_class_part(
+    nt: NonTerminal,
+    id: Id,
+    ctxt: &mut Ctxt,
+    seen: &mut Seen,
+    todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>,
+) -> Option<(NonTerminal, Id)> {
     let vals = ctxt.classes[nt][id].vals.to_vec();
     let seen_sigmas = ctxt.classes[nt][id].vals.len();
 
@@ -396,7 +421,17 @@ fn add_class_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen, tod
 
     add_canon_node_part(nt, id, ctxt, seen, todo);
     for WithOrd(n, _) in heap.into_sorted_vec().into_iter().skip(1) {
-        if let Some(id) = add_nodes_part(nt, id, n, ctxt, seen, &vals, seen_sigmas, todo, ctxt.classes[nt][id].prev_sol) {
+        if let Some(id) = add_nodes_part(
+            nt,
+            id,
+            n,
+            ctxt,
+            seen,
+            &vals,
+            seen_sigmas,
+            todo,
+            ctxt.classes[nt][id].prev_sol,
+        ) {
             return Some((nt, id));
         }
     }
@@ -404,16 +439,27 @@ fn add_class_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen, tod
     None
 }
 
-fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mut Seen, vals: &[Value], seen_sigmas: usize, todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>, prev_sol: usize) -> Option<Id> {
+fn add_nodes_part(
+    nt: NonTerminal,
+    id: Id,
+    node: Node,
+    ctxt: &mut Ctxt,
+    seen: &mut Seen,
+    vals: &[Value],
+    seen_sigmas: usize,
+    todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>,
+    prev_sol: usize,
+) -> Option<Id> {
     for c in node.children() {
         if let Child::Hole(j, i) = c {
             if seen.contains_or_insert(*j, *i) {
                 add_class_part(*j, *i, ctxt, seen, todo);
             }
-       }
+        }
     }
 
-    for comb in node.children()
+    for comb in node
+        .children()
         .iter()
         .map(|c| {
             if let Child::Hole(j, i) = c {
@@ -422,8 +468,8 @@ fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &m
                     .into_iter()
                     .map(Some)
                     .collect::<Vec<_>>()
-            } else { 
-                vec![None] 
+            } else {
+                vec![None]
             }
         })
         .multi_cartesian_product()
@@ -434,28 +480,49 @@ fn add_nodes_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &m
                 *c = Child::Hole(*j, new_id);
             }
         }
-        if let Some((idx, sol, sc)) = add_node_part(nt, id, new_node, ctxt, seen, vals, seen_sigmas, todo, prev_sol) {
-            if sol { 
-                return Some(idx)
+        if let Some((idx, sol, sc)) = add_node_part(
+            nt,
+            id,
+            new_node,
+            ctxt,
+            seen,
+            vals,
+            seen_sigmas,
+            todo,
+            prev_sol,
+        ) {
+            if sol {
+                return Some(idx);
             }
         }
     }
 
     None
-
 }
 
-fn add_node_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mut Seen, vals: &[Value], seen_sigmas: usize, todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>, prev_sol: usize) -> Option<(Id, bool, usize)> {
+fn add_node_part(
+    nt: NonTerminal,
+    id: Id,
+    node: Node,
+    ctxt: &mut Ctxt,
+    seen: &mut Seen,
+    vals: &[Value],
+    seen_sigmas: usize,
+    todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>,
+    prev_sol: usize,
+) -> Option<(Id, bool, usize)> {
     let mut delta = Vec::new();
     for (i, sigma) in ctxt.small_sigmas[seen_sigmas..].iter().enumerate() {
         let f = |cnt: NonTerminal, idx: Id| {
-            if ctxt.classes[cnt][idx].vals.len() <= (seen_sigmas + i) {  return None; }
+            if ctxt.classes[cnt][idx].vals.len() <= (seen_sigmas + i) {
+                return None;
+            }
             Some(ctxt.classes[cnt][idx].vals[seen_sigmas + i].clone())
         };
         if let Some(res) = node.eval(&f, sigma) {
             delta.push(res);
-        } else { 
-            todo.push_back((nt, id, node.clone(), vals.to_vec(), seen_sigmas)); 
+        } else {
+            todo.push_back((nt, id, node.clone(), vals.to_vec(), seen_sigmas));
             return None;
         }
     }
@@ -468,12 +535,17 @@ fn add_node_part(nt: NonTerminal, id: Id, node: Node, ctxt: &mut Ctxt, seen: &mu
 
     ctxt.classes[nt][nid].prev_sol = prev_sol;
 
-    ctxt.solids[nt].push(nid); 
+    ctxt.solids[nt].push(nid);
     Some((nid, sol, sc))
 }
 
-
-fn add_canon_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen, todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>) {
+fn add_canon_node_part(
+    nt: NonTerminal,
+    id: Id,
+    ctxt: &mut Ctxt,
+    seen: &mut Seen,
+    todo: &mut VecDeque<(NonTerminal, Id, Node, Vec<Value>, usize)>,
+) {
     let node = ctxt.classes[nt][id].node.clone();
     let seen_sigmas = ctxt.classes[nt][id].vals.len();
 
@@ -482,19 +554,27 @@ fn add_canon_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen
             if seen.contains_or_insert(*j, *i) {
                 add_class_part(*j, *i, ctxt, seen, todo);
             }
-       }
+        }
     }
 
     let mut delta = Vec::new();
-    for (i, sigma) in ctxt.small_sigmas[seen_sigmas ..].iter().enumerate() {
+    for (i, sigma) in ctxt.small_sigmas[seen_sigmas..].iter().enumerate() {
         let f = |cnt: NonTerminal, idx: Id| {
-            if ctxt.classes[cnt][idx].vals.len() <= (seen_sigmas + i) {  return None; }
+            if ctxt.classes[cnt][idx].vals.len() <= (seen_sigmas + i) {
+                return None;
+            }
             Some(ctxt.classes[cnt][idx].vals[seen_sigmas + i].clone())
         };
         if let Some(res) = node.eval(&f, sigma) {
             delta.push(res);
-        } else { 
-            todo.push_back((nt, id, node.clone(), ctxt.classes[nt][id].vals.to_vec(), seen_sigmas));
+        } else {
+            todo.push_back((
+                nt,
+                id,
+                node.clone(),
+                ctxt.classes[nt][id].vals.to_vec(),
+                seen_sigmas,
+            ));
             return;
         }
     }
@@ -507,17 +587,26 @@ fn add_canon_node_part(nt: NonTerminal, id: Id, ctxt: &mut Ctxt, seen: &mut Seen
     ctxt.vals_lookup.insert((nt, full_boxed), id);
 
     seen.add_result(nt, id, id);
-    ctxt.solids[nt].push(id); 
+    ctxt.solids[nt].push(id);
 
-    if ctxt.problem.rettys.contains(&ctxt.classes[nt][id].node.ty()) {
-        ctxt.classes[nt][id].satcount += satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
+    if ctxt
+        .problem
+        .rettys
+        .contains(&ctxt.classes[nt][id].node.ty())
+    {
+        ctxt.classes[nt][id].satcount +=
+            satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
     }
 
     enqueue(nt, id, ctxt);
 }
 
-
-fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<Box<[Value]>>) -> (Id, bool, usize) {
+fn add_node(
+    nt: NonTerminal,
+    node: Node,
+    ctxt: &mut Ctxt,
+    provided_vals: Option<Box<[Value]>>,
+) -> (Id, bool, usize) {
     let vals = match provided_vals {
         Some(v) => v,
         None => match vals(nt, &node, ctxt) {
@@ -528,7 +617,7 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
     let mut sc = 0;
     let i;
 
-    GLOBAL_STATS.lock().unwrap().programs_generated+= 1;
+    GLOBAL_STATS.lock().unwrap().programs_generated += 1;
 
     if let Some(&j) = ctxt.vals_lookup.get(&(nt, vals.clone())) {
         let newsize = minsize(nt, &node, ctxt);
@@ -539,11 +628,11 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
             c.node = node.clone();
             sc = c.satcount;
             enqueue(nt, j, ctxt);
-        } 
+        }
         push_bounded(&mut ctxt.classes[nt][j].nodes, WithOrd(node, newsize));
         i = j;
     } else {
-        GLOBAL_STATS.lock().unwrap().new_programs_generated+= 1;
+        GLOBAL_STATS.lock().unwrap().new_programs_generated += 1;
         i = ctxt.classes[nt].len();
         let size = minsize(nt, &node, ctxt);
         let mut nodes = NodeQueue::new();
@@ -562,10 +651,13 @@ fn add_node(nt: NonTerminal, node: Node, ctxt: &mut Ctxt, provided_vals: Option<
         ctxt.classes[nt].push(c);
 
         if ctxt.big_sigmas.len() > 0 {
-            let mut satc= 0;
+            let mut satc = 0;
             let mut to_check = Vec::new();
-            for (i , chunk) in ctxt.sigma_indices.iter().enumerate() {
-                let vals_chunk = chunk.iter().map(|idx| vals[*idx].clone()).collect::<Vec<_>>();
+            for (i, chunk) in ctxt.sigma_indices.iter().enumerate() {
+                let vals_chunk = chunk
+                    .iter()
+                    .map(|idx| vals[*idx].clone())
+                    .collect::<Vec<_>>();
                 if let Some(b) = ctxt.cxs_cache[i].get::<[core::Value]>(&vals_chunk) {
                     satc += *b as usize;
                 } else {
@@ -612,20 +704,31 @@ fn enqueue(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) {
 fn heuristic(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[nt][x];
     let ty = ctxt.classes[nt][x].node.ty();
-    if ctxt.problem.nt_mapping.get(&ty).expect("this never happens") != &ctxt.problem.rettype {
+    if ctxt
+        .problem
+        .nt_mapping
+        .get(&ty)
+        .expect("this never happens")
+        != &ctxt.problem.rettype
+    {
         return OrderedFloat(1000 as f64);
     }
 
     let mut a = 100000;
-    let max_subterm_satcount = c.node.children()
+    let max_subterm_satcount = c
+        .node
+        .children()
         .iter()
         .filter_map(|c| {
-            if let Child::Hole(j, i) = c { Some((j, i)) } else { None }
+            if let Child::Hole(j, i) = c {
+                Some((j, i))
+            } else {
+                None
+            }
         })
         .map(|(cnt, s)| ctxt.classes[*cnt][*s].satcount)
         .max()
         .unwrap_or_else(|| 0);
-
 
     let tmp = c.satcount.saturating_sub(max_subterm_satcount + 4);
 
@@ -640,9 +743,9 @@ fn matches_rule(n: &Node, r: &Node) -> bool {
     use std::mem::discriminant;
 
     match (n, r) {
-        (Node::VarInt(i, _),  Node::VarInt(j, _))  => i == j,
+        (Node::VarInt(i, _), Node::VarInt(j, _)) => i == j,
         (Node::VarBool(i, _), Node::VarBool(j, _)) => i == j,
-        (Node::ConstInt(a, _),  Node::ConstInt(b, _))  => a == b,
+        (Node::ConstInt(a, _), Node::ConstInt(b, _)) => a == b,
         _ => {
             let dn = discriminant(n);
             let dr = discriminant(r);
@@ -658,15 +761,15 @@ fn feature_set(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     let w2v: Vec<f64> = ctxt.temb.embed(&term);
 
     let sc = c.satcount;
-    let mut iter = c.node.children()
-        .iter()
-        .filter_map(|c| match c {
-            Child::Hole(j, i) => Some(ctxt.classes[*j][*i].satcount),
-            _ => None,
-        });
+    let mut iter = c.node.children().iter().filter_map(|c| match c {
+        Child::Hole(j, i) => Some(ctxt.classes[*j][*i].satcount),
+        _ => None,
+    });
 
     let (min_subterm_sc, max_subterm_sc) = if let Some(first) = iter.next() {
-        iter.fold((first, first), |(min, max), ssc| (min.min(ssc), max.max(ssc)))
+        iter.fold((first, first), |(min, max), ssc| {
+            (min.min(ssc), max.max(ssc))
+        })
     } else {
         (0, 0)
     };
@@ -687,7 +790,8 @@ fn feature_set(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
 fn heuristic(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> Score {
     let ty = ctxt.classes[nt][x].node.ty();
     let ret = &ctxt.problem.rettype;
-    let is_off = ctxt.problem
+    let is_off = ctxt
+        .problem
         .nt_mapping
         .get(&ty)
         .map(|t| t != ret)
@@ -697,10 +801,10 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> Score {
 
     let score = if is_off {
         feats[3] = (ctxt.big_sigmas.len() as f64) / 2.0;
-        let (s, _)  = ctxt.flinr.predict(feats.as_slice());
-        s 
+        let (s, _) = ctxt.flinr.predict(feats.as_slice());
+        s
     } else {
-        let (s, _)  = ctxt.olinr.predict(feats.as_slice());
+        let (s, _) = ctxt.olinr.predict(feats.as_slice());
         s
     };
 
@@ -710,20 +814,31 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> Score {
 
     if ctxt.classes.iter().map(|c| c.len()).sum::<usize>() < 1000 {
         let ty = ctxt.classes[nt][x].node.ty();
-        if ctxt.problem.nt_mapping.get(&ty).expect("this never happens") != &ctxt.problem.rettype {
+        if ctxt
+            .problem
+            .nt_mapping
+            .get(&ty)
+            .expect("this never happens")
+            != &ctxt.problem.rettype
+        {
             return OrderedFloat(7 as f64);
         }
 
         let mut a = 65;
-        let max_subterm_satcount = c.node.children()
+        let max_subterm_satcount = c
+            .node
+            .children()
             .iter()
             .filter_map(|c| {
-                if let Child::Hole(j, i) = c { Some((j, i)) } else { None }
+                if let Child::Hole(j, i) = c {
+                    Some((j, i))
+                } else {
+                    None
+                }
             })
             .map(|(cnt, s)| ctxt.classes[*cnt][*s].satcount)
             .max()
             .unwrap_or_else(|| 0);
-
 
         let tmp = c.satcount.saturating_sub(max_subterm_satcount + 4);
 
@@ -738,16 +853,31 @@ fn heuristic(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> Score {
 }
 
 fn vals(nt: NonTerminal, node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
-    ctxt.small_sigmas.iter().enumerate().map(|(i, sigma)| {
-        let f = |cnt: NonTerminal, id: Id| Some(ctxt.classes[cnt][id].vals[i].clone());
-        node.eval(&f, sigma)
-    }).collect()
+    ctxt.small_sigmas
+        .iter()
+        .enumerate()
+        .map(|(i, sigma)| {
+            let f = |cnt: NonTerminal, id: Id| Some(ctxt.classes[cnt][id].vals[i].clone());
+            node.eval(&f, sigma)
+        })
+        .collect()
 }
 
 fn minsize(nt: NonTerminal, node: &Node, ctxt: &Ctxt) -> usize {
-    node.signature().0.iter().zip(node.children())
-        .filter_map(|(cnt, x)| if let Child::Hole(j, i) = x { Some((j, i)) } else { None })
-        .map(|(cnt, x)| ctxt.classes[*cnt][*x].size).sum::<usize>() + 1
+    node.signature()
+        .0
+        .iter()
+        .zip(node.children())
+        .filter_map(|(cnt, x)| {
+            if let Child::Hole(j, i) = x {
+                Some((j, i))
+            } else {
+                None
+            }
+        })
+        .map(|(cnt, x)| ctxt.classes[*cnt][*x].size)
+        .sum::<usize>()
+        + 1
 }
 
 pub fn extract(nt: NonTerminal, x: Id, ctxt: &Ctxt) -> Term {

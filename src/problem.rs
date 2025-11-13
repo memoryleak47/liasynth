@@ -1,7 +1,7 @@
 use crate::*;
 
 use indexmap::IndexMap;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Clone)]
 pub struct Problem {
@@ -26,6 +26,8 @@ pub struct Problem {
     // The ids of these Nodes will be nulled away.
     pub prod_rules: Box<[(usize, Node)]>,
 
+    pub nt_tc: TransitiveClosure,
+
     pub context: String,
     pub context_vars: IndexMap<String, Ty>,
 
@@ -47,7 +49,7 @@ fn simplify_expr(e: Expr, defs: &IndexMap<String, DefinedFun>, varmap: &Map<Stri
             } else {
                 Expr::Var(v)
             }
-        },
+        }
         Expr::DefinedFunCall(op, exprs) => {
             let def = &defs[&op];
             let mut ivarmap: Map<String, Expr> = Map::default();
@@ -56,13 +58,19 @@ fn simplify_expr(e: Expr, defs: &IndexMap<String, DefinedFun>, varmap: &Map<Stri
                 ivarmap.insert(v.clone(), ex);
             }
             simplify_expr(def.expr.clone(), defs, &ivarmap)
-        },
+        }
         Expr::SynthFunCall(op, exprs) => {
-            let exprs: Vec<Expr> = exprs.into_iter().map(|x| simplify_expr(x, defs, varmap)).collect();
+            let exprs: Vec<Expr> = exprs
+                .into_iter()
+                .map(|x| simplify_expr(x, defs, varmap))
+                .collect();
             Expr::SynthFunCall(op, exprs)
-        },
+        }
         Expr::Op(op, exprs) => {
-            let exprs: Vec<Expr> = exprs.into_iter().map(|x| simplify_expr(x, defs, varmap)).collect();
+            let exprs: Vec<Expr> = exprs
+                .into_iter()
+                .map(|x| simplify_expr(x, defs, varmap))
+                .collect();
             Expr::Op(op, exprs)
         }
         Expr::Let(bindings, body) => {
@@ -72,18 +80,30 @@ fn simplify_expr(e: Expr, defs: &IndexMap<String, DefinedFun>, varmap: &Map<Stri
                 varmap.insert(var, ex);
             }
             simplify_expr(*body, defs, &varmap)
-        },
+        }
     }
 }
 
-fn expr_to_term(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, rettype: Ty) -> (Term, Vec<Box<[Id]>>) {
+fn expr_to_term(
+    e: Expr,
+    vars: &IndexMap<String, Ty>,
+    progname: &str,
+    rettype: Ty,
+) -> (Term, Vec<Box<[Id]>>) {
     let mut t = Term { elems: Vec::new() };
     let mut instvars = Vec::new();
     expr_to_term_impl(e, vars, progname, &mut t, &mut instvars, rettype);
     (t, instvars)
 }
 
-fn expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, t: &mut Term, instvars: &mut Vec<Box<[Id]>>, rettype: Ty) -> Id {
+fn expr_to_term_impl(
+    e: Expr,
+    vars: &IndexMap<String, Ty>,
+    progname: &str,
+    t: &mut Term,
+    instvars: &mut Vec<Box<[Id]>>,
+    rettype: Ty,
+) -> Id {
     match e {
         Expr::Var(v) => {
             let i = vars.iter().position(|x| *x.0 == *v).unwrap();
@@ -91,22 +111,33 @@ fn expr_to_term_impl(e: Expr, vars: &IndexMap<String, Ty>, progname: &str, t: &m
             match ty {
                 Ty::Int => t.push(Node::VarInt(i, Ty::Int)),
                 Ty::Bool => t.push(Node::VarBool(i, Ty::Bool)),
-                _ => panic!("should not happen")
+                _ => panic!("should not happen"),
             }
-        },
-        Expr::ConstBool(true) => { t.push(Node::True(Ty::Bool)) },
-        Expr::ConstBool(false) => { t.push(Node::False(Ty::Bool)) },
-        Expr::ConstInt(i) => { t.push(Node::ConstInt(i, Ty::Int)) },
+        }
+        Expr::ConstBool(true) => t.push(Node::True(Ty::Bool)),
+        Expr::ConstBool(false) => t.push(Node::False(Ty::Bool)),
+        Expr::ConstInt(i) => t.push(Node::ConstInt(i, Ty::Int)),
         Expr::Op(op, exprs) => {
-            let exprs: Box<[Node]> = exprs.into_iter().map(|x| Node::PlaceHolder(expr_to_term_impl(x, vars, progname, t, instvars, rettype), Ty::Int)).collect();
+            let exprs: Box<[Node]> = exprs
+                .into_iter()
+                .map(|x| {
+                    Node::PlaceHolder(
+                        expr_to_term_impl(x, vars, progname, t, instvars, rettype),
+                        Ty::Int,
+                    )
+                })
+                .collect();
             let n = Node::parse(&*op, &*exprs).unwrap();
             t.push(n)
-        },
+        }
         Expr::SynthFunCall(_name, exprs) => {
-            let exprs: Box<[Id]> = exprs.into_iter().map(|x| expr_to_term_impl(x, vars, progname, t, instvars, rettype)).collect();
+            let exprs: Box<[Id]> = exprs
+                .into_iter()
+                .map(|x| expr_to_term_impl(x, vars, progname, t, instvars, rettype))
+                .collect();
             instvars.push(exprs.iter().cloned().collect());
             t.push(Node::VarInt(instvars.len() + vars.len() - 1, rettype))
-        },
+        }
         Expr::DefinedFunCall(..) => unreachable!("DefinedFunCalls should already be resolved!"),
         Expr::Let(..) => unreachable!("Lets should already be resolved!"),
     }
@@ -118,7 +149,13 @@ pub fn mk_sygus_problem(f: &str) -> Problem {
     build_sygus(synth_problem)
 }
 
-fn parse_grammar_term(nt: usize, rule: &GrammarTerm, vars: &IndexMap<String, Ty>, nonterminals: &IndexMap<String, Ty>, refs: &IndexMap<usize, Vec<String>>) -> Option<Node> {
+fn parse_grammar_term(
+    nt: usize,
+    rule: &GrammarTerm,
+    vars: &IndexMap<String, Ty>,
+    nonterminals: &IndexMap<String, Ty>,
+    refs: &IndexMap<usize, Vec<String>>,
+) -> Option<Node> {
     match rule {
         GrammarTerm::NonTerminal(n, ty) => {
             // we'll iterate over the referenced non-terminal anyways.
@@ -134,15 +171,31 @@ fn parse_grammar_term(nt: usize, rule: &GrammarTerm, vars: &IndexMap<String, Ty>
             }
 
             Some(Node::PlaceHolder(0, Ty::PRule(valids)))
-        },
+        }
         GrammarTerm::Op(op, nts) => {
-            let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(nt, n, vars, nonterminals, refs)).collect();
-            Some(Node::parse_prod(&*op, &*args, Ty::NonTerminal(nt)).expect("Could not parse prod rule"))
-        },
+            let args: Vec<_> = nts
+                .iter()
+                .flat_map(|n| parse_grammar_term(nt, n, vars, nonterminals, refs))
+                .collect();
+            Some(
+                Node::parse_prod(&*op, &*args, Ty::NonTerminal(nt))
+                    .expect("Could not parse prod rule"),
+            )
+        }
         GrammarTerm::DefinedFunCall(op, template, nts) => {
-            let args: Vec<_> = nts.iter().flat_map(|n| parse_grammar_term(nt, n, vars, nonterminals, refs)).collect();
-            Some(Node::parse_prod(&*template, &*args, Ty::NonTerminal(nt)).unwrap_or_else(|| panic!("Could not parse prod rule: template: {:?}, args: {:?}", template, args)))
-        },
+            let args: Vec<_> = nts
+                .iter()
+                .flat_map(|n| parse_grammar_term(nt, n, vars, nonterminals, refs))
+                .collect();
+            Some(
+                Node::parse_prod(&*template, &*args, Ty::NonTerminal(nt)).unwrap_or_else(|| {
+                    panic!(
+                        "Could not parse prod rule: template: {:?}, args: {:?}",
+                        template, args
+                    )
+                }),
+            )
+        }
 
         GrammarTerm::ConstInt(i, ty) => Some(Node::ConstInt(*i, *ty)),
         GrammarTerm::ConstBool(true, ty) => Some(Node::True(*ty)),
@@ -155,7 +208,35 @@ fn parse_grammar_term(nt: usize, rule: &GrammarTerm, vars: &IndexMap<String, Ty>
                 Ty::Bool => Some(Node::VarBool(i, *tty)),
                 _ => panic!("should never happen"),
             }
-        },
+        }
+    }
+}
+
+#[derive(Default, Clone)]
+pub struct TransitiveClosure {
+    ancestors: Vec<HashSet<usize>>,
+}
+
+impl TransitiveClosure {
+    pub fn new(n: usize) -> Self {
+        let mut ancestors = vec![HashSet::new(); n];
+        for i in 0..n {
+            ancestors[i].insert(i);
+        }
+        Self { ancestors }
+    }
+
+    pub fn add_edge(&mut self, from: usize, to: usize) {
+        self.ancestors[to].insert(from);
+
+        let from_ancestors: Vec<_> = self.ancestors[from].iter().copied().collect();
+        for ancestor in from_ancestors {
+            self.ancestors[to].insert(ancestor);
+        }
+    }
+
+    pub fn reached_by(&self, node: usize) -> &HashSet<usize> {
+        &self.ancestors[node]
     }
 }
 
@@ -172,7 +253,11 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
 
     let vars = synth_fun.args.clone();
 
-    let mut constraint: Expr = synth_problem.constraints.get(0).cloned().unwrap_or_else(|| Expr::ConstBool(true));
+    let mut constraint: Expr = synth_problem
+        .constraints
+        .get(0)
+        .cloned()
+        .unwrap_or_else(|| Expr::ConstBool(true));
     for c in synth_problem.constraints.iter().skip(1) {
         constraint = Expr::Op(String::from("and"), vec![constraint, c.clone()]);
     }
@@ -182,19 +267,32 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
     let mut nt_mapping = HashMap::new();
     let mut rettys = Vec::new();
     let mut prod_rules = Vec::new();
+
+    let mut tc = TransitiveClosure::new(synth_fun.nonterminal_defs.len());
+
     for (n, (_, ntdef)) in synth_fun.nonterminal_defs.iter().enumerate() {
         nt_mapping.insert(Ty::NonTerminal(n), ntdef.ty);
         if n == 0 {
             rettys.push(Ty::NonTerminal(0))
         }
         for rule in ntdef.prod_rules.iter() {
+            if let GrammarTerm::NonTerminal(s, _) = rule {
+                let ont = synth_fun.nonterminal_defs.get_index_of(s).unwrap();
+                tc.add_edge(n, ont);
+            }
             if n == 0 {
                 if let GrammarTerm::NonTerminal(n, _) = rule {
                     let m = synth_fun.nonterminal_defs.get_index_of(&n.clone()).unwrap();
                     rettys.push(Ty::NonTerminal(m));
                 }
             }
-            if let Some(node) = parse_grammar_term(n, rule, &vars, &synth_fun.nonterminals, &synth_fun.nonterminal_refs) {
+            if let Some(node) = parse_grammar_term(
+                n,
+                rule,
+                &vars,
+                &synth_fun.nonterminals,
+                &synth_fun.nonterminal_refs,
+            ) {
                 prod_rules.push((n, node));
             };
         }
@@ -227,6 +325,7 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
         constraint,
         constraint_str,
         prod_rules: prod_rules.into(),
+        nt_tc: tc,
         context,
         context_vars,
         instvars,
@@ -241,12 +340,14 @@ fn show_val(v: &Value) -> String {
 }
 
 impl Problem {
-    pub fn prod_rules(&self) -> &[(usize, Node)] { &self.prod_rules }
+    pub fn prod_rules(&self) -> &[(usize, Node)] {
+        &self.prod_rules
+    }
 }
 
 impl Problem {
     pub fn verify(&self, term: &Term) -> Option<Sigma> {
-        time_block!("problem.verify"); 
+        time_block!("problem.verify");
         let mut query = self.context.clone();
         let retty = self.rettype.to_string();
         let progname = &self.progname;
@@ -281,6 +382,8 @@ impl Problem {
                 };
             }
             Some(sigma)
-        } else { None }
+        } else {
+            None
+        }
     }
 }
