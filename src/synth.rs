@@ -298,7 +298,6 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
     let ty = ctxt.classes[nnt][x].node.ty();
     let mut max_sat = 0;
 
-    println!("{:?}", ctxt.problem.prod_rules());
     for (nt, rule) in ctxt.problem.prod_rules() {
         let (in_types, _) = rule.signature();
 
@@ -322,21 +321,27 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
                 .cloned()
                 .collect();
 
-            let mut solid_combinations = remaining_types.iter().map(|ty| match ty {
-                Ty::PRule(_) => ty
-                    .nt_indices()
-                    .iter()
-                    .flat_map(|j| ctxt.solids[*j].iter().map(move |id| (*j, *id)))
-                    .collect::<Vec<_>>(),
-                _ => vec![],
-            });
+            let solid_combinations = remaining_types
+                .iter()
+                .map(|ty| match ty {
+                    Ty::PRule(_) => ty
+                        .nt_indices()
+                        .iter()
+                        .flat_map(|j| ctxt.solids[*j].iter().map(move |id| (*j, *id)))
+                        .collect::<Vec<_>>(),
+                    _ => vec![],
+                })
+                .collect::<Vec<_>>();
 
-            let l = solid_combinations.clone().collect::<Vec<_>>().len();
-            if l != remaining_types.len() || l == 0 || solid_combinations.any(|i| i.is_empty()) {
+            let l = solid_combinations.clone().len();
+            if l != remaining_types.len()
+                || l == 0
+                || solid_combinations.iter().any(|i| i.is_empty())
+            {
                 continue 'rules;
             }
 
-            for combination in solid_combinations.multi_cartesian_product() {
+            for combination in solid_combinations.into_iter().multi_cartesian_product() {
                 let mut childs = combination.clone();
                 childs.insert(i, (nnt, x));
                 if !prune(nt, rule, childs, ctxt) {
