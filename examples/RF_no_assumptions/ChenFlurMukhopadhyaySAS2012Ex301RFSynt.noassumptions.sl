@@ -1,0 +1,32 @@
+; printing sygus problem  
+
+(set-logic LIA)
+(declare-var x!11 Int)
+
+(declare-var xPostExec Int)
+
+(declare-var y!M0 Int)
+
+(declare-var x!M0 Int)
+
+(declare-var y!15 Int)
+
+(declare-var z!0 Int)
+
+(declare-var zPostExec Int)
+
+(declare-var J5 Bool)
+
+(declare-var yPostExec Int)
+
+(synth-fun rankingFunction!0((arg0 Int)(arg1 Int)(arg2 Int)) Int
+((NTInt Int)(NTbool Bool))
+((NTInt Int (arg0 arg1 arg2 0 1 (- NTInt) (+ NTInt NTInt) (- NTInt NTInt) (ite NTbool NTInt NTInt) ))
+(NTbool Bool ((not NTbool) (and NTbool NTbool) (or NTbool NTbool) (ite NTbool NTbool NTbool) (= NTInt NTInt) (< NTInt NTInt) (> NTInt NTInt) ))
+)
+)
+
+(constraint (=> (and (and (and (and (and (and (= J5 (>= x!M0 y!M0)) (= x!11 (+ 1 x!M0))) (= y!15 z!0)) (=> (not J5) (= xPostExec x!11))) (=> (not J5) (= yPostExec y!15))) (not J5)) (= z!0 zPostExec)) (and (> (rankingFunction!0 x!M0 y!M0 z!0 ) (rankingFunction!0 xPostExec yPostExec zPostExec )) (>= (rankingFunction!0 x!M0 y!M0 z!0 ) 0))))
+(check-synth)
+
+

@@ -1,0 +1,42 @@
+; printing sygus problem  
+
+(set-logic LIA)
+(declare-var xPostExec Int)
+
+(declare-var z!0 Int)
+
+(declare-var zPostExec Int)
+
+(declare-var yPostExec Int)
+
+(declare-var inI2 Int)
+
+(declare-var y!M0 Int)
+
+(declare-var inB3 Bool)
+
+(declare-var inI0 Int)
+
+(declare-var x!15 Int)
+
+(declare-var x!M0 Int)
+
+(declare-var J7 Bool)
+
+(declare-var inB5 Bool)
+
+(declare-var y!21 Int)
+
+(declare-var J4 Bool)
+
+(synth-fun rankingFunction!0((arg0 Int)(arg1 Int)(arg2 Int)) Int
+((NTInt Int)(NTbool Bool))
+((NTInt Int (arg0 arg1 arg2 0 1 (- NTInt) (+ NTInt NTInt) (- NTInt NTInt) (ite NTbool NTInt NTInt) ))
+(NTbool Bool ((not NTbool) (and NTbool NTbool) (or NTbool NTbool) (ite NTbool NTbool NTbool) (= NTInt NTInt) (< NTInt NTInt) (> NTInt NTInt) ))
+)
+)
+
+(constraint (=> (and (and (and (and (and (and (and (and (and (and (and (and (and (= J4 (not (<= 0 x!M0))) (= J7 (not (<= x!M0 z!0)))) (= x!15 (+ (* 2 x!M0) y!M0))) (= y!21 (+ 1 y!M0))) (=> (and (not J4) (not J7)) (= xPostExec x!15))) (=> (and (not J4) (not J7)) (= yPostExec y!21))) (and (not J4) (not J7))) (= inB3 (not (<= 0 inI2)))) (= inB5 (not (<= inI2 z!0)))) (= x!M0 (+ (* 2 inI2) inI0))) (= y!M0 (+ 1 inI0))) (and (not inB3) (not inB5))) (>= z!0 0)) (= z!0 zPostExec)) (and (> (rankingFunction!0 x!M0 y!M0 z!0 ) (rankingFunction!0 xPostExec yPostExec zPostExec )) (>= (rankingFunction!0 x!M0 y!M0 z!0 ) 0))))
+(check-synth)
+
+

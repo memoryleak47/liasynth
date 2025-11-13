@@ -1,0 +1,38 @@
+; printing sygus problem  
+
+(set-logic LIA)
+(declare-var iPostExec Int)
+
+(declare-var xPostExec Int)
+
+(declare-var inI2 Int)
+
+(declare-var n!0 Int)
+
+(declare-var inI1 Int)
+
+(declare-var x!M0 Int)
+
+(declare-var i!M0 Int)
+
+(declare-var i!11 Int)
+
+(declare-var x!17 Int)
+
+(declare-var nPostExec Int)
+
+(declare-var inB5 Bool)
+
+(declare-var J5 Bool)
+
+(synth-fun __SYNTHFUN_rankingFunction!0((arg0 Int)(arg1 Int)(arg2 Int)) Int
+((NTInt Int)(NTbool Bool))
+((NTInt Int (arg0 arg1 arg2 0 1 (- NTInt) (+ NTInt NTInt) (- NTInt NTInt) (ite NTbool NTInt NTInt) ))
+(NTbool Bool ((not NTbool) (and NTbool NTbool) (or NTbool NTbool) (ite NTbool NTbool NTbool) (= NTInt NTInt) (< NTInt NTInt) (> NTInt NTInt) ))
+)
+)
+
+(constraint (=> (and (and (and (and (and (and (and (and (and (and (= J5 (>= x!M0 n!0)) (= i!11 (+ 1 i!M0))) (= x!17 (+ 1 x!M0))) (=> (not J5) (= xPostExec x!17))) (=> (not J5) (= iPostExec i!11))) (not J5)) (= inB5 (>= inI1 n!0))) (= i!M0 (+ 1 inI2))) (= x!M0 (+ 1 inI1))) (not inB5)) (= n!0 nPostExec)) (and (> (__SYNTHFUN_rankingFunction!0 x!M0 i!M0 n!0 ) (__SYNTHFUN_rankingFunction!0 xPostExec iPostExec nPostExec )) (>= (__SYNTHFUN_rankingFunction!0 x!M0 i!M0 n!0 ) 0))))
+(check-synth)
+
+

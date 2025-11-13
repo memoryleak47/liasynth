@@ -1,0 +1,56 @@
+; printing sygus problem  
+
+(set-logic LIA)
+(declare-var c!27 Int)
+
+(declare-var xPostExec Int)
+
+(declare-var z!M16 Int)
+
+(declare-var v!7 Int)
+
+(declare-var wPostExec Int)
+
+(declare-var u!3 Int)
+
+(declare-var zPostExec Int)
+
+(declare-var x!M16 Int)
+
+(declare-var yPostExec Int)
+
+(declare-var x!44 Int)
+
+(declare-var uPostExec Int)
+
+(declare-var inI2 Int)
+
+(declare-var w!11 Int)
+
+(declare-var cPostExec Int)
+
+(declare-var z!38 Int)
+
+(declare-var vPostExec Int)
+
+(declare-var c!M16 Int)
+
+(declare-var y!52 Int)
+
+(declare-var y!M16 Int)
+
+(declare-var J21 Bool)
+
+(declare-var J32 Bool)
+
+(synth-fun rankingFunction!0((arg0 Int)(arg1 Int)(arg2 Int)(arg3 Int)(arg4 Int)(arg5 Int)(arg6 Int)) Int
+((NTInt Int)(NTbool Bool))
+((NTInt Int (arg0 arg1 arg2 arg3 arg4 arg5 arg6 0 1 (- NTInt) (+ NTInt NTInt) (- NTInt NTInt) (ite NTbool NTInt NTInt) ))
+(NTbool Bool ((not NTbool) (and NTbool NTbool) (or NTbool NTbool) (ite NTbool NTbool NTbool) (= NTInt NTInt) (< NTInt NTInt) (> NTInt NTInt) ))
+)
+)
+
+(constraint (=> (and (and (and (and (and (and (and (and (and (and (and (and (and (and (and (and (and (and (and (and (and (and (= J21 (not (<= y!M16 x!M16))) (= c!27 (+ 1 c!M16))) (= J32 (<= z!M16 1))) (= y!52 (+ 1 y!M16))) (= z!38 (+ (- 1) z!M16))) (= x!44 (+ x!M16 z!38))) (=> (and (not J21) J32) (= xPostExec x!M16))) (=> (and (not J21) J32) (= yPostExec y!52))) (=> (and (not J21) J32) (= zPostExec z!M16))) (=> (and (not J21) J32) (= cPostExec c!27))) (=> (and (not J21) (not J32)) (= xPostExec x!44))) (=> (and (not J21) (not J32)) (= yPostExec y!M16))) (=> (and (not J21) (not J32)) (= zPostExec z!38))) (=> (and (not J21) (not J32)) (= cPostExec c!27))) (or (and (not J21) J32) (and (not J21) (not J32)))) (= u!3 x!M16)) (= v!7 y!M16)) (= w!11 z!M16)) (= inI2 0)) (>= c!M16 0)) (= u!3 uPostExec)) (= v!7 vPostExec)) (= w!11 wPostExec)) (and (> (rankingFunction!0 x!M16 y!M16 z!M16 c!M16 u!3 v!7 w!11 ) (rankingFunction!0 xPostExec yPostExec zPostExec cPostExec uPostExec vPostExec wPostExec )) (>= (rankingFunction!0 x!M16 y!M16 z!M16 c!M16 u!3 v!7 w!11 ) 0))))
+(check-synth)
+
+

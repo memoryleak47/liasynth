@@ -14,6 +14,7 @@ Arg = namedtuple('Arg', 'name, typ, t')
 Nt = namedtuple('Nt', 'name, typ, t')
 splitter = re.compile(r'([\(\)\s+])')
 spaces = re.compile(r'\s+')
+lone_num_pat = re.compile(r'(?<=[\s()])(\d+)')
 consume = lambda x: x.pop(0)
 flat_map = lambda x: [a for a in x if a is not None]
 flatflat_map = lambda x: [a for b in x for a in flat_map(b)]
@@ -107,8 +108,8 @@ class ProductionRule:
         tmp = self.pr
         for n in sorted(nts, key=lambda x: len(x.name), reverse=True):  # how ugly but needed
             tmp = tmp.replace(n.name, '?')
-
-        return tmp
+        
+        return tmp 
 
     def extract_eval(self, nts, template, deffuns):
         if "ite" in self.op:
@@ -120,7 +121,8 @@ class ProductionRule:
 
         tmp = self.sexp
         tmp = replace(tmp, nts, self.varis, deffuns, self.a_idx)
-        return f"{r}{get_rust_eval(tmp)}"
+
+        return f"{r}{get_rust_eval(tmp, tmp[0] == 'ite')}"
 
 
 def replace(tmp, nts, varis, deffuns, a_idx):
@@ -161,6 +163,7 @@ def replace(tmp, nts, varis, deffuns, a_idx):
                         case _: tmp[i] = t
     return tmp
 
+
 rust_diad = lambda o, x, y:  f"({x} {o} {y})"
 rust_mon = lambda o, x:  f"({o} {x})"
 rust_imply = lambda x, y: f"(!{x} || {y})"
@@ -181,25 +184,29 @@ rust_div_mod = {
     'div': r'%',
 }
 
-def get_rust_eval(s):
+def get_rust_eval(s, ite=False):
     if not isinstance(s, list):
+        if s.isnumeric() and ite:
+            return f"Value::Int({s})"
         return s
+    pget_rust_eval = partial(get_rust_eval, ite=ite)
     match (n := consume(s)):
-        case [term]: return get_rust_eval(term)
+        case [term]: 
+            return pget_rust_eval(term)
         case '-' if len(s) == 1:
-                return rust_mon(n, *apply_n(compose(get_rust_eval, consume), s, 1))
+            return rust_mon(n, *apply_n(compose(pget_rust_eval, consume), s, 1))
         case '+' | '-' | '*' | '<=' | '<' | '>' | '>=':
-            return rust_diad(n, *apply_n(compose(get_rust_eval, consume), s, 2))
+            return rust_diad(n, *apply_n(compose(pget_rust_eval, consume), s, 2))
         case 'not':
-            return rust_mon(rust_boolean[n], *apply_n(compose(get_rust_eval, consume), s, 1))
+            return rust_mon(rust_boolean[n], *apply_n(compose(pget_rust_eval, consume), s, 1))
         case 'and' | 'or' | 'xor' | '=':
-            return rust_diad(rust_boolean[n], *apply_n(compose(get_rust_eval, consume), s, 2))
+            return rust_diad(rust_boolean[n], *apply_n(compose(pget_rust_eval, consume), s, 2))
         case 'div' | 'mod':
-            return rust_div(rust_div_mod[n], *apply_n(compose(get_rust_eval, consume), s, 2))
+            return rust_div(rust_div_mod[n], *apply_n(compose(pget_rust_eval, consume), s, 2))
         case '=>':
-            return rust_imply(n, *apply_n(compose(get_rust_eval, consume), s, 2))
+            return rust_imply(n, *apply_n(compose(pget_rust_eval, consume), s, 2))
         case 'ite':
-            return rust_ite( *apply_n(compose(get_rust_eval, consume), s, 3))
+            return rust_ite( *apply_n(compose(pget_rust_eval, consume), s, 3))
         case _:
             return n
 
@@ -345,6 +352,10 @@ def get_grammarterm(file=None):
 
     terms = set()
     names = defaultdict(int)
+
+    for nt in needed_terms:
+        names[nt.name] += 1
+
     for pr in synthfun.prodrules:
         pr.varis = synthfun.args
         term = extract_grammarterm(pr, synthfun.nonterms, definefuns, names, synthfun.nt_map)
@@ -374,7 +385,7 @@ define_language! {{
 
 
 if len(sys.argv) < 2:
-    f = 'examples/LIA/max2.sl'
+    f = 'examples/agent_problems/taxi/taxi_pickup1.sy'
 else:
     f = sys.argv[1]
 langfile(f)

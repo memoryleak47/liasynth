@@ -1,0 +1,42 @@
+; printing sygus problem  
+
+(set-logic LIA)
+(declare-var xPostExec Int)
+
+(declare-var zPostExec Int)
+
+(declare-var nPostExec Int)
+
+(declare-var yPostExec Int)
+
+(declare-var y!M0 Int)
+
+(declare-var n!0 Int)
+
+(declare-var z!M0 Int)
+
+(declare-var z!25 Int)
+
+(declare-var x!M0 Int)
+
+(declare-var x!17 Int)
+
+(declare-var J6 Bool)
+
+(declare-var J9 Bool)
+
+(declare-var z!31 Int)
+
+(declare-var y!21 Int)
+
+(synth-fun __SYNTHFUN_rankingFunction!0((arg0 Int)(arg1 Int)(arg2 Int)(arg3 Int)) Int
+((NTInt Int)(NTbool Bool))
+((NTInt Int (arg0 arg1 arg2 arg3 0 1 (- NTInt) (+ NTInt NTInt) (- NTInt NTInt) (ite NTbool NTInt NTInt) ))
+(NTbool Bool ((not NTbool) (and NTbool NTbool) (or NTbool NTbool) (ite NTbool NTbool NTbool) (= NTInt NTInt) (< NTInt NTInt) (> NTInt NTInt) ))
+)
+)
+
+(constraint (=> (and (and (and (and (and (and (and (and (and (and (= J6 (not (<= 0 (+ x!M0 y!M0)))) (= J9 (not (<= x!M0 n!0)))) (= x!17 (+ (* 2 x!M0) y!M0))) (= y!21 z!M0)) (= z!25 z!M0)) (= z!31 (+ 1 z!25))) (=> (and (not J6) (not J9)) (= xPostExec x!17))) (=> (and (not J6) (not J9)) (= yPostExec y!21))) (=> (and (not J6) (not J9)) (= zPostExec z!31))) (and (not J6) (not J9))) (= n!0 nPostExec)) (and (> (__SYNTHFUN_rankingFunction!0 x!M0 y!M0 z!M0 n!0 ) (__SYNTHFUN_rankingFunction!0 xPostExec yPostExec zPostExec nPostExec )) (>= (__SYNTHFUN_rankingFunction!0 x!M0 y!M0 z!M0 n!0 ) 0))))
+(check-synth)
+
+

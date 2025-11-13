@@ -1,0 +1,46 @@
+; printing sygus problem  
+
+(set-logic LIA)
+(declare-var v1PostExec Int)
+
+(declare-var J18 Bool)
+
+(declare-var mPostExec Int)
+
+(declare-var v2!M14 Int)
+
+(declare-var v2PostExec Int)
+
+(declare-var nPostExec Int)
+
+(declare-var inB2 Bool)
+
+(declare-var v1!0 Int)
+
+(declare-var v2!0 Int)
+
+(declare-var v1!35 Int)
+
+(declare-var inI0 Int)
+
+(declare-var v2!29 Int)
+
+(declare-var v1!M14 Int)
+
+(declare-var v2!41 Int)
+
+(declare-var inB5 Bool)
+
+(declare-var J23 Bool)
+
+(synth-fun __SYNTHFUN_rankingFunction!0((arg0 Int)(arg1 Int)(arg2 Int)(arg3 Int)) Int
+((NTInt Int)(NTbool Bool))
+((NTInt Int (arg0 arg1 arg2 arg3 0 1 (- NTInt) (+ NTInt NTInt) (- NTInt NTInt) (ite NTbool NTInt NTInt) ))
+(NTbool Bool ((not NTbool) (and NTbool NTbool) (or NTbool NTbool) (ite NTbool NTbool NTbool) (= NTInt NTInt) (< NTInt NTInt) (> NTInt NTInt) ))
+)
+)
+
+(constraint (=> (and (and (and (and (and (and (and (and (and (and (and (and (and (and (and (and (and (and (and (and (and (= J18 (<= v1!M14 0)) (= J23 (>= v2!M14 v2!0))) (= v2!41 0)) (= v2!29 (+ 1 v2!M14))) (= v1!35 (+ (- 1) v1!M14))) (=> (and (not J18) J23) (= nPostExec v1!M14))) (=> (and (not J18) J23) (= mPostExec 0))) (=> (and (not J18) (not J23)) (= nPostExec v1!35))) (=> (and (not J18) (not J23)) (= mPostExec v2!29))) (or (and (not J18) J23) (and (not J18) (not J23)))) (= inB2 (not (<= 0 v1!0)))) (= inB5 (<= v2!0 0))) (= v1!M14 v1!0)) (= inI0 0)) (and (not inB2) (not inB5))) (> v2!0 0)) (>= v1!0 0)) (>= v2!0 0)) (>= v1!M14 0)) (>= v2!M14 0)) (= v1!M14 v1PostExec)) (= v2!M14 v2PostExec)) (and (> (__SYNTHFUN_rankingFunction!0 v1!M14 v2!M14 v1!0 v2!0 ) (__SYNTHFUN_rankingFunction!0 v1PostExec v2PostExec nPostExec mPostExec )) (>= (__SYNTHFUN_rankingFunction!0 v1!M14 v2!M14 v1!0 v2!0 ) 0))))
+(check-synth)
+
+
