@@ -298,10 +298,12 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
     let ty = ctxt.classes[nnt][x].node.ty();
     let mut max_sat = 0;
 
+    println!("{:?}", ctxt.problem.prod_rules());
     for (nt, rule) in ctxt.problem.prod_rules() {
+        println!("{:?}", rule);
         let (in_types, _) = rule.signature();
 
-        for (i, child) in rule.children().iter().enumerate() {
+        'rules: for (i, child) in rule.children().iter().enumerate() {
             if !matches!(child, Child::Hole(_, 0)) {
                 continue;
             }
@@ -338,12 +340,12 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
                         return (Some((*ont, _sol)), max_sat);
                     }
                 }
-                return (None, max_sat);
+                continue 'rules;
             }
 
             // WOT?
             if solid_combinations.len() == 0 {
-                return (None, max_sat);
+                continue 'rules;
             }
 
             for combination in solid_combinations.multi_cartesian_product() {
@@ -628,6 +630,7 @@ fn add_node(
     ctxt: &mut Ctxt,
     provided_vals: Option<Box<[Value]>>,
 ) -> (Id, bool, usize) {
+    println!("{:?}", node);
     let vals = match provided_vals {
         Some(v) => v,
         None => match vals(nt, &node, ctxt) {
