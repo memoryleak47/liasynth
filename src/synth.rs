@@ -300,7 +300,6 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
 
     println!("{:?}", ctxt.problem.prod_rules());
     for (nt, rule) in ctxt.problem.prod_rules() {
-        println!("{:?}", rule);
         let (in_types, _) = rule.signature();
 
         'rules: for (i, child) in rule.children().iter().enumerate() {
@@ -332,19 +331,8 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
                 _ => vec![],
             });
 
-            if solid_combinations.len() == 0 || solid_combinations.any(|i| i.is_empty()) {
-                for ont in ctxt.problem.nt_tc.reached_by(*nt) {
-                    let (_sol, is_sol, sc) = add_node(*ont, new_rule.clone(), ctxt, None);
-                    max_sat = max_sat.max(sc);
-                    if is_sol {
-                        return (Some((*ont, _sol)), max_sat);
-                    }
-                }
-                continue 'rules;
-            }
-
-            // WOT?
-            if solid_combinations.len() == 0 {
+            let l = solid_combinations.clone().collect::<Vec<_>>().len();
+            if l != remaining_types.len() || l == 0 || solid_combinations.any(|i| i.is_empty()) {
                 continue 'rules;
             }
 
@@ -630,7 +618,6 @@ fn add_node(
     ctxt: &mut Ctxt,
     provided_vals: Option<Box<[Value]>>,
 ) -> (Id, bool, usize) {
-    println!("{:?}", node);
     let vals = match provided_vals {
         Some(v) => v,
         None => match vals(nt, &node, ctxt) {
