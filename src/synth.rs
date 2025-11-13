@@ -4,6 +4,7 @@ use indexmap::IndexSet;
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
 use rand::Rng;
+use rand::seq::IndexedRandom;
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet, VecDeque};
 
@@ -217,7 +218,9 @@ fn handle(nt: NonTerminal, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usiz
     }
 
     if c.handled_size.is_none() {
-        ctxt.solids[nt].push(x);
+        for ont in ctxt.problem.nt_tc.reached_by(nt) {
+            ctxt.solids[*ont].push(x);
+        }
     }
 
     c.handled_size = Some(c.size);
@@ -303,7 +306,7 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
                 continue;
             }
 
-            if !in_types[i].captures_ty(&ty) {
+            if !in_types[i].captures_ty(&Ty::NonTerminal(nnt)) {
                 continue;
             }
 
@@ -318,14 +321,30 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
                 .cloned()
                 .collect();
 
-            let solid_combinations = remaining_types.iter().map(|ty| match ty {
+            let mut solid_combinations = remaining_types.iter().map(|ty| match ty {
                 Ty::PRule(_) => ty
                     .nt_indices()
                     .iter()
                     .flat_map(|j| ctxt.solids[*j].iter().map(move |id| (*j, *id)))
                     .collect::<Vec<_>>(),
-                _ => panic!("Expected PRule type, got: {:?}", ty),
+                _ => vec![],
             });
+
+            if solid_combinations.len() == 0 || solid_combinations.any(|i| i.is_empty()) {
+                for ont in ctxt.problem.nt_tc.reached_by(*nt) {
+                    let (_sol, is_sol, sc) = add_node(*ont, new_rule.clone(), ctxt, None);
+                    max_sat = max_sat.max(sc);
+                    if is_sol {
+                        return (Some((*ont, _sol)), max_sat);
+                    }
+                }
+                return (None, max_sat);
+            }
+
+            // WOT?
+            if solid_combinations.len() == 0 {
+                return (None, max_sat);
+            }
 
             for combination in solid_combinations.multi_cartesian_product() {
                 let mut childs = combination.clone();
@@ -340,10 +359,12 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
                         }
                     }
 
-                    let (_sol, is_sol, sc) = add_node(*nt, new_rule.clone(), ctxt, None);
-                    max_sat = max_sat.max(sc);
-                    if is_sol {
-                        return (Some((*nt, _sol)), max_sat);
+                    for ont in ctxt.problem.nt_tc.reached_by(*nt) {
+                        let (_sol, is_sol, sc) = add_node(*ont, new_rule.clone(), ctxt, None);
+                        max_sat = max_sat.max(sc);
+                        if is_sol {
+                            return (Some((*ont, _sol)), max_sat);
+                        }
                     }
                 }
             }
