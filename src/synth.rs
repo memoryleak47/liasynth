@@ -335,6 +335,16 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
                 .collect::<Vec<_>>();
 
             if solid_combinations.is_empty() || solid_combinations.iter().any(|i| i.is_empty()) {
+                if remaining_types.iter().all(|r| !matches!(r, Ty::PRule(_))) {
+                    for ont in ctxt.problem.nt_tc.reached_by(*nt) {
+                        let (_sol, is_sol, sc) = add_node(*ont, new_rule.clone(), ctxt, None);
+                        max_sat = max_sat.max(sc);
+                        if is_sol {
+                            return (Some((*ont, _sol)), max_sat);
+                        }
+                    }
+                }
+
                 continue 'rules;
             }
 
