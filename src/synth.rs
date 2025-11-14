@@ -323,21 +323,18 @@ fn grow(nnt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<(usize, Id)>, usize) {
 
             let solid_combinations = remaining_types
                 .iter()
-                .map(|ty| match ty {
-                    Ty::PRule(_) => ty
-                        .nt_indices()
-                        .iter()
-                        .flat_map(|j| ctxt.solids[*j].iter().map(move |id| (*j, *id)))
-                        .collect::<Vec<_>>(),
-                    _ => vec![],
+                .flat_map(|ty| match ty {
+                    Ty::PRule(_) => Some(
+                        ty.nt_indices()
+                            .iter()
+                            .flat_map(|j| ctxt.solids[*j].iter().map(move |id| (*j, *id)))
+                            .collect::<Vec<_>>(),
+                    ),
+                    _ => None,
                 })
                 .collect::<Vec<_>>();
 
-            let l = solid_combinations.clone().len();
-            if l != remaining_types.len()
-                || l == 0
-                || solid_combinations.iter().any(|i| i.is_empty())
-            {
+            if solid_combinations.is_empty() || solid_combinations.iter().any(|i| i.is_empty()) {
                 continue 'rules;
             }
 
