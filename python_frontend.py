@@ -193,6 +193,8 @@ def get_rust_eval(s, ite=False):
     match (n := consume(s)):
         case [term]: 
             return pget_rust_eval(term)
+        case '-' if len(s) == 1 and s[0].isnumeric():
+            return f"Value::Int(-{s[0]})"
         case '-' if len(s) == 1:
             return rust_mon(n, *apply_n(compose(pget_rust_eval, consume), s, 1))
         case '+' | '-' | '*' | '<=' | '<' | '>' | '>=':

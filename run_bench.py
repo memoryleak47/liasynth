@@ -1,6 +1,7 @@
 import subprocess
 import itertools
 import sys
+import os
 
 
 try: 
@@ -8,6 +9,7 @@ try:
 except:
     raise Exception("missing arguments")
 
+os.makedirs(outdir, exist_ok=True)
 
 g2 = ["heuristic-default", "heuristic-linr"]
 g3 = [None, "winning-incremental", "winning-incremental, total-incremental"]
