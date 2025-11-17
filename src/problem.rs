@@ -214,28 +214,28 @@ fn parse_grammar_term(
 
 #[derive(Default, Clone)]
 pub struct TransitiveClosure {
-    ancestors: Vec<HashSet<usize>>,
+    ancestors: Vec<Vec<usize>>,
 }
 
 impl TransitiveClosure {
     pub fn new(n: usize) -> Self {
-        let mut ancestors = vec![HashSet::new(); n];
+        let mut ancestors = vec![Vec::new(); n];
         for i in 0..n {
-            ancestors[i].insert(i);
+            ancestors[i].push(i);
         }
         Self { ancestors }
     }
 
     pub fn add_edge(&mut self, from: usize, to: usize) {
-        self.ancestors[to].insert(from);
+        self.ancestors[to].push(from);
 
         let from_ancestors: Vec<_> = self.ancestors[from].iter().copied().collect();
         for ancestor in from_ancestors {
-            self.ancestors[to].insert(ancestor);
+            self.ancestors[to].push(ancestor);
         }
     }
 
-    pub fn reached_by(&self, node: usize) -> &HashSet<usize> {
+    pub fn reached_by(&self, node: usize) -> &Vec<usize> {
         &self.ancestors[node]
     }
 }
