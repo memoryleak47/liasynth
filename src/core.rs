@@ -3,7 +3,6 @@ use crate::*;
 use once_cell::sync::Lazy;
 use std::sync::Mutex;
 
-
 pub struct Stats {
     pub programs_generated: usize,
     pub new_programs_generated: usize,
@@ -59,9 +58,13 @@ impl Value {
 pub type Var = usize;
 pub type Id = usize;
 
-
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Hash, PartialOrd, Ord)]
-pub enum Ty { Int, Bool, NonTerminal(usize), PRule(usize) }
+pub enum Ty {
+    Int,
+    Bool,
+    NonTerminal(usize),
+    PRule(usize),
+}
 
 impl Ty {
     pub fn to_string(&self) -> &'static str {
@@ -77,7 +80,7 @@ impl Ty {
         match self {
             Ty::NonTerminal(s) => Some(*s),
             Ty::PRule(s) => Some(s.trailing_zeros() as usize),
-            _ => None
+            _ => None,
         }
     }
     pub fn captures_ty(&self, other: &Ty) -> bool {
@@ -102,7 +105,6 @@ impl Ty {
             _ => Vec::new(),
         }
     }
-
 }
 
 impl Node {
@@ -142,7 +144,6 @@ impl Term {
 
 pub type Sigma = Vec<Value>;
 
-
 pub fn to_int(v: Value) -> Int {
     match v {
         Value::Int(i) => i,
@@ -160,14 +161,14 @@ pub fn to_bool(v: Value) -> bool {
 pub fn eval_term(term: &Term, sigma: &Sigma) -> Option<Value> {
     let mut vals: Vec<Value> = Vec::new();
     for n in &term.elems {
-        let f = |_: usize, i: usize| Some(vals[i].clone());
+        let f = |i: usize| Some(vals[i].clone());
         vals.push(n.eval(&f, sigma)?);
     }
     Some(vals.last().unwrap().clone())
 }
 
 pub fn eval_term_partial(i: Id, term: &[Node], sigma: &Sigma) -> Option<Value> {
-    let f = |_: usize, id: Id| eval_term_partial(id, term, sigma);
+    let f = |id: Id| eval_term_partial(id, term, sigma);
     term[i].eval(&f, sigma)
 }
 
@@ -179,12 +180,23 @@ pub fn cegis(problem: &Problem) -> Term {
     let mut olinr = BayesianLinearRegression::with_default_prior(9);
     let mut flinr = BayesianLinearRegression::with_default_prior(9);
     loop {
-        let (term, cxsc, clss) = synth(problem, &sigmas, cxs_cache, classes, &mut term_embed, &mut olinr, &mut flinr);
+        let (term, cxsc, clss) = synth(
+            problem,
+            &sigmas,
+            cxs_cache,
+            classes,
+            &mut term_embed,
+            &mut olinr,
+            &mut flinr,
+        );
         classes = Some(clss);
         cxs_cache = Some(cxsc);
-        println!("Candidate: {}", term_to_z3(&term, &problem.vars.keys().cloned().collect::<Box<[_]>>()));
+        println!(
+            "Candidate: {}",
+            term_to_z3(&term, &problem.vars.keys().cloned().collect::<Box<[_]>>())
+        );
 
-        GLOBAL_STATS.lock().unwrap().counterexamples+= 1;
+        GLOBAL_STATS.lock().unwrap().counterexamples += 1;
         // TODO check this later: assert!(problem.sat(&..., &sigmas));
         if let Some(sigma) = problem.verify(&term) {
             // println!("CE: {:?}", &sigma);
@@ -201,13 +213,16 @@ pub fn cegis(problem: &Problem) -> Term {
 fn init_sigmas(problem: &Problem) -> Vec<Sigma> {
     let mut sigmas = Vec::new();
     for i in 0..=problem.context_vars.len() {
-        let sigma = problem.context_vars.iter().enumerate().map(|(i2, (v, ty))| {
-            match (i == i2, ty) {
+        let sigma = problem
+            .context_vars
+            .iter()
+            .enumerate()
+            .map(|(i2, (v, ty))| match (i == i2, ty) {
                 (b, Ty::Bool) => Value::Bool(b),
                 (b, Ty::Int) => Value::Int(b as i64),
-                _ => panic!("Should not happen")
-            }
-        }).collect();
+                _ => panic!("Should not happen"),
+            })
+            .collect();
         sigmas.push(sigma);
     }
     sigmas

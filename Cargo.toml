@@ -23,10 +23,9 @@ rand = "0.9.2"
 debug = true
 
 [features]
-default = ["heuristic-default"]
+default = []
 ignore-grammar = []
-heuristic-default = []
-heuristic-linr= []
-simple-incremental = []
-winning-incremental = []
-total-incremental = []
+learned_heuristic= []
+simple = []
+winning = []
+total = []

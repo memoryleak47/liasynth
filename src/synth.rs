@@ -3,10 +3,8 @@ use crate::*;
 use indexmap::IndexSet;
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
-use rand::Rng;
-use rand::seq::IndexedRandom;
+use std::collections::HashMap;
 use std::collections::hash_map::Entry;
-use std::collections::{HashMap, HashSet, VecDeque};
 
 type Score = OrderedFloat<f64>;
 type Queue = BinaryHeap<WithOrd<(usize, Id), Score>>;
@@ -17,6 +15,13 @@ compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
 const MAXSIZE: usize = if cfg!(feature = "total") { 5 } else { 0 };
+
+fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
+    heap.push(val);
+    if heap.len() > MAXSIZE {
+        heap.pop();
+    }
+}
 
 fn insert_if_absent<K, V>(map: &mut HashMap<K, V>, key: K) -> bool
 where
@@ -44,7 +49,7 @@ pub struct Ctxt<'a> {
     pub problem: &'a Problem,
 
     // indexed by small-sigma.
-    pub vals_lookup: Map<(NonTerminal, Box<[Value]>), Id>,
+    pub vals_lookup: Map<(usize, Box<[Value]>), Id>,
     pub cxs_cache: Vec<HashMap<Box<[Value]>, bool>>,
 
     pub classes: Vec<Class>,
@@ -66,6 +71,22 @@ pub struct Class {
     pub prev_sol: usize,
     pub in_sol: bool,
     pub features: Vec<f64>,
+}
+
+impl Class {
+    fn default_class(size: usize, node: Node, vals: Box<[Value]>) -> Self {
+        Class {
+            size,
+            node: node.clone(),
+            nodes: NodeQueue::from([WithOrd(node, size)]),
+            vals: vals.clone(),
+            handled_size: None,
+            satcount: 0,
+            prev_sol: 0,
+            in_sol: false,
+            features: Vec::new(),
+        }
+    }
 }
 
 pub fn synth(
@@ -154,13 +175,13 @@ fn enumerate_atoms(ctxt: &mut Ctxt) -> Option<Term> {
         let holed = n.children().iter().any(|c| matches!(c, Child::Hole(_, _)));
 
         if (n.children().is_empty() || !holed) && !is_ph {
-            let (id, is_sol, satcount) = add_node(n.clone(), ctxt, None);
+            let (id, is_sol, _) = add_node(*nt, n.clone(), ctxt, None);
             if is_sol {
                 handle_solution(id, ctxt);
-                return extract(id, ctxt);
+                return Some(extract(id, ctxt));
             }
-            ctxt.problem.nt_tc.reached_by(*nt).iter().for_each(|pnt| {
-                ctxt.solids[*nt].push(id);
+            ctxt.problem.nt_tc.reached_by(*nt).iter().for_each(|o| {
+                ctxt.solids[*o].push(id);
             });
             ctxt.classes[id].handled_size = Some(0);
         }
@@ -173,10 +194,10 @@ fn enumerate(ctxt: &mut Ctxt) -> Option<Term> {
         let (id, maxsat) = handle(nt, x, ctxt);
         if let Some(solution) = id {
             handle_solution(solution, ctxt);
-            return extract(solution, ctxt);
+            return Some(extract(solution, ctxt));
         }
 
-        if cfg!(feature = "heuristic-linr") {
+        if cfg!(feature = "learned_heuristic") {
             let target = if ctxt.problem.nt_mapping[&Ty::NonTerminal(nt)] == ctxt.problem.rettype {
                 &mut ctxt.olinr
             } else {
@@ -226,17 +247,17 @@ fn handle_sub_solution(id: Id, ctxt: &mut Ctxt) {
 
 fn handle(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     let c = &mut ctxt.classes[x];
-
     if c.handled_size == Some(c.size) {
         return (None, 0);
     }
 
     if c.handled_size.is_none() {
-        ctxt.solids[nt].push(x);
+        for o in ctxt.problem.nt_tc.reached_by(nt) {
+            ctxt.solids[*o].push(x);
+        }
     }
 
     c.handled_size = Some(c.size);
-
     grow(nt, x, ctxt)
 }
 
@@ -257,39 +278,53 @@ fn prune(nt: usize, rule: &Node, children: &[Id], ctxt: &Ctxt) -> bool {
 
             ctxt.classes[*b_then].satcount == 0 || ctxt.classes[*b_else].satcount == 0
         }
-        _ if children.len() == 2 && matches!(rule.ident(),"Add" | "Mul" | "Equals" | "And" | "Xor" | "Distinct" | "Or")=>  children[0] == children[1] 
-        "Add" => {
-            let [a, b] = children;
-            match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
-                (_, Node::ConstInt(0, ty)) | (Node::ConstInt(0, ty), _) => {
-                    return nt == ty.into_nt().unwrap();
-                }
-                _ => {}
-            }
-
-            ctxt.classes[*a].vals.iter().all(|v| *v == Value::Int(0)) || ctxt.classes[*b].vals.iter().all(|v| *v == Value::Int(0))
+        _ if children.len() == 2
+            && matches!(
+                rule.ident(),
+                "Add" | "Mul" | "Equals" | "And" | "Xor" | "Distinct" | "Or"
+            ) =>
+        {
+            children[0] == children[1]
         }
-        "Mul" =>  {
-            let [a, b] = children;
-            match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
-                (_, Node::ConstInt(0, ty) | Node::ConstInt(1, ty))
-                | (Node::ConstInt(0, ty) | Node::ConstInt(1, ty), _) => {
-                    return nt == ty.into_nt().unwrap();
+        "Add" => {
+            if let [a, b] = children {
+                match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
+                    (_, Node::ConstInt(0, ty)) | (Node::ConstInt(0, ty), _) => {
+                        return nt == ty.into_nt().unwrap();
+                    }
+                    _ => {}
                 }
-                _ => {}
-            }            
-            let a_vals = ctxt.classes[*a].vals;
-            let b_vals = ctxt.classes[*b].vals;
-            a_vals.iter().all(|v| *v == Value::Int(0)) || a_vals.iter().all(|v| *v == Value::Int(1)) || b_vals.iter().all(|v| *v == Value::Int(0)) || b_vals.iter().all(|v| *v == Value::Int(1))
+                return ctxt.classes[*a].vals.iter().all(|v| *v == Value::Int(0))
+                    || ctxt.classes[*b].vals.iter().all(|v| *v == Value::Int(0));
+            }
+            false
+        }
+        "Mul" => {
+            if let [a, b] = children {
+                match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
+                    (_, Node::ConstInt(0, ty) | Node::ConstInt(1, ty))
+                    | (Node::ConstInt(0, ty) | Node::ConstInt(1, ty), _) => {
+                        return nt == ty.into_nt().unwrap();
+                    }
+                    _ => {}
+                }
+                let a_vals = &ctxt.classes[*a].vals;
+                let b_vals = &ctxt.classes[*b].vals;
+                return a_vals.iter().all(|v| *v == Value::Int(0))
+                    || a_vals.iter().all(|v| *v == Value::Int(1))
+                    || b_vals.iter().all(|v| *v == Value::Int(0))
+                    || b_vals.iter().all(|v| *v == Value::Int(1));
+            }
+            false
         }
         _ => match rule.signature() {
-            (_, Ty::Bool) if rule.children().len() > 1 => children.iter().all(|c| *c == children[0]),
-            _ => false
+            (_, Ty::Bool) if rule.children().len() > 1 => {
+                children.iter().all(|c| *c == children[0])
+            }
+            _ => false,
         },
     }
 }
-
-fn grow_combinations()
 
 fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     let mut max_sat = 0;
@@ -321,9 +356,7 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
                 .iter()
                 .filter(|(_, ty)| matches!(ty, Ty::PRule(_)))
                 .map(|(pos, ty)| {
-                    let ids = ctxt.problem.nt_tc
-                        .reached_by(ty.into_nt().unwrap())
-                        .clone();
+                    let ids = ctxt.problem.nt_tc.reached_by(ty.into_nt().unwrap()).clone();
                     (*pos, ids)
                 })
                 .collect();
@@ -333,14 +366,10 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
                     .iter()
                     .all(|(_, ty)| !matches!(ty, Ty::PRule(_)))
                 {
-                    let (id, is_sol, satcount) = add_node(base_prog.clone(), ctxt, None);
+                    let (id, is_sol, satcount) = add_node(nt, base_prog, ctxt, None);
                     max_sat = max_sat.max(satcount);
                     if is_sol {
                         return (Some(id), max_sat);
-                    }
-
-                    for o in &nt_reached {
-                        ctxt.solids[*o].push(id);
                     }
                 }
                 continue 'rule;
@@ -355,8 +384,7 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
                 new_children.push((i, x));
                 new_children.sort_by_key(|(pos, _)| *pos);
 
-                let child_ids: Vec<usize> =
-                    new_children.iter().map(|(_, c)| *c).collect();
+                let child_ids: Vec<usize> = new_children.iter().map(|(_, c)| *c).collect();
 
                 if !prune(nt, rule, &child_ids, ctxt) {
                     let mut prog = base_prog.clone();
@@ -366,14 +394,10 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
                         prog.children_mut()[*pos] = Child::Hole(ty_nt, *c_idx);
                     }
 
-                    let (id, is_sol, satcount) = add_node(prog, ctxt, None);
+                    let (id, is_sol, satcount) = add_node(nt, prog, ctxt, None);
                     max_sat = max_sat.max(satcount);
                     if is_sol {
                         return (Some(id), max_sat);
-                    }
-
-                    for o in &nt_reached {
-                        ctxt.solids[*o].push(id);
                     }
                 }
             }
@@ -383,7 +407,206 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     (None, max_sat)
 }
 
-fn add_mode() {
-    todo!();
+fn enqueue(nt: usize, x: Id, ctxt: &mut Ctxt) {
+    let h = if cfg!(feature = "learned_heuristic") {
+        learned_heuristic(x, ctxt)
+    } else {
+        default_heuristic(x, ctxt)
+    };
+
+    ctxt.queue.push(WithOrd((nt, x), h));
 }
 
+fn add_node(
+    nt: usize,
+    node: Node,
+    ctxt: &mut Ctxt,
+    vals: Option<Box<[Value]>>,
+) -> (Id, bool, usize) {
+    let vals = vals.unwrap_or_else(|| match gen_vals(&node, ctxt) {
+        Some(v) => v,
+        _ => panic!("Could not generate vals"),
+    });
+
+    GLOBAL_STATS.lock().unwrap().programs_generated += 1;
+
+    let (id, satcount) = if let Some(&_id) = ctxt.vals_lookup.get(&(nt, vals.clone())) {
+        let newsize = minsize(&node, ctxt);
+        let c = &mut ctxt.classes[_id];
+        let _satcount = c.satcount;
+        if newsize < c.size {
+            c.size = newsize;
+            c.node = node.clone();
+            enqueue(nt, _id, ctxt);
+        }
+        push_bounded(&mut ctxt.classes[_id].nodes, WithOrd(node, newsize));
+        (_id, _satcount)
+    } else {
+        GLOBAL_STATS.lock().unwrap().new_programs_generated += 1;
+
+        let _id = ctxt.classes.len();
+        let size = minsize(&node, ctxt);
+        let c = Class::default_class(size, node, vals.clone());
+
+        ctxt.classes.push(c);
+
+        let mut _satcount = 0;
+        let mut to_check = Vec::new();
+        for (i, chunk) in ctxt.sigma_indices.iter().enumerate() {
+            let vals_chunk = chunk
+                .iter()
+                .map(|idx| vals[*idx].clone())
+                .collect::<Vec<_>>();
+            if let Some(b) = ctxt.cxs_cache[i].get::<[core::Value]>(&vals_chunk) {
+                _satcount += *b as usize;
+            } else {
+                to_check.push(i);
+            }
+        }
+        ctxt.classes[_id].satcount = _satcount;
+        ctxt.vals_lookup.insert((nt, vals), _id);
+
+        if _satcount == ctxt.big_sigmas.len() && ctxt.problem.rettys.contains(&Ty::NonTerminal(nt))
+        {
+            return (_id, true, _satcount);
+        }
+
+        enqueue(nt, _id, ctxt);
+
+        (_id, _satcount)
+    };
+
+    (id, false, satcount)
+}
+
+fn gen_vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
+    ctxt.small_sigmas
+        .iter()
+        .enumerate()
+        .map(|(i, sigma)| {
+            let f = |id: Id| Some(ctxt.classes[id].vals[i].clone());
+            node.eval(&f, sigma)
+        })
+        .collect()
+}
+
+fn minsize(node: &Node, ctxt: &Ctxt) -> usize {
+    node.children()
+        .iter()
+        .filter_map(|x| {
+            if let Child::Hole(_, i) = x {
+                Some(i)
+            } else {
+                None
+            }
+        })
+        .map(|x| ctxt.classes[*x].size)
+        .sum::<usize>()
+        + 1
+}
+
+pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
+    let mut t = Term { elems: Vec::new() };
+    let f = &|c: Id| ctxt.classes[c].node.clone();
+    ctxt.classes[x].node.extract(f, &mut t.elems);
+    t
+}
+
+fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
+    let c = &ctxt.classes[x];
+    let ty = ctxt.classes[x].node.ty();
+    if ctxt
+        .problem
+        .nt_mapping
+        .get(&ty)
+        .expect("this never happens")
+        != &ctxt.problem.rettype
+    {
+        return OrderedFloat(1000 as f64);
+    }
+
+    let mut a = 100000;
+    let max_subterm_satcount = c
+        .node
+        .children()
+        .iter()
+        .filter_map(|c| {
+            if let Child::Hole(_, i) = c {
+                Some(i)
+            } else {
+                None
+            }
+        })
+        .map(|s| ctxt.classes[*s].satcount)
+        .max()
+        .unwrap_or_else(|| 0);
+
+    let tmp = c.satcount.saturating_sub(max_subterm_satcount + 4);
+
+    for _ in tmp..ctxt.big_sigmas.len() {
+        a /= 2;
+    }
+
+    OrderedFloat((a / (c.size + 5)) as f64)
+}
+
+fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
+    let c = &ctxt.classes[x];
+    let term = extract(x, ctxt);
+
+    let w2v: Vec<f64> = ctxt.temb.embed(&term);
+
+    let sc = c.satcount;
+    let mut iter = c.node.children().iter().filter_map(|c| match c {
+        Child::Hole(_, i) => Some(ctxt.classes[*i].satcount),
+        _ => None,
+    });
+
+    let (min_subterm_sc, max_subterm_sc) = if let Some(first) = iter.next() {
+        iter.fold((first, first), |(min, max), ssc| {
+            (min.min(ssc), max.max(ssc))
+        })
+    } else {
+        (0, 0)
+    };
+
+    vec![
+        1.0,
+        c.prev_sol as f64,
+        max_subterm_sc as f64,
+        min_subterm_sc as f64,
+        sc as f64,
+    ]
+    .into_iter()
+    .chain(w2v)
+    .collect()
+}
+
+fn learned_heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
+    if ctxt.classes.len() < 1000 {
+        default_heuristic(x, ctxt)
+    } else {
+        let ty = ctxt.classes[x].node.ty();
+        let ret = &ctxt.problem.rettype;
+        let is_off = ctxt
+            .problem
+            .nt_mapping
+            .get(&ty)
+            .map(|t| t != ret)
+            .unwrap_or(true);
+
+        let mut feats = feature_set(x, ctxt);
+
+        let score = if is_off {
+            feats[3] = (ctxt.big_sigmas.len() as f64) / 2.0;
+            let (s, _) = ctxt.flinr.predict(feats.as_slice());
+            s
+        } else {
+            let (s, _) = ctxt.olinr.predict(feats.as_slice());
+            s
+        };
+        ctxt.classes[x].features = feats;
+
+        OrderedFloat(score / ((ctxt.classes[x].size + 5) as f64))
+    }
+}
