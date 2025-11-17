@@ -335,7 +335,7 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     let mut max_sat = 0;
     let nt_reached = ctxt.problem.nt_tc.reached_by(nt).clone();
 
-    for (_, rule) in ctxt.problem.prod_rules() {
+    for (pnt, rule) in ctxt.problem.prod_rules() {
         let (in_types, _) = rule.signature();
 
         'rule: for (i, child) in rule.children().iter().enumerate() {
@@ -361,7 +361,16 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
                 .iter()
                 .filter(|(_, ty)| matches!(ty, Ty::PRule(_)))
                 .map(|(pos, ty)| {
-                    let ids = ctxt.problem.nt_tc.reached_by(ty.into_nt().unwrap()).clone();
+                    let ids = match ty {
+                        Ty::PRule(_) => ctxt
+                            .problem
+                            .nt_tc
+                            .reached_by(ty.into_nt().unwrap())
+                            .iter()
+                            .flat_map(|o| ctxt.solids[*o].clone())
+                            .collect::<Vec<Id>>(),
+                        _ => vec![],
+                    };
                     (*pos, ids)
                 })
                 .collect();
@@ -371,7 +380,7 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
                     .iter()
                     .all(|(_, ty)| !matches!(ty, Ty::PRule(_)))
                 {
-                    let (id, is_sol, satcount) = add_node(nt, base_prog, ctxt, None);
+                    let (id, is_sol, satcount) = add_node(*pnt, base_prog, ctxt, None);
                     max_sat = max_sat.max(satcount);
                     if is_sol {
                         return (Some(id), max_sat);
@@ -387,19 +396,16 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
             {
                 let mut new_children = combination.clone();
                 new_children.push((i, x));
-                new_children.sort_by_key(|(pos, _)| *pos);
-
                 let child_ids: Vec<usize> = new_children.iter().map(|(_, c)| *c).collect();
 
                 if !prune(nt, rule, &child_ids, ctxt) {
                     let mut prog = base_prog.clone();
-
-                    for (pos, c_idx) in &new_children {
+                    for (pos, c_idx) in &combination {
                         let ty_nt = in_types[*pos].into_nt().unwrap();
                         prog.children_mut()[*pos] = Child::Hole(ty_nt, *c_idx);
                     }
 
-                    let (id, is_sol, satcount) = add_node(nt, prog, ctxt, None);
+                    let (id, is_sol, satcount) = add_node(*pnt, prog, ctxt, None);
                     max_sat = max_sat.max(satcount);
                     if is_sol {
                         return (Some(id), max_sat);
