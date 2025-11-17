@@ -149,11 +149,15 @@ fn run(ctxt: &mut Ctxt) -> Term {
         ctxt.classes.drain(..);
     };
 
-    enumerate_atoms(ctxt)
+    let _solution = enumerate_atoms(ctxt)
         .or_else(|| enumerate(ctxt))
-        .map(|solution| return solution);
+        .map(|solution| solution);
 
-    panic!("infeasible")
+    if let Some(solution) = _solution {
+        return solution;
+    } else {
+        panic!("infeasible")
+    }
 }
 
 fn incremental_comp(ctxt: &mut Ctxt) -> Option<Term> {
@@ -186,6 +190,7 @@ fn enumerate_atoms(ctxt: &mut Ctxt) -> Option<Term> {
             ctxt.classes[id].handled_size = Some(0);
         }
     }
+
     None
 }
 

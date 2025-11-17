@@ -1,6 +1,6 @@
 use proc_macro::TokenStream as TokenStream1;
 use proc_macro2::TokenStream as TokenStream2;
-use quote::{quote, ToTokens};
+use quote::{ToTokens, quote};
 use syn::*;
 
 const DEBUG: bool = false;
@@ -24,9 +24,18 @@ fn build_enum_def(input: TokenStream1) -> EnumDef {
     let mut cases: Vec<Case> = Vec::new();
     for x in arr.elems.iter() {
         let Expr::Tuple(tup) = x else { panic!() };
-        let [ident, argtys, retty, symb, template, compute] = &*tup.elems.iter().collect::<Box<[_]>>() else { panic!() };
-        let Expr::Array(argtys) = argtys else { panic!() };
-        let n = LitInt::new(&argtys.elems.len().to_string(), proc_macro2::Span::call_site());
+        let [ident, argtys, retty, symb, template, compute] =
+            &*tup.elems.iter().collect::<Box<[_]>>()
+        else {
+            panic!()
+        };
+        let Expr::Array(argtys) = argtys else {
+            panic!()
+        };
+        let n = LitInt::new(
+            &argtys.elems.len().to_string(),
+            proc_macro2::Span::call_site(),
+        );
         let case = Case {
             ident: (**ident).clone(),
             argtys: argtys.elems.iter().cloned().collect(),
@@ -38,9 +47,7 @@ fn build_enum_def(input: TokenStream1) -> EnumDef {
         cases.push(case);
     }
 
-    EnumDef {
-        cases,
-    }
+    EnumDef { cases }
 }
 
 #[proc_macro]
@@ -137,7 +144,7 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
                 }
             }
 
-            pub fn eval(&self, ch: impl Fn(usize, Id) -> Option<Value>, sigma: &Sigma) -> Option<Value> {
+            pub fn eval(&self, ch: impl Fn(Id) -> Option<Value>, sigma: &Sigma) -> Option<Value> {
                 Some(match self {
                     Node::PlaceHolder(_, _) => Value::Int(0),
                     Node::ConstInt(i, _) => Value::Int(*i),
@@ -148,7 +155,7 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
                 })
             }
 
-            pub fn extract(&self,  ex: &impl Fn(usize, Id) -> Node, out: &mut Vec<Node>) {
+            pub fn extract(&self,  ex: &impl Fn(Id) -> Node, out: &mut Vec<Node>) {
                 match self {
                     a@(Node::PlaceHolder(_, _) | Node::ConstInt(_, _) | Node::True(_) | Node::False(_) | Node::VarInt(_, _) | Node::VarBool(_, _)) => out.push(a.clone()),
                     #(#extract_cases),*
@@ -213,8 +220,8 @@ fn enum_cases(edef: &EnumDef) -> Vec<TokenStream2> {
 fn signature_cases(edef: &EnumDef) -> Vec<TokenStream2> {
     let mut cases = Vec::new();
     for c in edef.cases.iter() {
-        let ident  = &c.ident;
-        let retty  = &c.retty;
+        let ident = &c.ident;
+        let retty = &c.retty;
         let argtys = &c.argtys;
 
         // rvalue promotion gives this a 'static lifetime
@@ -230,7 +237,7 @@ fn signature_cases(edef: &EnumDef) -> Vec<TokenStream2> {
 fn template_cases(edef: &EnumDef) -> Vec<TokenStream2> {
     let mut cases = Vec::new();
     for c in edef.cases.iter() {
-        let ident    = &c.ident;
+        let ident = &c.ident;
         let template = &c.template;
         cases.push(quote! {
             Node::#ident(_) => Some(#template)
@@ -239,19 +246,24 @@ fn template_cases(edef: &EnumDef) -> Vec<TokenStream2> {
     cases
 }
 
-
 fn get_children_cases(edef: &EnumDef) -> Vec<TokenStream2> {
-    edef.cases.iter().map(|c| {
-        let ident = &c.ident;
-        quote! { Node::#ident(s) => &s[..] }
-    }).collect()
+    edef.cases
+        .iter()
+        .map(|c| {
+            let ident = &c.ident;
+            quote! { Node::#ident(s) => &s[..] }
+        })
+        .collect()
 }
 
 fn get_children_mut_cases(edef: &EnumDef) -> Vec<TokenStream2> {
-    edef.cases.iter().map(|c| {
-        let ident = &c.ident;
-        quote! { Node::#ident(s) => &mut s[..] }
-    }).collect()
+    edef.cases
+        .iter()
+        .map(|c| {
+            let ident = &c.ident;
+            quote! { Node::#ident(s) => &mut s[..] }
+        })
+        .collect()
 }
 
 fn eval_cases(edef: &EnumDef) -> Vec<TokenStream2> {
@@ -264,7 +276,7 @@ fn eval_cases(edef: &EnumDef) -> Vec<TokenStream2> {
                 let (argtys, _) = self.signature();
                 let ev = |x: usize| -> Option<Value> {
                     match (&argtys[x], &s[x]) {
-                        (_,                   &Child::Hole(j, i)) => ch(j, i),
+                        (_,                   &Child::Hole(j, i)) => ch(i),
                         (_,                   &Child::Constant(c)) => Some(Value::Int(c)),
                         (_,                   &Child::VarInt(v))   => Some(sigma.get(v).cloned().unwrap_or_else(|| panic!("sigma miss {v}"))),
                         (_,                   &Child::VarBool(v))  => Some(sigma.get(v).cloned().unwrap_or_else(|| panic!("sigma miss {v}"))),
@@ -290,8 +302,8 @@ fn extract_cases(edef: &EnumDef) -> Vec<TokenStream2> {
                     for i in 0..chs.len() {
                         match (&argtys[i], &mut chs[i]) {
                             (_, &mut Child::Hole(j, ref mut idx)) => {
-                                ex(j, *idx).extract(ex, out);
-                                *idx = out.len() - 1; 
+                                ex(*idx).extract(ex, out);
+                                *idx = out.len() - 1;
                             }
                             (&ty, &mut Child::Constant(c)) => {
                                 out.push(Node::ConstInt(c, ty));
@@ -317,8 +329,8 @@ fn parse_cases(edef: &EnumDef) -> Vec<TokenStream2> {
     let mut cases = Vec::new();
     for c in edef.cases.iter() {
         let ident = &c.ident;
-        let symb  = &c.symb;
-        let n     = c.argtys.len();
+        let symb = &c.symb;
+        let n = c.argtys.len();
         cases.push(quote! {
             (#symb, s) if s.len() == #n => {
                 let refs: ::std::vec::Vec<Child> = s.iter().map(|node| match node {
@@ -342,10 +354,10 @@ fn parse_cases(edef: &EnumDef) -> Vec<TokenStream2> {
 fn parse_prod_cases(edef: &EnumDef) -> Vec<TokenStream2> {
     let mut cases = Vec::new();
     for c in edef.cases.iter() {
-        let ident    = &c.ident;
+        let ident = &c.ident;
         let template = &c.template;
-        let retty    = &c.retty;
-        let n        = c.argtys.len();
+        let retty = &c.retty;
+        let n = c.argtys.len();
         cases.push(quote! {
             (#template, s) if s.len() == #n && #template == op && #retty == expected_ret => {
                 let refs: ::std::vec::Vec<Child> = s.iter().map(|node| match node {

@@ -3,9 +3,15 @@ use crate::*;
 const USE_INHOUSE_SATCOUNT: bool = true;
 
 pub fn satcount(nt: usize, x: Id, ctxt: &mut Ctxt, idxs: Option<Vec<usize>>) -> usize {
-    GLOBAL_STATS.lock().unwrap().programs_checked+= 1;
-    let ty = ctxt.classes[nt][x].node.ty();
-    if ctxt.problem.nt_mapping.get(&ty).expect("this never happens") != &ctxt.problem.rettype {
+    GLOBAL_STATS.lock().unwrap().programs_checked += 1;
+    let ty = ctxt.classes[x].node.ty();
+    if ctxt
+        .problem
+        .nt_mapping
+        .get(&ty)
+        .expect("this never happens")
+        != &ctxt.problem.rettype
+    {
         return 0;
     }
     let no_vals = ctxt.small_sigmas.len() / ctxt.big_sigmas.len();
@@ -14,14 +20,14 @@ pub fn satcount(nt: usize, x: Id, ctxt: &mut Ctxt, idxs: Option<Vec<usize>>) -> 
         let r = satisfy(nt, x, idxs.iter().cloned(), ctxt);
         for (pos, &i) in idxs.iter().enumerate() {
             let start = i * no_vals;
-            let vchunk = &ctxt.classes[nt][x].vals[start .. start + no_vals];
+            let vchunk = &ctxt.classes[x].vals[start..start + no_vals];
             ctxt.cxs_cache[i].insert(Box::<[Value]>::from(vchunk), r[pos]);
         }
         return r.iter().map(|x| *x as usize).sum();
     }
 
     let r = satisfy(nt, x, 0..ctxt.big_sigmas.len(), ctxt);
-    for (i, (vchunk, &res)) in ctxt.classes[nt][x]
+    for (i, (vchunk, &res)) in ctxt.classes[x]
         .vals
         .chunks_exact(no_vals)
         .zip(r.iter())
@@ -32,16 +38,25 @@ pub fn satcount(nt: usize, x: Id, ctxt: &mut Ctxt, idxs: Option<Vec<usize>>) -> 
     r.iter().map(|x| *x as usize).sum()
 }
 
-
-pub fn satisfy(nt: usize, x: Id, ce_indices: impl IntoIterator<Item = usize>, ctxt: &Ctxt) -> Vec<bool> {
+pub fn satisfy(
+    nt: usize,
+    x: Id,
+    ce_indices: impl IntoIterator<Item = usize>,
+    ctxt: &Ctxt,
+) -> Vec<bool> {
     if USE_INHOUSE_SATCOUNT {
         satisfy_inhouse(nt, x, ce_indices, ctxt)
     } else {
-        satisfy_z3(nt, x, ce_indices, ctxt)
+        satisfy_z3(x, ce_indices, ctxt)
     }
 }
 
-pub fn satisfy_inhouse(nt: usize, id: Id, ce_indices: impl IntoIterator<Item = usize>, ctxt: &Ctxt) -> Vec<bool> {
+pub fn satisfy_inhouse(
+    nt: usize,
+    id: Id,
+    ce_indices: impl IntoIterator<Item = usize>,
+    ctxt: &Ctxt,
+) -> Vec<bool> {
     time_block!("satisfy_inhouse");
 
     if ctxt.problem.nt_mapping[&Ty::NonTerminal(nt)] != ctxt.problem.rettype {
@@ -49,7 +64,7 @@ pub fn satisfy_inhouse(nt: usize, id: Id, ce_indices: impl IntoIterator<Item = u
         return Vec::new();
     }
 
-    let vals = &ctxt.classes[nt][id].vals;
+    let vals = &ctxt.classes[id].vals;
 
     let mut out = Vec::new();
 
@@ -65,17 +80,17 @@ pub fn satisfy_inhouse(nt: usize, id: Id, ce_indices: impl IntoIterator<Item = u
         for i in indices {
             sigma.push(vals[*i].clone());
         }
-        
+
         let v = eval_term(&ctxt.problem.constraint, &sigma).unwrap();
         out.push(to_bool(v));
     }
     out
 }
 
-pub fn satisfy_z3(nt: usize, x: Id, ce_indices: impl IntoIterator<Item = usize>, ctxt: &Ctxt) -> Vec<bool> {
-    time_block!("satisfy_z3"); 
+pub fn satisfy_z3(x: Id, ce_indices: impl IntoIterator<Item = usize>, ctxt: &Ctxt) -> Vec<bool> {
+    time_block!("satisfy_z3");
 
-    let term = &extract(nt, x, ctxt);
+    let term = &extract(x, ctxt);
     let p = &ctxt.problem;
     let mut results = Vec::new();
 
@@ -108,7 +123,7 @@ pub fn satisfy_z3(nt: usize, x: Id, ce_indices: impl IntoIterator<Item = usize>,
                     let b = z3::ast::Bool::new_const(var.to_string());
                     b.iff(&z3::ast::Bool::from_bool(*v))
                 }
-                _ => panic!("na")
+                _ => panic!("na"),
             };
             assumps.push(lit);
         }
