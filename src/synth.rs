@@ -405,7 +405,7 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
                         prog.children_mut()[*pos] = Child::Hole(ty_nt, *c_idx);
                     }
 
-                    let (id, is_sol, satcount) = add_node(*pnt, prog, ctxt, None);
+                    let (id, is_sol, satcount) = add_node(*pnt, prog.clone(), ctxt, None);
                     max_sat = max_sat.max(satcount);
                     if is_sol {
                         return (Some(id), max_sat);
@@ -474,6 +474,10 @@ fn add_node(
                 to_check.push(i);
             }
         }
+        if !to_check.is_empty() {
+            _satcount += satcount(nt, _id, ctxt, Some(to_check));
+        };
+
         ctxt.classes[_id].satcount = _satcount;
         ctxt.vals_lookup.insert((nt, vals), _id);
 
@@ -594,30 +598,30 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
 }
 
 fn learned_heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
+    let ty = ctxt.classes[x].node.ty();
+    let ret = &ctxt.problem.rettype;
+    let is_off = ctxt
+        .problem
+        .nt_mapping
+        .get(&ty)
+        .map(|t| t != ret)
+        .unwrap_or(true);
+
+    let mut feats = feature_set(x, ctxt);
+
+    let score = if is_off {
+        feats[3] = (ctxt.big_sigmas.len() as f64) / 2.0;
+        let (s, _) = ctxt.flinr.predict(feats.as_slice());
+        s
+    } else {
+        let (s, _) = ctxt.olinr.predict(feats.as_slice());
+        s
+    };
+    ctxt.classes[x].features = feats;
+
     if ctxt.classes.len() < 1000 {
         default_heuristic(x, ctxt)
     } else {
-        let ty = ctxt.classes[x].node.ty();
-        let ret = &ctxt.problem.rettype;
-        let is_off = ctxt
-            .problem
-            .nt_mapping
-            .get(&ty)
-            .map(|t| t != ret)
-            .unwrap_or(true);
-
-        let mut feats = feature_set(x, ctxt);
-
-        let score = if is_off {
-            feats[3] = (ctxt.big_sigmas.len() as f64) / 2.0;
-            let (s, _) = ctxt.flinr.predict(feats.as_slice());
-            s
-        } else {
-            let (s, _) = ctxt.olinr.predict(feats.as_slice());
-            s
-        };
-        ctxt.classes[x].features = feats;
-
         OrderedFloat(score / ((ctxt.classes[x].size + 5) as f64))
     }
 }
