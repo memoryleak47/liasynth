@@ -162,14 +162,143 @@ fn run(ctxt: &mut Ctxt) -> Term {
 
 fn incremental_comp(ctxt: &mut Ctxt) -> Option<Term> {
     let mut seen: HashMap<Id, Vec<Id>> = HashMap::new();
-    let c_and_idx = ctxt.classes.iter().enumerate();
 
-    for (id, c) in c_and_idx {
-        if insert_if_absent(&mut seen, id) && (WINNING && (c.prev_sol > 0 || c.in_sol)) {
-            todo!();
+    for id in 0..ctxt.classes.len() {
+        if insert_if_absent(&mut seen, id)
+            && (WINNING && (ctxt.classes[id].prev_sol > 0 || ctxt.classes[id].in_sol))
+        {
+            if let Some(id) = incremental_add_class(id, &mut seen, ctxt) {
+                handle_solution(id, ctxt);
+                return Some(extract(id, ctxt));
+            }
         }
     }
+    None
+}
 
+fn incremental_add_class(id: Id, seen: &mut HashMap<Id, Vec<Id>>, ctxt: &mut Ctxt) -> Option<Id> {
+    let vals = ctxt.classes[id].vals.to_vec();
+    let nt = ctxt.classes[id].node.ty().into_nt().unwrap();
+
+    if let Some(id) = update_class(nt, id, &vals, seen, ctxt) {
+        return Some(id);
+    }
+    None
+}
+
+fn update_children(node: &Node, seen: &mut HashMap<Id, Vec<Id>>, ctxt: &mut Ctxt) {
+    let rc = node
+        .children()
+        .iter()
+        .filter_map(|n| {
+            if let Child::Hole(_, i) = n {
+                Some(*i)
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>();
+
+    for c in rc {
+        if insert_if_absent(seen, c) {
+            incremental_add_class(c, seen, ctxt);
+        }
+    }
+}
+
+fn update_vals(node: &Node, vals: &Vec<Value>, ctxt: &Ctxt) -> Box<[Value]> {
+    let mut new_vals: Vec<Value> = vals.clone();
+    for (i, sigma) in ctxt.small_sigmas[vals.len()..].iter().enumerate() {
+        let f = |idx: Id| Some(ctxt.classes[idx].vals[vals.len() + i].clone());
+        let Some(res) = node.eval(&f, sigma) else {
+            panic!("uh oh")
+        };
+        new_vals.push(res);
+    }
+
+    new_vals.into_boxed_slice()
+}
+
+fn update_class(
+    nt: usize,
+    id: Id,
+    vals: &Vec<Value>,
+    seen: &mut HashMap<Id, Vec<Id>>,
+    ctxt: &mut Ctxt,
+) -> Option<Id> {
+    let nodes = std::mem::take(&mut ctxt.classes[id].nodes);
+    let node = ctxt.classes[id].node.clone();
+    update_children(&node, seen, ctxt);
+
+    let new_vals = update_vals(&node, vals, ctxt);
+    ctxt.classes[id].vals = new_vals.clone();
+    ctxt.vals_lookup.insert((nt, new_vals), id);
+
+    seen.get_mut(&id).unwrap().push(id);
+    for o in ctxt.problem.nt_tc.reached_by(nt) {
+        ctxt.solids[*o].push(id);
+    }
+
+    ctxt.classes[id].satcount += satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
+
+    enqueue(nt, id, ctxt);
+
+    for WithOrd(n, _) in nodes.into_sorted_vec().into_iter().skip(1) {
+        if let Some(id) = add_incremental_nodes(id, nt, n, vals, seen, ctxt) {
+            return Some(id);
+        }
+    }
+    None
+}
+
+fn add_incremental_nodes(
+    oid: Id,
+    nt: usize,
+    node: Node,
+    vals: &Vec<Value>,
+    seen: &mut HashMap<Id, Vec<Id>>,
+    ctxt: &mut Ctxt,
+) -> Option<Id> {
+    update_children(&node, seen, ctxt);
+
+    let child_ids: Vec<(usize, Vec<Id>)> = node
+        .children()
+        .iter()
+        .enumerate()
+        .filter_map(|(pos, c)| {
+            if let Child::Hole(_, i) = c {
+                let ids: Vec<Id> = seen.get(i).cloned().unwrap_or_default();
+                Some((pos, ids))
+            } else {
+                None
+            }
+        })
+        .collect();
+
+    for combination in child_ids
+        .iter()
+        .map(|(pos, ids)| ids.iter().map(move |id| (*pos, *id)))
+        .multi_cartesian_product()
+    {
+        println!("here");
+        let mut new_node = node.clone();
+        for (pos, c_idx) in &combination {
+            let ty_nt = node.signature().0[*pos].into_nt().unwrap();
+            new_node.children_mut()[*pos] = Child::Hole(ty_nt, *c_idx);
+        }
+        let new_vals = update_vals(&new_node, vals, ctxt);
+        let (id, is_sol, _) = add_node(nt, new_node, ctxt, Some(new_vals));
+        ctxt.classes[id].prev_sol = ctxt.classes[oid].prev_sol;
+
+        if is_sol {
+            return Some(id);
+        }
+
+        seen.get_mut(&oid).unwrap().push(id);
+        for o in ctxt.problem.nt_tc.reached_by(nt) {
+            ctxt.solids[*o].push(id);
+        }
+    }
     None
 }
 
@@ -202,7 +331,7 @@ fn enumerate(ctxt: &mut Ctxt) -> Option<Term> {
             return Some(extract(solution, ctxt));
         }
 
-        if cfg!(feature = "learned_heuristic") {
+        if cfg!(feature = "learned-heuristic") {
             let target = if ctxt.problem.nt_mapping[&Ty::NonTerminal(nt)] == ctxt.problem.rettype {
                 &mut ctxt.olinr
             } else {
@@ -419,7 +548,7 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
 }
 
 fn enqueue(nt: usize, x: Id, ctxt: &mut Ctxt) {
-    let h = if cfg!(feature = "learned_heuristic") {
+    let h = if cfg!(feature = "learned-heuristic") {
         learned_heuristic(x, ctxt)
     } else {
         default_heuristic(x, ctxt)
@@ -619,7 +748,7 @@ fn learned_heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
     };
     ctxt.classes[x].features = feats;
 
-    if ctxt.classes.len() < 1000 {
+    if GLOBAL_STATS.lock().unwrap().programs_generated < 10_000 {
         default_heuristic(x, ctxt)
     } else {
         OrderedFloat(score / ((ctxt.classes[x].size + 5) as f64))
