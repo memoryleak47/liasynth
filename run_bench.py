@@ -11,16 +11,16 @@ except:
 
 os.makedirs(outdir, exist_ok=True)
 
-g2 = ["heuristic-default", "heuristic-linr"]
-g3 = [None, "winning-incremental", "winning-incremental, total-incremental"]
+g2 = [None, "learned-heuristic"]
+g3 = [None, "winning"]
 
 def heur_tag(v):
-    return "d" if v == "heuristic-default" else "l"
+    return "l" if v == "learned-heuristic" else "d"
 
 def inc_tag(v):
     if v is None:
         return ""
-    if v == "winning-incremental":
+    if v == "winning":
         return "_w"
     return "_wt"  
 

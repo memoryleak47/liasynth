@@ -23,7 +23,7 @@ rand = "0.9.2"
 debug = true
 
 [features]
-default = ["learned-heuristic"]
+default = []
 ignore-grammar = []
 learned-heuristic = []
 simple = []

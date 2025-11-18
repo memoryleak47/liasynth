@@ -165,7 +165,7 @@ fn incremental_comp(ctxt: &mut Ctxt) -> Option<Term> {
 
     for id in 0..ctxt.classes.len() {
         if insert_if_absent(&mut seen, id)
-            && (WINNING && (ctxt.classes[id].prev_sol > 0 || ctxt.classes[id].in_sol))
+            && (!WINNING || (ctxt.classes[id].prev_sol > 0 || ctxt.classes[id].in_sol))
         {
             if let Some(id) = incremental_add_class(id, &mut seen, ctxt) {
                 handle_solution(id, ctxt);
@@ -206,17 +206,20 @@ fn update_children(node: &Node, seen: &mut HashMap<Id, Vec<Id>>, ctxt: &mut Ctxt
     }
 }
 
-fn update_vals(node: &Node, vals: &Vec<Value>, ctxt: &Ctxt) -> Box<[Value]> {
+// TODO: We have an issue with cycles hence needing to return an Err
+fn update_vals(node: &Node, vals: &Vec<Value>, ctxt: &Ctxt) -> Result<Box<[Value]>, ()> {
     let mut new_vals: Vec<Value> = vals.clone();
     for (i, sigma) in ctxt.small_sigmas[vals.len()..].iter().enumerate() {
-        let f = |idx: Id| Some(ctxt.classes[idx].vals[vals.len() + i].clone());
-        let Some(res) = node.eval(&f, sigma) else {
-            panic!("uh oh")
+        let f = |idx: Id| {
+            ctxt.classes
+                .get(idx)
+                .and_then(|class| class.vals.get(vals.len() + i))
+                .cloned()
         };
+        let res = node.eval(&f, sigma).ok_or(())?;
         new_vals.push(res);
     }
-
-    new_vals.into_boxed_slice()
+    Ok(new_vals.into_boxed_slice())
 }
 
 fn update_class(
@@ -230,7 +233,9 @@ fn update_class(
     let node = ctxt.classes[id].node.clone();
     update_children(&node, seen, ctxt);
 
-    let new_vals = update_vals(&node, vals, ctxt);
+    let Ok(new_vals) = update_vals(&node, vals, ctxt) else {
+        return None;
+    };
     ctxt.classes[id].vals = new_vals.clone();
     ctxt.vals_lookup.insert((nt, new_vals), id);
 
@@ -240,7 +245,6 @@ fn update_class(
     }
 
     ctxt.classes[id].satcount += satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
-
     enqueue(nt, id, ctxt);
 
     for WithOrd(n, _) in nodes.into_sorted_vec().into_iter().skip(1) {
@@ -280,23 +284,27 @@ fn add_incremental_nodes(
         .map(|(pos, ids)| ids.iter().map(move |id| (*pos, *id)))
         .multi_cartesian_product()
     {
-        println!("here");
         let mut new_node = node.clone();
         for (pos, c_idx) in &combination {
             let ty_nt = node.signature().0[*pos].into_nt().unwrap();
             new_node.children_mut()[*pos] = Child::Hole(ty_nt, *c_idx);
         }
-        let new_vals = update_vals(&new_node, vals, ctxt);
-        let (id, is_sol, _) = add_node(nt, new_node, ctxt, Some(new_vals));
+
+        let Ok(new_vals) = update_vals(&node, vals, ctxt) else {
+            return None;
+        };
+        let (id, is_sol, satcount) = add_node(nt, new_node, ctxt, Some(new_vals));
         ctxt.classes[id].prev_sol = ctxt.classes[oid].prev_sol;
 
         if is_sol {
             return Some(id);
         }
 
-        seen.get_mut(&oid).unwrap().push(id);
-        for o in ctxt.problem.nt_tc.reached_by(nt) {
-            ctxt.solids[*o].push(id);
+        if satcount > ctxt.classes[oid].satcount {
+            seen.get_mut(&oid).unwrap().push(id);
+            for o in ctxt.problem.nt_tc.reached_by(nt) {
+                ctxt.solids[*o].push(id);
+            }
         }
     }
     None
@@ -748,7 +756,7 @@ fn learned_heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
     };
     ctxt.classes[x].features = feats;
 
-    if GLOBAL_STATS.lock().unwrap().programs_generated < 10_000 {
+    if GLOBAL_STATS.lock().unwrap().programs_generated < 50_000 {
         default_heuristic(x, ctxt)
     } else {
         OrderedFloat(score / ((ctxt.classes[x].size + 5) as f64))
