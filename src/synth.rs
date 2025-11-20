@@ -14,7 +14,8 @@ type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 5 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 10 } else { 0 };
+// TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
     heap.push(val);
@@ -247,11 +248,14 @@ fn update_class(
     ctxt.classes[id].satcount += satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
     enqueue(nt, id, ctxt);
 
-    for WithOrd(n, _) in nodes.into_sorted_vec().into_iter().skip(1) {
-        if let Some(id) = add_incremental_nodes(id, nt, n, vals, seen, ctxt) {
-            return Some(id);
+    if ctxt.classes[id].prev_sol > 0 {
+        for WithOrd(n, _) in nodes.into_sorted_vec().into_iter().skip(1) {
+            if let Some(id) = add_incremental_nodes(id, nt, n, vals, seen, ctxt) {
+                return Some(id);
+            }
         }
     }
+
     None
 }
 
@@ -305,6 +309,8 @@ fn add_incremental_nodes(
             for o in ctxt.problem.nt_tc.reached_by(nt) {
                 ctxt.solids[*o].push(id);
             }
+
+            enqueue(nt, id, ctxt);
         }
     }
     None

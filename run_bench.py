@@ -11,24 +11,23 @@ except:
 
 os.makedirs(outdir, exist_ok=True)
 
-g2 = [None, "learned-heuristic"]
-g3 = [None, "winning"]
+g1 = [None, "learned-heuristic"]
+g2 = [None, "simple", "winning"]
+g3 = [None, "total"]
 
-def heur_tag(v):
-    return "l" if v == "learned-heuristic" else "d"
+heur_tag = lambda v: "l" if v == "learned-heuristic" else "d"
+inc_tag = lambda v: "_w" if v == "winning" else "_s" if v == "simple" else ""
+tot_tag = lambda x: "t" if x == "total" else ""
 
-def inc_tag(v):
-    if v is None:
-        return ""
-    if v == "winning":
-        return "_w"
-    return "_wt"  
-
-for o2, o3 in itertools.product(g2, g3):
-    opts = [v for v in (o2, o3) if v is not None]
+for o1, o2, o3 in itertools.product(g1, g2, g3):
+    opts = [v for v in (o1, o2, o3) if v is not None]
     opts_str = ", ".join(opts)
 
-    outfile = f"{outdir}/grammar_{heur_tag(o2)}{inc_tag(o3)}.txt"
+    if o2 is None:
+        if o3 is not None:
+            continue
+
+    outfile = f"{outdir}/grammar_{heur_tag(o1)}{inc_tag(o2)}{tot_tag(o3)}.txt"
 
     cmd = ["./runall_dir.sh"]
     cmd.append(f"{opts_str}")
