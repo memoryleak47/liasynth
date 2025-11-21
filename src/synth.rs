@@ -345,7 +345,7 @@ fn enumerate(ctxt: &mut Ctxt) -> Option<Term> {
             return Some(extract(solution, ctxt));
         }
 
-        if cfg!(feature = "learned-heuristic") {
+        if cfg!(feature = "learned") {
             let target = if ctxt.problem.nt_mapping[&Ty::NonTerminal(nt)] == ctxt.problem.rettype {
                 &mut ctxt.olinr
             } else {
@@ -562,7 +562,7 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
 }
 
 fn enqueue(nt: usize, x: Id, ctxt: &mut Ctxt) {
-    let h = if cfg!(feature = "learned-heuristic") {
+    let h = if cfg!(feature = "learned") {
         learned_heuristic(x, ctxt)
     } else {
         default_heuristic(x, ctxt)

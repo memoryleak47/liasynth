@@ -25,7 +25,7 @@ debug = true
 [features]
 default = []
 ignore-grammar = []
-learned-heuristic = []
+learned = []
 simple = []
 winning = []
 total = []
