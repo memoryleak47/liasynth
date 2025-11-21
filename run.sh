@@ -1,3 +1,3 @@
-f=examples/LIA/s1.sl
+f=examples/LIA/$1.sl
 python3 python_frontend.py "$f"
-cargo r --release --features heuristic-default -- "$f"
+cargo r --release -- "$f"
