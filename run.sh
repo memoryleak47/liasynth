@@ -1,3 +1,2 @@
-f=examples/LIA/$1.sl
-python3 python_frontend.py "$f"
-cargo r --release -- "$f"
+python3 python_frontend.py "$1"
+cargo r --release -- "$1"
