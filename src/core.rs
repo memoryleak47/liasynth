@@ -1,7 +1,7 @@
 use crate::*;
 
 use once_cell::sync::Lazy;
-use std::sync::Mutex;
+use std::{hash::Hasher, sync::Mutex};
 
 pub struct Stats {
     pub programs_generated: usize,
@@ -176,9 +176,10 @@ pub fn cegis(problem: &Problem) -> Term {
     let mut sigmas = Vec::new();
     let mut cxs_cache = None;
     let mut classes = None;
-    let mut term_embed = TermEmbedder::new(4);
-    let mut olinr = BayesianLinearRegression::with_default_prior(9);
-    let mut flinr = BayesianLinearRegression::with_default_prior(9);
+    let embedding_dim = 4;
+    let mut term_embed = TermEmbedder::new(embedding_dim);
+    let mut olinr = BayesianLinearRegression::with_default_prior(embedding_dim + 5);
+    let mut flinr = BayesianLinearRegression::with_default_prior(embedding_dim + 5);
     loop {
         let (term, cxsc, clss) = synth(
             problem,

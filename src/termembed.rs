@@ -1,50 +1,37 @@
 use crate::Term;
-use std::collections::HashMap;
-
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 
 pub struct TermEmbedder {
-    template_to_idx: HashMap<String, usize>,
     embedding_dim: usize,
 }
 
 impl TermEmbedder {
     pub fn new(embedding_dim: usize) -> Self {
-        Self { 
-            template_to_idx: HashMap::new(),
-            embedding_dim 
-        }
+        assert!(embedding_dim > 0);
+        Self { embedding_dim }
     }
 
-    pub fn embed(&mut self, term: &Term) -> Vec<f64> {
+    pub fn embed(&self, term: &Term) -> Vec<f64> {
         let mut vec = vec![0.0; self.embedding_dim];
 
         if term.elems.is_empty() {
             return vec;
         }
 
-        let mut counts = HashMap::new();
-        for node in &term.elems {
-
-            let key = node.template()
-                .map(|s| s.to_string())
-                .unwrap_or_else(|| format!("{:?}", std::mem::discriminant(node)));
-
-            if !self.template_to_idx.contains_key(&key) {
-                self.template_to_idx.insert(key.clone(), self.template_to_idx.len());
-            }
-
-            let idx = self.template_to_idx[&key];
-            *counts.entry(idx).or_insert(0.0) += 1.0;
-        }
-
         let size = term.elems.len() as f64;
-        for count in counts.values_mut() {
-            *count /= size;
+
+        for node in &term.elems {
+            let mut hasher = DefaultHasher::new();
+            node.hash(&mut hasher);
+            let h = hasher.finish() as usize;
+
+            let idx = h % self.embedding_dim;
+            vec[idx] += 1.0;
         }
 
-        for (idx, count) in counts {
-            let target = idx % self.embedding_dim;
-            vec[target] += count;
+        for i in 0..self.embedding_dim {
+            vec[i] /= size;
         }
 
         if self.embedding_dim > 1 {
@@ -52,9 +39,5 @@ impl TermEmbedder {
         }
 
         vec
-    }
-
-    pub fn vocab_size(&self) -> usize {
-        self.template_to_idx.len()
     }
 }
