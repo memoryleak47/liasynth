@@ -112,17 +112,10 @@ class ProductionRule:
         return tmp 
 
     def extract_eval(self, nts, template, deffuns):
-        if "ite" in self.op:
-            r = ""
-        else:
-            match self.ret:
-                case (_, 'Int') : r = "Value::Int"
-                case (_, 'Bool'): r = "Value::Bool"
-
         tmp = self.sexp
         tmp = replace(tmp, nts, self.varis, deffuns, self.a_idx)
 
-        return f"{r}{get_rust_eval(tmp, tmp[0] == 'ite')}"
+        return f"{get_rust_eval(tmp)}"
 
 
 def replace(tmp, nts, varis, deffuns, a_idx):
@@ -151,10 +144,7 @@ def replace(tmp, nts, varis, deffuns, a_idx):
                     if t.strip() == x.name:
                         tmp
                         idx = consume(a_idx)
-                        if (tmp[0] == 'ite' and idx > 0) or tmp[0] == '=':
-                            rep = f"ev({idx})?" 
-                        else:
-                            rep = f"to_int(ev({idx})?)" if x.t == "Int" else f"to_bool(ev({idx})?)"
+                        rep = f"ev({idx})?" 
                         tmp[i] = rep
                         break
                 else:
@@ -164,11 +154,15 @@ def replace(tmp, nts, varis, deffuns, a_idx):
     return tmp
 
 
-rust_diad = lambda o, x, y:  f"({x} {o} {y})"
-rust_mon = lambda o, x:  f"({o} {x})"
-rust_imply = lambda x, y: f"(!{x} || {y})"
-rust_ite = lambda c, x, y: f"(if {c} {{ {x} }} else {{ {y} }} )"
-rust_div = lambda n, x, y: f"({{let b = ev(1)?; if b== Value::Int(0) {{ return None }} else {{ {x} {n} to_int(b) }} }})"
+rust_diad_int = lambda o, x, y:  f"Value::Int(to_int({x}) {o} to_int({y}))"
+rust_diad_intbool = lambda o, x, y:  f"Value::Bool(to_int({x}) {o} to_int({y}))"
+rust_diad_bool = lambda o, x, y:  f"Value::Bool(to_bool({x}) {o} to_bool({y}))"
+rust_mon_int = lambda o, x:  f"Value::Int({o} to_int({x}))"
+rust_mon_bool = lambda o, x:  f"Value::Bool({o} to_bool({x}))"
+rust_imply = lambda x, y: f"Value::Bool(!{x} || {y})"
+rust_eq = lambda o, x, y:  f"Value::Bool({x} {o} {y})"
+rust_ite = lambda c, x, y: f"(if to_bool({c}) {{ {x} }} else {{ {y} }} )"
+rust_div = lambda n, x, y: f"Value::Int({{let b = ev(1)?; if b== Value::Int(0) {{ return None }} else {{ {x} {n} to_int(b) }} }})"
 
 rust_boolean = {
     'not'     : '!',
@@ -184,31 +178,34 @@ rust_div_mod = {
     'div': r'%',
 }
 
-def get_rust_eval(s, ite=False):
+def get_rust_eval(s):
     if not isinstance(s, list):
-        if s.isnumeric() and ite:
+        if s.isnumeric():
             return f"Value::Int({s})"
         return s
-    pget_rust_eval = partial(get_rust_eval, ite=ite)
     match (n := consume(s)):
         case [term]: 
-            return pget_rust_eval(term)
+            return get_rust_eval(term)
         case '-' if len(s) == 1 and s[0].isnumeric():
-            return f"Value::Int(-{s[0]})"
+                return f"Value::Int(-{s[0]})"
         case '-' if len(s) == 1:
-            return rust_mon(n, *apply_n(compose(pget_rust_eval, consume), s, 1))
-        case '+' | '-' | '*' | '<=' | '<' | '>' | '>=':
-            return rust_diad(n, *apply_n(compose(pget_rust_eval, consume), s, 2))
+            return rust_mon_int(n, *apply_n(compose(get_rust_eval, consume), s, 1))
+        case '+' | '-' | '*' :
+            return rust_diad_int(n, *apply_n(compose(get_rust_eval, consume), s, 2))
+        case  '<=' | '<' | '>' | '>=':
+            return rust_diad_intbool(n, *apply_n(compose(get_rust_eval, consume), s, 2))
         case 'not':
-            return rust_mon(rust_boolean[n], *apply_n(compose(pget_rust_eval, consume), s, 1))
-        case 'and' | 'or' | 'xor' | '=':
-            return rust_diad(rust_boolean[n], *apply_n(compose(pget_rust_eval, consume), s, 2))
+            return rust_mon_bool(rust_boolean[n], *apply_n(compose(get_rust_eval, consume), s, 1))
+        case 'and' | 'or' | 'xor':
+            return rust_diad_bool(rust_boolean[n], *apply_n(compose(get_rust_eval, consume), s, 2))
+        case  '=':
+            return rust_eq(rust_boolean[n], *apply_n(compose(get_rust_eval, consume), s, 2))
         case 'div' | 'mod':
-            return rust_div(rust_div_mod[n], *apply_n(compose(pget_rust_eval, consume), s, 2))
+            return rust_div(rust_div_mod[n], *apply_n(compose(get_rust_eval, consume), s, 2))
         case '=>':
-            return rust_imply(n, *apply_n(compose(pget_rust_eval, consume), s, 2))
+            return rust_imply(n, *apply_n(compose(get_rust_eval, consume), s, 2))
         case 'ite':
-            return rust_ite( *apply_n(compose(pget_rust_eval, consume), s, 3))
+            return rust_ite( *apply_n(compose(get_rust_eval, consume), s, 3))
         case _:
             return n
 
@@ -387,7 +384,7 @@ define_language! {{
 
 
 if len(sys.argv) < 2:
-    f = 'examples/agent_problems/taxi/taxi_pickup1.sy'
+    f = 'examples/agent_problems_clean/taxi/taxi_pickup1.sl'
 else:
     f = sys.argv[1]
 langfile(f)
