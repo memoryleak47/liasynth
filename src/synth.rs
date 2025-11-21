@@ -14,7 +14,7 @@ type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 10 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 6 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
@@ -338,7 +338,7 @@ fn enumerate_atoms(ctxt: &mut Ctxt) -> Option<Term> {
 }
 
 fn enumerate(ctxt: &mut Ctxt) -> Option<Term> {
-    while let Some(WithOrd((nt, x), _)) = ctxt.queue.pop() {
+    while let Some(WithOrd((nt, x), _s)) = ctxt.queue.pop() {
         let (id, maxsat) = handle(nt, x, ctxt);
         if let Some(solution) = id {
             handle_solution(solution, ctxt);
@@ -549,6 +549,13 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
                     }
 
                     let (id, is_sol, satcount) = add_node(*pnt, prog.clone(), ctxt, None);
+
+                    // let t = extract(id, ctxt);
+                    // println!(
+                    //     "{:?}",
+                    //     term_to_z3(&t, &ctxt.problem.vars.keys().cloned().collect::<Box<[_]>>())
+                    // );
+
                     max_sat = max_sat.max(satcount);
                     if is_sol {
                         return (Some(id), max_sat);
@@ -673,6 +680,9 @@ pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
 fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
     let ty = ctxt.classes[x].node.ty();
+    let l = ctxt.big_sigmas.len() as f64;
+    let normaliser = (c.size) as f64;
+
     if ctxt
         .problem
         .nt_mapping
@@ -680,10 +690,11 @@ fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
         .expect("this never happens")
         != &ctxt.problem.rettype
     {
-        return OrderedFloat(1000 as f64);
+        let half = l / 1.6;
+        let score = 1.0 - (-2.0 * (1.0 * half) / (l * l)).exp();
+        return OrderedFloat(score / normaliser);
     }
 
-    let mut a = 100000;
     let max_subterm_satcount = c
         .node
         .children()
@@ -699,13 +710,10 @@ fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
         .max()
         .unwrap_or_else(|| 0);
 
-    let tmp = c.satcount.saturating_sub(max_subterm_satcount + 4);
+    let diff = c.satcount.saturating_sub(max_subterm_satcount) as f64;
+    let score = 1.0 - (-2.0 * (diff * c.satcount as f64) / (l * l)).exp();
 
-    for _ in tmp..ctxt.big_sigmas.len() {
-        a /= 2;
-    }
-
-    OrderedFloat((a / (c.size + 5)) as f64)
+    OrderedFloat(score / normaliser)
 }
 
 fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
@@ -762,7 +770,12 @@ fn learned_heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
     };
     ctxt.classes[x].features = feats;
 
-    if GLOBAL_STATS.lock().unwrap().programs_generated < 50_000 {
+    let thresh = if matches!(ret, Ty::Int) {
+        45_000
+    } else {
+        15_000
+    };
+    if GLOBAL_STATS.lock().unwrap().programs_generated < thresh {
         default_heuristic(x, ctxt)
     } else {
         OrderedFloat(score / ((ctxt.classes[x].size + 5) as f64))
