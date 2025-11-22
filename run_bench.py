@@ -11,11 +11,12 @@ except:
 
 os.makedirs(outdir, exist_ok=True)
 
-g1 = [None, "learned-heuristic"]
-g2 = [None, "simple", "winning"]
+g1 = [None, "learned"]
+# g2 = [None, "simple", "winning"]
+g2 = [None, "winning"]
 g3 = [None, "total"]
 
-heur_tag = lambda v: "l" if v == "learned-heuristic" else "d"
+heur_tag = lambda v: "l" if v == "learned" else "d"
 inc_tag = lambda v: "_w" if v == "winning" else "_s" if v == "simple" else ""
 tot_tag = lambda x: "t" if x == "total" else ""
 
