@@ -14,7 +14,7 @@ type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 6 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 5 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
@@ -297,20 +297,16 @@ fn add_incremental_nodes(
         let Ok(new_vals) = update_vals(&node, vals, ctxt) else {
             return None;
         };
-        let (id, is_sol, satcount) = add_node(nt, new_node, ctxt, Some(new_vals));
-        ctxt.classes[id].prev_sol = ctxt.classes[oid].prev_sol;
 
-        if is_sol {
-            return Some(id);
-        }
-
-        if satcount > ctxt.classes[oid].satcount {
+        let new_sat = satisfy_inhouse_incr(node.ty(), &new_vals, ctxt.big_sigmas.len() - 1, ctxt);
+        if new_sat {
+            let (id, is_sol, satcount) = add_node(nt, new_node, ctxt, Some(new_vals));
             seen.get_mut(&oid).unwrap().push(id);
-            for o in ctxt.problem.nt_tc.reached_by(nt) {
-                ctxt.solids[*o].push(id);
+            ctxt.classes[id].prev_sol = ctxt.classes[oid].prev_sol;
+            ctxt.classes[id].satcount = satcount;
+            if is_sol {
+                return Some(id);
             }
-
-            enqueue(nt, id, ctxt);
         }
     }
     None
@@ -346,13 +342,8 @@ fn enumerate(ctxt: &mut Ctxt) -> Option<Term> {
         }
 
         if cfg!(feature = "learned") {
-            let target = if ctxt.problem.nt_mapping[&Ty::NonTerminal(nt)] == ctxt.problem.rettype {
-                &mut ctxt.olinr
-            } else {
-                &mut ctxt.flinr
-            };
-
-            target.update(ctxt.classes[x].features.as_slice(), maxsat as f64);
+            ctxt.olinr
+                .update(ctxt.classes[x].features.as_slice(), maxsat as f64);
         }
     }
 
@@ -690,7 +681,7 @@ fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
         .expect("this never happens")
         != &ctxt.problem.rettype
     {
-        let half = l / 1.6;
+        let half = l / 1.7;
         let score = 1.0 - (-2.0 * (1.0 * half) / (l * l)).exp();
         return OrderedFloat(score / normaliser);
     }
@@ -760,24 +751,20 @@ fn learned_heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
 
     let mut feats = feature_set(x, ctxt);
 
-    let score = if is_off {
-        feats[3] = (ctxt.big_sigmas.len() as f64) / 2.0;
-        let (s, _) = ctxt.flinr.predict(feats.as_slice());
-        s
-    } else {
-        let (s, _) = ctxt.olinr.predict(feats.as_slice());
-        s
-    };
+    if is_off {
+        feats[3] = (ctxt.big_sigmas.len() as f64) / 1.7;
+    }
+    let (score, _) = ctxt.olinr.predict(feats.as_slice());
     ctxt.classes[x].features = feats;
 
     let thresh = if matches!(ret, Ty::Int) {
-        45_000
+        50_000
     } else {
         15_000
     };
     if GLOBAL_STATS.lock().unwrap().programs_generated < thresh {
         default_heuristic(x, ctxt)
     } else {
-        OrderedFloat(score / ((ctxt.classes[x].size + 5) as f64))
+        OrderedFloat(score / (ctxt.classes[x].size as f64))
     }
 }

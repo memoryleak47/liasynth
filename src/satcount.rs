@@ -51,6 +51,35 @@ pub fn satisfy(
     }
 }
 
+pub fn satisfy_inhouse_incr(ty: Ty, vals: &Box<[Value]>, id: usize, ctxt: &Ctxt) -> bool {
+    time_block!("satisfy_inhouse");
+
+    if ctxt
+        .problem
+        .nt_mapping
+        .get(&ty)
+        .expect("this never happens")
+        != &ctxt.problem.rettype
+    {
+        return false;
+    }
+
+    let big_sigma = &ctxt.big_sigmas[id];
+    let indices = &ctxt.sigma_indices[id];
+
+    let mut sigma = big_sigma.clone();
+    // This is a huge sigma. It's a
+    // - big sigma (all variables from the constraints), plus
+    // - one variable per invocation of the synthfun
+
+    for i in indices {
+        sigma.push(vals[*i].clone());
+    }
+
+    let v = eval_term(&ctxt.problem.constraint, &sigma).unwrap();
+    to_bool(v)
+}
+
 pub fn satisfy_inhouse(
     nt: usize,
     id: Id,
