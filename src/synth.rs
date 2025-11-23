@@ -14,7 +14,7 @@ type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 5 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 3 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
@@ -342,11 +342,15 @@ fn enumerate(ctxt: &mut Ctxt) -> Option<Term> {
         }
 
         if cfg!(feature = "learned") {
-            ctxt.olinr
-                .update(ctxt.classes[x].features.as_slice(), maxsat as f64);
+            let target = if ctxt.problem.nt_mapping[&Ty::NonTerminal(nt)] == ctxt.problem.rettype {
+                &mut ctxt.olinr
+            } else {
+                &mut ctxt.flinr
+            };
+
+            target.update(ctxt.classes[x].features.as_slice(), maxsat as f64);
         }
     }
-
     None
 }
 
@@ -751,16 +755,19 @@ fn learned_heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
 
     let mut feats = feature_set(x, ctxt);
 
-    if is_off {
+    let score = if is_off {
         let l = ctxt.big_sigmas.len() as f64;
-        let half = l / 1.7;
-        let score = 1.0 - (-2.0 * (1.0 * half) / (l * l)).exp();
-        feats[4] = score;
-    }
-    let (score, _) = ctxt.olinr.predict(feats.as_slice());
+        let half = l / 2.4;
+        let sc = 1.0 - (-2.0 * (1.0 * half) / (l * l)).exp();
+        feats[4] = sc;
+        ctxt.flinr.predict(feats.as_slice()).0
+    } else {
+        ctxt.olinr.predict(feats.as_slice()).0
+    };
+
     ctxt.classes[x].features = feats;
 
-    if GLOBAL_STATS.lock().unwrap().programs_generated < 50_000 {
+    if GLOBAL_STATS.lock().unwrap().programs_generated < 100_000 {
         default_heuristic(x, ctxt)
     } else {
         OrderedFloat(score / (ctxt.classes[x].size as f64))
