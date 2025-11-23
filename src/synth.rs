@@ -672,7 +672,7 @@ fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
     let ty = ctxt.classes[x].node.ty();
     let l = ctxt.big_sigmas.len() as f64;
-    let normaliser = (c.size) as f64;
+    let normaliser = c.size as f64;
 
     if ctxt
         .problem
@@ -752,17 +752,15 @@ fn learned_heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
     let mut feats = feature_set(x, ctxt);
 
     if is_off {
-        feats[3] = (ctxt.big_sigmas.len() as f64) / 1.7;
+        let l = ctxt.big_sigmas.len() as f64;
+        let half = l / 1.7;
+        let score = 1.0 - (-2.0 * (1.0 * half) / (l * l)).exp();
+        feats[4] = score;
     }
     let (score, _) = ctxt.olinr.predict(feats.as_slice());
     ctxt.classes[x].features = feats;
 
-    let thresh = if matches!(ret, Ty::Int) {
-        50_000
-    } else {
-        15_000
-    };
-    if GLOBAL_STATS.lock().unwrap().programs_generated < thresh {
+    if GLOBAL_STATS.lock().unwrap().programs_generated < 50_000 {
         default_heuristic(x, ctxt)
     } else {
         OrderedFloat(score / (ctxt.classes[x].size as f64))
