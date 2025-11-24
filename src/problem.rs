@@ -310,7 +310,10 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
         context.push_str(&format!("(declare-fun {name} () {ty})\n"));
     }
 
-    let constraint = simplify_expr(constraint, &defs, &Map::default());
+    let constraint = {
+        time_block!("simplify_expr");
+        simplify_expr(constraint, &defs, &Map::default())
+    };
     let (constraint, instvars) = expr_to_term(constraint, &context_vars, &progname, rettype);
 
     Problem {
