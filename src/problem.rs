@@ -45,9 +45,10 @@ fn expr_to_term(
     rettype: Ty,
 ) -> (Term, Vec<Box<[Id]>>) {
     let mut t = Term { elems: Vec::new() };
-    let mut instvars = Vec::new();
+    let mut instvars = IndexMap::new();
     let tmpvars = IndexMap::default();
-    expr_to_term_impl(e, defs, &tmpvars, vars, progname, &mut t, &mut instvars, rettype);
+    expr_to_term_impl(e, defs, &tmpvars, vars, progname, &mut t, &mut Map::default(), &mut instvars, rettype);
+    let instvars = instvars.into_iter().map(|(x, _)| x).collect();
     (t, instvars)
 }
 
@@ -58,9 +59,18 @@ fn expr_to_term_impl(
     vars: &IndexMap<String, Ty>, // global variables created by "declare-var".
     progname: &str,
     t: &mut Term,
-    instvars: &mut Vec<Box<[Id]>>,
+    hashcons: &mut Map<Node, Id>,
+    instvars: &mut IndexMap<Box<[Id]>, Id>,
     rettype: Ty,
 ) -> Id {
+    let hashconsed_push = |t: &mut Term, n: Node, hashcons: &mut Map<Node, Id>| -> Id {
+        if let Some(x) = hashcons.get(&n) {
+            return *x;
+        }
+        let i = t.push(n.clone());
+        hashcons.insert(n, i);
+        i
+    };
     match e {
         Expr::Var(v) => {
             if let Some(x) = tmpvars.get(&v) {
@@ -68,55 +78,60 @@ fn expr_to_term_impl(
             }
             let i = vars.iter().position(|x| *x.0 == *v).unwrap();
             let (_, ty) = vars.get_index(i).unwrap();
-            match ty {
-                Ty::Int => t.push(Node::VarInt(i, Ty::Int)),
-                Ty::Bool => t.push(Node::VarBool(i, Ty::Bool)),
+            let n = match ty {
+                Ty::Int => Node::VarInt(i, Ty::Int),
+                Ty::Bool => Node::VarBool(i, Ty::Bool),
                 _ => panic!("should not happen"),
-            }
+            };
+            hashconsed_push(t, n, hashcons)
         }
-        Expr::ConstBool(true) => t.push(Node::True(Ty::Bool)),
-        Expr::ConstBool(false) => t.push(Node::False(Ty::Bool)),
-        Expr::ConstInt(i) => t.push(Node::ConstInt(i, Ty::Int)),
+        Expr::ConstBool(true) => hashconsed_push(t, Node::True(Ty::Bool), hashcons),
+        Expr::ConstBool(false) => hashconsed_push(t, Node::False(Ty::Bool), hashcons),
+        Expr::ConstInt(i) => hashconsed_push(t, Node::ConstInt(i, Ty::Int), hashcons),
         Expr::Op(op, exprs) => {
             let exprs: Box<[Node]> = exprs
                 .into_iter()
                 .map(|x| {
                     Node::PlaceHolder(
-                        expr_to_term_impl(x, defs, tmpvars, vars, progname, t, instvars, rettype),
+                        expr_to_term_impl(x, defs, tmpvars, vars, progname, t, hashcons, instvars, rettype),
                         Ty::Int,
                     )
                 })
                 .collect();
             let n = Node::parse(&*op, &*exprs).unwrap();
-            t.push(n)
+            hashconsed_push(t, n, hashcons)
         }
         Expr::SynthFunCall(_name, exprs) => {
             let exprs: Box<[Id]> = exprs
                 .into_iter()
-                .map(|x| expr_to_term_impl(x, defs, tmpvars, vars, progname, t, instvars, rettype))
+                .map(|x| expr_to_term_impl(x, defs, tmpvars, vars, progname, t, hashcons, instvars, rettype))
                 .collect();
-            instvars.push(exprs.iter().cloned().collect());
-            t.push(Node::VarInt(instvars.len() + vars.len() - 1, rettype))
+            if let Some(x) = instvars.get(&exprs) {
+                return *x;
+            }
+            let i = t.push(Node::VarInt(instvars.len() + vars.len() - 1, rettype));
+            instvars.insert(exprs.iter().cloned().collect(), i);
+            i
         }
         Expr::DefinedFunCall(op, exprs) => {
             let exprs: Box<[Id]> = exprs
                 .into_iter()
-                .map(|x| expr_to_term_impl(x, defs, tmpvars, vars, progname, t, instvars, rettype))
+                .map(|x| expr_to_term_impl(x, defs, tmpvars, vars, progname, t, hashcons, instvars, rettype))
                 .collect();
             let def = &defs[&op];
             let mut ivarmap: IndexMap<String, Id> = IndexMap::default();
             for ((v, _), ex) in (def.args.iter()).zip(exprs.into_iter()) {
                 ivarmap.insert(v.clone(), ex);
             }
-            expr_to_term_impl(def.expr.clone(), defs, &ivarmap, vars, progname, t, instvars, rettype)
+            expr_to_term_impl(def.expr.clone(), defs, &ivarmap, vars, progname, t, hashcons, instvars, rettype)
         }
         Expr::Let(bindings, body) => {
             let mut varmap = tmpvars.clone();
             for (var, ex) in bindings {
-                let ex = expr_to_term_impl(ex, defs, &varmap, vars, progname, t, instvars, rettype);
+                let ex = expr_to_term_impl(ex, defs, &varmap, vars, progname, t, hashcons, instvars, rettype);
                 varmap.insert(var, ex);
             }
-            expr_to_term_impl(*body, defs, &varmap, vars, progname, t, instvars, rettype)
+            expr_to_term_impl(*body, defs, &varmap, vars, progname, t, hashcons, instvars, rettype)
         }
     }
 }
