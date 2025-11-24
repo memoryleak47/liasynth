@@ -109,7 +109,7 @@ fn expr_to_term_impl(
             if let Some(x) = instvars.get(&exprs) {
                 return *x;
             }
-            let i = t.push(Node::VarInt(instvars.len() + vars.len() - 1, rettype));
+            let i = t.push(Node::VarInt(instvars.len() + vars.len(), rettype));
             instvars.insert(exprs.iter().cloned().collect(), i);
             i
         }
