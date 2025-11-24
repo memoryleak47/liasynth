@@ -748,14 +748,14 @@ fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
 
     let score = if is_off {
         feats[4] = ctxt.big_sigmas.len() as f64 / 4.0;
-        ctxt.flinr.predict(feats.as_slice()).0
+        ctxt.flinr.predict(feats.as_slice()).0 / 3.0
     } else {
         ctxt.olinr.predict(feats.as_slice()).0
     };
 
     ctxt.classes[x].features = feats;
 
-    if GLOBAL_STATS.lock().unwrap().programs_generated < 20_000 {
+    if GLOBAL_STATS.lock().unwrap().programs_generated < 30_000 {
         default_heuristic(x, ctxt)
     } else {
         OrderedFloat(score / (ctxt.classes[x].size as f64))
