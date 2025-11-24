@@ -37,68 +37,25 @@ pub struct Problem {
     pub instvars: Vec<Box<[Id]>>,
 }
 
-// resolves "let" and "defined-funs"
-// defs are not necessarily simplified, but varmap is.
-fn simplify_expr(e: Expr, defs: &IndexMap<String, DefinedFun>, varmap: &Map<String, Expr>) -> Expr {
-    match e {
-        Expr::ConstInt(i) => Expr::ConstInt(i),
-        Expr::ConstBool(b) => Expr::ConstBool(b),
-        Expr::Var(v) => {
-            if let Some(t) = varmap.get(&v) {
-                t.clone()
-            } else {
-                Expr::Var(v)
-            }
-        }
-        Expr::DefinedFunCall(op, exprs) => {
-            let def = &defs[&op];
-            let mut ivarmap: Map<String, Expr> = Map::default();
-            for ((v, _), ex) in (def.args.iter()).zip(exprs.into_iter()) {
-                let ex = simplify_expr(ex, defs, varmap);
-                ivarmap.insert(v.clone(), ex);
-            }
-            simplify_expr(def.expr.clone(), defs, &ivarmap)
-        }
-        Expr::SynthFunCall(op, exprs) => {
-            let exprs: Vec<Expr> = exprs
-                .into_iter()
-                .map(|x| simplify_expr(x, defs, varmap))
-                .collect();
-            Expr::SynthFunCall(op, exprs)
-        }
-        Expr::Op(op, exprs) => {
-            let exprs: Vec<Expr> = exprs
-                .into_iter()
-                .map(|x| simplify_expr(x, defs, varmap))
-                .collect();
-            Expr::Op(op, exprs)
-        }
-        Expr::Let(bindings, body) => {
-            let mut varmap = varmap.clone();
-            for (var, ex) in bindings {
-                let ex = simplify_expr(ex, defs, &varmap);
-                varmap.insert(var, ex);
-            }
-            simplify_expr(*body, defs, &varmap)
-        }
-    }
-}
-
 fn expr_to_term(
     e: Expr,
+    defs: &IndexMap<String, DefinedFun>,
     vars: &IndexMap<String, Ty>,
     progname: &str,
     rettype: Ty,
 ) -> (Term, Vec<Box<[Id]>>) {
     let mut t = Term { elems: Vec::new() };
     let mut instvars = Vec::new();
-    expr_to_term_impl(e, vars, progname, &mut t, &mut instvars, rettype);
+    let tmpvars = IndexMap::default();
+    expr_to_term_impl(e, defs, &tmpvars, vars, progname, &mut t, &mut instvars, rettype);
     (t, instvars)
 }
 
 fn expr_to_term_impl(
     e: Expr,
-    vars: &IndexMap<String, Ty>,
+    defs: &IndexMap<String, DefinedFun>,
+    tmpvars: &IndexMap<String, Id>, // variables created by "let" or defined-fun args.
+    vars: &IndexMap<String, Ty>, // global variables created by "declare-var".
     progname: &str,
     t: &mut Term,
     instvars: &mut Vec<Box<[Id]>>,
@@ -106,6 +63,9 @@ fn expr_to_term_impl(
 ) -> Id {
     match e {
         Expr::Var(v) => {
+            if let Some(x) = tmpvars.get(&v) {
+                return *x;
+            }
             let i = vars.iter().position(|x| *x.0 == *v).unwrap();
             let (_, ty) = vars.get_index(i).unwrap();
             match ty {
@@ -122,7 +82,7 @@ fn expr_to_term_impl(
                 .into_iter()
                 .map(|x| {
                     Node::PlaceHolder(
-                        expr_to_term_impl(x, vars, progname, t, instvars, rettype),
+                        expr_to_term_impl(x, defs, tmpvars, vars, progname, t, instvars, rettype),
                         Ty::Int,
                     )
                 })
@@ -133,13 +93,31 @@ fn expr_to_term_impl(
         Expr::SynthFunCall(_name, exprs) => {
             let exprs: Box<[Id]> = exprs
                 .into_iter()
-                .map(|x| expr_to_term_impl(x, vars, progname, t, instvars, rettype))
+                .map(|x| expr_to_term_impl(x, defs, tmpvars, vars, progname, t, instvars, rettype))
                 .collect();
             instvars.push(exprs.iter().cloned().collect());
             t.push(Node::VarInt(instvars.len() + vars.len() - 1, rettype))
         }
-        Expr::DefinedFunCall(..) => unreachable!("DefinedFunCalls should already be resolved!"),
-        Expr::Let(..) => unreachable!("Lets should already be resolved!"),
+        Expr::DefinedFunCall(op, exprs) => {
+            let exprs: Box<[Id]> = exprs
+                .into_iter()
+                .map(|x| expr_to_term_impl(x, defs, tmpvars, vars, progname, t, instvars, rettype))
+                .collect();
+            let def = &defs[&op];
+            let mut ivarmap: IndexMap<String, Id> = IndexMap::default();
+            for ((v, _), ex) in (def.args.iter()).zip(exprs.into_iter()) {
+                ivarmap.insert(v.clone(), ex);
+            }
+            expr_to_term_impl(def.expr.clone(), defs, &ivarmap, vars, progname, t, instvars, rettype)
+        }
+        Expr::Let(bindings, body) => {
+            let mut varmap = tmpvars.clone();
+            for (var, ex) in bindings {
+                let ex = expr_to_term_impl(ex, defs, &varmap, vars, progname, t, instvars, rettype);
+                varmap.insert(var, ex);
+            }
+            expr_to_term_impl(*body, defs, &varmap, vars, progname, t, instvars, rettype)
+        }
     }
 }
 
@@ -310,11 +288,10 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
         context.push_str(&format!("(declare-fun {name} () {ty})\n"));
     }
 
-    let constraint = {
-        time_block!("simplify_expr");
-        simplify_expr(constraint, &defs, &Map::default())
+    let (constraint, instvars) = {
+        time_block!("expr_to_term");
+        expr_to_term(constraint, &defs, &context_vars, &progname, rettype)
     };
-    let (constraint, instvars) = expr_to_term(constraint, &context_vars, &progname, rettype);
 
     Problem {
         synth_problem,
