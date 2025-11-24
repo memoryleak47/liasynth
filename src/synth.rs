@@ -685,7 +685,7 @@ fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
         .expect("this never happens")
         != &ctxt.problem.rettype
     {
-        let half = l / 1.7;
+        let half = l / 1.6;
         let score = 1.0 - (-2.0 * (1.0 * half) / (l * l)).exp();
         return OrderedFloat(score / normaliser);
     }
@@ -756,10 +756,7 @@ fn learned_heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
     let mut feats = feature_set(x, ctxt);
 
     let score = if is_off {
-        let l = ctxt.big_sigmas.len() as f64;
-        let half = l / 2.4;
-        let sc = 1.0 - (-2.0 * (1.0 * half) / (l * l)).exp();
-        feats[4] = sc;
+        feats[4] = (ctxt.big_sigmas.len() as f64) / 2.0;
         ctxt.flinr.predict(feats.as_slice()).0
     } else {
         ctxt.olinr.predict(feats.as_slice()).0
@@ -767,7 +764,7 @@ fn learned_heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
 
     ctxt.classes[x].features = feats;
 
-    if GLOBAL_STATS.lock().unwrap().programs_generated < 100_000 {
+    if GLOBAL_STATS.lock().unwrap().programs_generated < 200_000 {
         default_heuristic(x, ctxt)
     } else {
         OrderedFloat(score / (ctxt.classes[x].size as f64))
