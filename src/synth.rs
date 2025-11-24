@@ -1,20 +1,22 @@
 use crate::*;
 
+use hashbrown::{DefaultHashBuilder, HashSet};
 use indexmap::IndexSet;
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
+use priority_queue::PriorityQueue;
 use std::collections::HashMap;
 use std::collections::hash_map::Entry;
 
 type Score = OrderedFloat<f64>;
-type Queue = BinaryHeap<WithOrd<(usize, Id), Score>>;
+type Queue = PriorityQueue<(usize, Id), Score, DefaultHashBuilder>;
 type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 
 #[cfg(all(feature = "simple", any(feature = "winning")))]
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 3 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 2 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
@@ -241,10 +243,6 @@ fn update_class(
     ctxt.vals_lookup.insert((nt, new_vals), id);
 
     seen.get_mut(&id).unwrap().push(id);
-    for o in ctxt.problem.nt_tc.reached_by(nt) {
-        ctxt.solids[*o].push(id);
-    }
-
     ctxt.classes[id].satcount += satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
     enqueue(nt, id, ctxt);
 
@@ -298,14 +296,17 @@ fn add_incremental_nodes(
             return None;
         };
 
-        let new_sat = satisfy_inhouse_incr(node.ty(), &new_vals, ctxt.big_sigmas.len() - 1, ctxt);
-        if new_sat {
+        if !ctxt.vals_lookup.contains_key(&(nt, new_vals.clone())) {
             let (id, is_sol, satcount) = add_node(nt, new_node, ctxt, Some(new_vals));
             seen.get_mut(&oid).unwrap().push(id);
             ctxt.classes[id].prev_sol = ctxt.classes[oid].prev_sol;
             ctxt.classes[id].satcount = satcount;
             if is_sol {
                 return Some(id);
+            }
+            ctxt.classes[id].handled_size = Some(ctxt.classes[id].size);
+            for o in ctxt.problem.nt_tc.reached_by(nt) {
+                ctxt.solids[*o].push(id);
             }
         }
     }
@@ -334,7 +335,7 @@ fn enumerate_atoms(ctxt: &mut Ctxt) -> Option<Term> {
 }
 
 fn enumerate(ctxt: &mut Ctxt) -> Option<Term> {
-    while let Some(WithOrd((nt, x), _s)) = ctxt.queue.pop() {
+    while let Some(((nt, x), _)) = ctxt.queue.pop() {
         let (id, maxsat) = handle(nt, x, ctxt);
         if let Some(solution) = id {
             handle_solution(solution, ctxt);
@@ -390,14 +391,8 @@ fn handle_sub_solution(id: Id, ctxt: &mut Ctxt) {
 
 fn handle(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     let c = &mut ctxt.classes[x];
-    if c.handled_size == Some(c.size) {
-        return (None, 0);
-    }
-
-    if c.handled_size.is_none() {
-        for o in ctxt.problem.nt_tc.reached_by(nt) {
-            ctxt.solids[*o].push(x);
-        }
+    for o in ctxt.problem.nt_tc.reached_by(nt) {
+        ctxt.solids[*o].push(x);
     }
 
     c.handled_size = Some(c.size);
@@ -545,12 +540,6 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
 
                     let (id, is_sol, satcount) = add_node(*pnt, prog.clone(), ctxt, None);
 
-                    // let t = extract(id, ctxt);
-                    // println!(
-                    //     "{:?}",
-                    //     term_to_z3(&t, &ctxt.problem.vars.keys().cloned().collect::<Box<[_]>>())
-                    // );
-
                     max_sat = max_sat.max(satcount);
                     if is_sol {
                         return (Some(id), max_sat);
@@ -565,7 +554,7 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
 
 fn enqueue(nt: usize, x: Id, ctxt: &mut Ctxt) {
     let h = heuristic(x, ctxt);
-    ctxt.queue.push(WithOrd((nt, x), h));
+    ctxt.queue.push((nt, x), h);
 }
 
 fn add_node(
@@ -669,6 +658,10 @@ pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
 
 #[cfg(all(not(feature = "learned"), not(feature = "random")))]
 fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
+    default_heuristic(x, ctxt)
+}
+
+fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
     let ty = ctxt.classes[x].node.ty();
     let l = ctxt.big_sigmas.len() as f64;
@@ -707,6 +700,7 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     OrderedFloat(score / normaliser)
 }
 
+#[cfg(feature = "learned")]
 fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     let c = &ctxt.classes[x];
     let term = extract(x, ctxt);
@@ -753,7 +747,7 @@ fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
     let mut feats = feature_set(x, ctxt);
 
     let score = if is_off {
-        feats[4] = (ctxt.big_sigmas.len() as f64) / 2.0;
+        feats[4] = ctxt.big_sigmas.len() as f64 / 4.0;
         ctxt.flinr.predict(feats.as_slice()).0
     } else {
         ctxt.olinr.predict(feats.as_slice()).0
@@ -761,7 +755,7 @@ fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
 
     ctxt.classes[x].features = feats;
 
-    if GLOBAL_STATS.lock().unwrap().programs_generated < 200_000 {
+    if GLOBAL_STATS.lock().unwrap().programs_generated < 20_000 {
         default_heuristic(x, ctxt)
     } else {
         OrderedFloat(score / (ctxt.classes[x].size as f64))
