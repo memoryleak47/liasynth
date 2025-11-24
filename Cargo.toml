@@ -26,6 +26,7 @@ debug = true
 default = []
 ignore-grammar = []
 learned = []
+random = []
 simple = []
 winning = []
 total = []

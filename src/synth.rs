@@ -564,12 +564,7 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
 }
 
 fn enqueue(nt: usize, x: Id, ctxt: &mut Ctxt) {
-    let h = if cfg!(feature = "learned") {
-        learned_heuristic(x, ctxt)
-    } else {
-        default_heuristic(x, ctxt)
-    };
-
+    let h = heuristic(x, ctxt);
     ctxt.queue.push(WithOrd((nt, x), h));
 }
 
@@ -672,7 +667,8 @@ pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
     t
 }
 
-fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
+#[cfg(all(not(feature = "learned"), not(feature = "random")))]
+fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
     let ty = ctxt.classes[x].node.ty();
     let l = ctxt.big_sigmas.len() as f64;
@@ -743,7 +739,8 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     .collect()
 }
 
-fn learned_heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
+#[cfg(feature = "learned")]
+fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
     let ty = ctxt.classes[x].node.ty();
     let ret = &ctxt.problem.rettype;
     let is_off = ctxt
@@ -769,4 +766,9 @@ fn learned_heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
     } else {
         OrderedFloat(score / (ctxt.classes[x].size as f64))
     }
+}
+
+#[cfg(feature = "random")]
+fn heuristic(_x: Id, _ctxt: &mut Ctxt) -> Score {
+    OrderedFloat(rand::random::<f64>())
 }
