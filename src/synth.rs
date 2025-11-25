@@ -1,6 +1,6 @@
 use crate::*;
 
-use hashbrown::{DefaultHashBuilder, HashSet};
+use hashbrown::DefaultHashBuilder;
 use indexmap::IndexSet;
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
@@ -16,7 +16,7 @@ type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 2 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 5 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
@@ -61,7 +61,6 @@ pub struct Ctxt<'a> {
 
     pub temb: &'a mut TermEmbedder,
     pub olinr: &'a mut BayesianLinearRegression,
-    pub flinr: &'a mut BayesianLinearRegression,
 }
 
 pub struct Class {
@@ -99,7 +98,6 @@ pub fn synth(
     classes: Option<Vec<Class>>,
     temb: &mut TermEmbedder,
     olinr: &mut BayesianLinearRegression,
-    flinr: &mut BayesianLinearRegression,
 ) -> (Term, Vec<HashMap<Box<[Value]>, bool>>, Vec<Class>) {
     let mut small_sigmas: IndexSet<Sigma> = IndexSet::new();
     let mut sigma_indices: Vec<Box<[usize]>> = Vec::new();
@@ -135,7 +133,6 @@ pub fn synth(
         temb,
         solids: vec![vec![]; no_nt],
         olinr,
-        flinr,
     };
 
     (run(&mut ctxt), ctxt.cxs_cache, ctxt.classes)
@@ -343,13 +340,11 @@ fn enumerate(ctxt: &mut Ctxt) -> Option<Term> {
         }
 
         if cfg!(feature = "learned") {
-            let target = if ctxt.problem.nt_mapping[&Ty::NonTerminal(nt)] == ctxt.problem.rettype {
-                &mut ctxt.olinr
-            } else {
-                &mut ctxt.flinr
-            };
-
-            target.update(ctxt.classes[x].features.as_slice(), maxsat as f64);
+            ctxt.olinr.update(
+                ctxt.classes[x].features.as_slice(),
+                maxsat as f64,
+                ctxt.big_sigmas.len(),
+            );
         }
     }
     None
@@ -701,7 +696,7 @@ fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
 }
 
 #[cfg(feature = "learned")]
-fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
+fn feature_set(is_on: bool, ret: &Ty, x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     let c = &ctxt.classes[x];
     let term = extract(x, ctxt);
 
@@ -709,7 +704,19 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
 
     let sc = c.satcount;
     let mut iter = c.node.children().iter().filter_map(|c| match c {
-        Child::Hole(_, i) => Some(ctxt.classes[*i].satcount),
+        Child::Hole(_, i) => {
+            if ctxt
+                .problem
+                .nt_mapping
+                .get(&ctxt.classes[*i].node.ty())
+                .map(|t| t == ret)
+                .unwrap_or(false)
+            {
+                Some(ctxt.classes[*i].satcount)
+            } else {
+                None
+            }
+        }
         _ => None,
     });
 
@@ -718,15 +725,14 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
             (min.min(ssc), max.max(ssc))
         })
     } else {
-        (0, 0)
+        (sc, 0)
     };
 
     vec![
-        1.0,
-        c.prev_sol as f64,
-        max_subterm_sc as f64,
-        min_subterm_sc as f64,
-        sc as f64,
+        (c.prev_sol as f64 / ctxt.big_sigmas.len() as f64).ln_1p(),
+        (max_subterm_sc as f64 / ctxt.big_sigmas.len() as f64).ln_1p(),
+        (sc as f64 / ctxt.big_sigmas.len() as f64).ln_1p(),
+        (f64::from(is_on)).ln_1p(),
     ]
     .into_iter()
     .chain(w2v)
@@ -737,29 +743,17 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
 fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
     let ty = ctxt.classes[x].node.ty();
     let ret = &ctxt.problem.rettype;
-    let is_off = ctxt
+    let is_on = ctxt
         .problem
         .nt_mapping
         .get(&ty)
-        .map(|t| t != ret)
-        .unwrap_or(true);
+        .map(|t| t == ret)
+        .unwrap_or(false);
 
-    let mut feats = feature_set(x, ctxt);
-
-    let score = if is_off {
-        feats[4] = ctxt.big_sigmas.len() as f64 / 4.0;
-        ctxt.flinr.predict(feats.as_slice()).0 / 3.0
-    } else {
-        ctxt.olinr.predict(feats.as_slice()).0
-    };
-
+    let mut feats = feature_set(is_on, ret, x, ctxt);
+    let (score, var) = ctxt.olinr.predict(feats.as_slice());
     ctxt.classes[x].features = feats;
-
-    if GLOBAL_STATS.lock().unwrap().programs_generated < 30_000 {
-        default_heuristic(x, ctxt)
-    } else {
-        OrderedFloat(score / (ctxt.classes[x].size as f64))
-    }
+    OrderedFloat(score / (ctxt.classes[x].size as f64))
 }
 
 #[cfg(feature = "random")]
