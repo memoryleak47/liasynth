@@ -702,36 +702,31 @@ fn feature_set(is_on: bool, ret: &Ty, x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
 
     let w2v: Vec<f64> = ctxt.temb.embed(&term);
 
+    let l = ctxt.big_sigmas.len() as f64;
     let sc = c.satcount;
-    let mut iter = c.node.children().iter().filter_map(|c| match c {
-        Child::Hole(_, i) => {
-            if ctxt
-                .problem
-                .nt_mapping
-                .get(&ctxt.classes[*i].node.ty())
-                .map(|t| t == ret)
-                .unwrap_or(false)
-            {
-                Some(ctxt.classes[*i].satcount)
+    let max_subterm_satcount = c
+        .node
+        .children()
+        .iter()
+        .filter_map(|c| {
+            if let Child::Hole(_, i) = c {
+                Some(i)
             } else {
                 None
             }
-        }
-        _ => None,
-    });
-
-    let (min_subterm_sc, max_subterm_sc) = if let Some(first) = iter.next() {
-        iter.fold((first, first), |(min, max), ssc| {
-            (min.min(ssc), max.max(ssc))
         })
-    } else {
-        (sc, 0)
-    };
+        .map(|s| ctxt.classes[*s].satcount)
+        .max()
+        .unwrap_or_else(|| 0);
+    let diff = sc.saturating_sub(max_subterm_satcount) as f64;
 
     vec![
-        (c.prev_sol as f64 / ctxt.big_sigmas.len() as f64).ln_1p(),
-        (max_subterm_sc as f64 / ctxt.big_sigmas.len() as f64).ln_1p(),
-        (sc as f64 / ctxt.big_sigmas.len() as f64).ln_1p(),
+        (c.prev_sol as f64 / l).ln_1p(),
+        (diff / l).ln_1p(),
+        (sc as f64 / l).ln_1p(),
+        (sc as f64 / l).ln_1p(),
+        (diff / c.size as f64).ln_1p(),
+        (1.0 / c.size as f64).ln_1p(),
         (f64::from(is_on)).ln_1p(),
     ]
     .into_iter()
