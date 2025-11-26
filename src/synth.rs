@@ -724,7 +724,7 @@ fn expm1_norm(x: f64, l: f64, alpha: f64) -> f64 {
 }
 
 #[cfg(feature = "learned")]
-fn feature_set(ty: f64, x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
+fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     let c = &ctxt.classes[x];
     let term = extract(x, ctxt);
     let w2v: Vec<f64> = ctxt.temb.embed(&term);
@@ -749,21 +749,16 @@ fn feature_set(ty: f64, x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     let diff = f64::max(sc - max_subterm_satcount, 0.0);
     let size = c.size as f64;
 
-    vec![
-        // ty,
-        expm1_norm(sc, l, 0.7),
-        expm1_norm(diff, l, 3.5),
-        sc / size,
-    ]
-    .into_iter()
-    .chain(w2v)
-    .collect()
+    vec![expm1_norm(sc, l, 0.7), expm1_norm(diff, l, 3.5), sc / size]
+        .into_iter()
+        .chain(w2v)
+        .collect()
 }
 
 #[cfg(feature = "learned")]
 fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
     let ty = ctxt.classes[x].node.ty();
-    let mut feats = feature_set(ty.into(), x, ctxt);
+    let mut feats = feature_set(x, ctxt);
     let (log_odds, _) = ctxt.olinr.predict(feats.as_slice());
 
     let score = log_odds.clamp(-10.0, 10.0).exp() / (ctxt.classes[x].size as f64);
