@@ -16,7 +16,7 @@ type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 5 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 4 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
@@ -340,11 +340,15 @@ fn enumerate(ctxt: &mut Ctxt) -> Option<Term> {
         }
 
         if cfg!(feature = "learned") {
-            ctxt.olinr.update(
-                ctxt.classes[x].features.as_slice(),
-                maxsat as f64,
-                ctxt.big_sigmas.len(),
-            );
+            let num_cxs = ctxt.big_sigmas.len();
+            let normalised_score = if num_cxs > 0 {
+                (maxsat as f64 / num_cxs as f64).min(1.0)
+            } else {
+                0.0
+            };
+
+            ctxt.olinr
+                .update(ctxt.classes[x].features.as_slice(), normalised_score);
         }
     }
     None
@@ -535,6 +539,13 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
 
                     let (id, is_sol, satcount) = add_node(*pnt, prog.clone(), ctxt, None);
 
+                    // let term = extract(id, ctxt);
+                    // let term = term_to_z3(
+                    //     &term,
+                    //     &ctxt.problem.vars.keys().cloned().collect::<Box<[_]>>(),
+                    // );
+                    // println!("{:?}", term);
+
                     max_sat = max_sat.max(satcount);
                     if is_sol {
                         return (Some(id), max_sat);
@@ -598,6 +609,7 @@ fn add_node(
                 to_check.push(i);
             }
         }
+
         if !to_check.is_empty() {
             _satcount += satcount(nt, _id, ctxt, Some(to_check));
         };
@@ -695,15 +707,30 @@ fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
     OrderedFloat(score / normaliser)
 }
 
+fn expm1_norm(x: f64, l: f64, alpha: f64) -> f64 {
+    if l <= 0.0 {
+        return 0.5;
+    }
+    if x <= 0.0 {
+        return 0.0;
+    }
+
+    let ratio = x / l;
+    let z = (alpha * ratio).exp_m1();
+    let n = alpha.exp_m1();
+
+    let result = z / n;
+    result.clamp(0.0, 1.0)
+}
+
 #[cfg(feature = "learned")]
-fn feature_set(is_on: bool, ret: &Ty, x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
+fn feature_set(ty: f64, x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     let c = &ctxt.classes[x];
     let term = extract(x, ctxt);
-
     let w2v: Vec<f64> = ctxt.temb.embed(&term);
-
     let l = ctxt.big_sigmas.len() as f64;
-    let sc = c.satcount;
+
+    let sc = c.satcount as f64;
     let max_subterm_satcount = c
         .node
         .children()
@@ -717,17 +744,16 @@ fn feature_set(is_on: bool, ret: &Ty, x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
         })
         .map(|s| ctxt.classes[*s].satcount)
         .max()
-        .unwrap_or_else(|| 0);
-    let diff = sc.saturating_sub(max_subterm_satcount) as f64;
+        .unwrap_or(0) as f64;
+
+    let diff = f64::max(sc - max_subterm_satcount, 0.0);
+    let size = c.size as f64;
 
     vec![
-        (c.prev_sol as f64 / l).ln_1p(),
-        (diff / l).ln_1p(),
-        (sc as f64 / l).ln_1p(),
-        (sc as f64 / l).ln_1p(),
-        (diff / c.size as f64).ln_1p(),
-        (1.0 / c.size as f64).ln_1p(),
-        (f64::from(is_on)).ln_1p(),
+        // ty,
+        expm1_norm(sc, l, 0.7),
+        expm1_norm(diff, l, 3.5),
+        sc / size,
     ]
     .into_iter()
     .chain(w2v)
@@ -737,18 +763,13 @@ fn feature_set(is_on: bool, ret: &Ty, x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
 #[cfg(feature = "learned")]
 fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
     let ty = ctxt.classes[x].node.ty();
-    let ret = &ctxt.problem.rettype;
-    let is_on = ctxt
-        .problem
-        .nt_mapping
-        .get(&ty)
-        .map(|t| t == ret)
-        .unwrap_or(false);
+    let mut feats = feature_set(ty.into(), x, ctxt);
+    let (log_odds, _) = ctxt.olinr.predict(feats.as_slice());
 
-    let mut feats = feature_set(is_on, ret, x, ctxt);
-    let (score, var) = ctxt.olinr.predict(feats.as_slice());
+    let score = log_odds.clamp(-10.0, 10.0).exp() / (ctxt.classes[x].size as f64);
+
     ctxt.classes[x].features = feats;
-    OrderedFloat(score / (ctxt.classes[x].size as f64))
+    OrderedFloat(score)
 }
 
 #[cfg(feature = "random")]
