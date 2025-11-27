@@ -294,9 +294,10 @@ fn add_incremental_nodes(
         };
 
         if !ctxt.vals_lookup.contains_key(&(nt, new_vals.clone())) {
-            let (id, is_sol, _satcount) = add_node(nt, new_node, ctxt, Some(new_vals));
+            let (id, is_sol, satcount) = add_node(nt, new_node, ctxt, Some(new_vals));
             seen.get_mut(&oid).unwrap().push(id);
             ctxt.classes[id].prev_sol = ctxt.classes[oid].prev_sol;
+            ctxt.classes[id].satcount = satcount;
             if is_sol {
                 return Some(id);
             }
@@ -389,10 +390,8 @@ fn handle_sub_solution(id: Id, ctxt: &mut Ctxt) {
 
 fn handle(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     let c = &mut ctxt.classes[x];
-    if c.handled_size.is_none() {
-        for o in ctxt.problem.nt_tc.reached_by(nt) {
-            ctxt.solids[*o].push(x);
-        }
+    for o in ctxt.problem.nt_tc.reached_by(nt) {
+        ctxt.solids[*o].push(x);
     }
 
     c.handled_size = Some(c.size);

@@ -11,9 +11,7 @@ outfile="$2"
 all=$(find "$indir" -type f -name "*.sl" | wc -l)
 function run() {
     i=0
-    t=$(mktemp -d)
     for f in $(find "$indir" -type f -name "*.sl" | sort); do
-    do
         echo
         echo ==========
         echo "[$i/$all] $f:"
