@@ -47,7 +47,17 @@ fn expr_to_term(
     let mut t = Term { elems: Vec::new() };
     let mut instvars = IndexMap::new();
     let tmpvars = IndexMap::default();
-    expr_to_term_impl(e, defs, &tmpvars, vars, progname, &mut t, &mut Map::default(), &mut instvars, rettype);
+    expr_to_term_impl(
+        e,
+        defs,
+        &tmpvars,
+        vars,
+        progname,
+        &mut t,
+        &mut Map::default(),
+        &mut instvars,
+        rettype,
+    );
     let instvars = instvars.into_iter().map(|(x, _)| x).collect();
     (t, instvars)
 }
@@ -56,7 +66,7 @@ fn expr_to_term_impl(
     e: Expr,
     defs: &IndexMap<String, DefinedFun>,
     tmpvars: &IndexMap<String, Id>, // variables created by "let" or defined-fun args.
-    vars: &IndexMap<String, Ty>, // global variables created by "declare-var".
+    vars: &IndexMap<String, Ty>,    // global variables created by "declare-var".
     progname: &str,
     t: &mut Term,
     hashcons: &mut Map<Node, Id>,
@@ -93,7 +103,9 @@ fn expr_to_term_impl(
                 .into_iter()
                 .map(|x| {
                     Node::PlaceHolder(
-                        expr_to_term_impl(x, defs, tmpvars, vars, progname, t, hashcons, instvars, rettype),
+                        expr_to_term_impl(
+                            x, defs, tmpvars, vars, progname, t, hashcons, instvars, rettype,
+                        ),
                         Ty::Int,
                     )
                 })
@@ -104,7 +116,11 @@ fn expr_to_term_impl(
         Expr::SynthFunCall(_name, exprs) => {
             let exprs: Box<[Id]> = exprs
                 .into_iter()
-                .map(|x| expr_to_term_impl(x, defs, tmpvars, vars, progname, t, hashcons, instvars, rettype))
+                .map(|x| {
+                    expr_to_term_impl(
+                        x, defs, tmpvars, vars, progname, t, hashcons, instvars, rettype,
+                    )
+                })
                 .collect();
             if let Some(x) = instvars.get(&exprs) {
                 return *x;
@@ -116,22 +132,40 @@ fn expr_to_term_impl(
         Expr::DefinedFunCall(op, exprs) => {
             let exprs: Box<[Id]> = exprs
                 .into_iter()
-                .map(|x| expr_to_term_impl(x, defs, tmpvars, vars, progname, t, hashcons, instvars, rettype))
+                .map(|x| {
+                    expr_to_term_impl(
+                        x, defs, tmpvars, vars, progname, t, hashcons, instvars, rettype,
+                    )
+                })
                 .collect();
             let def = &defs[&op];
             let mut ivarmap: IndexMap<String, Id> = IndexMap::default();
             for ((v, _), ex) in (def.args.iter()).zip(exprs.into_iter()) {
                 ivarmap.insert(v.clone(), ex);
             }
-            expr_to_term_impl(def.expr.clone(), defs, &ivarmap, vars, progname, t, hashcons, instvars, rettype)
+            expr_to_term_impl(
+                def.expr.clone(),
+                defs,
+                &ivarmap,
+                vars,
+                progname,
+                t,
+                hashcons,
+                instvars,
+                rettype,
+            )
         }
         Expr::Let(bindings, body) => {
             let mut varmap = tmpvars.clone();
             for (var, ex) in bindings {
-                let ex = expr_to_term_impl(ex, defs, &varmap, vars, progname, t, hashcons, instvars, rettype);
+                let ex = expr_to_term_impl(
+                    ex, defs, &varmap, vars, progname, t, hashcons, instvars, rettype,
+                );
                 varmap.insert(var, ex);
             }
-            expr_to_term_impl(*body, defs, &varmap, vars, progname, t, hashcons, instvars, rettype)
+            expr_to_term_impl(
+                *body, defs, &varmap, vars, progname, t, hashcons, instvars, rettype,
+            )
         }
     }
 }
