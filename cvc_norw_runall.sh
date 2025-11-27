@@ -17,7 +17,7 @@ function run() {
         echo
         echo ==========
         echo "[$i/$all] $f:"
-        timeout 120s cvc5 "$f"
+        timeout 120s cvc5 --sygus-rewrite=none "$f"
         i=$(($i+1))
     done
 
