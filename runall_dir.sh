@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 if [ $# -ne 3 ]; then
-    echo "Usage: $0 <feature> <outfile> <directory>"
+    echo "Usage: $0 <feature> <directory> <outfile>"
     exit 1
 fi
 feature="$1"
@@ -19,7 +19,7 @@ run() {
             i=$((i+1))
             continue
         fi
-        prlimit --as=10737418240 timeout 100s target/release/liasynth "$f"
+        prlimit --as=10737418240 timeout 120s target/release/liasynth "$f"
         i=$((i+1))
     done
     success=$(grep -c "Answer" "$outfile" || true)
