@@ -420,11 +420,11 @@ fn handle(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     grow(nt, x, ctxt)
 }
 
-fn prune(nt: usize, rule: &Node, children: &[Id], ctxt: &Ctxt) -> bool {
+fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool {
     match rule.ident() {
-        "Ite" => {
-            let [cond, b_then, b_else] = children else {
-                unreachable!()
+        ident if ident.starts_with("Ite") => {
+            let [(_, cond), (_, b_then), (_, b_else)] = children else {
+                return false;
             };
             if b_then > b_else {
                 return true;
@@ -437,16 +437,16 @@ fn prune(nt: usize, rule: &Node, children: &[Id], ctxt: &Ctxt) -> bool {
 
             ctxt.classes[*b_then].satcount == 0 || ctxt.classes[*b_else].satcount == 0
         }
-        _ if children.len() == 2
-            && matches!(
-                rule.ident(),
-                "Add" | "Mul" | "Equals" | "And" | "Xor" | "Distinct" | "Or"
-            ) =>
+        ident
+            if children.len() == 2
+                && ["Add", "Mul", "Equals", "And", "Xor", "Distinct", "Or"]
+                    .iter()
+                    .any(|p| ident.starts_with(p)) =>
         {
-            children[0] == children[1]
+            children[0].0 == children[1].0 && children[0].1 > children[1].1
         }
-        "Add" => {
-            if let [a, b] = children {
+        ident if ident.starts_with("Add") => {
+            if let [(_, a), (_, b)] = children {
                 match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
                     (_, Node::ConstInt(0, ty)) | (Node::ConstInt(0, ty), _) => {
                         return nt == ty.into_nt().unwrap();
@@ -458,8 +458,8 @@ fn prune(nt: usize, rule: &Node, children: &[Id], ctxt: &Ctxt) -> bool {
             }
             false
         }
-        "Mul" => {
-            if let [a, b] = children {
+        ident if ident.starts_with("Mul") => {
+            if let [(_, a), (_, b)] = children {
                 match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
                     (_, Node::ConstInt(0, ty) | Node::ConstInt(1, ty))
                     | (Node::ConstInt(0, ty) | Node::ConstInt(1, ty), _) => {
@@ -550,7 +550,10 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
             {
                 let mut new_children = combination.clone();
                 new_children.push((i, x));
-                let child_ids: Vec<usize> = new_children.iter().map(|(_, c)| *c).collect();
+                let child_ids: Vec<(usize, Id)> = new_children
+                    .iter()
+                    .map(|(pos, id)| (in_types[*pos].into_nt().unwrap(), *id))
+                    .collect();
 
                 if !prune(nt, rule, &child_ids, ctxt) {
                     let mut prog = base_prog.clone();
