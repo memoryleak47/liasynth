@@ -2,7 +2,7 @@ use crate::*;
 
 const USE_INHOUSE_SATCOUNT: bool = true;
 
-pub fn satcount(nt: usize, x: Id, ctxt: &mut Ctxt, idxs: Option<Vec<usize>>) -> usize {
+pub fn satcount(nt: usize, x: Id, ctxt: &mut Ctxt, idxs: Option<Vec<usize>>) -> u64 {
     GLOBAL_STATS.lock().unwrap().programs_checked += 1;
     let ty = ctxt.classes[x].node.ty();
     if ctxt
@@ -23,7 +23,13 @@ pub fn satcount(nt: usize, x: Id, ctxt: &mut Ctxt, idxs: Option<Vec<usize>>) -> 
             let vchunk = &ctxt.classes[x].vals[start..start + no_vals];
             ctxt.cxs_cache[i].insert(Box::<[Value]>::from(vchunk), r[pos]);
         }
-        return r.iter().map(|x| *x as usize).sum();
+
+        return idxs.iter().zip(r.iter()).fold(
+            0u64,
+            |acc, (i, &val)| {
+                if val { acc | (1 << i) } else { acc }
+            },
+        );
     }
 
     let r = satisfy(nt, x, 0..ctxt.big_sigmas.len(), ctxt);
@@ -35,7 +41,10 @@ pub fn satcount(nt: usize, x: Id, ctxt: &mut Ctxt, idxs: Option<Vec<usize>>) -> 
     {
         ctxt.cxs_cache[i].insert(Box::<[Value]>::from(vchunk), res);
     }
-    r.iter().map(|x| *x as usize).sum()
+
+    r.iter()
+        .enumerate()
+        .fold(064, |acc, (i, &val)| if val { acc | (1 << i) } else { acc })
 }
 
 pub fn satisfy(

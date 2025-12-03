@@ -1,12 +1,12 @@
 use crate::*;
 
-use hashbrown::DefaultHashBuilder;
+use hashbrown::{DefaultHashBuilder, HashSet};
 use indexmap::IndexSet;
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
 use priority_queue::PriorityQueue;
+use std::collections::HashMap;
 use std::collections::hash_map::Entry;
-use std::collections::{HashMap, HashSet};
 
 type Score = OrderedFloat<f64>;
 type Queue = PriorityQueue<(usize, Id), Score, DefaultHashBuilder>;
@@ -72,6 +72,7 @@ pub struct Ctxt<'a> {
     pub temb: &'a mut TermEmbedder,
     pub olinr: &'a mut BayesianLinearRegression,
     pub var_num: f64,
+    pub seen_scs: Vec<HashSet<u64>>,
 }
 
 pub struct Class {
@@ -82,7 +83,7 @@ pub struct Class {
     pub cscore: OrderedFloat<f64>,
     pub vals: Box<[Value]>,
     pub handled_size: Option<usize>, // what was the size when this class was handled last time.
-    pub satcount: usize,
+    pub satcount: u64,
     pub prev_sol: usize,
     pub in_sol: usize,
     pub features: Vec<f64>,
@@ -156,6 +157,7 @@ pub fn synth(
         solids: vec![vec![]; no_nt],
         olinr,
         var_num: problem.vars.len() as f64,
+        seen_scs: vec![HashSet::new(); no_nt],
     };
 
     (run(&mut ctxt), ctxt.cxs_cache, ctxt.classes)
@@ -261,7 +263,11 @@ fn update_class(
     ctxt.vals_lookup.insert((nt, new_vals), id);
 
     seen.get_mut(&id).unwrap().push(id);
-    ctxt.classes[id].satcount += satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
+    let new_sat = satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
+    if new_sat != 0 {
+        ctxt.classes[id].satcount |= new_sat;
+        ctxt.seen_scs[nt].insert(ctxt.classes[id].satcount.clone());
+    }
     enqueue(nt, id, ctxt);
 
     if ctxt.classes[id].prev_sol > 0 {
@@ -316,6 +322,7 @@ fn add_incremental_nodes(
 
         if !ctxt.vals_lookup.contains_key(&(nt, new_vals.clone())) {
             let (id, is_sol, satcount) = add_node(nt, new_node, ctxt, Some(new_vals));
+            ctxt.seen_scs[nt].insert(satcount.clone());
             seen.get_mut(&oid).unwrap().push(id);
             ctxt.classes[id].prev_sol = ctxt.classes[oid].prev_sol;
             ctxt.classes[id].in_sol = ctxt.classes[oid].in_sol;
@@ -423,19 +430,28 @@ fn handle(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
 fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool {
     match rule.ident() {
         ident if ident.starts_with("Ite") => {
-            let [(_, cond), (_, b_then), (_, b_else)] = children else {
+            let [(_, cond), (tt, b_then), (te, b_else)] = children else {
                 return false;
             };
-            if b_then > b_else {
-                return true;
-            }
 
             let cond_vals = &ctxt.classes[*cond].vals;
             if cond_vals.len() > 1 && cond_vals.iter().all(|v| *v == cond_vals[0]) {
                 return true;
             }
 
-            ctxt.classes[*b_then].satcount == 0 || ctxt.classes[*b_else].satcount == 0
+            let satcount = ctxt.classes[*b_then].satcount;
+            let satcount_popcount = satcount.count_ones();
+
+            if ctxt.seen_scs[nt]
+                .iter()
+                .any(|&sc| (satcount & sc) == satcount && sc.count_ones() > satcount_popcount)
+            {
+                return true;
+            }
+
+            let rt = &rule.signature().1.into_nt().unwrap();
+            (rt == tt && ctxt.classes[*b_then].satcount.count_ones() == 0)
+                || (rt == te && ctxt.classes[*b_else].satcount.count_ones() == 0)
         }
         ident
             if children.len() == 2
@@ -535,9 +551,9 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
                     .all(|(_, ty)| !matches!(ty, Ty::PRule(_)))
                 {
                     let (id, is_sol, satcount) = add_node(*pnt, base_prog, ctxt, None);
-                    max_sat = max_sat.max(satcount);
+                    max_sat = max_sat.max(satcount.count_ones());
                     if is_sol {
-                        return (Some(id), max_sat);
+                        return (Some(id), max_sat as usize);
                     }
                 }
                 continue 'rule;
@@ -564,16 +580,16 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
 
                     let (id, is_sol, satcount) = add_node(*pnt, prog.clone(), ctxt, None);
 
-                    max_sat = max_sat.max(satcount);
+                    max_sat = max_sat.max(satcount.count_ones());
                     if is_sol {
-                        return (Some(id), max_sat);
+                        return (Some(id), max_sat as usize);
                     }
                 }
             }
         }
     }
 
-    (None, max_sat)
+    (None, max_sat as usize)
 }
 
 fn enqueue(nt: usize, x: Id, ctxt: &mut Ctxt) {
@@ -585,12 +601,7 @@ fn node_complexity(size: usize, complexity: usize, var_num: f64) -> OrderedFloat
     OrderedFloat((size as f64 * var_num) / complexity as f64)
 }
 
-fn add_node(
-    nt: usize,
-    node: Node,
-    ctxt: &mut Ctxt,
-    vals: Option<Box<[Value]>>,
-) -> (Id, bool, usize) {
+fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) -> (Id, bool, u64) {
     let vals = vals.unwrap_or_else(|| match gen_vals(&node, ctxt) {
         Some(v) => v,
         _ => panic!("Could not generate vals"),
@@ -602,7 +613,7 @@ fn add_node(
         let (newsize, newcomplex) = minsize_and_complexity(&node, ctxt);
         let score = node_complexity(newsize, newcomplex.cost, ctxt.var_num);
         let c = &mut ctxt.classes[_id];
-        let _satcount = c.satcount;
+        let _satcount = c.satcount.count_ones() as u64;
         if score < c.cscore {
             c.size = newsize;
             c.node = node.clone();
@@ -628,27 +639,33 @@ fn add_node(
                 .map(|idx| vals[*idx].clone())
                 .collect::<Vec<_>>();
             if let Some(b) = ctxt.cxs_cache[i].get::<[core::Value]>(&vals_chunk) {
-                _satcount += *b as usize;
+                if *b {
+                    _satcount |= 1 << i;
+                }
             } else {
                 to_check.push(i);
             }
         }
 
         if !to_check.is_empty() {
-            _satcount += satcount(nt, _id, ctxt, Some(to_check));
-        };
+            let sc = satcount(nt, _id, ctxt, Some(to_check));
+            _satcount |= sc;
+        }
 
+        ctxt.seen_scs[nt].insert(_satcount.clone());
+        let sc = _satcount.count_ones();
         ctxt.classes[_id].satcount = _satcount;
         ctxt.vals_lookup.insert((nt, vals), _id);
 
-        if _satcount == ctxt.big_sigmas.len() && ctxt.problem.rettys.contains(&Ty::NonTerminal(nt))
+        if (ctxt.sigma_indices.len() == sc as usize)
+            && ctxt.problem.rettys.contains(&Ty::NonTerminal(nt))
         {
             return (_id, true, _satcount);
         }
 
         enqueue(nt, _id, ctxt);
 
-        (_id, _satcount)
+        (_id, sc as u64)
     };
 
     (id, false, satcount)
@@ -733,12 +750,13 @@ fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
                 None
             }
         })
-        .map(|s| ctxt.classes[*s].satcount)
+        .map(|s| ctxt.classes[*s].satcount.count_ones())
         .max()
         .unwrap_or_else(|| 0);
 
-    let diff = c.satcount.saturating_sub(max_subterm_satcount) as f64;
-    let score = 1.0 - (-2.0 * (diff * c.satcount as f64) / (l * l)).exp();
+    let sc = c.satcount.count_ones();
+    let diff = sc.saturating_sub(max_subterm_satcount) as f64;
+    let score = 1.0 - (-2.0 * (diff * sc as f64) / (l * l)).exp();
 
     OrderedFloat(score / normaliser)
 }
@@ -766,7 +784,7 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     let w2v: Vec<f64> = ctxt.temb.embed(&term);
     let l = ctxt.big_sigmas.len() as f64;
 
-    let sc = c.satcount as f64;
+    let sc = c.satcount.count_ones() as f64;
     let max_subterm_satcount = c
         .node
         .children()
@@ -778,7 +796,7 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
                 None
             }
         })
-        .map(|s| ctxt.classes[*s].satcount)
+        .map(|s| ctxt.classes[*s].satcount.count_ones())
         .max()
         .unwrap_or(0) as f64;
 
