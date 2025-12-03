@@ -5,18 +5,19 @@ use indexmap::IndexSet;
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
 use priority_queue::PriorityQueue;
+use std::cmp::Reverse;
 use std::collections::HashMap;
 use std::collections::hash_map::Entry;
 
 type Score = OrderedFloat<f64>;
 type Queue = PriorityQueue<(usize, Id), Score, DefaultHashBuilder>;
-type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
+type NodeQueue = BinaryHeap<WithOrd<Node, Reverse<usize>>>;
 
 #[cfg(all(feature = "simple", any(feature = "winning")))]
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 4 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 2 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
@@ -71,7 +72,7 @@ pub struct Class {
     pub handled_size: Option<usize>, // what was the size when this class was handled last time.
     pub satcount: usize,
     pub prev_sol: usize,
-    pub in_sol: bool,
+    pub in_sol: usize,
     pub features: Vec<f64>,
 }
 
@@ -80,12 +81,12 @@ impl Class {
         Class {
             size,
             node: node.clone(),
-            nodes: NodeQueue::from([WithOrd(node, size)]),
+            nodes: NodeQueue::from([WithOrd(node, Reverse(size))]),
             vals: vals.clone(),
             handled_size: None,
             satcount: 0,
             prev_sol: 0,
-            in_sol: false,
+            in_sol: 0,
             features: Vec::new(),
         }
     }
@@ -164,9 +165,7 @@ fn incremental_comp(ctxt: &mut Ctxt) -> Option<Term> {
     let mut seen: HashMap<Id, Vec<Id>> = HashMap::new();
 
     for id in 0..ctxt.classes.len() {
-        if insert_if_absent(&mut seen, id)
-            && (!WINNING || (ctxt.classes[id].prev_sol > 0 || ctxt.classes[id].in_sol))
-        {
+        if insert_if_absent(&mut seen, id) && (!WINNING || (ctxt.classes[id].prev_sol > 0)) {
             if let Some(id) = incremental_add_class(id, &mut seen, ctxt) {
                 handle_solution(id, ctxt);
                 return Some(extract(id, ctxt));
@@ -297,6 +296,7 @@ fn add_incremental_nodes(
             let (id, is_sol, satcount) = add_node(nt, new_node, ctxt, Some(new_vals));
             seen.get_mut(&oid).unwrap().push(id);
             ctxt.classes[id].prev_sol = ctxt.classes[oid].prev_sol;
+            ctxt.classes[id].in_sol = ctxt.classes[oid].in_sol;
             ctxt.classes[id].satcount = satcount;
             if is_sol {
                 return Some(id);
@@ -372,7 +372,7 @@ fn handle_solution(id: Id, ctxt: &mut Ctxt) {
 }
 
 fn handle_sub_solution(id: Id, ctxt: &mut Ctxt) {
-    ctxt.classes[id].in_sol = true;
+    ctxt.classes[id].in_sol += 1;
     let children = ctxt.classes[id]
         .node
         .children()
@@ -539,13 +539,6 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
 
                     let (id, is_sol, satcount) = add_node(*pnt, prog.clone(), ctxt, None);
 
-                    // let term = extract(id, ctxt);
-                    // let term = term_to_z3(
-                    //     &term,
-                    //     &ctxt.problem.vars.keys().cloned().collect::<Box<[_]>>(),
-                    // );
-                    // println!("{:?}", term);
-
                     max_sat = max_sat.max(satcount);
                     if is_sol {
                         return (Some(id), max_sat);
@@ -585,7 +578,12 @@ fn add_node(
             c.node = node.clone();
             enqueue(nt, _id, ctxt);
         }
-        push_bounded(&mut ctxt.classes[_id].nodes, WithOrd(node, newsize));
+        if cfg!(feature = "total") {
+            push_bounded(
+                &mut ctxt.classes[_id].nodes,
+                WithOrd(node, Reverse(newsize)),
+            );
+        }
         (_id, _satcount)
     } else {
         GLOBAL_STATS.lock().unwrap().new_programs_generated += 1;
@@ -748,8 +746,9 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
 
     let diff = f64::max(sc - max_subterm_satcount, 0.0);
     let size = c.size as f64;
+    let prev_sol = c.prev_sol as f64;
 
-    vec![expm1_norm(sc, l, 0.7), expm1_norm(diff, l, 3.5), sc / size]
+    vec![expm1_norm(sc, l, 0.7), expm1_norm(diff, l, 0.9), sc / size]
         .into_iter()
         .chain(w2v)
         .collect()
