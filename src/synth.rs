@@ -10,7 +10,7 @@ use std::collections::hash_map::Entry;
 
 type Score = OrderedFloat<f64>;
 type Queue = PriorityQueue<(usize, Id), Score, DefaultHashBuilder>;
-type NodeQueue = BinaryHeap<WithOrd<Node, Score>>;
+type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 
 #[derive(Clone, Default)]
 pub struct Complexity {
@@ -22,7 +22,7 @@ pub struct Complexity {
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 11 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 7 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
@@ -79,36 +79,25 @@ pub struct Class {
     pub node: Node,
     pub nodes: NodeQueue,
     pub size: usize,
-    pub complexity: Complexity,
-    pub cscore: OrderedFloat<f64>,
     pub vals: Box<[Value]>,
     pub handled_size: Option<usize>, // what was the size when this class was handled last time.
     pub satcount: u64,
     pub prev_sol: usize,
-    pub in_sol: usize,
+    pub in_sol: bool,
     pub features: Vec<f64>,
 }
 
 impl Class {
-    fn default_class(
-        size: usize,
-        complexity: Complexity,
-        node: Node,
-        vals: Box<[Value]>,
-        var_num: f64,
-    ) -> Self {
-        let score = node_complexity(size, complexity.cost, var_num);
+    fn default_class(size: usize, node: Node, vals: Box<[Value]>) -> Self {
         Class {
             size,
-            complexity,
-            cscore: score,
             node: node.clone(),
-            nodes: NodeQueue::from([WithOrd(node, score)]),
+            nodes: NodeQueue::from([WithOrd(node, size)]),
             vals: vals.clone(),
             handled_size: None,
             satcount: 0,
             prev_sol: 0,
-            in_sol: 0,
+            in_sol: false,
             features: Vec::new(),
         }
     }
@@ -189,7 +178,9 @@ fn incremental_comp(ctxt: &mut Ctxt) -> Option<Term> {
     let mut seen: HashMap<Id, Vec<Id>> = HashMap::new();
 
     for id in 0..ctxt.classes.len() {
-        if insert_if_absent(&mut seen, id) && (!WINNING || (ctxt.classes[id].prev_sol > 0)) {
+        if insert_if_absent(&mut seen, id)
+            && (!WINNING || (ctxt.classes[id].prev_sol > 0 && ctxt.classes[id].in_sol))
+        {
             if let Some(id) = incremental_add_class(id, &mut seen, ctxt) {
                 handle_solution(id, ctxt);
                 return Some(extract(id, ctxt));
@@ -325,7 +316,6 @@ fn add_incremental_nodes(
             ctxt.seen_scs[nt].insert(satcount.clone());
             seen.get_mut(&oid).unwrap().push(id);
             ctxt.classes[id].prev_sol = ctxt.classes[oid].prev_sol;
-            ctxt.classes[id].in_sol = ctxt.classes[oid].in_sol;
             ctxt.classes[id].satcount = satcount;
             if is_sol {
                 return Some(id);
@@ -401,7 +391,7 @@ fn handle_solution(id: Id, ctxt: &mut Ctxt) {
 }
 
 fn handle_sub_solution(id: Id, ctxt: &mut Ctxt) {
-    ctxt.classes[id].in_sol += 1;
+    ctxt.classes[id].in_sol = true;
     let children = ctxt.classes[id]
         .node
         .children()
@@ -597,10 +587,6 @@ fn enqueue(nt: usize, x: Id, ctxt: &mut Ctxt) {
     ctxt.queue.push((nt, x), h);
 }
 
-fn node_complexity(size: usize, complexity: usize, var_num: f64) -> OrderedFloat<f64> {
-    OrderedFloat((size as f64 * var_num) / complexity as f64)
-}
-
 fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) -> (Id, bool, u64) {
     let vals = vals.unwrap_or_else(|| match gen_vals(&node, ctxt) {
         Some(v) => v,
@@ -610,24 +596,23 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
     GLOBAL_STATS.lock().unwrap().programs_generated += 1;
 
     let (id, satcount) = if let Some(&_id) = ctxt.vals_lookup.get(&(nt, vals.clone())) {
-        let (newsize, newcomplex) = minsize_and_complexity(&node, ctxt);
-        let score = node_complexity(newsize, newcomplex.cost, ctxt.var_num);
+        let newsize = minsize(&node, ctxt);
         let c = &mut ctxt.classes[_id];
         let _satcount = c.satcount.count_ones() as u64;
-        if score < c.cscore {
+        if newsize < c.size {
             c.size = newsize;
             c.node = node.clone();
             enqueue(nt, _id, ctxt);
         }
         if cfg!(feature = "total") {
-            push_bounded(&mut ctxt.classes[_id].nodes, WithOrd(node, score));
+            push_bounded(&mut ctxt.classes[_id].nodes, WithOrd(node, newsize));
         }
         (_id, _satcount)
     } else {
         GLOBAL_STATS.lock().unwrap().new_programs_generated += 1;
         let _id = ctxt.classes.len();
-        let (size, complexity) = minsize_and_complexity(&node, ctxt);
-        let c = Class::default_class(size, complexity, node, vals.clone(), ctxt.var_num);
+        let size = minsize(&node, ctxt);
+        let c = Class::default_class(size, node, vals.clone());
 
         ctxt.classes.push(c);
 
@@ -682,31 +667,19 @@ fn gen_vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
         .collect()
 }
 
-fn minsize_and_complexity(node: &Node, ctxt: &Ctxt) -> (usize, Complexity) {
-    let mut size = 1;
-    let mut vars = HashSet::new();
-    let mut cost = 0;
-
-    for child in node.children() {
-        match child {
-            Child::VarInt(i) | Child::VarBool(i) => {
-                vars.insert(*i);
+fn minsize(node: &Node, ctxt: &Ctxt) -> usize {
+    node.children()
+        .iter()
+        .filter_map(|x| {
+            if let Child::Hole(_, i) = x {
+                Some(i)
+            } else {
+                None
             }
-            Child::Hole(_, id) => {
-                let c = &ctxt.classes[*id].complexity;
-                cost += c.cost;
-                for v in &c.vars {
-                    vars.insert(*v);
-                }
-                size += ctxt.classes[*id].size;
-            }
-            _ => {}
-        }
-    }
-
-    cost += vars.len();
-
-    (size, Complexity { cost, vars })
+        })
+        .map(|x| ctxt.classes[*x].size)
+        .sum::<usize>()
+        + 1
 }
 
 pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
