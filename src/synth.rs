@@ -5,25 +5,34 @@ use indexmap::IndexSet;
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
 use priority_queue::PriorityQueue;
-use std::cmp::Reverse;
-use std::collections::HashMap;
 use std::collections::hash_map::Entry;
+use std::collections::{HashMap, HashSet};
 
 type Score = OrderedFloat<f64>;
 type Queue = PriorityQueue<(usize, Id), Score, DefaultHashBuilder>;
-type NodeQueue = BinaryHeap<WithOrd<Node, Reverse<usize>>>;
+type NodeQueue = BinaryHeap<WithOrd<Node, Score>>;
+
+#[derive(Clone, Default)]
+pub struct Complexity {
+    pub cost: usize,
+    pub vars: HashSet<usize>, // or (bool, usize) or whatever your var id is
+}
 
 #[cfg(all(feature = "simple", any(feature = "winning")))]
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 2 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 11 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
-    heap.push(val);
-    if heap.len() > MAXSIZE {
-        heap.pop();
+    if heap.len() < MAXSIZE {
+        heap.push(val);
+    } else if let Some(top) = heap.peek() {
+        if &val < top {
+            heap.pop();
+            heap.push(val);
+        }
     }
 }
 
@@ -62,12 +71,15 @@ pub struct Ctxt<'a> {
 
     pub temb: &'a mut TermEmbedder,
     pub olinr: &'a mut BayesianLinearRegression,
+    pub var_num: f64,
 }
 
 pub struct Class {
     pub node: Node,
     pub nodes: NodeQueue,
     pub size: usize,
+    pub complexity: Complexity,
+    pub cscore: OrderedFloat<f64>,
     pub vals: Box<[Value]>,
     pub handled_size: Option<usize>, // what was the size when this class was handled last time.
     pub satcount: usize,
@@ -77,11 +89,20 @@ pub struct Class {
 }
 
 impl Class {
-    fn default_class(size: usize, node: Node, vals: Box<[Value]>) -> Self {
+    fn default_class(
+        size: usize,
+        complexity: Complexity,
+        node: Node,
+        vals: Box<[Value]>,
+        var_num: f64,
+    ) -> Self {
+        let score = node_complexity(size, complexity.cost, var_num);
         Class {
             size,
+            complexity,
+            cscore: score,
             node: node.clone(),
-            nodes: NodeQueue::from([WithOrd(node, Reverse(size))]),
+            nodes: NodeQueue::from([WithOrd(node, score)]),
             vals: vals.clone(),
             handled_size: None,
             satcount: 0,
@@ -134,6 +155,7 @@ pub fn synth(
         temb,
         solids: vec![vec![]; no_nt],
         olinr,
+        var_num: problem.vars.len() as f64,
     };
 
     (run(&mut ctxt), ctxt.cxs_cache, ctxt.classes)
@@ -556,6 +578,10 @@ fn enqueue(nt: usize, x: Id, ctxt: &mut Ctxt) {
     ctxt.queue.push((nt, x), h);
 }
 
+fn node_complexity(size: usize, complexity: usize, var_num: f64) -> OrderedFloat<f64> {
+    OrderedFloat((size as f64 * var_num) / complexity as f64)
+}
+
 fn add_node(
     nt: usize,
     node: Node,
@@ -570,27 +596,24 @@ fn add_node(
     GLOBAL_STATS.lock().unwrap().programs_generated += 1;
 
     let (id, satcount) = if let Some(&_id) = ctxt.vals_lookup.get(&(nt, vals.clone())) {
-        let newsize = minsize(&node, ctxt);
+        let (newsize, newcomplex) = minsize_and_complexity(&node, ctxt);
+        let score = node_complexity(newsize, newcomplex.cost, ctxt.var_num);
         let c = &mut ctxt.classes[_id];
         let _satcount = c.satcount;
-        if newsize < c.size {
+        if score < c.cscore {
             c.size = newsize;
             c.node = node.clone();
             enqueue(nt, _id, ctxt);
         }
         if cfg!(feature = "total") {
-            push_bounded(
-                &mut ctxt.classes[_id].nodes,
-                WithOrd(node, Reverse(newsize)),
-            );
+            push_bounded(&mut ctxt.classes[_id].nodes, WithOrd(node, score));
         }
         (_id, _satcount)
     } else {
         GLOBAL_STATS.lock().unwrap().new_programs_generated += 1;
-
         let _id = ctxt.classes.len();
-        let size = minsize(&node, ctxt);
-        let c = Class::default_class(size, node, vals.clone());
+        let (size, complexity) = minsize_and_complexity(&node, ctxt);
+        let c = Class::default_class(size, complexity, node, vals.clone(), ctxt.var_num);
 
         ctxt.classes.push(c);
 
@@ -639,19 +662,31 @@ fn gen_vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
         .collect()
 }
 
-fn minsize(node: &Node, ctxt: &Ctxt) -> usize {
-    node.children()
-        .iter()
-        .filter_map(|x| {
-            if let Child::Hole(_, i) = x {
-                Some(i)
-            } else {
-                None
+fn minsize_and_complexity(node: &Node, ctxt: &Ctxt) -> (usize, Complexity) {
+    let mut size = 1;
+    let mut vars = HashSet::new();
+    let mut cost = 0;
+
+    for child in node.children() {
+        match child {
+            Child::VarInt(i) | Child::VarBool(i) => {
+                vars.insert(*i);
             }
-        })
-        .map(|x| ctxt.classes[*x].size)
-        .sum::<usize>()
-        + 1
+            Child::Hole(_, id) => {
+                let c = &ctxt.classes[*id].complexity;
+                cost += c.cost;
+                for v in &c.vars {
+                    vars.insert(*v);
+                }
+                size += ctxt.classes[*id].size;
+            }
+            _ => {}
+        }
+    }
+
+    cost += vars.len();
+
+    (size, Complexity { cost, vars })
 }
 
 pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
