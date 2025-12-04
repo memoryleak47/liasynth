@@ -14,8 +14,8 @@ type NodeQueue = BinaryHeap<WithOrd<Node, Score>>;
 
 #[derive(Clone, Default)]
 pub struct Complexity {
-    pub cost: usize,
-    pub vars: HashSet<usize>, // or (bool, usize) or whatever your var id is
+    pub cost: f64,
+    pub vars: Vec<usize>, // or (bool, usize) or whatever your var id is
 }
 
 #[cfg(all(feature = "simple", any(feature = "winning")))]
@@ -360,7 +360,7 @@ fn enumerate(ctxt: &mut Ctxt) -> Option<Term> {
         if cfg!(feature = "learned") {
             let num_cxs = ctxt.big_sigmas.len();
             let normalised_score = if num_cxs > 0 {
-                (maxsat as f64 / num_cxs as f64).min(1.0)
+                maxsat as f64 / num_cxs as f64
             } else {
                 0.0
             };
@@ -586,12 +586,17 @@ fn enqueue(nt: usize, x: Id, ctxt: &mut Ctxt) {
     ctxt.queue.push((nt, x), h);
 }
 
-fn node_complexity(size: usize, complexity: usize) -> OrderedFloat<f64> {
-    if complexity == 0 {
-        OrderedFloat(100.0)
+fn node_complexity(size: usize, complexity: f64) -> OrderedFloat<f64> {
+    let size_f64 = size as f64;
+
+    let size_score = if size_f64 > 1.0 {
+        (size_f64.ln() + 1.0) * size_f64.sqrt()
     } else {
-        OrderedFloat((size as f64 / complexity as f64) + complexity as f64 / 10.0)
-    }
+        size_f64
+    };
+
+    // OrderedFloat(complexity * size_score)
+    OrderedFloat(1.0)
 }
 
 fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) -> (Id, bool, u64) {
@@ -603,17 +608,21 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
     GLOBAL_STATS.lock().unwrap().programs_generated += 1;
 
     let (id, satcount) = if let Some(&_id) = ctxt.vals_lookup.get(&(nt, vals.clone())) {
-        let (newsize, newcomplex) = minsize_and_complexity(&node, ctxt);
-        let score = node_complexity(newsize, newcomplex.cost);
+        // let (newsize, newcomplex) = minsize_and_complexity(&node, ctxt);
+        // let score = node_complexity(newsize, newcomplex.cost);
         let c = &mut ctxt.classes[_id];
         let _satcount = c.satcount;
-        if score < c.cscore {
-            c.size = newsize;
-            c.node = node.clone();
-            enqueue(nt, _id, ctxt);
-        }
+        // println!("{score}, {}", c.cscore);
+        // if score < c.cscore {
+        //     c.size = newsize;
+        //     c.node = node.clone();
+        //     enqueue(nt, _id, ctxt);
+        // }
         if cfg!(feature = "total") {
-            push_bounded(&mut ctxt.classes[_id].nodes, WithOrd(node, score));
+            push_bounded(
+                &mut ctxt.classes[_id].nodes,
+                WithOrd(node, OrderedFloat(1.0)),
+            );
         }
         (_id, _satcount)
     } else {
@@ -677,29 +686,53 @@ fn gen_vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
 
 fn minsize_and_complexity(node: &Node, ctxt: &Ctxt) -> (usize, Complexity) {
     let mut size = 1;
-    let mut vars = HashSet::new();
-    let mut cost = 0;
+    let mut vars: HashMap<usize, f64> = HashMap::new();
 
-    for child in node.children() {
-        match child {
-            Child::VarInt(i) | Child::VarBool(i) => {
-                vars.insert(*i);
-            }
-            Child::Hole(_, id) => {
-                let c = &ctxt.classes[*id].complexity;
-                cost += c.cost;
-                for v in &c.vars {
-                    vars.insert(*v);
-                }
-                size += ctxt.classes[*id].size;
-            }
-            _ => {}
+    let cost = match node {
+        Node::ConstInt(..) | Node::True(..) | Node::False(..) => 1.3,
+        Node::VarInt(i, _) | Node::VarBool(i, _) => {
+            vars.insert(*i as usize, 1.0);
+            1.0
         }
-    }
+        _ => node
+            .children()
+            .iter()
+            .map(|child| match child {
+                Child::VarInt(i) | Child::VarBool(i) => accumulate_var_cost(&mut vars, *i),
+                Child::Hole(_, id) => {
+                    let class = &ctxt.classes[*id];
+                    size += class.size;
 
-    cost += vars.len();
+                    let hole_cost = class.complexity.cost;
+                    let vars_cost: f64 = class
+                        .complexity
+                        .vars
+                        .iter()
+                        .map(|v| accumulate_var_cost(&mut vars, *v))
+                        .sum();
 
-    (size, Complexity { cost, vars })
+                    hole_cost + vars_cost
+                }
+                _ => 1.3,
+            })
+            .sum(),
+    };
+
+    (
+        size,
+        Complexity {
+            cost,
+            vars: vars.into_keys().collect(),
+        },
+    )
+}
+
+#[inline]
+fn accumulate_var_cost(vars: &mut HashMap<usize, f64>, var_id: usize) -> f64 {
+    vars.entry(var_id)
+        .and_modify(|cost| *cost += 0.1)
+        .or_insert(1.0);
+    vars[&var_id]
 }
 
 pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
@@ -808,7 +841,6 @@ fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
     let ty = ctxt.classes[x].node.ty();
     let mut feats = feature_set(x, ctxt);
     let (log_odds, _) = ctxt.olinr.predict(feats.as_slice());
-
     let score = log_odds.clamp(-10.0, 10.0).exp() / (ctxt.classes[x].size as f64);
 
     ctxt.classes[x].features = feats;
