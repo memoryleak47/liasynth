@@ -1,12 +1,12 @@
 use crate::*;
 
-use hashbrown::{DefaultHashBuilder, HashSet};
+use hashbrown::DefaultHashBuilder;
 use indexmap::IndexSet;
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
 use priority_queue::PriorityQueue;
-use std::collections::HashMap;
 use std::collections::hash_map::Entry;
+use std::collections::{HashMap, HashSet};
 
 type Score = OrderedFloat<f64>;
 type Queue = PriorityQueue<(usize, Id), Score, DefaultHashBuilder>;
@@ -22,17 +22,13 @@ pub struct Complexity {
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 11 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 4 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
-    if heap.len() < MAXSIZE {
-        heap.push(val);
-    } else if let Some(top) = heap.peek() {
-        if &val < top {
-            heap.pop();
-            heap.push(val);
-        }
+    heap.push(val);
+    if heap.len() > MAXSIZE {
+        heap.pop();
     }
 }
 
@@ -71,7 +67,6 @@ pub struct Ctxt<'a> {
 
     pub temb: &'a mut TermEmbedder,
     pub olinr: &'a mut BayesianLinearRegression,
-    pub var_num: f64,
     pub seen_scs: Vec<HashSet<u64>>,
 }
 
@@ -90,14 +85,8 @@ pub struct Class {
 }
 
 impl Class {
-    fn default_class(
-        size: usize,
-        complexity: Complexity,
-        node: Node,
-        vals: Box<[Value]>,
-        var_num: f64,
-    ) -> Self {
-        let score = node_complexity(size, complexity.cost, var_num);
+    fn default_class(size: usize, complexity: Complexity, node: Node, vals: Box<[Value]>) -> Self {
+        let score = node_complexity(size, complexity.cost);
         Class {
             size,
             complexity,
@@ -156,7 +145,6 @@ pub fn synth(
         temb,
         solids: vec![vec![]; no_nt],
         olinr,
-        var_num: problem.vars.len() as f64,
         seen_scs: vec![HashSet::new(); no_nt],
     };
 
@@ -190,7 +178,7 @@ fn incremental_comp(ctxt: &mut Ctxt) -> Option<Term> {
 
     for id in 0..ctxt.classes.len() {
         if insert_if_absent(&mut seen, id)
-            && (!WINNING || (ctxt.classes[id].prev_sol > 0 && ctxt.classes[id].in_sol))
+            && (!WINNING || (ctxt.classes[id].prev_sol > 0 || ctxt.classes[id].in_sol))
         {
             if let Some(id) = incremental_add_class(id, &mut seen, ctxt) {
                 handle_solution(id, ctxt);
@@ -572,20 +560,20 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
                     .map(|(pos, id)| (in_types[*pos].into_nt().unwrap(), *id))
                     .collect();
 
-                // if !prune(nt, rule, &child_ids, ctxt) {
-                let mut prog = base_prog.clone();
-                for (pos, c_idx) in &combination {
-                    let ty_nt = in_types[*pos].into_nt().unwrap();
-                    prog.children_mut()[*pos] = Child::Hole(ty_nt, *c_idx);
-                }
+                if !prune(nt, rule, &child_ids, ctxt) {
+                    let mut prog = base_prog.clone();
+                    for (pos, c_idx) in &combination {
+                        let ty_nt = in_types[*pos].into_nt().unwrap();
+                        prog.children_mut()[*pos] = Child::Hole(ty_nt, *c_idx);
+                    }
 
-                let (id, is_sol, satcount) = add_node(*pnt, prog.clone(), ctxt, None);
+                    let (id, is_sol, satcount) = add_node(*pnt, prog.clone(), ctxt, None);
 
-                max_sat = max_sat.max(satcount.count_ones());
-                if is_sol {
-                    return (Some(id), max_sat as usize);
+                    max_sat = max_sat.max(satcount.count_ones());
+                    if is_sol {
+                        return (Some(id), max_sat as usize);
+                    }
                 }
-                // }
             }
         }
     }
@@ -598,8 +586,12 @@ fn enqueue(nt: usize, x: Id, ctxt: &mut Ctxt) {
     ctxt.queue.push((nt, x), h);
 }
 
-fn node_complexity(size: usize, complexity: usize, var_num: f64) -> OrderedFloat<f64> {
-    OrderedFloat((size as f64 * var_num) / complexity as f64)
+fn node_complexity(size: usize, complexity: usize) -> OrderedFloat<f64> {
+    if complexity == 0 {
+        OrderedFloat(100.0)
+    } else {
+        OrderedFloat((size as f64 / complexity as f64) + complexity as f64 / 10.0)
+    }
 }
 
 fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) -> (Id, bool, u64) {
@@ -612,10 +604,10 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
 
     let (id, satcount) = if let Some(&_id) = ctxt.vals_lookup.get(&(nt, vals.clone())) {
         let (newsize, newcomplex) = minsize_and_complexity(&node, ctxt);
-        let score = node_complexity(newsize, newcomplex.cost, ctxt.var_num);
+        let score = node_complexity(newsize, newcomplex.cost);
         let c = &mut ctxt.classes[_id];
-        let _satcount = c.satcount.count_ones() as u64;
-        if minsize < c.cscore {
+        let _satcount = c.satcount;
+        if score < c.cscore {
             c.size = newsize;
             c.node = node.clone();
             enqueue(nt, _id, ctxt);
@@ -628,7 +620,7 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
         GLOBAL_STATS.lock().unwrap().new_programs_generated += 1;
         let _id = ctxt.classes.len();
         let (size, complexity) = minsize_and_complexity(&node, ctxt);
-        let c = Class::default_class(size, complexity, node, vals.clone(), ctxt.var_num);
+        let c = Class::default_class(size, complexity, node, vals.clone());
 
         ctxt.classes.push(c);
 
@@ -666,7 +658,7 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
 
         enqueue(nt, _id, ctxt);
 
-        (_id, sc as u64)
+        (_id, _satcount)
     };
 
     (id, false, satcount)
@@ -805,7 +797,7 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     let size = c.size as f64;
     let prev_sol = c.prev_sol as f64;
 
-    vec![expm1_norm(sc, l, 1.2), expm1_norm(diff, l, 3.5), sc / size]
+    vec![expm1_norm(sc, l, 0.7), expm1_norm(diff, l, 3.5), sc / size]
         .into_iter()
         .chain(w2v)
         .collect()
