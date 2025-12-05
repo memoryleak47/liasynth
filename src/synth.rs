@@ -771,7 +771,7 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
         .max()
         .unwrap_or(0) as f64;
 
-    let diff = f64::max(sc - max_subterm_satcount, 0);
+    let diff = f64::max(sc - max_subterm_satcount, 0.0);
     let prev_sol = c.prev_sol as f64;
 
     vec![
