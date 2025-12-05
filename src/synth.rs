@@ -73,11 +73,9 @@ pub struct Ctxt<'a> {
 pub struct Class {
     pub node: Node,
     pub nodes: NodeQueue,
-    pub size: usize,
-    pub complexity: Complexity,
-    pub cscore: OrderedFloat<f64>,
+    pub complex: f64,
     pub vals: Box<[Value]>,
-    pub handled_size: Option<usize>, // what was the size when this class was handled last time.
+    pub handled_complex: Option<f64>, // what was the size when this class was handled last time.
     pub satcount: u64,
     pub prev_sol: usize,
     pub in_sol: bool,
@@ -85,16 +83,13 @@ pub struct Class {
 }
 
 impl Class {
-    fn default_class(size: usize, complexity: Complexity, node: Node, vals: Box<[Value]>) -> Self {
-        let score = node_complexity(size, complexity.cost);
+    fn default_class(complex: f64, node: Node, vals: Box<[Value]>) -> Self {
         Class {
-            size,
-            complexity,
-            cscore: score,
+            complex,
             node: node.clone(),
-            nodes: NodeQueue::from([WithOrd(node, score)]),
+            nodes: NodeQueue::from([WithOrd(node, OrderedFloat(complex))]),
             vals: vals.clone(),
-            handled_size: None,
+            handled_complex: None,
             satcount: 0,
             prev_sol: 0,
             in_sol: false,
@@ -319,7 +314,7 @@ fn add_incremental_nodes(
             if is_sol {
                 return Some(id);
             }
-            ctxt.classes[id].handled_size = Some(ctxt.classes[id].size);
+            ctxt.classes[id].handled_complex = Some(ctxt.classes[id].complex);
             for o in ctxt.problem.nt_tc.reached_by(nt) {
                 ctxt.solids[*o].push(id);
             }
@@ -342,7 +337,7 @@ fn enumerate_atoms(ctxt: &mut Ctxt) -> Option<Term> {
             ctxt.problem.nt_tc.reached_by(*nt).iter().for_each(|o| {
                 ctxt.solids[*o].push(id);
             });
-            ctxt.classes[id].handled_size = Some(0);
+            ctxt.classes[id].handled_complex = Some(ctxt.classes[id].complex);
         }
     }
 
@@ -412,7 +407,7 @@ fn handle(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
         ctxt.solids[*o].push(x);
     }
 
-    c.handled_size = Some(c.size);
+    c.handled_complex = Some(c.complex);
     grow(nt, x, ctxt)
 }
 
@@ -586,19 +581,6 @@ fn enqueue(nt: usize, x: Id, ctxt: &mut Ctxt) {
     ctxt.queue.push((nt, x), h);
 }
 
-fn node_complexity(size: usize, complexity: f64) -> OrderedFloat<f64> {
-    let size_f64 = size as f64;
-
-    let size_score = if size_f64 > 1.0 {
-        (size_f64.ln() + 1.0) * size_f64.sqrt()
-    } else {
-        size_f64
-    };
-
-    // OrderedFloat(complexity * size_score)
-    OrderedFloat(1.0)
-}
-
 fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) -> (Id, bool, u64) {
     let vals = vals.unwrap_or_else(|| match gen_vals(&node, ctxt) {
         Some(v) => v,
@@ -608,28 +590,26 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
     GLOBAL_STATS.lock().unwrap().programs_generated += 1;
 
     let (id, satcount) = if let Some(&_id) = ctxt.vals_lookup.get(&(nt, vals.clone())) {
-        // let (newsize, newcomplex) = minsize_and_complexity(&node, ctxt);
-        // let score = node_complexity(newsize, newcomplex.cost);
+        let newcomplex = mincomplexity(&node, ctxt);
         let c = &mut ctxt.classes[_id];
         let _satcount = c.satcount;
-        // println!("{score}, {}", c.cscore);
-        // if score < c.cscore {
-        //     c.size = newsize;
-        //     c.node = node.clone();
-        //     enqueue(nt, _id, ctxt);
-        // }
+        if newcomplex < c.complex {
+            c.complex = newcomplex;
+            c.node = node.clone();
+            //     enqueue(nt, _id, ctxt);
+        }
         if cfg!(feature = "total") {
             push_bounded(
                 &mut ctxt.classes[_id].nodes,
-                WithOrd(node, OrderedFloat(1.0)),
+                WithOrd(node, OrderedFloat(newcomplex)),
             );
         }
         (_id, _satcount)
     } else {
         GLOBAL_STATS.lock().unwrap().new_programs_generated += 1;
         let _id = ctxt.classes.len();
-        let (size, complexity) = minsize_and_complexity(&node, ctxt);
-        let c = Class::default_class(size, complexity, node, vals.clone());
+        let complexity = mincomplexity(&node, ctxt);
+        let c = Class::default_class(complexity, node, vals.clone());
 
         ctxt.classes.push(c);
 
@@ -684,47 +664,20 @@ fn gen_vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
         .collect()
 }
 
-fn minsize_and_complexity(node: &Node, ctxt: &Ctxt) -> (usize, Complexity) {
-    let mut size = 1;
-    let mut vars: HashMap<usize, f64> = HashMap::new();
-
-    let cost = match node {
-        Node::ConstInt(..) | Node::True(..) | Node::False(..) => 1.3,
-        Node::VarInt(i, _) | Node::VarBool(i, _) => {
-            vars.insert(*i as usize, 1.0);
-            1.0
-        }
+fn mincomplexity(node: &Node, ctxt: &Ctxt) -> f64 {
+    match node {
+        Node::ConstInt(..) | Node::True(..) | Node::False(..) => 1.1,
+        Node::VarInt(_, _) | Node::VarBool(_, _) => 1.0,
         _ => node
             .children()
             .iter()
             .map(|child| match child {
-                Child::VarInt(i) | Child::VarBool(i) => accumulate_var_cost(&mut vars, *i),
-                Child::Hole(_, id) => {
-                    let class = &ctxt.classes[*id];
-                    size += class.size;
-
-                    let hole_cost = class.complexity.cost;
-                    let vars_cost: f64 = class
-                        .complexity
-                        .vars
-                        .iter()
-                        .map(|v| accumulate_var_cost(&mut vars, *v))
-                        .sum();
-
-                    hole_cost + vars_cost
-                }
-                _ => 1.3,
+                Child::VarInt(_) | Child::VarBool(_) => 1.0,
+                Child::Hole(_, id) => ctxt.classes[*id].complex,
+                _ => 1.1,
             })
             .sum(),
-    };
-
-    (
-        size,
-        Complexity {
-            cost,
-            vars: vars.into_keys().collect(),
-        },
-    )
+    }
 }
 
 #[inline]
@@ -751,7 +704,7 @@ fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
     let ty = ctxt.classes[x].node.ty();
     let l = ctxt.big_sigmas.len() as f64;
-    let normaliser = c.size as f64;
+    let normaliser = c.complex.powf(0.8);
 
     if ctxt
         .problem
@@ -826,14 +779,17 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
         .max()
         .unwrap_or(0) as f64;
 
-    let diff = f64::max(sc - max_subterm_satcount, 0.0);
-    let size = c.size as f64;
+    let diff = sc - max_subterm_satcount;
     let prev_sol = c.prev_sol as f64;
 
-    vec![expm1_norm(sc, l, 0.7), expm1_norm(diff, l, 3.5), sc / size]
-        .into_iter()
-        .chain(w2v)
-        .collect()
+    vec![
+        expm1_norm(sc, l, 0.7),
+        expm1_norm(diff, l, 3.5),
+        1.0 / c.complex.sqrt(),
+    ]
+    .into_iter()
+    .chain(w2v)
+    .collect()
 }
 
 #[cfg(feature = "learned")]
@@ -841,7 +797,7 @@ fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
     let ty = ctxt.classes[x].node.ty();
     let mut feats = feature_set(x, ctxt);
     let (log_odds, _) = ctxt.olinr.predict(feats.as_slice());
-    let score = log_odds.clamp(-10.0, 10.0).exp() / (ctxt.classes[x].size as f64);
+    let score = log_odds.clamp(-10.0, 10.0).exp() / ctxt.classes[x].complex;
 
     ctxt.classes[x].features = feats;
     OrderedFloat(score)
@@ -851,3 +807,7 @@ fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
 fn heuristic(_x: Id, _ctxt: &mut Ctxt) -> Score {
     OrderedFloat(rand::random::<f64>())
 }
+
+/*
+Integrate Rudi's thing for MPwol
+*/
