@@ -596,7 +596,7 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
         if newcomplex < c.complex {
             c.complex = newcomplex;
             c.node = node.clone();
-            enqueue(nt, _id, ctxt);
+            // enqueue(nt, _id, ctxt);
         }
         if cfg!(feature = "total") {
             push_bounded(
@@ -680,14 +680,6 @@ fn mincomplexity(node: &Node, ctxt: &Ctxt) -> f64 {
     }
 }
 
-#[inline]
-fn accumulate_var_cost(vars: &mut HashMap<usize, f64>, var_id: usize) -> f64 {
-    vars.entry(var_id)
-        .and_modify(|cost| *cost += 0.1)
-        .or_insert(1.0);
-    vars[&var_id]
-}
-
 pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
     let mut t = Term { elems: Vec::new() };
     let f = &|c: Id| ctxt.classes[c].node.clone();
@@ -704,7 +696,7 @@ fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
     let ty = ctxt.classes[x].node.ty();
     let l = ctxt.big_sigmas.len() as f64;
-    let normaliser = c.complex.powf(0.8);
+    let normaliser = c.complex;
 
     if ctxt
         .problem
@@ -734,7 +726,7 @@ fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
         .unwrap_or_else(|| 0);
 
     let sc = c.satcount.count_ones();
-    let diff = sc.saturating_sub(max_subterm_satcount) as f64;
+    let diff = sc.saturating_sub(max_subterm_satcount).max(0) as f64;
     let score = 1.0 - (-2.0 * (diff * sc as f64) / (l * l)).exp();
 
     OrderedFloat(score / normaliser)
@@ -779,7 +771,7 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
         .max()
         .unwrap_or(0) as f64;
 
-    let diff = sc - max_subterm_satcount;
+    let diff = f64::max(sc - max_subterm_satcount, 0);
     let prev_sol = c.prev_sol as f64;
 
     vec![
