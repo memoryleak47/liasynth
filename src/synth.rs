@@ -424,11 +424,9 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
             }
 
             let satcount = ctxt.classes[*b_then].satcount;
-            let satcount_popcount = satcount.count_ones();
-
             if ctxt.seen_scs[nt]
                 .iter()
-                .any(|&sc| (satcount & sc) == satcount && sc.count_ones() > satcount_popcount)
+                .any(|&sc| (satcount & sc) == satcount && sc != satcount)
             {
                 return true;
             }
@@ -441,9 +439,10 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
             if children.len() == 2
                 && ["Add", "Mul", "Equals", "And", "Xor", "Distinct", "Or"]
                     .iter()
-                    .any(|p| ident.starts_with(p)) =>
+                    .any(|p| ident.starts_with(p))
+                && (children[0].0 == children[1].0 && children[0].1 > children[1].1) =>
         {
-            children[0].0 == children[1].0 && children[0].1 > children[1].1
+            return true;
         }
         ident if ident.starts_with("Add") => {
             if let [(_, a), (_, b)] = children {
@@ -453,8 +452,8 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                     }
                     _ => {}
                 }
-                return ctxt.classes[*a].vals.iter().all(|v| *v == Value::Int(0))
-                    || ctxt.classes[*b].vals.iter().all(|v| *v == Value::Int(0));
+                // return ctxt.classes[*a].vals.iter().all(|v| *v == Value::Int(0))
+                //     || ctxt.classes[*b].vals.iter().all(|v| *v == Value::Int(0));
             }
             false
         }
@@ -467,12 +466,12 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                     }
                     _ => {}
                 }
-                let a_vals = &ctxt.classes[*a].vals;
-                let b_vals = &ctxt.classes[*b].vals;
-                return a_vals.iter().all(|v| *v == Value::Int(0))
-                    || a_vals.iter().all(|v| *v == Value::Int(1))
-                    || b_vals.iter().all(|v| *v == Value::Int(0))
-                    || b_vals.iter().all(|v| *v == Value::Int(1));
+                // let a_vals = &ctxt.classes[*a].vals;
+                // let b_vals = &ctxt.classes[*b].vals;
+                // return a_vals.iter().all(|v| *v == Value::Int(0))
+                //     || a_vals.iter().all(|v| *v == Value::Int(1))
+                //     || b_vals.iter().all(|v| *v == Value::Int(0))
+                //     || b_vals.iter().all(|v| *v == Value::Int(1));
             }
             false
         }
