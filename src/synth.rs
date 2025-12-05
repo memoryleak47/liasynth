@@ -596,7 +596,7 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
         if newcomplex < c.complex {
             c.complex = newcomplex;
             c.node = node.clone();
-            //     enqueue(nt, _id, ctxt);
+            enqueue(nt, _id, ctxt);
         }
         if cfg!(feature = "total") {
             push_bounded(
@@ -807,7 +807,3 @@ fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
 fn heuristic(_x: Id, _ctxt: &mut Ctxt) -> Score {
     OrderedFloat(rand::random::<f64>())
 }
-
-/*
-Integrate Rudi's thing for MPwol
-*/
