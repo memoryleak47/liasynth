@@ -22,7 +22,7 @@ pub struct Complexity {
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 4 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 8 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
@@ -412,8 +412,8 @@ fn handle(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
 }
 
 fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool {
-    match rule.ident() {
-        ident if ident.starts_with("Ite") => {
+    match rule.template() {
+        Some("(ite ? ? ? )") => {
             let [(_, cond), (tt, b_then), (te, b_else)] = children else {
                 return false;
             };
@@ -435,30 +435,37 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
             (rt == tt && ctxt.classes[*b_then].satcount.count_ones() == 0)
                 || (rt == te && ctxt.classes[*b_else].satcount.count_ones() == 0)
         }
-        ident
+        Some("(+ ? ?)")
+        | Some("(* ? ?)")
+        | Some("(= ? ?)")
+        | Some("(and ? ?)")
+        | Some("(or ? ?)")
+        | Some("(oxr ? ?)")
+        | Some("(distinct ? ?)")
             if children.len() == 2
-                && ["Add", "Mul", "Equals", "And", "Xor", "Distinct", "Or"]
-                    .iter()
-                    .any(|p| ident.starts_with(p))
                 && (children[0].0 == children[1].0 && children[0].1 > children[1].1) =>
         {
             return true;
         }
-        ident if ident.starts_with("Add") => {
-            if let [(_, a), (_, b)] = children {
+        Some("(+ ? ?)") => {
+            if let [(at, a), (bt, b)] = children {
                 match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
                     (_, Node::ConstInt(0, ty)) | (Node::ConstInt(0, ty), _) => {
                         return nt == ty.into_nt().unwrap();
                     }
                     _ => {}
                 }
-                // return ctxt.classes[*a].vals.iter().all(|v| *v == Value::Int(0))
-                //     || ctxt.classes[*b].vals.iter().all(|v| *v == Value::Int(0));
+
+                let rt = &rule.signature().1.into_nt().unwrap();
+                let a_vals = &ctxt.classes[*a].vals;
+                let b_vals = &ctxt.classes[*b].vals;
+                return (rt == at && (a_vals.iter().all(|v| *v == Value::Int(0))))
+                    || (rt == bt) && (b_vals.iter().all(|v| *v == Value::Int(0)));
             }
             false
         }
-        ident if ident.starts_with("Mul") => {
-            if let [(_, a), (_, b)] = children {
+        Some("(* ? ?)") => {
+            if let [(at, a), (bt, b)] = children {
                 match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
                     (_, Node::ConstInt(0, ty) | Node::ConstInt(1, ty))
                     | (Node::ConstInt(0, ty) | Node::ConstInt(1, ty), _) => {
@@ -466,12 +473,16 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                     }
                     _ => {}
                 }
-                // let a_vals = &ctxt.classes[*a].vals;
-                // let b_vals = &ctxt.classes[*b].vals;
-                // return a_vals.iter().all(|v| *v == Value::Int(0))
-                //     || a_vals.iter().all(|v| *v == Value::Int(1))
-                //     || b_vals.iter().all(|v| *v == Value::Int(0))
-                //     || b_vals.iter().all(|v| *v == Value::Int(1));
+
+                let rt = &rule.signature().1.into_nt().unwrap();
+                let a_vals = &ctxt.classes[*a].vals;
+                let b_vals = &ctxt.classes[*b].vals;
+                return (rt == at
+                    && (a_vals.iter().all(|v| *v == Value::Int(0))
+                        || a_vals.iter().all(|v| *v == Value::Int(1))))
+                    || (rt == bt)
+                        && (b_vals.iter().all(|v| *v == Value::Int(0))
+                            || b_vals.iter().all(|v| *v == Value::Int(1)));
             }
             false
         }
