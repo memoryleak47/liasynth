@@ -12,12 +12,6 @@ type Score = OrderedFloat<f64>;
 type Queue = PriorityQueue<(usize, Id), Score, DefaultHashBuilder>;
 type NodeQueue = BinaryHeap<WithOrd<Node, Score>>;
 
-#[derive(Clone, Default)]
-pub struct Complexity {
-    pub cost: f64,
-    pub vars: Vec<usize>, // or (bool, usize) or whatever your var id is
-}
-
 #[cfg(all(feature = "simple", any(feature = "winning")))]
 compile_error!("simple is incompatible with winning");
 
@@ -412,8 +406,9 @@ fn handle(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
 }
 
 fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool {
+    let rt = &rule.signature().1.into_nt().unwrap();
     match rule.template() {
-        Some("(ite ? ? ? )") => {
+        Some("(ite ? ? ?)") => {
             let [(_, cond), (tt, b_then), (te, b_else)] = children else {
                 return false;
             };
@@ -431,7 +426,14 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                 return true;
             }
 
-            let rt = &rule.signature().1.into_nt().unwrap();
+            let satcount = ctxt.classes[*b_else].satcount;
+            if ctxt.seen_scs[nt]
+                .iter()
+                .any(|&sc| (satcount & sc) == satcount && sc != satcount)
+            {
+                return true;
+            }
+
             (rt == tt && ctxt.classes[*b_then].satcount.count_ones() == 0)
                 || (rt == te && ctxt.classes[*b_else].satcount.count_ones() == 0)
         }
@@ -443,6 +445,7 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
         | Some("(oxr ? ?)")
         | Some("(distinct ? ?)")
             if children.len() == 2
+                && (children[0].0 == *rt && children[1].0 == *rt)
                 && (children[0].0 == children[1].0 && children[0].1 > children[1].1) =>
         {
             return true;
@@ -675,20 +678,35 @@ fn gen_vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
 }
 
 fn mincomplexity(node: &Node, ctxt: &Ctxt) -> f64 {
-    match node {
-        Node::ConstInt(..) | Node::True(..) | Node::False(..) => 1.1,
-        Node::VarInt(_, _) | Node::VarBool(_, _) => 1.0,
-        _ => node
-            .children()
-            .iter()
-            .map(|child| match child {
-                Child::VarInt(_) | Child::VarBool(_) => 1.0,
-                Child::Hole(_, id) => ctxt.classes[*id].complex,
-                _ => 1.1,
-            })
-            .sum(),
-    }
+    node.children()
+        .iter()
+        .filter_map(|x| {
+            if let Child::Hole(_, i) = x {
+                Some(i)
+            } else {
+                None
+            }
+        })
+        .map(|x| ctxt.classes[*x].complex)
+        .sum::<f64>()
+        + 1.0
 }
+
+// fn mincomplexity(node: &Node, ctxt: &Ctxt) -> f64 {
+//     match node {
+//         Node::ConstInt(..) | Node::True(..) | Node::False(..) => 1.1,
+//         Node::VarInt(_, _) | Node::VarBool(_, _) => 1.0,
+//         _ => node
+//             .children()
+//             .iter()
+//             .map(|child| match child {
+//                 Child::VarInt(_) | Child::VarBool(_) => 1.0,
+//                 Child::Hole(_, id) => ctxt.classes[*id].complex,
+//                 _ => 1.1,
+//             })
+//             .sum(),
+//     }
+// }
 
 pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
     let mut t = Term { elems: Vec::new() };
@@ -736,7 +754,7 @@ fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
         .unwrap_or_else(|| 0);
 
     let sc = c.satcount.count_ones();
-    let diff = sc.saturating_sub(max_subterm_satcount).max(0) as f64;
+    let diff = sc.saturating_sub(max_subterm_satcount) as f64;
     let score = 1.0 - (-2.0 * (diff * sc as f64) / (l * l)).exp();
 
     OrderedFloat(score / normaliser)
@@ -782,7 +800,6 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
         .unwrap_or(0) as f64;
 
     let diff = f64::max(sc - max_subterm_satcount, 0.0);
-    let prev_sol = c.prev_sol as f64;
 
     vec![
         expm1_norm(sc, l, 0.7),
