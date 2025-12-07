@@ -677,36 +677,36 @@ fn gen_vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
         .collect()
 }
 
-fn mincomplexity(node: &Node, ctxt: &Ctxt) -> f64 {
-    node.children()
-        .iter()
-        .filter_map(|x| {
-            if let Child::Hole(_, i) = x {
-                Some(i)
-            } else {
-                None
-            }
-        })
-        .map(|x| ctxt.classes[*x].complex)
-        .sum::<f64>()
-        + 1.0
-}
-
 // fn mincomplexity(node: &Node, ctxt: &Ctxt) -> f64 {
-//     match node {
-//         Node::ConstInt(..) | Node::True(..) | Node::False(..) => 1.1,
-//         Node::VarInt(_, _) | Node::VarBool(_, _) => 1.0,
-//         _ => node
-//             .children()
-//             .iter()
-//             .map(|child| match child {
-//                 Child::VarInt(_) | Child::VarBool(_) => 1.0,
-//                 Child::Hole(_, id) => ctxt.classes[*id].complex,
-//                 _ => 1.1,
-//             })
-//             .sum(),
-//     }
+//     node.children()
+//         .iter()
+//         .filter_map(|x| {
+//             if let Child::Hole(_, i) = x {
+//                 Some(i)
+//             } else {
+//                 None
+//             }
+//         })
+//         .map(|x| ctxt.classes[*x].complex)
+//         .sum::<f64>()
+//         + 1.0
 // }
+
+fn mincomplexity(node: &Node, ctxt: &Ctxt) -> f64 {
+    match node {
+        Node::ConstInt(..) | Node::True(..) | Node::False(..) => 1.1,
+        Node::VarInt(_, _) | Node::VarBool(_, _) => 1.0,
+        _ => node
+            .children()
+            .iter()
+            .map(|child| match child {
+                Child::VarInt(_) | Child::VarBool(_) => 1.0,
+                Child::Hole(_, id) => ctxt.classes[*id].complex,
+                _ => 1.1,
+            })
+            .sum(),
+    }
+}
 
 pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
     let mut t = Term { elems: Vec::new() };
@@ -804,7 +804,7 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     vec![
         expm1_norm(sc, l, 0.7),
         expm1_norm(diff, l, 3.5),
-        1.0 / c.complex.sqrt(),
+        sc / c.complex.sqrt(),
     ]
     .into_iter()
     .chain(w2v)
