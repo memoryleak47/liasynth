@@ -607,9 +607,9 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
         if newcomplex < c.complex {
             c.complex = newcomplex;
             c.node = node.clone();
-            if c.handled_complex.is_none() {
-                enqueue(nt, _id, ctxt);
-            }
+            // if c.handled_complex.is_none() {
+            //     enqueue(nt, _id, ctxt);
+            // }
         }
         if cfg!(feature = "total") {
             push_bounded(&mut ctxt.classes[_id].nodes, WithOrd(node, newcomplex));
