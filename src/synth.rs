@@ -245,8 +245,8 @@ fn update_class(
     let new_sat = satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
     if new_sat != 0 {
         ctxt.classes[id].satcount |= new_sat;
-        ctxt.seen_scs[nt].insert(ctxt.classes[id].satcount.clone());
     }
+    ctxt.seen_scs[nt].insert(ctxt.classes[id].satcount.clone());
     enqueue(nt, id, ctxt);
 
     if ctxt.classes[id].prev_sol > 0 {
@@ -299,7 +299,7 @@ fn add_incremental_nodes(
             return None;
         };
 
-        if !ctxt.vals_lookup.contains_key(&(nt, new_vals.clone())) {
+        if new_vals != ctxt.classes[oid].vals {
             let (id, is_sol, satcount) = add_node(nt, new_node, ctxt, Some(new_vals));
             ctxt.seen_scs[nt].insert(satcount.clone());
             seen.get_mut(&oid).unwrap().push(id);
@@ -307,10 +307,6 @@ fn add_incremental_nodes(
             ctxt.classes[id].satcount = satcount;
             if is_sol {
                 return Some(id);
-            }
-            ctxt.classes[id].handled_complex = Some(ctxt.classes[id].complex);
-            for o in ctxt.problem.nt_tc.reached_by(nt) {
-                ctxt.solids[*o].push(id);
             }
         }
     }
@@ -609,7 +605,9 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
         if newcomplex < c.complex {
             c.complex = newcomplex;
             c.node = node.clone();
-            // enqueue(nt, _id, ctxt);
+            if c.handled_complex.is_none() {
+                enqueue(nt, _id, ctxt);
+            }
         }
         if cfg!(feature = "total") {
             push_bounded(
@@ -677,35 +675,19 @@ fn gen_vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
         .collect()
 }
 
-// fn mincomplexity(node: &Node, ctxt: &Ctxt) -> f64 {
-//     node.children()
-//         .iter()
-//         .filter_map(|x| {
-//             if let Child::Hole(_, i) = x {
-//                 Some(i)
-//             } else {
-//                 None
-//             }
-//         })
-//         .map(|x| ctxt.classes[*x].complex)
-//         .sum::<f64>()
-//         + 1.0
-// }
-
 fn mincomplexity(node: &Node, ctxt: &Ctxt) -> f64 {
-    match node {
-        Node::ConstInt(..) | Node::True(..) | Node::False(..) => 1.1,
-        Node::VarInt(_, _) | Node::VarBool(_, _) => 1.0,
-        _ => node
-            .children()
-            .iter()
-            .map(|child| match child {
-                Child::VarInt(_) | Child::VarBool(_) => 1.0,
-                Child::Hole(_, id) => ctxt.classes[*id].complex,
-                _ => 1.1,
-            })
-            .sum(),
-    }
+    node.children()
+        .iter()
+        .filter_map(|x| {
+            if let Child::Hole(_, i) = x {
+                Some(i)
+            } else {
+                None
+            }
+        })
+        .map(|x| ctxt.classes[*x].complex)
+        .sum::<f64>()
+        + 1.0
 }
 
 pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
@@ -804,7 +786,7 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     vec![
         expm1_norm(sc, l, 0.7),
         expm1_norm(diff, l, 3.5),
-        sc / c.complex.sqrt(),
+        sc / c.complex,
     ]
     .into_iter()
     .chain(w2v)
