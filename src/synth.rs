@@ -10,13 +10,13 @@ use std::collections::{HashMap, HashSet};
 
 type Score = OrderedFloat<f64>;
 type Queue = PriorityQueue<(usize, Id), Score, DefaultHashBuilder>;
-type NodeQueue = BinaryHeap<WithOrd<Node, Score>>;
+type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 
 #[cfg(all(feature = "simple", any(feature = "winning")))]
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 8 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 4 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
@@ -67,9 +67,9 @@ pub struct Ctxt<'a> {
 pub struct Class {
     pub node: Node,
     pub nodes: NodeQueue,
-    pub complex: f64,
+    pub complex: usize,
     pub vals: Box<[Value]>,
-    pub handled_complex: Option<f64>, // what was the size when this class was handled last time.
+    pub handled_complex: Option<usize>, // what was the size when this class was handled last time.
     pub satcount: u64,
     pub prev_sol: usize,
     pub in_sol: bool,
@@ -77,11 +77,11 @@ pub struct Class {
 }
 
 impl Class {
-    fn default_class(complex: f64, node: Node, vals: Box<[Value]>) -> Self {
+    fn default_class(complex: usize, node: Node, vals: Box<[Value]>) -> Self {
         Class {
             complex,
             node: node.clone(),
-            nodes: NodeQueue::from([WithOrd(node, OrderedFloat(complex))]),
+            nodes: NodeQueue::from([WithOrd(node, complex)]),
             vals: vals.clone(),
             handled_complex: None,
             satcount: 0,
@@ -243,9 +243,7 @@ fn update_class(
 
     seen.get_mut(&id).unwrap().push(id);
     let new_sat = satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
-    if new_sat != 0 {
-        ctxt.classes[id].satcount |= new_sat;
-    }
+    ctxt.classes[id].satcount |= new_sat;
     ctxt.seen_scs[nt].insert(ctxt.classes[id].satcount.clone());
     enqueue(nt, id, ctxt);
 
@@ -299,7 +297,7 @@ fn add_incremental_nodes(
             return None;
         };
 
-        if new_vals != ctxt.classes[oid].vals {
+        if !ctxt.vals_lookup.contains_key(&(nt, new_vals.clone())) {
             let (id, is_sol, satcount) = add_node(nt, new_node, ctxt, Some(new_vals));
             ctxt.seen_scs[nt].insert(satcount.clone());
             seen.get_mut(&oid).unwrap().push(id);
@@ -307,6 +305,10 @@ fn add_incremental_nodes(
             ctxt.classes[id].satcount = satcount;
             if is_sol {
                 return Some(id);
+            }
+            ctxt.classes[id].handled_complex = Some(ctxt.classes[id].complex);
+            for o in ctxt.problem.nt_tc.reached_by(nt) {
+                ctxt.solids[*o].push(id);
             }
         }
     }
@@ -610,10 +612,7 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
             }
         }
         if cfg!(feature = "total") {
-            push_bounded(
-                &mut ctxt.classes[_id].nodes,
-                WithOrd(node, OrderedFloat(newcomplex)),
-            );
+            push_bounded(&mut ctxt.classes[_id].nodes, WithOrd(node, newcomplex));
         }
         (_id, _satcount)
     } else {
@@ -675,7 +674,7 @@ fn gen_vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
         .collect()
 }
 
-fn mincomplexity(node: &Node, ctxt: &Ctxt) -> f64 {
+fn mincomplexity(node: &Node, ctxt: &Ctxt) -> usize {
     node.children()
         .iter()
         .filter_map(|x| {
@@ -686,8 +685,8 @@ fn mincomplexity(node: &Node, ctxt: &Ctxt) -> f64 {
             }
         })
         .map(|x| ctxt.classes[*x].complex)
-        .sum::<f64>()
-        + 1.0
+        .sum::<usize>()
+        + 1
 }
 
 pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
@@ -706,7 +705,7 @@ fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
     let ty = ctxt.classes[x].node.ty();
     let l = ctxt.big_sigmas.len() as f64;
-    let normaliser = c.complex;
+    let normaliser = c.complex as f64;
 
     if ctxt
         .problem
@@ -786,7 +785,7 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     vec![
         expm1_norm(sc, l, 0.7),
         expm1_norm(diff, l, 3.5),
-        sc / c.complex,
+        sc / c.complex as f64,
     ]
     .into_iter()
     .chain(w2v)
@@ -798,7 +797,7 @@ fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
     let ty = ctxt.classes[x].node.ty();
     let mut feats = feature_set(x, ctxt);
     let (log_odds, _) = ctxt.olinr.predict(feats.as_slice());
-    let score = log_odds.clamp(-10.0, 10.0).exp() / ctxt.classes[x].complex;
+    let score = log_odds.clamp(-10.0, 10.0).exp() / ctxt.classes[x].complex as f64;
 
     ctxt.classes[x].features = feats;
     OrderedFloat(score)
