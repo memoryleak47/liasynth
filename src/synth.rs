@@ -8,9 +8,6 @@ use priority_queue::PriorityQueue;
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet};
 
-use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
-
 type Score = OrderedFloat<f64>;
 type Queue = PriorityQueue<(usize, Id), Score, DefaultHashBuilder>;
 type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
@@ -19,7 +16,7 @@ type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 4 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 8 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
@@ -248,8 +245,10 @@ fn update_class(
 
     seen.get_mut(&id).unwrap().push(id);
     let new_sat = satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
-    ctxt.classes[id].satcount |= new_sat;
-    ctxt.seen_scs[nt].insert(ctxt.classes[id].satcount.clone());
+    if new_sat != 0 {
+        ctxt.classes[id].satcount |= new_sat;
+        ctxt.seen_scs[nt].insert(ctxt.classes[id].satcount.clone());
+    }
     enqueue(nt, id, ctxt);
 
     if ctxt.classes[id].prev_sol > 0 {
@@ -354,7 +353,7 @@ fn enumerate(ctxt: &mut Ctxt) -> Option<Term> {
             let normalised_score = if num_cxs > 0 {
                 maxsat as f64 / num_cxs as f64
             } else {
-                1.0
+                0.0
             };
 
             ctxt.olinr
@@ -399,12 +398,12 @@ fn handle_sub_solution(id: Id, ctxt: &mut Ctxt) {
 }
 
 fn handle(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
-    // let c = &mut ctxt.classes[x];
+    let c = &mut ctxt.classes[x];
     for o in ctxt.problem.nt_tc.reached_by(nt) {
         ctxt.solids[*o].push(x);
     }
 
-    // c.handled_complex = Some(c.complex);
+    c.handled_complex = Some(c.complex);
     grow(nt, x, ctxt)
 }
 
@@ -417,7 +416,11 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
             };
 
             let cond_vals = &ctxt.classes[*cond].vals;
-            if cond_vals.len() > 1 && cond_vals.iter().all(|v| *v == cond_vals[0]) {
+            if cond_vals.len() > 1
+                && cond_vals.iter().all(|v| *v == cond_vals[0])
+                && rt == tt
+                && rt == te
+            {
                 return true;
             }
 
@@ -775,8 +778,7 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     vec![
         expm1_norm(sc, l, 0.7),
         expm1_norm(diff, l, 3.5),
-        sc / c.complex as f64,
-        // c.complex as f64,
+        1.0 / c.complex.sqrt(),
     ]
     .into_iter()
     .chain(w2v)
