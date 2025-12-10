@@ -8,6 +8,9 @@ use priority_queue::PriorityQueue;
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet};
 
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
+
 type Score = OrderedFloat<f64>;
 type Queue = PriorityQueue<(usize, Id), Score, DefaultHashBuilder>;
 type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
@@ -299,9 +302,7 @@ fn add_incremental_nodes(
             return None;
         };
 
-        // println!("tere");
         if !ctxt.vals_lookup.contains_key(&(nt, new_vals.clone())) {
-            // println!("here");
             let (id, is_sol, satcount) = add_node(nt, new_node, ctxt, Some(new_vals));
             ctxt.seen_scs[nt].insert(satcount.clone());
             seen.get_mut(&oid).unwrap().push(id);
@@ -583,31 +584,6 @@ fn enqueue(nt: usize, x: Id, ctxt: &mut Ctxt) {
     ctxt.queue.push((nt, x), h);
 }
 
-pub fn extract_node(node: &Node, ctxt: &Ctxt) -> Term {
-    let mut t = Term { elems: Vec::new() };
-    let f = &|c: Id| ctxt.classes[c].node.clone();
-    node.extract(f, &mut t.elems);
-    t
-}
-
-fn euclidean_distance(v1: &[f64], v2: &[f64]) -> f64 {
-    v1.iter()
-        .zip(v2.iter())
-        .map(|(a, b)| (a - b).powi(2))
-        .sum::<f64>()
-}
-
-fn difference_proxy(other: &Node, node: &Node, ctxt: &Ctxt) -> bool {
-    let o_term = extract_node(other, ctxt);
-    let n_term = extract_node(node, ctxt);
-    let o_emb = ctxt.temb.embed(&o_term);
-    let n_emb = ctxt.temb.embed(&n_term);
-
-    let dist = euclidean_distance(&o_emb, &n_emb);
-
-    dist > 0.07
-}
-
 fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) -> (Id, bool, u64) {
     let vals = vals.unwrap_or_else(|| match gen_vals(&node, ctxt) {
         Some(v) => v,
@@ -626,14 +602,7 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
             // enqueue(nt, _id, ctxt);
         }
         if cfg!(feature = "total") {
-            let all_different = ctxt.classes[_id]
-                .nodes
-                .iter()
-                .all(|WithOrd(o, _)| difference_proxy(o, &node, &ctxt));
-
-            if all_different {
-                push_bounded(&mut ctxt.classes[_id].nodes, WithOrd(node, newcomplex));
-            }
+            push_bounded(&mut ctxt.classes[_id].nodes, WithOrd(node, newcomplex));
         }
         (_id, _satcount)
     } else {
