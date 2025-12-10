@@ -151,6 +151,8 @@ fn run(ctxt: &mut Ctxt) -> Term {
         ctxt.classes.drain(..);
     };
 
+    ctxt.olinr.start_new_curriculum();
+
     let _solution = enumerate_atoms(ctxt)
         .or_else(|| enumerate(ctxt))
         .map(|solution| solution);
@@ -349,7 +351,7 @@ fn enumerate(ctxt: &mut Ctxt) -> Option<Term> {
             let normalised_score = if num_cxs > 0 {
                 maxsat as f64 / num_cxs as f64
             } else {
-                0.0
+                1.0
             };
 
             ctxt.olinr
@@ -394,12 +396,12 @@ fn handle_sub_solution(id: Id, ctxt: &mut Ctxt) {
 }
 
 fn handle(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
-    let c = &mut ctxt.classes[x];
+    // let c = &mut ctxt.classes[x];
     for o in ctxt.problem.nt_tc.reached_by(nt) {
         ctxt.solids[*o].push(x);
     }
 
-    c.handled_complex = Some(c.complex);
+    // c.handled_complex = Some(c.complex);
     grow(nt, x, ctxt)
 }
 
@@ -607,9 +609,7 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
         if newcomplex < c.complex {
             c.complex = newcomplex;
             c.node = node.clone();
-            // if c.handled_complex.is_none() {
-            //     enqueue(nt, _id, ctxt);
-            // }
+            // enqueue(nt, _id, ctxt);
         }
         if cfg!(feature = "total") {
             push_bounded(&mut ctxt.classes[_id].nodes, WithOrd(node, newcomplex));
@@ -786,6 +786,7 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
         expm1_norm(sc, l, 0.7),
         expm1_norm(diff, l, 3.5),
         sc / c.complex as f64,
+        // c.complex as f64,
     ]
     .into_iter()
     .chain(w2v)
@@ -796,8 +797,14 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
 fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
     let ty = ctxt.classes[x].node.ty();
     let mut feats = feature_set(x, ctxt);
-    let (log_odds, _) = ctxt.olinr.predict(feats.as_slice());
-    let score = log_odds.clamp(-10.0, 10.0).exp() / ctxt.classes[x].complex as f64;
+    let (mean, var) = ctxt.olinr.predict(&feats);
+    let mean = mean.clamp(0.0, 1.0);
+    let std = var.max(0.0).sqrt();
+
+    let beta = 0.00001;
+    let ucb = mean + beta * std;
+
+    let score = ucb / ctxt.classes[x].complex as f64;
 
     ctxt.classes[x].features = feats;
     OrderedFloat(score)
