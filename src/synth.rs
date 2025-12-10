@@ -437,19 +437,6 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
             (rt == tt && ctxt.classes[*b_then].satcount.count_ones() == 0)
                 || (rt == te && ctxt.classes[*b_else].satcount.count_ones() == 0)
         }
-        Some("(+ ? ?)")
-        | Some("(* ? ?)")
-        | Some("(= ? ?)")
-        | Some("(and ? ?)")
-        | Some("(or ? ?)")
-        | Some("(oxr ? ?)")
-        | Some("(distinct ? ?)")
-            if children.len() == 2
-                && (children[0].0 == *rt && children[1].0 == *rt)
-                && (children[0].0 == children[1].0 && children[0].1 > children[1].1) =>
-        {
-            return true;
-        }
         Some("(+ ? ?)") => {
             if let [(at, a), (bt, b)] = children {
                 match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
@@ -594,6 +581,10 @@ fn enqueue(nt: usize, x: Id, ctxt: &mut Ctxt) {
     ctxt.queue.push((nt, x), h);
 }
 
+fn difference_proxy(other: &Node, node: &Node) -> bool {
+    true
+}
+
 fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) -> (Id, bool, u64) {
     let vals = vals.unwrap_or_else(|| match gen_vals(&node, ctxt) {
         Some(v) => v,
@@ -612,7 +603,14 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
             // enqueue(nt, _id, ctxt);
         }
         if cfg!(feature = "total") {
-            push_bounded(&mut ctxt.classes[_id].nodes, WithOrd(node, newcomplex));
+            let all_different = ctxt.classes[_id]
+                .nodes
+                .iter()
+                .all(|WithOrd(o, _)| difference_proxy(o, &node));
+
+            if all_different {
+                push_bounded(&mut ctxt.classes[_id].nodes, WithOrd(node, newcomplex));
+            }
         }
         (_id, _satcount)
     } else {
