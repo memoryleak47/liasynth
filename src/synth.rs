@@ -778,7 +778,7 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     vec![
         expm1_norm(sc, l, 0.7),
         expm1_norm(diff, l, 3.5),
-        1.0 / c.complex.sqrt(),
+        1.0 / (c.complex as f64).sqrt(),
     ]
     .into_iter()
     .chain(w2v)
