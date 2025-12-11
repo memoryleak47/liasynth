@@ -143,6 +143,8 @@ pub fn synth(
 fn run(ctxt: &mut Ctxt) -> Term {
     time_block!("synth.run");
 
+    // ctxt.olinr.on_curriculum_change(0.0, 1.00);
+
     if cfg!(any(feature = "simple", feature = "winning",)) {
         if let Some(solution) = incremental_comp(ctxt) {
             return solution;
@@ -789,14 +791,8 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
 fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
     let ty = ctxt.classes[x].node.ty();
     let mut feats = feature_set(x, ctxt);
-    let (mean, var) = ctxt.olinr.predict(&feats);
-    let mean = mean.clamp(0.0, 1.0);
-    let std = var.max(0.0).sqrt();
-
-    let beta = 0.00001;
-    let ucb = mean + beta * std;
-
-    let score = ucb / ctxt.classes[x].complex as f64;
+    let (log_odds, _) = ctxt.olinr.predict(feats.as_slice());
+    let score = log_odds.clamp(-10.0, 10.0).exp() / ctxt.classes[x].complex as f64;
 
     ctxt.classes[x].features = feats;
     OrderedFloat(score)

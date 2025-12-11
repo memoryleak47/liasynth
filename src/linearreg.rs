@@ -1,4 +1,4 @@
-use rand::SeedableRng;
+use rand::{Rng, SeedableRng};
 use rand_distr::Distribution;
 use rand_distr::{Normal, Uniform};
 
@@ -47,10 +47,10 @@ impl Rff {
 pub struct BayesianLinearRegression {
     mu: Vec<f64>,
     v: Vec<Vec<f64>>,
-    sigma_sq: f64,
-    lambda_prior: f64,
-    eta_lik: f64,
+    a: f64,
+    b: f64,
     n_obs: usize,
+
     pub rff: Rff,
 }
 
@@ -58,14 +58,13 @@ impl BayesianLinearRegression {
     pub fn new(
         input_dim: usize,
         rff_features: usize,
-        sigma_rff: f64,
+        sigma: f64,
         seed: u64,
         prior_variance: f64,
-        noise_variance: f64,
-        lambda_prior: f64,
-        eta_lik: f64,
+        noise_shape: f64,
+        noise_scale: f64,
     ) -> Self {
-        let rff = Rff::new(input_dim, rff_features, sigma_rff, seed);
+        let rff = Rff::new(input_dim, rff_features, sigma, seed);
         let dim = rff.num_features + 1;
 
         let mut v = vec![vec![0.0; dim]; dim];
@@ -76,30 +75,26 @@ impl BayesianLinearRegression {
         Self {
             mu: vec![0.0; dim],
             v,
-            sigma_sq: noise_variance,
-            lambda_prior: lambda_prior.clamp(0.0001, 1.0),
-            eta_lik: eta_lik.max(1e-6),
+            a: noise_shape,
+            b: noise_scale,
             n_obs: 0,
             rff,
         }
     }
 
     pub fn with_default(input_dim: usize, rff_features: usize) -> Self {
-        BayesianLinearRegression::new(input_dim, rff_features, 1.0, 12345, 100.0, 1.0, 1.0, 1.0)
-    }
-
-    fn build_feature_vector(&self, x_raw: &[f64]) -> Vec<f64> {
-        let mut out = Vec::with_capacity(self.mu.len());
-        out.push(1.0);
-        out.extend(self.rff.transform(x_raw));
-        out
+        Self::new(input_dim, rff_features, 1.0, 12345, 100.0, 1.0, 1.0)
     }
 
     pub fn predict(&self, x_raw: &[f64]) -> (f64, f64) {
         let x = self.build_feature_vector(x_raw);
+
         let mean = dot(&x, &self.mu);
+        let sigma_sq = self.b / self.a;
+
         let xvx = quadratic_form(&x, &self.v);
-        let var = self.sigma_sq + xvx;
+        let var = sigma_sq * (1.0 + xvx);
+
         (mean, var)
     }
 
@@ -114,40 +109,39 @@ impl BayesianLinearRegression {
     pub fn update(&mut self, x_raw: &[f64], y: f64) -> f64 {
         let x = self.build_feature_vector(x_raw);
 
-        if self.lambda_prior < 1.0 {
-            let inv_lambda = 1.0 / self.lambda_prior;
-            for i in 0..self.v.len() {
-                for j in 0..self.v[0].len() {
-                    self.v[i][j] *= inv_lambda;
-                }
-            }
-        }
+        let (pred_mean, pred_var) = self.predict(x_raw);
+        let error = y - pred_mean;
+        let sigma_sq = self.b / self.a;
+        let xvx = quadratic_form(&x, &self.v);
 
         let vx = matvec(&self.v, &x);
-        let xvx = dot(&x, &vx);
-
-        let adj_sigma_sq = self.sigma_sq / self.eta_lik;
-        let denom = adj_sigma_sq + xvx;
+        let denom = sigma_sq + xvx;
         let gain = 1.0 / denom;
 
-        let pred = dot(&x, &self.mu);
-        let error = y - pred;
-
-        let scaled_gain = self.eta_lik * gain;
-
         for i in 0..self.mu.len() {
-            self.mu[i] += scaled_gain * error * vx[i];
+            self.mu[i] += gain * error * vx[i];
         }
 
         for i in 0..self.v.len() {
             for j in 0..self.v[0].len() {
-                self.v[i][j] -= scaled_gain * vx[i] * vx[j];
+                self.v[i][j] -= vx[i] * vx[j] * gain;
             }
         }
 
+        self.a += 0.5;
+        let noise_update = 0.5 * error * error / (1.0 + xvx / sigma_sq);
+        self.b = (self.b + noise_update).clamp(0.01, 1000.0);
+
         self.n_obs += 1;
 
-        0.5 * error * error
+        0.5 * (pred_var.ln() + error * error / pred_var)
+    }
+
+    fn build_feature_vector(&self, x_raw: &[f64]) -> Vec<f64> {
+        let mut out = Vec::with_capacity(self.mu.len());
+        out.push(1.0); // bias
+        out.extend(self.rff.transform(x_raw));
+        out
     }
 }
 
