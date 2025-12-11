@@ -178,7 +178,7 @@ pub fn cegis(problem: &Problem) -> Term {
     let mut classes = None;
     let embedding_dim = 5;
     let mut term_embed = TermEmbedder::new(embedding_dim);
-    let mut olinr = BayesianLinearRegression::with_default(embedding_dim + 3, 40);
+    let mut olinr = BayesianLinearRegression::with_default(embedding_dim + 3, 50);
     loop {
         let (term, cxsc, clss) = synth(
             problem,
