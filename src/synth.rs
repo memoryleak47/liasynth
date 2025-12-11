@@ -16,7 +16,7 @@ type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 8 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 6 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
@@ -151,8 +151,6 @@ fn run(ctxt: &mut Ctxt) -> Term {
         ctxt.classes.drain(..);
     };
 
-    ctxt.olinr.start_new_curriculum();
-
     let _solution = enumerate_atoms(ctxt)
         .or_else(|| enumerate(ctxt))
         .map(|solution| solution);
@@ -210,7 +208,7 @@ fn update_children(node: &Node, seen: &mut HashMap<Id, Vec<Id>>, ctxt: &mut Ctxt
     }
 }
 
-// TODO: We have an issue with cycles hence needing to return an Err
+// We cannot support cycles hence sometimes return an Err
 fn update_vals(node: &Node, vals: &Vec<Value>, ctxt: &Ctxt) -> Result<Box<[Value]>, ()> {
     let mut new_vals: Vec<Value> = vals.clone();
     for (i, sigma) in ctxt.small_sigmas[vals.len()..].iter().enumerate() {
@@ -311,9 +309,9 @@ fn add_incremental_nodes(
                 return Some(id);
             }
             ctxt.classes[id].handled_complex = Some(ctxt.classes[id].complex);
-            for o in ctxt.problem.nt_tc.reached_by(nt) {
-                ctxt.solids[*o].push(id);
-            }
+            // for o in ctxt.problem.nt_tc.reached_by(nt) {
+            //     ctxt.solids[*o].push(id);
+            // }
         }
     }
     None
@@ -602,7 +600,9 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
         if newcomplex < c.complex {
             c.complex = newcomplex;
             c.node = node.clone();
-            // enqueue(nt, _id, ctxt);
+            if c.handled_complex.is_none() {
+                enqueue(nt, _id, ctxt);
+            }
         }
         if cfg!(feature = "total") {
             push_bounded(&mut ctxt.classes[_id].nodes, WithOrd(node, newcomplex));
