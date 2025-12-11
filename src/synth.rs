@@ -16,7 +16,7 @@ type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 10 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 6 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
