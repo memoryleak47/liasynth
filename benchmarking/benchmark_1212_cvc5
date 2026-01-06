@@ -1,0 +1,842 @@
+
+==========
+[0/161] examples/LIA/array_search_10.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[1/161] examples/LIA/array_search_11.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[2/161] examples/LIA/array_search_12.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[3/161] examples/LIA/array_search_13.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[4/161] examples/LIA/array_search_14.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[5/161] examples/LIA/array_search_15.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[6/161] examples/LIA/array_search_2.sl:
+(
+(define-fun findIdx ((y1 Int) (y2 Int) (k1 Int)) Int (ite (< y2 k1) 2 (ite (<= y1 k1) 1 0)))
+)
+
+==========
+[7/161] examples/LIA/array_search_3.sl:
+(
+(define-fun findIdx ((y1 Int) (y2 Int) (y3 Int) (k1 Int)) Int (ite (< y3 k1) 3 (ite (<= k1 y2) (ite (<= y1 k1) 1 0) 2)))
+)
+
+==========
+[8/161] examples/LIA/array_search_4.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[9/161] examples/LIA/array_search_5.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[10/161] examples/LIA/array_search_6.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[11/161] examples/LIA/array_search_7.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[12/161] examples/LIA/array_search_8.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[13/161] examples/LIA/array_search_9.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[14/161] examples/LIA/commutative.sl:
+(
+(define-fun comm ((x Int) (y Int)) Int (- x x))
+)
+
+==========
+[15/161] examples/LIA/constant.sl:
+(
+(define-fun constant ((x Int)) Int 0)
+)
+
+==========
+[16/161] examples/LIA/inv_gen_array.sl:
+(
+(define-fun inv ((m Int) (j Int) (a0 Int)) Bool (or (<= (+ (* 0 m) (* 1 j)) 0) (<= (+ (* 1 m) (* (- 1) a0)) 0)))
+)
+
+==========
+[17/161] examples/LIA/inv_gen_cegar2.sl:
+infeasible
+
+==========
+[18/161] examples/LIA/inv_gen_cgr1.sl:
+(
+(define-fun inv ((x Int) (y Int)) Bool (let ((_let_1 (* 0 x))) (or (<= (+ _let_1 _let_1) (- 3)) (<= (+ (* 1 x) (* (- 1) y)) 2))))
+)
+
+==========
+[19/161] examples/LIA/inv_gen_ex14.sl:
+(
+(define-fun inv ((x Int) (y Int)) Bool (let ((_let_1 (- 1))) (let ((_let_2 (* 0 x))) (or (<= (+ _let_2 _let_2) (- 3)) (<= (+ _let_2 (* _let_1 x)) _let_1)))))
+)
+
+==========
+[20/161] examples/LIA/inv_gen_ex23.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[21/161] examples/LIA/inv_gen_ex7.sl:
+(
+(define-fun inv ((i Int) (y Int) (l Int)) Bool (let ((_let_1 (- 1))) (and (<= (+ (* 0 i) (* _let_1 i)) 0) (<= (+ (* 1 y) (* _let_1 l)) 0))))
+)
+
+==========
+[22/161] examples/LIA/inv_gen_fig1.sl:
+(
+(define-fun inv ((x Int) (y Int)) Bool (let ((_let_1 (* 0 x))) (or (<= (+ _let_1 (* 1 x)) (- 3)) (<= (+ _let_1 (* (- 1) y)) (- 2)))))
+)
+
+==========
+[23/161] examples/LIA/inv_gen_fig3.sl:
+(
+(define-fun inv ((x Int) (y Int) (l Int)) Bool (let ((_let_1 (- 1))) (or (= (+ (* 0 x) (* 1 l)) 1) (<= (+ (* 1 x) (* _let_1 y)) _let_1))))
+)
+
+==========
+[24/161] examples/LIA/inv_gen_fig6.sl:
+(
+(define-fun inv ((y Int)) Bool (let ((_let_1 (* 0 y))) (let ((_let_2 (+ _let_1 _let_1))) (or (<= _let_2 (- 3)) (<= _let_2 0)))))
+)
+
+==========
+[25/161] examples/LIA/inv_gen_fig8.sl:
+(
+(define-fun inv ((l Int)) Bool (let ((_let_1 (* 0 l))) (or (<= (+ _let_1 _let_1) (- 3)) (= (+ _let_1 (* 1 l)) 0))))
+)
+
+==========
+[26/161] examples/LIA/inv_gen_fig9.sl:
+(
+(define-fun inv ((x Int) (y Int)) Bool (let ((_let_1 (* 0 x))) (and (= (+ _let_1 (* 1 x)) 0) (= (+ _let_1 (* 1 y)) 0))))
+)
+
+==========
+[27/161] examples/LIA/inv_gen_finf1.sl:
+(
+(define-fun inv ((i Int) (x Int) (y Int) (n Int)) Bool (let ((_let_1 (* 0 i))) (or (<= (+ _let_1 _let_1) (- 3)) (= (+ _let_1 (* 1 x)) 0))))
+)
+
+==========
+[28/161] examples/LIA/inv_gen_finf2.sl:
+(
+(define-fun inv ((i Int) (x Int) (y Int) (n Int)) Bool (let ((_let_1 (* 0 i))) (or (<= (+ _let_1 _let_1) (- 3)) (= (+ _let_1 (* 1 x)) 0))))
+)
+
+==========
+[29/161] examples/LIA/inv_gen_n_c11.sl:
+(
+(define-fun inv ((i Int) (l Int)) Bool (let ((_let_1 (* 0 i))) (and (<= (+ _let_1 (* 1 l)) 4) (<= (+ _let_1 (* (- 1) l)) 0))))
+)
+
+==========
+[30/161] examples/LIA/inv_gen_sum1.sl:
+infeasible
+
+==========
+[31/161] examples/LIA/inv_gen_sum3.sl:
+(
+(define-fun inv ((s Int) (l Int) (n Int) (x Int)) Bool (let ((_let_1 (* 0 s))) (or (<= (+ _let_1 _let_1) (- 3)) (= (+ (* 1 s) (* (- 1) x)) 0))))
+)
+
+==========
+[32/161] examples/LIA/inv_gen_sum4.sl:
+(
+(define-fun inv ((s Int) (i Int)) Bool (let ((_let_1 (- 1))) (let ((_let_2 (* 1 s))) (and (<= (+ (* 0 s) _let_2) 8) (= (+ _let_2 (* _let_1 i)) _let_1)))))
+)
+
+==========
+[33/161] examples/LIA/inv_gen_tcs.sl:
+infeasible
+
+==========
+[34/161] examples/LIA/inv_gen_term2.sl:
+(
+(define-fun inv ((x Int) (y Int) (z Int)) Bool (let ((_let_1 (* 0 x))) (let ((_let_2 (+ _let_1 _let_1))) (or (<= _let_2 (- 3)) (<= _let_2 0)))))
+)
+
+==========
+[35/161] examples/LIA/inv_gen_term3.sl:
+(
+(define-fun inv ((x Int) (y Int)) Bool (let ((_let_1 (* 0 x))) (let ((_let_2 (+ _let_1 _let_1))) (or (<= _let_2 (- 3)) (<= _let_2 0)))))
+)
+
+==========
+[36/161] examples/LIA/inv_gen_trex1.sl:
+(
+(define-fun inv ((x Int) (y Int) (k Int) (z Int) (c Int)) Bool (let ((_let_1 (- 1))) (let ((_let_2 (* 0 x))) (or (<= (+ _let_2 _let_2) (- 3)) (<= (+ _let_2 (* _let_1 z)) _let_1)))))
+)
+
+==========
+[37/161] examples/LIA/inv_gen_trex2.sl:
+(
+(define-fun inv ((x Int)) Bool (let ((_let_1 (* 0 x))) (let ((_let_2 (+ _let_1 _let_1))) (or (<= _let_2 (- 3)) (<= _let_2 0)))))
+)
+
+==========
+[38/161] examples/LIA/inv_gen_trex4.sl:
+(
+(define-fun inv ((x Int) (d Int)) Bool (let ((_let_1 (* 0 x))) (let ((_let_2 (+ _let_1 _let_1))) (or (<= _let_2 (- 3)) (<= _let_2 0)))))
+)
+
+==========
+[39/161] examples/LIA/inv_gen_vmail.sl:
+(
+(define-fun inv ((i Int) (j Int)) Bool (let ((_let_1 (* 0 i))) (or (<= (+ _let_1 _let_1) (- 3)) (<= (+ _let_1 (* (- 1) i)) 0))))
+)
+
+==========
+[40/161] examples/LIA/inv_gen_w1.sl:
+(
+(define-fun inv ((x Int) (n Int)) Bool (let ((_let_1 (* 0 x))) (or (<= (+ _let_1 _let_1) (- 3)) (<= (+ (* 1 x) (* (- 1) n)) 0))))
+)
+
+==========
+[41/161] examples/LIA/inv_gen_w2.sl:
+(
+(define-fun inv ((x Int) (n Int)) Bool (let ((_let_1 (- 1))) (let ((_let_2 (* 0 x))) (or (<= (+ _let_2 _let_2) (- 3)) (<= (+ (* 1 x) (* _let_1 n)) _let_1)))))
+)
+
+==========
+[42/161] examples/LIA/inv_gen_winf1.sl:
+(
+(define-fun inv ((x Int)) Bool (let ((_let_1 (* 0 x))) (or (<= (+ _let_1 _let_1) (- 3)) (= (+ _let_1 (* 1 x)) 0))))
+)
+
+==========
+[43/161] examples/LIA/inv_gen_winf2.sl:
+(
+(define-fun inv ((x Int)) Bool (let ((_let_1 (* 0 x))) (or (<= (+ _let_1 _let_1) (- 3)) (= (+ _let_1 (* 1 x)) 0))))
+)
+
+==========
+[44/161] examples/LIA/LinExpr_eq1ex.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[45/161] examples/LIA/LinExpr_eq2ex.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[46/161] examples/LIA/LinExpr_inv1_ex.sl:
+(
+(define-fun inv ((x Int) (y Int)) Int (ite (or (= x 1) (<= y 1)) (+ (+ 1 1) 1) 1))
+)
+
+==========
+[47/161] examples/LIA/LinExpr_inv1.sl:
+(
+(define-fun inv ((x Int) (y Int)) Int (ite (<= y x) (+ (+ x x) y) (+ (+ x y) y)))
+)
+
+==========
+[48/161] examples/LIA/max10.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[49/161] examples/LIA/max_11.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[50/161] examples/LIA/max12.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[51/161] examples/LIA/max13.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[52/161] examples/LIA/max14.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[53/161] examples/LIA/max15.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[54/161] examples/LIA/max2.sl:
+examples/LIA/max2.sl:3.2: No set-logic command was given before this point.
+examples/LIA/max2.sl:3.2: cvc5 will make all theories available.
+examples/LIA/max2.sl:3.2: Consider setting a stricter logic for (likely) better performance.
+examples/LIA/max2.sl:3.2: To suppress this warning in the future use (set-logic ALL).
+(
+(define-fun max2 ((x Int) (y Int)) Int (ite (<= y x) x y))
+)
+
+==========
+[55/161] examples/LIA/max3.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[56/161] examples/LIA/max4.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[57/161] examples/LIA/max5.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[58/161] examples/LIA/max6.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[59/161] examples/LIA/max7.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[60/161] examples/LIA/max8.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[61/161] examples/LIA/max9.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[62/161] examples/LIA/mpg_example1.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[63/161] examples/LIA/mpg_example2.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[64/161] examples/LIA/mpg_example3.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[65/161] examples/LIA/mpg_example4.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[66/161] examples/LIA/mpg_example5.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[67/161] examples/LIA/mpg_guard1.sl:
+(
+(define-fun eq1 ((x Int) (y Int) (z Int)) Int (let ((_let_1 (+ y x))) (ite (<= 1 _let_1) _let_1 (- x y))))
+)
+
+==========
+[68/161] examples/LIA/mpg_guard2.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[69/161] examples/LIA/mpg_guard3.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[70/161] examples/LIA/mpg_guard4.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[71/161] examples/LIA/mpg_ite1.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[72/161] examples/LIA/mpg_ite2.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[73/161] examples/LIA/mpg_plane1.sl:
+(
+(define-fun eq1 ((x Int) (y Int) (z Int)) Int (+ y x))
+)
+
+==========
+[74/161] examples/LIA/mpg_plane2.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[75/161] examples/LIA/mpg_plane3.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[76/161] examples/LIA/MPwL_d1s3.sl:
+(
+(define-fun move ((currPoint Int) (o0 Int) (o1 Int)) Int 1)
+)
+
+==========
+[77/161] examples/LIA/MPwL_d1s7.sl:
+(
+(define-fun move ((currPoint Int) (o0 Int) (o1 Int)) Int 1)
+)
+
+==========
+[78/161] examples/LIA/MPwL_d4s3.sl:
+(
+(define-fun move ((currPoint Int) (o0 Int) (o1 Int)) Int (ite (<= (get-y currPoint) 1) 1 2))
+)
+
+==========
+[79/161] examples/LIA/MPwL_d4s7.sl:
+(
+(define-fun move ((currPoint Int) (o0 Int) (o1 Int)) Int (ite (= (get-y currPoint) 6) 2 1))
+)
+
+==========
+[80/161] examples/LIA/MPwL_d5s3.sl:
+(
+(define-fun move ((currPoint Int) (o0 Int) (o1 Int)) Int (let ((_let_1 (get-x currPoint))) (ite (= _let_1 (get-y currPoint)) (ite (= _let_1 1) 0 2) 1)))
+)
+
+==========
+[81/161] examples/LIA/MPwL_d5s7.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[82/161] examples/LIA/MPwoL_d1s3.sl:
+(
+(define-fun move ((currPoint Int) (o0 Int) (o1 Int)) Int 1)
+)
+
+==========
+[83/161] examples/LIA/MPwoL_d1s7.sl:
+(
+(define-fun move ((currPoint Int) (o0 Int) (o1 Int)) Int 1)
+)
+
+==========
+[84/161] examples/LIA/MPwoL_d4s3.sl:
+(
+(define-fun move ((currPoint Int) (o0 Int) (o1 Int)) Int (ite (<= (get-y currPoint) 1) 1 2))
+)
+
+==========
+[85/161] examples/LIA/MPwoL_d4s7.sl:
+(
+(define-fun move ((currPoint Int) (o0 Int) (o1 Int)) Int (ite (= (get-y currPoint) 6) 2 1))
+)
+
+==========
+[86/161] examples/LIA/MPwoL_d5s3.sl:
+(
+(define-fun move ((currPoint Int) (o0 Int) (o1 Int)) Int (ite (= 0 (get-y currPoint)) 1 (ite (<= 1 (get-x currPoint)) 0 2)))
+)
+
+==========
+[87/161] examples/LIA/MPwoL_d5s7.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[88/161] examples/LIA/qm_area_sel_2.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[89/161] examples/LIA/qm_choose_01.sl:
+(
+(define-fun qm-choose ((x Int)) Int (ite (< 0 x) 0 1))
+)
+
+==========
+[90/161] examples/LIA/qm_choose_yz.sl:
+(
+(define-fun qm-choose ((x Int) (y Int) (z Int)) Int (ite (< x 1) y z))
+)
+
+==========
+[91/161] examples/LIA/qm_in_range.sl:
+(
+(define-fun qm-choose ((x Int) (y Int) (z Int)) Int (ite (< (ite (< x z) y x) x) 1 0))
+)
+
+==========
+[92/161] examples/LIA/qm_loop_1.sl:
+(
+(define-fun qm-loop ((x Int)) Int (ite (< 0 x) (- x 1) 3))
+)
+
+==========
+[93/161] examples/LIA/qm_loop_2.sl:
+(
+(define-fun qm-multi-loop ((x Int) (y Int)) Int (ite (< y 1) (ite (< y x) (- x 1) 3) x))
+)
+
+==========
+[94/161] examples/LIA/qm_loop_3.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[95/161] examples/LIA/qm_max2.sl:
+(
+(define-fun qm-foo ((x Int) (y Int)) Int (ite (< x y) y x))
+)
+
+==========
+[96/161] examples/LIA/qm_max3.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[97/161] examples/LIA/qm_max4.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[98/161] examples/LIA/qm_max5.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[99/161] examples/LIA/qm_neg_1.sl:
+(
+(define-fun qm-foo ((x Int)) Int (ite (< x 0) 1 0))
+)
+
+==========
+[100/161] examples/LIA/qm_neg_2.sl:
+(
+(define-fun qm-foo ((x Int) (y Int)) Int (ite (< (ite (< y 0) x y) 0) 1 0))
+)
+
+==========
+[101/161] examples/LIA/qm_neg_3.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[102/161] examples/LIA/qm_neg_4.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[103/161] examples/LIA/qm_neg_5.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[104/161] examples/LIA/qm_neg_eq_1.sl:
+(
+(define-fun qm-foo ((x Int)) Int (ite (< 0 x) 0 1))
+)
+
+==========
+[105/161] examples/LIA/qm_neg_eq_2.sl:
+(
+(define-fun qm-foo ((x Int) (y Int)) Int (ite (< 0 y) 0 (ite (< x 1) 1 0)))
+)
+
+==========
+[106/161] examples/LIA/qm_neg_eq_3.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[107/161] examples/LIA/qm_neg_eq_4.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[108/161] examples/LIA/qm_neg_eq_5.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[109/161] examples/LIA/s0_d0.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[110/161] examples/LIA/s0_d1.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[111/161] examples/LIA/s0_d2.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[112/161] examples/LIA/s0.sl:
+(
+(define-fun f ((x Int)) Int (let ((_let_1 (+ x x))) (let ((_let_2 (+ x _let_1))) (let ((_let_3 (+ x _let_2))) (ite (not (= x 10)) (ite (<= x (- 30 _let_2)) (ite (<= x (- 10 _let_1)) (ite (= x (- 10 _let_3)) 20 (ite (<= x 0) x (ite (<= 10 _let_3) 30 10))) (ite (<= x (- 10 x)) (ite (not (<= 10 _let_1)) 40 50) x)) x) x)))))
+)
+
+==========
+[113/161] examples/LIA/s1.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[114/161] examples/LIA/s2.sl:
+(
+(define-fun f ((x Int) (y Int)) Int (- 1))
+)
+
+==========
+[115/161] examples/LIA/s3.sl:
+(
+(define-fun f ((x Int) (y Int)) Int (- 1))
+)
+
+==========
+[116/161] examples/LIA/t10.sl:
+(
+(define-fun f_35-7-35-46 ((this.total Int) (this.num Int) (this.start Int)) Bool (> this.total this.total))
+)
+
+==========
+[117/161] examples/LIA/t11.sl:
+(
+(define-fun f_1981-20-1981-42 ((NCK_NEQ_741360 Bool) (NCK_NEQ_505948 Bool)) Bool (not NCK_NEQ_741360))
+)
+
+==========
+[118/161] examples/LIA/t12.sl:
+(
+(define-fun f_29-21-29-36 ((pair.length Int)) Bool (>= pair.length pair.length))
+)
+
+==========
+[119/161] examples/LIA/t14.sl:
+(
+(define-fun f_31-12-31-30 ((newLength Int) (offset Int)) Bool (>= newLength newLength))
+)
+
+==========
+[120/161] examples/LIA/t15.sl:
+(
+(define-fun f_97-10-97-48 ((NOACK Int) (this.acknowledgeId Int) (enabled Bool)) Bool enabled)
+)
+
+==========
+[121/161] examples/LIA/t17.sl:
+(
+(define-fun f_255-8-255-24 ((j Int) (MC_741360 Int)) Bool (= j j))
+)
+
+==========
+[122/161] examples/LIA/t18.sl:
+(
+(define-fun f_338-17-338-60 ((entry Int) (MC_505948 Int) (i Int) (MC_741360 Int)) Bool (> entry 0))
+)
+
+==========
+[123/161] examples/LIA/t1.sl:
+(
+(define-fun f_119-13-119-51 ((stopTime Int) (this.stopTime Int) (org.apache.commons.lang.time.StopWatch.STATE_RUNNING Int) (this.splitState Int) (org.apache.commons.lang.time.StopWatch.STATE_SUSPENDED Int) (org.apache.commons.lang.time.StopWatch.STATE_UNSTARTED Int) (this.startTime Int) (org.apache.commons.lang.time.StopWatch.STATE_SPLIT Int) (org.apache.commons.lang.time.StopWatch.STATE_UNSPLIT Int) (org.apache.commons.lang.time.StopWatch.STATE_STOPPED Int) (MC_741360 Int) (this.runningState Int)) Bool (= this.stopTime org.apache.commons.lang.time.StopWatch.STATE_RUNNING))
+)
+
+==========
+[124/161] examples/LIA/t20.sl:
+(
+(define-fun f_68-13-68-36 ((next Int) (pos Int) (MC_741360 Bool)) Bool (let ((_let_1 (= next 55))) (or (or _let_1 (and MC_741360 (= pos 56))) (or (= next pos) (not _let_1)))))
+)
+
+==========
+[125/161] examples/LIA/t2.sl:
+(
+(define-fun f_290-29-290-44 ((data.length Int)) Bool (> data.length 0))
+)
+
+==========
+[126/161] examples/LIA/t3.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[127/161] examples/LIA/t4.sl:
+(
+(define-fun f_141-11-141-28 ((x.end Int) (size Int) (i Int) (elem.end Int)) Bool (> x.end elem.end))
+)
+
+==========
+[128/161] examples/LIA/t5.sl:
+(
+(define-fun f_97-11-98-60 ((charno Int) (MC_505948 Int) (MC_741360 Bool)) Bool MC_741360)
+)
+
+==========
+[129/161] examples/LIA/t6.sl:
+(
+(define-fun f_30-42-30-64 ((i Int) (MC_741360 Int)) Bool (<= i MC_741360))
+)
+
+==========
+[130/161] examples/LIA/t7.sl:
+(
+(define-fun f_125-10-125-47 ((bufferIndex Int) (MC_741360 Int)) Bool (> bufferIndex bufferIndex))
+)
+
+==========
+[131/161] examples/LIA/t8.sl:
+(
+(define-fun f_143-17-143-55 ((x2 Int) (x1 Int) (parentNode Int) (EMPTY_PARENT Int)) Bool (= x1 x1))
+)
+
+==========
+[132/161] examples/LIA/t9.sl:
+(
+(define-fun f_147-8-147-37 ((yearInt Int)) Bool (<= yearInt yearInt))
+)
+
+==========
+[133/161] examples/LIA/unbdd_inv_gen_array.sl:
+(
+(define-fun inv ((m Int) (j Int) (a0 Int)) Bool (or (<= (+ (* 0 m) (* 1 j)) 0) (<= (+ (* 1 m) (* (- 1) a0)) 0)))
+)
+
+==========
+[134/161] examples/LIA/unbdd_inv_gen_cegar2.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[135/161] examples/LIA/unbdd_inv_gen_cgr1.sl:
+(
+(define-fun inv ((x Int) (y Int)) Bool (let ((_let_1 (* 0 x))) (and (<= (+ _let_1 _let_1) 0) (<= (+ (* 1 x) (* (- 1) y)) (+ 1 1)))))
+)
+
+==========
+[136/161] examples/LIA/unbdd_inv_gen_ex14.sl:
+(
+(define-fun inv ((x Int) (y Int)) Bool (let ((_let_1 (* 0 x))) (and (<= (+ _let_1 _let_1) 0) (<= (+ _let_1 (* (- 1) x)) (- 0 1)))))
+)
+
+==========
+[137/161] examples/LIA/unbdd_inv_gen_ex23.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[138/161] examples/LIA/unbdd_inv_gen_ex7.sl:
+(
+(define-fun inv ((i Int) (y Int) (l Int)) Bool (let ((_let_1 (- 1))) (and (<= (+ (* 0 i) (* _let_1 i)) 0) (<= (+ (* 1 y) (* _let_1 l)) 0))))
+)
+
+==========
+[139/161] examples/LIA/unbdd_inv_gen_fig1.sl:
+(
+(define-fun inv ((x Int) (y Int)) Bool (let ((_let_1 (- 0 1))) (let ((_let_2 (* 0 x))) (or (<= (+ _let_2 (* 1 x)) _let_1) (<= (+ _let_2 (* (- 1) y)) _let_1)))))
+)
+
+==========
+[140/161] examples/LIA/unbdd_inv_gen_fig3.sl:
+(
+(define-fun inv ((x Int) (y Int) (l Int)) Bool (or (= (+ (* 0 x) (* 1 l)) 1) (= (+ (* 1 y) (* (- 1) x)) 1)))
+)
+
+==========
+[141/161] examples/LIA/unbdd_inv_gen_fig6.sl:
+(
+(define-fun inv ((y Int)) Bool (let ((_let_1 (* 0 y))) (let ((_let_2 (<= (+ _let_1 _let_1) 0))) (and _let_2 _let_2))))
+)
+
+==========
+[142/161] examples/LIA/unbdd_inv_gen_fig8.sl:
+(
+(define-fun inv ((l Int)) Bool (let ((_let_1 (* 0 l))) (and (<= (+ _let_1 _let_1) 0) (= (+ _let_1 (* 1 l)) 0))))
+)
+
+==========
+[143/161] examples/LIA/unbdd_inv_gen_fig9.sl:
+(
+(define-fun inv ((x Int) (y Int)) Bool (let ((_let_1 (* 0 x))) (and (= (+ _let_1 (* 1 x)) 0) (= (+ _let_1 (* 1 y)) 0))))
+)
+
+==========
+[144/161] examples/LIA/unbdd_inv_gen_finf1.sl:
+(
+(define-fun inv ((i Int) (x Int) (y Int) (n Int)) Bool (let ((_let_1 (* 0 i))) (and (<= (+ _let_1 _let_1) 0) (= (+ _let_1 (* 1 x)) 0))))
+)
+
+==========
+[145/161] examples/LIA/unbdd_inv_gen_finf2.sl:
+(
+(define-fun inv ((i Int) (x Int) (y Int) (n Int)) Bool (let ((_let_1 (* 0 i))) (and (<= (+ _let_1 _let_1) 0) (= (+ _let_1 (* 1 x)) 0))))
+)
+
+==========
+[146/161] examples/LIA/unbdd_inv_gen_n_c11.sl:
+(
+(define-fun inv ((i Int) (l Int)) Bool (let ((_let_1 (* 0 i))) (and (<= (+ _let_1 (* 1 l)) 4) (<= (+ _let_1 (* (- 1) l)) 0))))
+)
+
+==========
+[147/161] examples/LIA/unbdd_inv_gen_sum1.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[148/161] examples/LIA/unbdd_inv_gen_sum3.sl:
+(
+(define-fun inv ((s Int) (l Int) (n Int) (x Int)) Bool (let ((_let_1 (* 0 s))) (and (<= (+ _let_1 _let_1) 0) (= (+ (* 1 s) (* (- 1) x)) 0))))
+)
+
+==========
+[149/161] examples/LIA/unbdd_inv_gen_sum4.sl:
+(
+(define-fun inv ((s Int) (i Int)) Bool (and (<= (+ (* 0 s) (* 1 s)) 8) (= (+ (* 1 i) (* (- 1) s)) 1)))
+)
+
+==========
+[150/161] examples/LIA/unbdd_inv_gen_tcs.sl:
+cvc5 interrupted by SIGTERM.
+
+==========
+[151/161] examples/LIA/unbdd_inv_gen_term2.sl:
+(
+(define-fun inv ((x Int) (y Int) (z Int)) Bool (let ((_let_1 (* 0 x))) (let ((_let_2 (<= (+ _let_1 _let_1) 0))) (and _let_2 _let_2))))
+)
+
+==========
+[152/161] examples/LIA/unbdd_inv_gen_term3.sl:
+(
+(define-fun inv ((x Int) (y Int)) Bool (let ((_let_1 (* 0 x))) (let ((_let_2 (<= (+ _let_1 _let_1) 0))) (and _let_2 _let_2))))
+)
+
+==========
+[153/161] examples/LIA/unbdd_inv_gen_trex1.sl:
+(
+(define-fun inv ((x Int) (y Int) (k Int) (z Int) (c Int)) Bool (let ((_let_1 (* 0 x))) (and (<= (+ _let_1 _let_1) 0) (<= (+ _let_1 (* (- 1) z)) (- 0 1)))))
+)
+
+==========
+[154/161] examples/LIA/unbdd_inv_gen_trex2.sl:
+(
+(define-fun inv ((x Int)) Bool (let ((_let_1 (* 0 x))) (let ((_let_2 (<= (+ _let_1 _let_1) 0))) (and _let_2 _let_2))))
+)
+
+==========
+[155/161] examples/LIA/unbdd_inv_gen_trex4.sl:
+(
+(define-fun inv ((x Int) (d Int)) Bool (let ((_let_1 (* 0 x))) (let ((_let_2 (<= (+ _let_1 _let_1) 0))) (and _let_2 _let_2))))
+)
+
+==========
+[156/161] examples/LIA/unbdd_inv_gen_vmail.sl:
+(
+(define-fun inv ((i Int) (j Int)) Bool (let ((_let_1 (* 0 i))) (and (<= (+ _let_1 _let_1) 0) (<= (+ _let_1 (* (- 1) i)) 0))))
+)
+
+==========
+[157/161] examples/LIA/unbdd_inv_gen_w1.sl:
+(
+(define-fun inv ((x Int) (n Int)) Bool (let ((_let_1 (* 0 x))) (and (<= (+ _let_1 _let_1) 0) (<= (+ (* 1 x) (* (- 1) n)) 0))))
+)
+
+==========
+[158/161] examples/LIA/unbdd_inv_gen_w2.sl:
+(
+(define-fun inv ((x Int) (n Int)) Bool (let ((_let_1 (* 0 x))) (and (<= (+ _let_1 _let_1) 0) (<= (+ (* 1 x) (* (- 1) n)) (- 0 1)))))
+)
+
+==========
+[159/161] examples/LIA/unbdd_inv_gen_winf1.sl:
+(
+(define-fun inv ((x Int)) Bool (let ((_let_1 (* 0 x))) (and (<= (+ _let_1 _let_1) 0) (= (+ _let_1 (* 1 x)) 0))))
+)
+
+==========
+[160/161] examples/LIA/unbdd_inv_gen_winf2.sl:
+(
+(define-fun inv ((x Int)) Bool (let ((_let_1 (* 0 x))) (and (<= (+ _let_1 _let_1) 0) (= (+ _let_1 (* 1 x)) 0))))
+)
+
+Completed 0/161

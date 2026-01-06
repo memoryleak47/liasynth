@@ -1,0 +1,4112 @@
+
+==========
+[0/161] examples/LIA/array_search_10.sl:
+Candidate: 0
+Candidate: 9
+Candidate: (ite (< 3 k1) 9 4)
+Candidate: (ite (< k1 5) (ite (< y7 6) 9 4) (ite (< y7 6) 9 6))
+Candidate: (ite (< k1 (ite (<= 8 k1) 9 4)) (ite (< y7 6) 9 4) (ite (< 0 y7) y7 10))
+Candidate: (ite (< k1 4) (ite (< k1 (ite (< k1 4) y5 6)) (ite (< k1 4) y5 6) (ite (< k1 4) 5 y10)) (ite (< k1 (ite (<= 8 k1) 9 4)) (ite (< y7 6) 9 4) (ite (< 0 y7) y7 10)))
+
+== Phase timing ==
+         synth.run:  33360.985 ms   99.73 %  (n=6)
+    problem.verify:     90.801 ms    0.27 %  (n=6)
+   satisfy_inhouse:      0.683 ms    0.00 %  (n=106)
+      expr_to_term:      0.074 ms    0.00 %  (n=1)
+             TOTAL:  33452.542 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     130767299
+new_programs_generated: 1264502
+programs_checked:       230
+counterexamples:        6
+
+==========
+[1/161] examples/LIA/array_search_11.sl:
+Candidate: 0
+Candidate: 2
+Candidate: (ite (< 2 k1) 5 2)
+Candidate: (ite (< 2 y5) (ite (< 2 k1) y6 2) (ite (< 2 k1) 9 2))
+Candidate: (ite (< k1 (ite (< k1 7) 2 11)) (ite (< k1 7) 2 11) (ite (<= 7 y11) y6 9))
+
+== Phase timing ==
+         synth.run:   1393.688 ms   95.91 %  (n=5)
+    problem.verify:     59.087 ms    4.07 %  (n=5)
+   satisfy_inhouse:      0.314 ms    0.02 %  (n=74)
+      expr_to_term:      0.088 ms    0.01 %  (n=1)
+             TOTAL:   1453.177 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     134777142
+new_programs_generated: 104618
+programs_checked:       134
+counterexamples:        5
+
+==========
+[2/161] examples/LIA/array_search_12.sl:
+Candidate: 0
+Candidate: 2
+Candidate: (ite (< 2 k1) 6 2)
+Candidate: (ite (< y10 9) (ite (< 2 k1) 10 2) (ite (< 2 k1) y7 2))
+Candidate: (ite (< 1 y3) (ite (< k1 6) y3 y11) (ite (< k1 6) 6 y11))
+Candidate: (ite (< 1 (ite (< 6 k1) y11 y3)) (ite (< 2 k1) y11 2) (ite (< y10 9) 12 y7))
+
+== Phase timing ==
+         synth.run:  19587.331 ms   99.63 %  (n=6)
+    problem.verify:     72.144 ms    0.37 %  (n=6)
+   satisfy_inhouse:      0.878 ms    0.00 %  (n=109)
+      expr_to_term:      0.113 ms    0.00 %  (n=1)
+             TOTAL:  19660.466 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     110861110
+new_programs_generated: 209262
+programs_checked:       229
+counterexamples:        6
+
+==========
+[3/161] examples/LIA/array_search_13.sl:
+Candidate: 0
+Candidate: 6
+Candidate: (ite (< 6 k1) 12 6)
+Candidate: (ite (< y13 13) (ite (< 6 y8) 6 12) (ite (< 6 y8) k1 12))
+Candidate: (ite (< y8 6) (ite (< y13 13) (ite (< 6 y8) (ite (< 6 k1) 7 y7) (ite (< 6 k1) 12 6)) (ite (< k1 y7) 6 8)) (ite (< 6 y8) (ite (< 6 k1) 7 y7) (ite (< 6 k1) 12 6)))
+Candidate: (ite (< (ite (< k1 y7) y7 k1) 8) (ite (< y8 6) (ite (< y7 k1) (ite (<= k1 7) 8 12) (ite (<= k1 7) 6 12)) (ite (< 6 y8) (ite (< 6 k1) 7 y7) (ite (< 6 k1) 12 6))) (ite (< k1 y7) 2 12))
+
+== Phase timing ==
+         synth.run:  45347.765 ms   99.64 %  (n=6)
+    problem.verify:    160.489 ms    0.35 %  (n=6)
+   satisfy_inhouse:      1.488 ms    0.00 %  (n=128)
+      expr_to_term:      0.176 ms    0.00 %  (n=1)
+             TOTAL:  45509.918 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     100537311
+new_programs_generated: 273826
+programs_checked:       252
+counterexamples:        6
+
+==========
+[4/161] examples/LIA/array_search_14.sl:
+Candidate: 0
+Candidate: 2
+Candidate: (ite (< 2 k1) 8 2)
+Candidate: (ite (< 2 k1) (ite (<= k1 6) 11 8) (ite (<= k1 6) y3 8))
+Candidate: (ite (<= 7 k1) (ite (< (ite (< 8 y10) y6 11) 5) 8 (ite (<= 7 k1) y6 y3)) (ite (< 2 k1) (ite (<= k1 6) 11 8) (ite (<= k1 6) y3 8)))
+
+== Phase timing ==
+         synth.run: 116914.857 ms   99.92 %  (n=5)
+    problem.verify:     91.005 ms    0.08 %  (n=5)
+   satisfy_inhouse:      1.079 ms    0.00 %  (n=102)
+      expr_to_term:      0.209 ms    0.00 %  (n=1)
+             TOTAL: 117007.151 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     158592444
+new_programs_generated: 16497
+programs_checked:       162
+counterexamples:        5
+
+==========
+[5/161] examples/LIA/array_search_15.sl:
+Candidate: 0
+Candidate: 14
+Candidate: (ite (< 0 k1) 14 4)
+Candidate: (ite (< 2 k1) (ite (< 2 y13) 12 14) (ite (< 0 k1) 12 4))
+
+== Phase timing ==
+         synth.run:    640.417 ms   92.55 %  (n=4)
+    problem.verify:     50.938 ms    7.36 %  (n=4)
+   satisfy_inhouse:      0.499 ms    0.07 %  (n=93)
+      expr_to_term:      0.147 ms    0.02 %  (n=1)
+             TOTAL:    692.002 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     146876634
+new_programs_generated: 22234
+programs_checked:       121
+counterexamples:        4
+
+==========
+[6/161] examples/LIA/array_search_2.sl:
+Candidate: 0
+Candidate: 1
+Candidate: (ite (< k1 1) 0 1)
+Candidate: (ite (< k1 y1) 0 1)
+Candidate: (ite (< 0 k1) (ite (< y1 0) 1 k1) (ite (< y1 0) 1 0))
+Candidate: (ite (< y1 0) (ite (< k1 y1) 0 1) (ite (< y1 k1) k1 0))
+Candidate: (ite (<= y2 (ite (< k1 y1) 1 k1)) (ite (< k1 y1) 0 2) (ite (< k1 y1) 0 1))
+Answer: (ite (<= y2 (ite (< k1 y1) 1 k1)) (ite (< k1 y1) 0 2) (ite (< k1 y1) 0 1))
+
+== Phase timing ==
+         synth.run:    291.806 ms   67.73 %  (n=7)
+    problem.verify:    138.528 ms   32.16 %  (n=7)
+   satisfy_inhouse:      0.456 ms    0.11 %  (n=41)
+      expr_to_term:      0.020 ms    0.00 %  (n=1)
+             TOTAL:    430.810 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     210137
+new_programs_generated: 855
+programs_checked:       153
+counterexamples:        7
+
+==========
+[7/161] examples/LIA/array_search_3.sl:
+Candidate: 0
+Candidate: 2
+Candidate: y3
+Candidate: (ite (< k1 y1) 0 y3)
+Candidate: (ite (< 0 k1) (ite (< k1 y1) 0 y3) (ite (< k1 y1) 0 1))
+Candidate: (ite (< 0 k1) (ite (< 0 y2) (ite (< 0 k1) 3 1) (ite (< k1 2) y3 3)) (ite (< k1 y1) 0 1))
+Candidate: (ite (< 0 y2) (ite (< k1 y1) 0 1) (ite (< 0 k1) (ite (< 1 k1) 3 2) (ite (< k1 y2) 1 2)))
+Candidate: (ite (< k1 2) (ite (< (ite (< y2 k1) k1 y3) y3) 2 (ite (< k1 y1) 0 1)) (ite (< 2 k1) (ite (< 2 k1) 3 2) (ite (< k1 y2) 1 2)))
+Candidate: (ite (< y3 (ite (< k1 2) 1 k1)) (ite (< 2 k1) 3 2) (ite (< (ite (< y2 k1) k1 y3) y3) 2 (ite (< k1 y1) 0 1)))
+Candidate: (ite (< k1 (ite (< k1 y2) y1 2)) (ite (< y1 0) 2 0) (ite (< k1 2) 1 k1))
+Candidate: (ite (< k1 (ite (< y2 0) k1 y2)) (ite (< k1 y1) 0 1) (ite (< 0 (ite (< k1 y2) y1 2)) (ite (< 2 k1) 3 2) (ite (< k1 y1) 0 1)))
+Candidate: (ite (<= 0 (ite (< y3 k1) 0 y1)) (ite (< y1 0) 3 0) (ite (< k1 y2) 1 2))
+Candidate: (ite (< y1 (ite (< k1 y3) k1 y1)) (ite (< k1 y2) 1 2) (ite (< y1 k1) 3 0))
+Answer: (ite (< y1 (ite (< k1 y3) k1 y1)) (ite (< k1 y2) 1 2) (ite (< y1 k1) 3 0))
+
+== Phase timing ==
+         synth.run:  21709.110 ms   99.11 %  (n=13)
+    problem.verify:    193.847 ms    0.88 %  (n=13)
+   satisfy_inhouse:      1.146 ms    0.01 %  (n=215)
+      expr_to_term:      0.026 ms    0.00 %  (n=1)
+             TOTAL:  21904.129 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     14038044
+new_programs_generated: 607515
+programs_checked:       3034
+counterexamples:        13
+
+==========
+[8/161] examples/LIA/array_search_4.sl:
+Candidate: 0
+Candidate: 3
+Candidate: (ite (< 1 k1) 3 2)
+Candidate: (ite (< 1 k1) (ite (< y2 3) 3 1) (ite (< y2 3) 2 1))
+Candidate: (ite (< 1 k1) (ite (< (ite (< 2 y2) y1 2) 2) 1 (ite (< y3 2) 3 0)) (ite (< 2 y1) (ite (< 2 y2) 0 y3) (ite (< 2 y2) y1 y3)))
+Candidate: (ite (< k1 y1) (ite (< k1 y2) 0 y3) (ite (< 1 k1) (ite (< (ite (< 2 y2) y1 2) 2) 1 (ite (< y3 2) 3 0)) (ite (< 2 y1) (ite (< 2 y2) 0 y3) (ite (< 2 y2) y1 y3))))
+Candidate: (ite (< (ite (< 2 y2) y1 2) 2) 1 (ite (< 1 y3) (ite (< k1 y2) 0 2) (ite (< k1 y2) 0 y4)))
+Candidate: (ite (< (ite (< 2 y2) y1 2) 2) (ite (< k1 y2) 1 y3) (ite (< k1 y1) (ite (< k1 y2) 0 y4) (ite (< 1 y3) y3 y4)))
+Candidate: (ite (< (ite (< 2 y2) y1 k1) 2) (ite (< (ite (< y1 k1) y3 0) 2) (ite (< k1 y2) 0 y4) (ite (< k1 y2) 1 y3)) (ite (< k1 y2) 0 3))
+
+== Phase timing ==
+         synth.run:  21784.579 ms   99.40 %  (n=9)
+    problem.verify:    130.712 ms    0.60 %  (n=9)
+   satisfy_inhouse:      0.782 ms    0.00 %  (n=165)
+      expr_to_term:      0.027 ms    0.00 %  (n=1)
+             TOTAL:  21916.100 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     125480777
+new_programs_generated: 2125553
+programs_checked:       1170
+counterexamples:        9
+
+==========
+[9/161] examples/LIA/array_search_5.sl:
+Candidate: 0
+Candidate: 4
+Candidate: (ite (< k1 2) 2 4)
+Candidate: (ite (< y3 k1) 4 y3)
+Candidate: (ite (< y2 0) (ite (< k1 0) 1 2) (ite (< y3 k1) 4 y3))
+Candidate: (ite (< y3 k1) (ite (< y3 k1) 4 2) (ite (< k1 0) 1 2))
+Candidate: (ite (< 2 (ite (< y2 0) 3 y3)) (ite (< y5 3) 3 2) (ite (< k1 y3) y3 y5))
+Candidate: (ite (< 2 (ite (< y2 0) 3 y3)) (ite (< k1 y3) 2 3) (ite (< 2 (ite (< y2 0) 3 y3)) (ite (< y5 3) 3 2) (ite (< k1 y3) y3 y5)))
+
+== Phase timing ==
+         synth.run:  10787.250 ms   99.08 %  (n=8)
+    problem.verify:     99.286 ms    0.91 %  (n=8)
+   satisfy_inhouse:      0.786 ms    0.01 %  (n=104)
+      expr_to_term:      0.030 ms    0.00 %  (n=1)
+             TOTAL:  10887.352 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     84728757
+new_programs_generated: 839444
+programs_checked:       598
+counterexamples:        8
+
+==========
+[10/161] examples/LIA/array_search_6.sl:
+Candidate: 0
+Candidate: 5
+Candidate: (ite (< k1 4) 4 5)
+Candidate: (ite (< y5 4) 5 4)
+Candidate: (ite (< y5 k1) 5 4)
+Candidate: (ite (<= 3 y4) (ite (< y5 5) (ite (< y5 k1) 5 y3) (ite (< y5 5) 5 4)) (ite (< y5 k1) 5 4))
+Candidate: (ite (< y5 4) (ite (< (ite (< 0 y3) 5 3) y6) (ite (<= 6 y6) k1 y5) (ite (< 1 k1) 5 y3)) (ite (< (ite (< 0 y3) 5 3) y6) (ite (<= 6 y6) k1 y5) (ite (< 1 k1) 4 y3)))
+Candidate: (ite (< 0 y3) (ite (< (ite (< 3 y5) y4 y5) 3) 4 (ite (< 1 k1) 5 y3)) (ite (< (ite (<= 5 y5) y1 y5) 3) 4 (ite (< k1 4) y5 5)))
+
+== Phase timing ==
+         synth.run:  87721.167 ms   99.86 %  (n=8)
+    problem.verify:    121.002 ms    0.14 %  (n=8)
+   satisfy_inhouse:      0.728 ms    0.00 %  (n=123)
+      expr_to_term:      0.039 ms    0.00 %  (n=1)
+             TOTAL:  87842.935 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     109394861
+new_programs_generated: 731207
+programs_checked:       629
+counterexamples:        8
+
+==========
+[11/161] examples/LIA/array_search_7.sl:
+Candidate: 0
+Candidate: 6
+Candidate: y7
+Candidate: (ite (< y6 5) y7 4)
+Candidate: (ite (< k1 0) (ite (< y2 k1) y7 1) (ite (<= 5 y6) 4 6))
+Candidate: (ite (< k1 (ite (< k1 y2) k1 y5)) (ite (< y7 5) y7 y5) (ite (< y2 k1) y7 1))
+Candidate: (ite (< 1 (ite (< k1 y5) y5 6)) (ite (< k1 y5) y5 6) (ite (< y2 k1) y7 1))
+
+== Phase timing ==
+         synth.run:  12713.624 ms   99.40 %  (n=7)
+    problem.verify:     76.496 ms    0.60 %  (n=7)
+   satisfy_inhouse:      0.613 ms    0.00 %  (n=104)
+      expr_to_term:      0.074 ms    0.00 %  (n=1)
+             TOTAL:  12790.808 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     90653523
+new_programs_generated: 315370
+programs_checked:       352
+counterexamples:        7
+
+==========
+[12/161] examples/LIA/array_search_8.sl:
+Candidate: 0
+Candidate: 3
+Candidate: (ite (< y4 3) 4 3)
+Candidate: (ite (< 6 y8) (ite (< y4 3) 4 3) (ite (< y4 3) 1 3))
+Candidate: (ite (< y4 (ite (< k1 0) 1 3)) (ite (< k1 2) 2 y5) (ite (< y4 3) 1 3))
+Candidate: (ite (< y8 8) (ite (< y4 (ite (< y2 0) 2 3)) (ite (< 4 y6) 4 1) (ite (< y4 3) 2 3)) (ite (< y4 (ite (< y2 0) 2 3)) (ite (< 4 y6) y6 1) (ite (< y4 3) 2 3)))
+Candidate: (ite (< (ite (< y2 0) k1 3) y4) (ite (< y4 3) 2 3) (ite (< 3 (ite (< y5 5) y5 3)) (ite (<= 8 y8) 6 y5) (ite (< y5 5) 1 8)))
+
+== Phase timing ==
+         synth.run:  62014.182 ms   99.61 %  (n=7)
+    problem.verify:    240.557 ms    0.39 %  (n=7)
+   satisfy_inhouse:      1.136 ms    0.00 %  (n=124)
+      expr_to_term:      0.051 ms    0.00 %  (n=1)
+             TOTAL:  62255.926 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     119504576
+new_programs_generated: 1226644
+programs_checked:       376
+counterexamples:        7
+
+==========
+[13/161] examples/LIA/array_search_9.sl:
+Candidate: 0
+Candidate: 9
+Candidate: (ite (< k1 0) 0 9)
+Candidate: (ite (< y7 k1) (ite (< k1 y1) 0 9) (ite (< k1 y1) 0 3))
+Candidate: (ite (< (ite (< k1 8) 0 9) y4) (ite (< k1 y1) 0 8) (ite (< k1 8) 3 9))
+
+== Phase timing ==
+         synth.run:   1504.767 ms   96.64 %  (n=5)
+    problem.verify:     51.623 ms    3.32 %  (n=5)
+   satisfy_inhouse:      0.691 ms    0.04 %  (n=73)
+      expr_to_term:      0.064 ms    0.00 %  (n=1)
+             TOTAL:   1557.144 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     101605739
+new_programs_generated: 46287
+programs_checked:       133
+counterexamples:        5
+
+==========
+[14/161] examples/LIA/commutative.sl:
+Candidate: x
+Candidate: (+ x y)
+Answer: (+ x y)
+
+== Phase timing ==
+    problem.verify:     44.768 ms   98.54 %  (n=2)
+         synth.run:      0.648 ms    1.43 %  (n=2)
+   satisfy_inhouse:      0.007 ms    0.02 %  (n=4)
+      expr_to_term:      0.006 ms    0.01 %  (n=1)
+             TOTAL:     45.430 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     5
+new_programs_generated: 5
+programs_checked:       4
+counterexamples:        2
+
+==========
+[15/161] examples/LIA/constant.sl:
+Candidate: x
+Candidate: 0
+Answer: 0
+
+== Phase timing ==
+    problem.verify:     45.284 ms   99.50 %  (n=2)
+         synth.run:      0.216 ms    0.47 %  (n=2)
+      expr_to_term:      0.007 ms    0.02 %  (n=1)
+   satisfy_inhouse:      0.004 ms    0.01 %  (n=2)
+             TOTAL:     45.511 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     3
+new_programs_generated: 3
+programs_checked:       2
+counterexamples:        2
+
+==========
+[16/161] examples/LIA/inv_gen_array.sl:
+Candidate: (and (<= (+ (* 0 m) (* 0 m)) -3) (<= (+ (* 0 m) (* 0 m)) -3))
+Candidate: (and (<= (+ (* 0 m) (* 0 m)) 0) (<= (+ (* 0 m) (* 0 m)) 0))
+Candidate: (and (= (+ (* -1 j) (* 0 m)) 0) (= (+ (* -1 j) (* 0 m)) 0))
+Candidate: (and (<= (+ (* -1 a0) (* -1 a0)) 0) (<= (+ (* -1 a0) (* -1 a0)) 0))
+Candidate: (or (= (+ (* -1 j) (* 0 m)) 0) (= (+ (* 1 j) (* 1 j)) 2))
+Candidate: (or (<= (+ (* 1 j) (* 1 j)) 2) (<= (+ (* -1 a0) (* -1 a0)) 0))
+Candidate: (or (= (+ (* 0 m) (* 1 j)) 2) (<= (+ (* 1 j) (* 1 j)) 2))
+Candidate: (or (= (+ (* -1 a0) (* 1 j)) 3) (<= (+ (* -1 a0) (* 1 j)) 2))
+Candidate: (or (<= (+ (* -1 m) (* 1 j)) 2) (= (+ (* -1 j) (* 1 m)) -3))
+Candidate: (or (<= (+ (* 0 m) (* 1 j)) 2) (= (+ (* 0 m) (* 1 j)) 3))
+Candidate: (or (= (+ (* -1 a0) (* -1 a0)) 0) (= (+ (* -1 a0) (* 1 j)) 1))
+Candidate: (or (<= (+ (* -1 a0) (* -1 a0)) 0) (<= (+ (* 1 m) (* 1 j)) 2))
+Candidate: (or (<= (+ (* -1 a0) (* 1 j)) 3) (<= (+ (* -1 a0) (* -1 a0)) 0))
+Candidate: (or (= (+ (* -1 a0) (* -1 a0)) 0) (<= (+ (* 1 m) (* 1 j)) 0))
+Candidate: (or (<= (+ (* -1 a0) (* -1 a0)) 0) (= (+ (* -1 j) (* 1 m)) 0))
+Candidate: (or (<= (+ (* -1 a0) (* -1 a0)) 0) (= (+ (* -1 j) (* 0 m)) 0))
+Candidate: (or (= (+ (* -1 j) (* 0 m)) 0) (<= (+ (* -1 a0) (* 1 m)) 0))
+Answer: (or (= (+ (* -1 j) (* 0 m)) 0) (<= (+ (* -1 a0) (* 1 m)) 0))
+
+== Phase timing ==
+    problem.verify:    389.047 ms   42.74 %  (n=17)
+         synth.run:    329.112 ms   36.15 %  (n=17)
+   satisfy_inhouse:    192.049 ms   21.10 %  (n=4424)
+      expr_to_term:      0.134 ms    0.01 %  (n=1)
+             TOTAL:    910.343 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     39617
+new_programs_generated: 4437
+programs_checked:       5024
+counterexamples:        17
+
+==========
+[17/161] examples/LIA/inv_gen_cegar2.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) -3) (<= (+ (* 0 x) (* 0 x)) -3))
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+Candidate: (and (<= (+ (* 1 x) (* -1 m)) 1) (<= (+ (* 1 x) (* -1 m)) 1))
+Candidate: (and (= (+ (* 1 m) (* 1 m)) 0) (= (+ (* 1 m) (* 1 m)) 0))
+Candidate: (and (<= (+ (* -1 m) (* -1 m)) 0) (<= (+ (* -1 m) (* -1 m)) 0))
+Candidate: (and (<= (+ (* 1 n) (* 1 n)) 0) (<= (+ (* 1 x) (* 1 x)) 2))
+Candidate: (or (= (+ (* -1 n) (* -1 m)) -1) (<= (+ (* 1 n) (* 1 n)) 0))
+Candidate: (and (= (+ (* -1 x) (* -1 m)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+Candidate: (or (= (+ (* -1 m) (* 1 n)) 1) (= (+ (* 1 m) (* 1 m)) 0))
+Candidate: (or (<= (+ (* 1 x) (* 0 x)) 0) (= (+ (* -1 n) (* -1 m)) -1))
+Candidate: (or (<= (+ (* -1 n) (* 0 x)) -2) (= (+ (* 1 m) (* 1 m)) 0))
+Candidate: (or (= (+ (* -1 x) (* 1 m)) -1) (= (+ (* 1 m) (* 1 m)) 0))
+
+== Phase timing ==
+    problem.verify:    128.736 ms   55.88 %  (n=13)
+         synth.run:     51.845 ms   22.50 %  (n=13)
+   satisfy_inhouse:     49.783 ms   21.61 %  (n=3895)
+      expr_to_term:      0.027 ms    0.01 %  (n=1)
+             TOTAL:    230.391 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     33539
+new_programs_generated: 3982
+programs_checked:       4417
+counterexamples:        13
+
+thread 'main' (3355520) panicked at src/synth.rs:163:9:
+infeasible
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+== Synthesis stats ==
+programs_generated:     33539
+new_programs_generated: 3982
+programs_checked:       4417
+counterexamples:        13
+
+==========
+[18/161] examples/LIA/inv_gen_cgr1.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) -3) (<= (+ (* 0 x) (* 0 x)) -3))
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (<= (+ (* 1 x) (* 1 x)) 0) (<= (+ (* 1 x) (* 1 x)) 0))
+Candidate: (and (= (+ (* 1 x) (* 1 x)) 0) (= (+ (* 1 x) (* 1 x)) 0))
+Candidate: (and (<= (+ (* 0 x) (* 1 x)) 2) (<= (+ (* 0 x) (* 1 x)) 2))
+Candidate: (and (<= (+ (* 0 x) (* 1 x)) 3) (<= (+ (* 0 x) (* 1 x)) 3))
+Candidate: (and (<= (+ (* -1 y) (* 1 x)) 1) (<= (+ (* -1 y) (* 1 x)) 1))
+Candidate: (and (<= (+ (* -1 y) (* 1 x)) 2) (<= (+ (* -1 y) (* 1 x)) 2))
+Answer: (and (<= (+ (* -1 y) (* 1 x)) 2) (<= (+ (* -1 y) (* 1 x)) 2))
+
+== Phase timing ==
+    problem.verify:     77.256 ms   92.22 %  (n=8)
+         synth.run:      5.503 ms    6.57 %  (n=8)
+   satisfy_inhouse:      0.988 ms    1.18 %  (n=144)
+      expr_to_term:      0.024 ms    0.03 %  (n=1)
+             TOTAL:     83.770 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     1891
+new_programs_generated: 207
+programs_checked:       318
+counterexamples:        8
+
+==========
+[19/161] examples/LIA/inv_gen_ex14.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) -3) (<= (+ (* 0 x) (* 0 x)) -3))
+Candidate: (and (= (+ (* 1 x) (* 1 x)) 2) (= (+ (* 1 x) (* 1 x)) 2))
+Candidate: (or (= (+ (* 1 x) (* 1 x)) 2) (<= (+ (* -1 x) (* -1 x)) -3))
+Answer: (or (= (+ (* 1 x) (* 1 x)) 2) (<= (+ (* -1 x) (* -1 x)) -3))
+
+== Phase timing ==
+    problem.verify:     31.263 ms   95.21 %  (n=3)
+         synth.run:      1.407 ms    4.29 %  (n=3)
+   satisfy_inhouse:      0.139 ms    0.42 %  (n=18)
+      expr_to_term:      0.026 ms    0.08 %  (n=1)
+             TOTAL:     32.836 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     662
+new_programs_generated: 58
+programs_checked:       68
+counterexamples:        3
+
+==========
+[20/161] examples/LIA/inv_gen_ex23.sl:
+Candidate: (and (<= (+ (* 0 y) (* 0 y)) -5000) (<= (+ (* 0 y) (* 0 y)) -5000))
+Candidate: (and (<= (+ (* 0 y) (* 0 y)) 0) (<= (+ (* 0 y) (* 0 y)) 0))
+Candidate: (and (<= (+ (* -1 z) (* -1 z)) 0) (<= (+ (* 0 y) (* 0 y)) 0))
+Candidate: (and (= (+ (* -1 z) (* -1 z)) 0) (= (+ (* -1 z) (* -1 z)) 0))
+Candidate: (and (<= (+ (* 1 z) (* 0 y)) 1) (<= (+ (* -1 z) (* -1 z)) 0))
+Candidate: (or (<= (+ (* -1 y) (* -1 y)) -2) (= (+ (* -1 y) (* -1 c)) 0))
+Candidate: (or (= (+ (* -1 c) (* 0 y)) 0) (= (+ (* -1 z) (* -1 y)) -38))
+Candidate: (and (<= (+ (* -1 z) (* 1 c)) 0) (<= (+ (* -1 c) (* 0 y)) 0))
+Candidate: (and (<= (+ (* 1 z) (* -1 y)) 36) (<= (+ (* -1 z) (* 1 c)) 0))
+Candidate: (and (<= (+ (* 1 z) (* -1 y)) 37) (<= (+ (* -1 z) (* 1 c)) 0))
+Candidate: (and (<= (+ (* 1 z) (* -1 y)) 71) (<= (+ (* -1 z) (* 1 c)) 0))
+Candidate: (and (<= (+ (* 1 z) (* -1 y)) 72) (<= (+ (* -1 z) (* 1 c)) 0))
+Candidate: (and (<= (+ (* -1 z) (* -1 y)) 0) (<= (+ (* 1 y) (* 1 z)) 75))
+Candidate: (and (<= (+ (* -1 c) (* 1 z)) 72) (<= (+ (* -1 z) (* -1 z)) 0))
+Candidate: (and (<= (+ (* -1 z) (* -1 y)) 0) (<= (+ (* 1 z) (* -1 y)) 4446))
+Candidate: (and (<= (+ (* -1 z) (* -1 z)) 0) (<= (+ (* 1 z) (* -1 y)) 4446))
+Candidate: (and (<= (+ (* -1 z) (* -1 z)) 0) (<= (+ (* 1 z) (* -1 y)) 4447))
+Candidate: (and (<= (+ (* -1 z) (* -1 z)) 0) (<= (+ (* 1 z) (* -1 y)) 4448))
+Candidate: (and (<= (+ (* -1 c) (* 1 z)) 4572) (<= (+ (* -1 z) (* -1 z)) 0))
+Answer: (and (<= (+ (* -1 c) (* 1 z)) 4572) (<= (+ (* -1 z) (* -1 z)) 0))
+
+== Phase timing ==
+         synth.run:  35499.822 ms   95.85 %  (n=19)
+   satisfy_inhouse:   1115.835 ms    3.01 %  (n=31102)
+    problem.verify:    419.866 ms    1.13 %  (n=19)
+      expr_to_term:      0.030 ms    0.00 %  (n=1)
+             TOTAL:  37035.553 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     13283841
+new_programs_generated: 210896
+programs_checked:       211689
+counterexamples:        19
+
+==========
+[21/161] examples/LIA/inv_gen_ex7.sl:
+Candidate: (and (<= (+ (* 0 i) (* 0 i)) -3) (<= (+ (* 0 i) (* 0 i)) -3))
+Candidate: (and (<= (+ (* 0 i) (* 0 i)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Candidate: (and (= (+ (* 1 i) (* 1 i)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Candidate: (and (<= (+ (* 1 y) (* 1 y)) 0) (<= (+ (* -1 i) (* -1 i)) 0))
+Candidate: (or (<= (+ (* 1 y) (* -1 i)) 0) (<= (+ (* -1 l) (* -1 i)) -1))
+Candidate: (and (<= (+ (* -1 l) (* 1 y)) 0) (<= (+ (* -1 i) (* -1 i)) 0))
+Answer: (and (<= (+ (* -1 l) (* 1 y)) 0) (<= (+ (* -1 i) (* -1 i)) 0))
+
+== Phase timing ==
+    problem.verify:    132.516 ms   89.13 %  (n=6)
+         synth.run:     13.348 ms    8.98 %  (n=6)
+   satisfy_inhouse:      2.774 ms    1.87 %  (n=235)
+      expr_to_term:      0.046 ms    0.03 %  (n=1)
+             TOTAL:    148.685 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     4096
+new_programs_generated: 313
+programs_checked:       389
+counterexamples:        6
+
+==========
+[22/161] examples/LIA/inv_gen_fig1.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) -3) (<= (+ (* 0 x) (* 0 x)) -3))
+Candidate: (and (<= (+ (* 1 x) (* 1 x)) 0) (<= (+ (* 1 x) (* 1 x)) 0))
+Candidate: (or (<= (+ (* 1 x) (* 1 x)) -2) (<= (+ (* -1 x) (* 1 y)) 3))
+Candidate: (and (<= (+ (* 1 x) (* 1 x)) -3) (<= (+ (* 1 x) (* 1 x)) 0))
+Candidate: (and (<= (+ (* -1 y) (* 1 x)) -2) (<= (+ (* -1 y) (* 1 x)) -2))
+Candidate: (or (<= (+ (* -1 y) (* 1 x)) -2) (<= (+ (* 1 x) (* 1 x)) -3))
+Answer: (or (<= (+ (* -1 y) (* 1 x)) -2) (<= (+ (* 1 x) (* 1 x)) -3))
+
+== Phase timing ==
+    problem.verify:     88.150 ms   93.13 %  (n=6)
+         synth.run:      6.181 ms    6.53 %  (n=6)
+   satisfy_inhouse:      0.301 ms    0.32 %  (n=120)
+      expr_to_term:      0.019 ms    0.02 %  (n=1)
+             TOTAL:     94.652 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     1997
+new_programs_generated: 191
+programs_checked:       260
+counterexamples:        6
+
+==========
+[23/161] examples/LIA/inv_gen_fig3.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) -3) (<= (+ (* 0 x) (* 0 x)) -3))
+Candidate: (and (= (+ (* -1 y) (* -1 l)) -1) (<= (+ (* 1 l) (* 1 l)) 0))
+Candidate: (and (= (+ (* 1 x) (* 1 y)) 1) (= (+ (* 1 x) (* 1 y)) 1))
+Candidate: (and (<= (+ (* -1 y) (* 1 x)) -1) (<= (+ (* -1 y) (* 1 x)) -1))
+Candidate: (or (<= (+ (* -1 y) (* 1 x)) -1) (= (+ (* 1 l) (* 0 x)) 1))
+Answer: (or (<= (+ (* -1 y) (* 1 x)) -1) (= (+ (* 1 l) (* 0 x)) 1))
+
+== Phase timing ==
+    problem.verify:    103.661 ms   77.71 %  (n=5)
+         synth.run:     25.348 ms   19.00 %  (n=5)
+   satisfy_inhouse:      4.347 ms    3.26 %  (n=609)
+      expr_to_term:      0.042 ms    0.03 %  (n=1)
+             TOTAL:    133.398 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     9142
+new_programs_generated: 702
+programs_checked:       769
+counterexamples:        5
+
+==========
+[24/161] examples/LIA/inv_gen_fig6.sl:
+Candidate: (and (<= (+ (* 0 y) (* 0 y)) -3) (<= (+ (* 0 y) (* 0 y)) -3))
+Candidate: (and (<= (+ (* 0 y) (* 0 y)) 0) (<= (+ (* 0 y) (* 0 y)) 0))
+Answer: (and (<= (+ (* 0 y) (* 0 y)) 0) (<= (+ (* 0 y) (* 0 y)) 0))
+
+== Phase timing ==
+    problem.verify:     42.986 ms   97.61 %  (n=2)
+         synth.run:      1.015 ms    2.30 %  (n=2)
+      expr_to_term:      0.027 ms    0.06 %  (n=1)
+   satisfy_inhouse:      0.011 ms    0.02 %  (n=4)
+             TOTAL:     44.039 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     87
+new_programs_generated: 18
+programs_checked:       17
+counterexamples:        2
+
+==========
+[25/161] examples/LIA/inv_gen_fig8.sl:
+Candidate: (and (<= (+ (* 0 l) (* 0 l)) -3) (<= (+ (* 0 l) (* 0 l)) -3))
+Candidate: (and (<= (+ (* 0 l) (* 0 l)) 0) (<= (+ (* 0 l) (* 0 l)) 0))
+Candidate: (and (<= (+ (* 1 l) (* 1 l)) 0) (<= (+ (* 1 l) (* 1 l)) 0))
+Candidate: (and (= (+ (* 1 l) (* 1 l)) 0) (= (+ (* 1 l) (* 1 l)) 0))
+Answer: (and (= (+ (* 1 l) (* 1 l)) 0) (= (+ (* 1 l) (* 1 l)) 0))
+
+== Phase timing ==
+    problem.verify:     82.354 ms   96.53 %  (n=4)
+         synth.run:      2.431 ms    2.85 %  (n=4)
+   satisfy_inhouse:      0.493 ms    0.58 %  (n=10)
+      expr_to_term:      0.039 ms    0.05 %  (n=1)
+             TOTAL:     85.316 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     437
+new_programs_generated: 53
+programs_checked:       61
+counterexamples:        4
+
+==========
+[26/161] examples/LIA/inv_gen_fig9.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) -3) (<= (+ (* 0 x) (* 0 x)) -3))
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* 1 y) (* 1 y)) 0) (= (+ (* 1 y) (* 1 y)) 0))
+Candidate: (and (<= (+ (* -1 y) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+Answer: (and (<= (+ (* -1 y) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+
+== Phase timing ==
+    problem.verify:     81.723 ms   96.44 %  (n=4)
+         synth.run:      2.873 ms    3.39 %  (n=4)
+   satisfy_inhouse:      0.116 ms    0.14 %  (n=34)
+      expr_to_term:      0.030 ms    0.04 %  (n=1)
+             TOTAL:     84.742 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     651
+new_programs_generated: 71
+programs_checked:       94
+counterexamples:        4
+
+==========
+[27/161] examples/LIA/inv_gen_finf1.sl:
+Candidate: (and (<= (+ (* 0 i) (* 0 i)) -3) (<= (+ (* 0 i) (* 0 i)) -3))
+Candidate: (and (<= (+ (* 0 i) (* -1 n)) -1) (<= (+ (* 0 i) (* -1 n)) -1))
+Candidate: (and (<= (+ (* 1 n) (* 1 x)) 1) (<= (+ (* 0 i) (* -1 n)) -1))
+Candidate: (and (<= (+ (* 1 x) (* 1 x)) 0) (<= (+ (* 0 i) (* -1 n)) -1))
+Candidate: (or (= (+ (* -1 n) (* 1 x)) -1) (= (+ (* 1 n) (* 0 i)) 2))
+Candidate: (and (<= (+ (* 1 x) (* 1 x)) 0) (<= (+ (* -1 x) (* -1 x)) 0))
+Answer: (and (<= (+ (* 1 x) (* 1 x)) 0) (<= (+ (* -1 x) (* -1 x)) 0))
+
+== Phase timing ==
+    problem.verify:    117.789 ms   93.04 %  (n=6)
+         synth.run:      7.599 ms    6.00 %  (n=6)
+   satisfy_inhouse:      1.166 ms    0.92 %  (n=96)
+      expr_to_term:      0.040 ms    0.03 %  (n=1)
+             TOTAL:    126.594 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     2351
+new_programs_generated: 151
+programs_checked:       240
+counterexamples:        6
+
+==========
+[28/161] examples/LIA/inv_gen_finf2.sl:
+Candidate: (and (<= (+ (* 0 i) (* 0 i)) -3) (<= (+ (* 0 i) (* 0 i)) -3))
+Candidate: (and (<= (+ (* 0 i) (* -1 n)) -1) (<= (+ (* 0 i) (* -1 n)) -1))
+Candidate: (and (= (+ (* 1 n) (* -1 x)) 1) (= (+ (* 1 n) (* -1 x)) 1))
+Candidate: (and (<= (+ (* 1 x) (* 1 x)) 0) (= (+ (* 1 n) (* -1 x)) 1))
+Candidate: (and (= (+ (* 1 x) (* 1 x)) 0) (= (+ (* 1 x) (* 1 x)) 0))
+Answer: (and (= (+ (* 1 x) (* 1 x)) 0) (= (+ (* 1 x) (* 1 x)) 0))
+
+== Phase timing ==
+    problem.verify:     90.332 ms   94.77 %  (n=5)
+         synth.run:      4.252 ms    4.46 %  (n=5)
+   satisfy_inhouse:      0.700 ms    0.73 %  (n=39)
+      expr_to_term:      0.037 ms    0.04 %  (n=1)
+             TOTAL:     95.321 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     1517
+new_programs_generated: 93
+programs_checked:       152
+counterexamples:        5
+
+==========
+[29/161] examples/LIA/inv_gen_n_c11.sl:
+Candidate: (and (<= (+ (* 0 i) (* 0 i)) -7) (<= (+ (* 0 i) (* 0 i)) -7))
+Candidate: (and (<= (+ (* 0 i) (* 0 i)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Candidate: (and (= (+ (* 1 l) (* 1 l)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Candidate: (or (= (+ (* 1 l) (* 1 l)) 2) (= (+ (* 1 l) (* 1 l)) 0))
+Candidate: (or (= (+ (* 1 l) (* 1 l)) 0) (<= (+ (* -1 l) (* 0 i)) -1))
+Candidate: (and (<= (+ (* -1 l) (* -1 l)) 0) (<= (+ (* 0 i) (* 1 l)) 2))
+Candidate: (and (<= (+ (* -1 l) (* -1 l)) 0) (<= (+ (* 0 i) (* 1 l)) 3))
+Candidate: (and (<= (+ (* -1 l) (* -1 l)) 0) (<= (+ (* 0 i) (* 1 l)) 4))
+Answer: (and (<= (+ (* -1 l) (* -1 l)) 0) (<= (+ (* 0 i) (* 1 l)) 4))
+
+== Phase timing ==
+    problem.verify:    198.976 ms   92.67 %  (n=8)
+         synth.run:     13.936 ms    6.49 %  (n=8)
+   satisfy_inhouse:      1.752 ms    0.82 %  (n=141)
+      expr_to_term:      0.049 ms    0.02 %  (n=1)
+             TOTAL:    214.712 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     2302
+new_programs_generated: 201
+programs_checked:       327
+counterexamples:        8
+
+==========
+[30/161] examples/LIA/inv_gen_sum1.sl:
+Candidate: (and (<= (+ (* 0 s) (* 0 s)) -3) (<= (+ (* 0 s) (* 0 s)) -3))
+Candidate: (and (<= (+ (* 0 s) (* -1 i)) 0) (<= (+ (* 0 s) (* -1 i)) 0))
+Candidate: (and (<= (+ (* 0 s) (* -1 i)) -1) (<= (+ (* 0 s) (* -1 i)) -1))
+Candidate: (and (<= (+ (* 1 i) (* -1 s)) 1) (<= (+ (* 1 i) (* -1 s)) 1))
+Candidate: (and (= (+ (* -1 s) (* -1 s)) 0) (= (+ (* -1 s) (* -1 s)) 0))
+Candidate: (and (= (+ (* 1 i) (* -1 s)) 1) (= (+ (* 1 i) (* -1 s)) 1))
+Candidate: (and (= (+ (* -1 n) (* -1 s)) 0) (= (+ (* -1 n) (* -1 s)) 0))
+Candidate: (and (= (+ (* 1 s) (* -1 n)) 0) (= (+ (* 1 s) (* -1 n)) 0))
+Candidate: (and (<= (+ (* -1 s) (* -1 s)) 0) (= (+ (* 1 i) (* -1 s)) 1))
+Candidate: (or (= (+ (* 1 s) (* -1 n)) 0) (<= (+ (* -1 n) (* -1 n)) -3))
+Candidate: (and (<= (+ (* 1 i) (* -1 n)) 1) (= (+ (* 1 i) (* -1 s)) 1))
+
+== Phase timing ==
+    problem.verify:    214.701 ms   85.37 %  (n=11)
+         synth.run:     36.443 ms   14.49 %  (n=11)
+   satisfy_inhouse:      0.320 ms    0.13 %  (n=136)
+      expr_to_term:      0.033 ms    0.01 %  (n=1)
+             TOTAL:    251.497 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     38616
+new_programs_generated: 5246
+programs_checked:       534
+counterexamples:        11
+
+thread 'main' (3360413) panicked at src/synth.rs:163:9:
+infeasible
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+== Synthesis stats ==
+programs_generated:     38616
+new_programs_generated: 5246
+programs_checked:       534
+counterexamples:        11
+
+==========
+[31/161] examples/LIA/inv_gen_sum3.sl:
+Candidate: (and (<= (+ (* 0 s) (* 0 s)) -3) (<= (+ (* 0 s) (* 0 s)) -3))
+Candidate: (and (<= (+ (* 0 s) (* 0 s)) 0) (<= (+ (* 0 s) (* 0 s)) 0))
+Candidate: (and (<= (+ (* 1 x) (* 1 s)) 0) (<= (+ (* 0 s) (* 0 s)) 0))
+Candidate: (and (<= (+ (* 1 x) (* -1 s)) 0) (<= (+ (* 0 s) (* 0 s)) 0))
+Candidate: (and (= (+ (* 1 x) (* -1 s)) 0) (= (+ (* 1 x) (* -1 s)) 0))
+Answer: (and (= (+ (* 1 x) (* -1 s)) 0) (= (+ (* 1 x) (* -1 s)) 0))
+
+== Phase timing ==
+    problem.verify:     98.895 ms   94.80 %  (n=5)
+         synth.run:      5.094 ms    4.88 %  (n=5)
+   satisfy_inhouse:      0.299 ms    0.29 %  (n=62)
+      expr_to_term:      0.028 ms    0.03 %  (n=1)
+             TOTAL:    104.316 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     1274
+new_programs_generated: 123
+programs_checked:       168
+counterexamples:        5
+
+==========
+[32/161] examples/LIA/inv_gen_sum4.sl:
+Candidate: (and (<= (+ (* 0 s) (* 0 s)) -15) (<= (+ (* 0 s) (* 0 s)) -15))
+Candidate: (and (= (+ (* 1 i) (* 1 i)) 2) (= (+ (* 1 i) (* 1 i)) 2))
+Candidate: (and (<= (+ (* -1 i) (* -1 s)) -1) (<= (+ (* -1 i) (* -1 s)) -1))
+Candidate: (and (= (+ (* -1 i) (* -1 s)) -1) (<= (+ (* -1 i) (* -1 s)) -1))
+Candidate: (and (<= (+ (* -1 i) (* 1 s)) -1) (= (+ (* -1 i) (* -1 s)) -1))
+Candidate: (and (<= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* -1 s) (* 1 i)) 1))
+Candidate: (and (= (+ (* -1 s) (* 1 i)) 1) (= (+ (* -1 s) (* 1 i)) 1))
+Candidate: (and (<= (+ (* 1 i) (* 1 i)) 4) (<= (+ (* 1 i) (* 1 i)) 4))
+Candidate: (and (<= (+ (* 1 i) (* 1 i)) 6) (<= (+ (* 1 i) (* 1 i)) 6))
+Candidate: (and (<= (+ (* 1 i) (* 1 i)) 8) (<= (+ (* 1 i) (* 1 i)) 8))
+Candidate: (and (<= (+ (* 1 i) (* 1 i)) 10) (<= (+ (* 1 i) (* 1 i)) 10))
+Candidate: (and (<= (+ (* 1 s) (* 1 i)) 6) (<= (+ (* 1 s) (* 1 i)) 6))
+Candidate: (and (<= (+ (* 1 s) (* 1 i)) 7) (<= (+ (* 1 s) (* 1 i)) 7))
+Candidate: (and (<= (+ (* 1 i) (* 1 i)) 14) (<= (+ (* 1 i) (* 1 i)) 14))
+Candidate: (and (<= (+ (* 0 s) (* 1 i)) 8) (<= (+ (* 1 s) (* 1 i)) 9))
+Candidate: (and (<= (+ (* -1 s) (* 1 i)) 8) (<= (+ (* 1 s) (* 1 i)) 12))
+Candidate: (and (<= (+ (* -1 s) (* 1 i)) 8) (<= (+ (* 1 s) (* 1 i)) 15))
+Candidate: (and (<= (+ (* -1 s) (* 1 i)) 3) (<= (+ (* 1 i) (* 1 i)) 14))
+Candidate: (and (<= (+ (* -1 s) (* 1 i)) 3) (<= (+ (* 1 s) (* 1 s)) 2))
+Candidate: (and (<= (+ (* -1 s) (* 1 i)) 3) (<= (+ (* 1 i) (* 1 i)) 8))
+Candidate: (and (<= (+ (* 1 s) (* 1 s)) 6) (<= (+ (* -1 s) (* 1 i)) 3))
+Candidate: (and (<= (+ (* 1 s) (* 1 i)) 6) (<= (+ (* -1 s) (* 1 i)) 3))
+Candidate: (and (<= (+ (* 1 s) (* 1 i)) 8) (<= (+ (* -1 s) (* 1 i)) 3))
+Candidate: (and (<= (+ (* 1 s) (* 1 s)) 8) (<= (+ (* -1 s) (* 1 i)) 3))
+Candidate: (and (<= (+ (* 1 s) (* 1 s)) 10) (<= (+ (* -1 s) (* 1 i)) 3))
+Candidate: (and (<= (+ (* -1 s) (* 1 i)) 3) (<= (+ (* 1 s) (* 1 s)) 12))
+Candidate: (and (<= (+ (* 1 s) (* 1 s)) 12) (<= (+ (* -1 s) (* 1 i)) 2))
+Candidate: (and (<= (+ (* 0 s) (* 1 i)) 8) (<= (+ (* -1 s) (* 1 i)) 2))
+Candidate: (and (<= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* 0 s) (* 1 i)) 8))
+Candidate: (and (<= (+ (* 1 i) (* 1 i)) 12) (<= (+ (* -1 s) (* 1 i)) 2))
+Candidate: (and (= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* 1 s) (* 1 s)) 6))
+Candidate: (and (<= (+ (* 1 i) (* 1 i)) 4) (= (+ (* -1 s) (* 1 i)) 1))
+Candidate: (and (<= (+ (* 1 s) (* 1 s)) 8) (= (+ (* -1 s) (* 1 i)) 1))
+Candidate: (and (<= (+ (* 1 s) (* 1 s)) 10) (= (+ (* -1 s) (* 1 i)) 1))
+Candidate: (and (<= (+ (* 1 s) (* 1 i)) 13) (= (+ (* -1 s) (* 1 i)) 1))
+Candidate: (and (<= (+ (* 0 s) (* 1 i)) 9) (= (+ (* -1 s) (* 1 i)) 1))
+Answer: (and (<= (+ (* 0 s) (* 1 i)) 9) (= (+ (* -1 s) (* 1 i)) 1))
+
+== Phase timing ==
+         synth.run:    722.363 ms   49.64 %  (n=36)
+    problem.verify:    447.923 ms   30.78 %  (n=36)
+   satisfy_inhouse:    284.881 ms   19.58 %  (n=14002)
+      expr_to_term:      0.020 ms    0.00 %  (n=1)
+             TOTAL:   1455.186 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     97714
+new_programs_generated: 13780
+programs_checked:       15816
+counterexamples:        36
+
+==========
+[33/161] examples/LIA/inv_gen_tcs.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) -3) (<= (+ (* 0 x) (* 0 x)) -3))
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* -1 y) (* -1 y)) 0) (= (+ (* -1 y) (* -1 y)) 0))
+Candidate: (or (= (+ (* -1 y) (* -1 y)) 0) (<= (+ (* 1 y) (* 0 x)) -1))
+Candidate: (or (= (+ (* -1 y) (* 1 j)) 0) (<= (+ (* 1 y) (* 1 x)) -1))
+Candidate: (or (= (+ (* 1 i) (* 1 j)) 1) (= (+ (* -1 y) (* 1 x)) 0))
+Candidate: (or (<= (+ (* 1 y) (* -1 i)) 0) (<= (+ (* -1 j) (* 1 x)) -1))
+Candidate: (or (<= (+ (* 1 y) (* -1 i)) 0) (= (+ (* -1 i) (* 0 x)) 1))
+Candidate: (or (<= (+ (* 1 y) (* 1 j)) 0) (= (+ (* -1 i) (* 0 x)) 1))
+Candidate: (or (<= (+ (* 1 y) (* 1 j)) 0) (<= (+ (* 1 x) (* 1 i)) -2))
+Candidate: (or (<= (+ (* 1 y) (* 1 j)) 0) (<= (+ (* -1 j) (* 1 i)) -1))
+Candidate: (or (<= (+ (* 1 y) (* -1 x)) 0) (<= (+ (* -1 j) (* 1 i)) -1))
+
+== Phase timing ==
+    problem.verify:    352.423 ms   46.04 %  (n=12)
+   satisfy_inhouse:    287.685 ms   37.59 %  (n=11035)
+         synth.run:    125.271 ms   16.37 %  (n=12)
+      expr_to_term:      0.033 ms    0.00 %  (n=1)
+             TOTAL:    765.411 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     103019
+new_programs_generated: 11267
+programs_checked:       11690
+counterexamples:        12
+
+thread 'main' (3361535) panicked at src/synth.rs:163:9:
+infeasible
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+== Synthesis stats ==
+programs_generated:     103019
+new_programs_generated: 11267
+programs_checked:       11690
+counterexamples:        12
+
+==========
+[34/161] examples/LIA/inv_gen_term2.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) -3) (<= (+ (* 0 x) (* 0 x)) -3))
+Candidate: (and (<= (+ (* -1 x) (* -1 x)) -3) (<= (+ (* -1 x) (* -1 x)) -3))
+Candidate: (or (= (+ (* -1 x) (* -1 x)) 0) (<= (+ (* -1 x) (* -1 x)) -3))
+Candidate: (or (<= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 2))
+Candidate: (or (<= (+ (* 1 x) (* 0 x)) -1) (= (+ (* 1 x) (* -1 z)) 0))
+Candidate: (or (<= (+ (* 1 x) (* 1 z)) 0) (<= (+ (* -1 x) (* -1 x)) 0))
+Candidate: (or (<= (+ (* 1 x) (* 1 z)) 0) (<= (+ (* -1 z) (* -1 x)) 0))
+Answer: (or (<= (+ (* 1 x) (* 1 z)) 0) (<= (+ (* -1 z) (* -1 x)) 0))
+
+== Phase timing ==
+    problem.verify:    117.902 ms   89.40 %  (n=7)
+         synth.run:     11.059 ms    8.39 %  (n=7)
+   satisfy_inhouse:      2.872 ms    2.18 %  (n=261)
+      expr_to_term:      0.043 ms    0.03 %  (n=1)
+             TOTAL:    131.877 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     2687
+new_programs_generated: 335
+programs_checked:       436
+counterexamples:        7
+
+==========
+[35/161] examples/LIA/inv_gen_term3.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) -3) (<= (+ (* 0 x) (* 0 x)) -3))
+Candidate: (and (<= (+ (* 0 x) (* -1 y)) -1) (<= (+ (* 0 x) (* -1 y)) -1))
+Answer: (and (<= (+ (* 0 x) (* -1 y)) -1) (<= (+ (* 0 x) (* -1 y)) -1))
+
+== Phase timing ==
+    problem.verify:     30.691 ms   97.12 %  (n=2)
+         synth.run:      0.848 ms    2.68 %  (n=2)
+   satisfy_inhouse:      0.042 ms    0.13 %  (n=4)
+      expr_to_term:      0.021 ms    0.07 %  (n=1)
+             TOTAL:     31.602 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     217
+new_programs_generated: 25
+programs_checked:       24
+counterexamples:        2
+
+==========
+[36/161] examples/LIA/inv_gen_trex1.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) -3) (<= (+ (* 0 x) (* 0 x)) -3))
+Candidate: (and (<= (+ (* 0 x) (* -1 z)) 0) (<= (+ (* 0 x) (* -1 z)) 0))
+Candidate: (and (<= (+ (* 0 x) (* -1 z)) -1) (<= (+ (* 0 x) (* -1 z)) 0))
+Answer: (and (<= (+ (* 0 x) (* -1 z)) -1) (<= (+ (* 0 x) (* -1 z)) 0))
+
+== Phase timing ==
+    problem.verify:    170.181 ms   96.08 %  (n=3)
+         synth.run:      6.875 ms    3.88 %  (n=3)
+   satisfy_inhouse:      0.039 ms    0.02 %  (n=12)
+      expr_to_term:      0.023 ms    0.01 %  (n=1)
+             TOTAL:    177.119 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     437
+new_programs_generated: 42
+programs_checked:       52
+counterexamples:        3
+
+==========
+[37/161] examples/LIA/inv_gen_trex2.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) -3) (<= (+ (* 0 x) (* 0 x)) -3))
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+
+== Phase timing ==
+    problem.verify:     93.439 ms   94.54 %  (n=2)
+         synth.run:      5.290 ms    5.35 %  (n=2)
+   satisfy_inhouse:      0.069 ms    0.07 %  (n=4)
+      expr_to_term:      0.032 ms    0.03 %  (n=1)
+             TOTAL:     98.831 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     87
+new_programs_generated: 18
+programs_checked:       17
+counterexamples:        2
+
+==========
+[38/161] examples/LIA/inv_gen_trex4.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) -3) (<= (+ (* 0 x) (* 0 x)) -3))
+Candidate: (and (= (+ (* 0 x) (* -1 d)) 0) (= (+ (* 0 x) (* -1 d)) 0))
+Candidate: (or (= (+ (* 0 x) (* -1 d)) 0) (<= (+ (* 0 x) (* -1 d)) -1))
+Candidate: (and (<= (+ (* 0 x) (* -1 d)) 1) (<= (+ (* 0 x) (* -1 d)) 1))
+Answer: (and (<= (+ (* 0 x) (* -1 d)) 1) (<= (+ (* 0 x) (* -1 d)) 1))
+
+== Phase timing ==
+    problem.verify:     83.723 ms   96.48 %  (n=4)
+         synth.run:      2.503 ms    2.88 %  (n=4)
+   satisfy_inhouse:      0.501 ms    0.58 %  (n=22)
+      expr_to_term:      0.051 ms    0.06 %  (n=1)
+             TOTAL:     86.778 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     465
+new_programs_generated: 51
+programs_checked:       79
+counterexamples:        4
+
+==========
+[39/161] examples/LIA/inv_gen_vmail.sl:
+Candidate: (and (<= (+ (* 0 i) (* 0 i)) -3) (<= (+ (* 0 i) (* 0 i)) -3))
+Candidate: (and (<= (+ (* 0 i) (* 0 i)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Candidate: (and (= (+ (* 1 i) (* 1 i)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Candidate: (or (= (+ (* 1 i) (* 1 i)) 0) (= (+ (* 1 i) (* 1 i)) 2))
+Candidate: (and (<= (+ (* -1 i) (* -1 i)) 0) (<= (+ (* -1 i) (* -1 i)) 0))
+Answer: (and (<= (+ (* -1 i) (* -1 i)) 0) (<= (+ (* -1 i) (* -1 i)) 0))
+
+== Phase timing ==
+    problem.verify:     79.555 ms   94.52 %  (n=5)
+         synth.run:      3.697 ms    4.39 %  (n=5)
+   satisfy_inhouse:      0.891 ms    1.06 %  (n=47)
+      expr_to_term:      0.024 ms    0.03 %  (n=1)
+             TOTAL:     84.167 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     862
+new_programs_generated: 91
+programs_checked:       130
+counterexamples:        5
+
+==========
+[40/161] examples/LIA/inv_gen_w1.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) -3) (<= (+ (* 0 x) (* 0 x)) -3))
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* 1 n) (* 1 n)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (or (= (+ (* 1 n) (* 1 n)) 2) (= (+ (* 1 n) (* 1 n)) 0))
+Candidate: (or (= (+ (* 1 n) (* 1 n)) 0) (<= (+ (* -1 n) (* 0 x)) -1))
+Candidate: (and (<= (+ (* -1 n) (* 0 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+Candidate: (and (<= (+ (* -1 n) (* 0 x)) 0) (<= (+ (* 0 x) (* 1 x)) 1))
+Candidate: (and (<= (+ (* -1 n) (* 0 x)) 0) (<= (+ (* 1 n) (* 1 x)) 2))
+Candidate: (or (<= (+ (* -1 n) (* 1 x)) -1) (= (+ (* -1 n) (* 1 x)) 0))
+Answer: (or (<= (+ (* -1 n) (* 1 x)) -1) (= (+ (* -1 n) (* 1 x)) 0))
+
+== Phase timing ==
+    problem.verify:    136.729 ms   89.94 %  (n=9)
+         synth.run:     13.356 ms    8.79 %  (n=9)
+   satisfy_inhouse:      1.917 ms    1.26 %  (n=296)
+      expr_to_term:      0.018 ms    0.01 %  (n=1)
+             TOTAL:    152.021 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     3384
+new_programs_generated: 324
+programs_checked:       489
+counterexamples:        9
+
+==========
+[41/161] examples/LIA/inv_gen_w2.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) -3) (<= (+ (* 0 x) (* 0 x)) -3))
+Candidate: (and (<= (+ (* 0 x) (* -1 n)) -1) (<= (+ (* 0 x) (* -1 n)) -1))
+Candidate: (and (= (+ (* -1 x) (* -1 x)) 0) (<= (+ (* 0 x) (* -1 n)) -1))
+Candidate: (or (<= (+ (* -1 n) (* -1 x)) -3) (= (+ (* -1 x) (* -1 x)) 0))
+Candidate: (or (= (+ (* 1 n) (* -1 x)) 1) (= (+ (* 1 n) (* -1 x)) 2))
+Candidate: (or (= (+ (* 1 n) (* -1 x)) 1) (<= (+ (* -1 n) (* 1 x)) -2))
+Answer: (or (= (+ (* 1 n) (* -1 x)) 1) (<= (+ (* -1 n) (* 1 x)) -2))
+
+== Phase timing ==
+    problem.verify:    152.493 ms   87.35 %  (n=6)
+         synth.run:     17.919 ms   10.26 %  (n=6)
+   satisfy_inhouse:      4.140 ms    2.37 %  (n=234)
+      expr_to_term:      0.024 ms    0.01 %  (n=1)
+             TOTAL:    174.576 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     3422
+new_programs_generated: 294
+programs_checked:       374
+counterexamples:        6
+
+==========
+[42/161] examples/LIA/inv_gen_winf1.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) -3) (<= (+ (* 0 x) (* 0 x)) -3))
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+Answer: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+
+== Phase timing ==
+    problem.verify:    110.420 ms   96.16 %  (n=3)
+         synth.run:      4.367 ms    3.80 %  (n=3)
+      expr_to_term:      0.025 ms    0.02 %  (n=1)
+   satisfy_inhouse:      0.014 ms    0.01 %  (n=5)
+             TOTAL:    114.825 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     228
+new_programs_generated: 34
+programs_checked:       37
+counterexamples:        3
+
+==========
+[43/161] examples/LIA/inv_gen_winf2.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) -3) (<= (+ (* 0 x) (* 0 x)) -3))
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+Answer: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+
+== Phase timing ==
+    problem.verify:     31.390 ms   97.13 %  (n=3)
+         synth.run:      0.904 ms    2.80 %  (n=3)
+      expr_to_term:      0.017 ms    0.05 %  (n=1)
+   satisfy_inhouse:      0.006 ms    0.02 %  (n=5)
+             TOTAL:     32.318 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     228
+new_programs_generated: 34
+programs_checked:       37
+counterexamples:        3
+
+==========
+[44/161] examples/LIA/LinExpr_eq1ex.sl:
+Candidate: x
+Candidate: y
+Candidate: (ite (<= y x) z y)
+Candidate: (ite (<= (- y z) x) z y)
+Candidate: (+ (- z (ite (<= z y) x z)) (ite (<= y x) x z))
+Candidate: (ite (<= (- x y) y) (ite (<= (- y z) x) z y) x)
+Candidate: (ite (or (<= x y) (<= z y)) (ite (<= (- y z) x) z y) (ite (<= z x) x z))
+Candidate: (ite (not (<= (- x 1) y)) (ite (<= z y) z x) (ite (<= z y) y z))
+Candidate: (ite (or (<= x z) (<= z y)) (ite (or (<= y x) (<= y z)) z y) x)
+Candidate: (ite (<= (- x z) (+ 1 1)) (ite (<= z y) y z) (ite (<= z y) z x))
+Candidate: (ite (<= (- x 1) (+ 1 1)) (ite (<= z y) x z) (ite (<= (- x z) (+ 1 1)) (ite (<= z y) y z) (ite (<= z y) z x)))
+
+== Phase timing ==
+         synth.run:   8055.513 ms   95.56 %  (n=11)
+    problem.verify:    300.776 ms    3.57 %  (n=11)
+   satisfy_inhouse:     73.675 ms    0.87 %  (n=5342)
+      expr_to_term:      0.152 ms    0.00 %  (n=1)
+             TOTAL:   8430.115 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     33543115
+new_programs_generated: 8056173
+programs_checked:       7348
+counterexamples:        11
+
+==========
+[45/161] examples/LIA/LinExpr_eq2ex.sl:
+Candidate: x
+Candidate: (- (- x 1) (- 1 z))
+Candidate: (- (+ (- (- x 1) 1) (- (- x 1) y)) (- (+ z 1) (- (- x 1) z)))
+
+== Phase timing ==
+         synth.run:     62.806 ms   39.87 %  (n=3)
+   satisfy_inhouse:     55.299 ms   35.10 %  (n=4413)
+    problem.verify:     39.194 ms   24.88 %  (n=3)
+      expr_to_term:      0.235 ms    0.15 %  (n=1)
+             TOTAL:    157.534 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     164173098
+new_programs_generated: 3246670
+programs_checked:       4427
+counterexamples:        3
+
+==========
+[46/161] examples/LIA/LinExpr_inv1_ex.sl:
+Candidate: x
+Candidate: 1
+Candidate: (ite (<= y 1) (+ (+ 1 1) 1) 1)
+Candidate: (ite (or (<= y 1) (<= x 1)) (+ (+ 1 1) 1) 1)
+Answer: (ite (or (<= y 1) (<= x 1)) (+ (+ 1 1) 1) 1)
+
+== Phase timing ==
+    problem.verify:     88.206 ms   65.82 %  (n=4)
+         synth.run:     42.544 ms   31.74 %  (n=4)
+   satisfy_inhouse:      3.114 ms    2.32 %  (n=254)
+      expr_to_term:      0.156 ms    0.12 %  (n=1)
+             TOTAL:    134.019 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     31291
+new_programs_generated: 1690
+programs_checked:       266
+counterexamples:        4
+
+==========
+[47/161] examples/LIA/LinExpr_inv1.sl:
+Candidate: x
+Candidate: y
+Candidate: 1
+Candidate: (+ y x)
+Candidate: (- y x)
+Candidate: (- x y)
+Candidate: (+ (+ x x) y)
+Candidate: (+ (+ y x) (+ y x))
+Candidate: (ite (= x y) x (+ 1 1))
+Candidate: (ite (= x y) 0 (+ 1 1))
+Candidate: (ite (= (+ y x) 1) (+ 1 1) (+ (+ y y) x))
+Candidate: (ite (<= x (+ y y)) (+ (+ y y) x) (+ x x))
+Candidate: (ite (<= x (+ y y)) (+ (+ y y) x) (+ x 1))
+Candidate: (ite (not (<= (+ x x) y)) (+ (+ 1 1) y) (+ (+ y y) x))
+Candidate: (ite (= (- x y) 1) (+ x 1) (+ (+ y y) x))
+Candidate: (ite (= (- x y) 1) (+ 1 1) (+ (+ y y) x))
+Candidate: (ite (<= y (+ x x)) (+ (+ x x) y) (+ (+ y y) x))
+Candidate: (ite (not (= (- x y) 1)) (+ (+ y y) x) (+ (+ x x) y))
+Candidate: (ite (<= (+ x x) y) (+ (+ y y) x) (+ (+ x x) y))
+Candidate: (ite (not (<= (+ y y) x)) (+ (+ y y) x) (- (+ x x) y))
+Candidate: (ite (not (<= (+ y y) x)) (+ (+ y y) x) (+ (+ x x) y))
+Candidate: (ite (<= (- x y) (- 1 x)) (+ (+ y y) x) (- (+ x 1) y))
+Candidate: (ite (or (<= x 0) (<= x y)) (+ (+ y y) x) (+ x x))
+Candidate: (ite (or (<= x 0) (<= x y)) (+ (+ y y) x) (+ (+ x x) y))
+Candidate: (ite (or (<= y x) (= x 1)) (+ (+ x x) y) (+ (+ y y) x))
+Candidate: (+ (ite (<= x y) y x) (+ y x))
+Answer: (+ (ite (<= x y) y x) (+ y x))
+
+== Phase timing ==
+         synth.run:  33996.685 ms   59.16 %  (n=26)
+   satisfy_inhouse:  23125.851 ms   40.24 %  (n=568140)
+    problem.verify:    346.952 ms    0.60 %  (n=26)
+      expr_to_term:      0.050 ms    0.00 %  (n=1)
+             TOTAL:  57469.537 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     1533539
+new_programs_generated: 593411
+programs_checked:       593979
+counterexamples:        26
+
+==========
+[48/161] examples/LIA/max10.sl:
+Candidate: x1
+Candidate: x2
+Candidate: 1
+Candidate: (+ x2 x1)
+Candidate: (ite (= 1 x9) x7 (+ 1 x7))
+Candidate: (+ (ite (= 1 x7) 0 x3) (+ x2 x1))
+Candidate: (ite (<= x7 x2) (+ 1 x4) x7)
+Candidate: (ite (<= x7 x5) (+ x5 1) x7)
+Candidate: (ite (<= x7 x10) (+ x10 1) x7)
+Candidate: (ite (<= 0 x10) (ite (<= x7 x3) (+ 1 x4) x7) (ite (= 0 x1) x2 (+ 1 x3)))
+Candidate: (ite (<= x3 (- x7 x3)) (+ (+ 1 x9) x6) (+ x3 x1))
+
+== Phase timing ==
+         synth.run:  68878.012 ms   99.47 %  (n=11)
+    problem.verify:    361.898 ms    0.52 %  (n=11)
+   satisfy_inhouse:      1.776 ms    0.00 %  (n=328)
+      expr_to_term:      0.030 ms    0.00 %  (n=1)
+             TOTAL:  69241.717 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     47373731
+new_programs_generated: 4709425
+programs_checked:       3892
+counterexamples:        11
+
+==========
+[49/161] examples/LIA/max_11.sl:
+Candidate: x1
+Candidate: x2
+Candidate: 1
+Candidate: (+ x2 x1)
+Candidate: (+ (+ x3 x1) x2)
+Candidate: (+ (+ x2 x1) (+ x10 x3))
+Candidate: (+ (+ (+ x10 x8) x1) (+ x2 x3))
+Candidate: (+ (+ (+ (+ x7 x2) x8) (+ x10 x1)) x3)
+Candidate: (+ (+ (+ (+ (+ x7 x2) x8) (+ x10 x1)) x3) x4)
+Candidate: (ite (and (= x10 x8) (= x3 x1)) (+ (+ x7 x4) x2) (ite (<= 0 x2) 1 x1))
+
+== Phase timing ==
+         synth.run: 100816.466 ms   99.83 %  (n=10)
+    problem.verify:    164.374 ms    0.16 %  (n=10)
+   satisfy_inhouse:      2.868 ms    0.00 %  (n=275)
+      expr_to_term:      0.034 ms    0.00 %  (n=1)
+             TOTAL: 100983.742 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     84287604
+new_programs_generated: 972127
+programs_checked:       2026
+counterexamples:        10
+
+==========
+[50/161] examples/LIA/max12.sl:
+Candidate: x1
+Candidate: x2
+Candidate: 1
+Candidate: (+ (+ x7 x1) x2)
+Candidate: (ite (<= x1 x3) (+ x2 x7) (+ (+ x1 x8) x7))
+Candidate: (ite (not (<= x2 x4)) (- (+ 1 x6) x7) (+ x7 x1))
+Candidate: (ite (not (<= x1 x6)) x1 (+ (+ x2 x7) x11))
+Candidate: (ite (= (- x7 x11) x2) (- (+ 1 x7) x4) (+ (+ x2 x7) x11))
+Candidate: (ite (= (+ x7 x4) x1) (+ (+ 1 x1) x11) (- (+ x7 x1) x4))
+Candidate: (ite (= (- x6 x7) x4) 1 (+ (+ (+ x7 x1) x1) (+ x2 x3)))
+
+== Phase timing ==
+         synth.run:  11155.268 ms   98.81 %  (n=10)
+    problem.verify:    133.248 ms    1.18 %  (n=10)
+   satisfy_inhouse:      1.604 ms    0.01 %  (n=322)
+      expr_to_term:      0.040 ms    0.00 %  (n=1)
+             TOTAL:  11290.160 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     57843330
+new_programs_generated: 4298210
+programs_checked:       2344
+counterexamples:        10
+
+==========
+[51/161] examples/LIA/max13.sl:
+Candidate: x1
+Candidate: x2
+Candidate: 1
+Candidate: (+ x2 x1)
+Candidate: (+ (+ x1 x4) x2)
+Candidate: (+ (+ x2 x1) x10)
+Candidate: (ite (= x10 x2) (+ (+ x1 x10) x4) (+ (+ x1 x10) 1))
+Candidate: (ite (not (<= x4 x1)) (- x10 x3) (+ (+ x2 x1) x11))
+Candidate: (ite (= (- x1 x11) x2) (+ x10 x4) (+ (+ x10 1) x4))
+Candidate: (ite (not (= (- x1 x11) x2)) (+ (+ x10 1) x4) (+ (+ x9 x10) x4))
+Candidate: (ite (= (+ x4 x2) x1) (+ x9 x10) (ite (<= x6 x1) 1 x6))
+
+== Phase timing ==
+         synth.run:  73470.214 ms   99.63 %  (n=11)
+    problem.verify:    271.287 ms    0.37 %  (n=11)
+   satisfy_inhouse:      1.527 ms    0.00 %  (n=316)
+      expr_to_term:      0.045 ms    0.00 %  (n=1)
+             TOTAL:  73743.072 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     74332765
+new_programs_generated: 3463958
+programs_checked:       3958
+counterexamples:        11
+
+==========
+[52/161] examples/LIA/max14.sl:
+Candidate: x1
+Candidate: x2
+Candidate: 1
+Candidate: (+ x2 x1)
+Candidate: (ite (<= x1 x3) x2 x1)
+Candidate: (- (+ x2 x1) x5)
+Candidate: (- (+ x2 x1) (+ x3 x6))
+Candidate: (ite (<= x2 x6) (- x1 x3) (- 1 x6))
+Candidate: (ite (not (<= x1 x6)) (+ x12 x1) (- x2 x3))
+Candidate: (ite (not (<= x2 x6)) (+ x2 x12) (- x1 x3))
+Candidate: (ite (= (- x10 x6) x2) (- x1 x3) (- (+ x2 x12) x11))
+Candidate: (ite (= (- x9 x7) x2) (ite (= x14 x1) x12 1) (ite (= x2 x14) x9 1))
+Candidate: (ite (= (- x9 x1) x2) (+ x12 x14) (- x9 (- x11 1)))
+
+== Phase timing ==
+         synth.run:  83098.480 ms   99.63 %  (n=13)
+    problem.verify:    305.853 ms    0.37 %  (n=13)
+   satisfy_inhouse:      2.999 ms    0.00 %  (n=334)
+      expr_to_term:      0.053 ms    0.00 %  (n=1)
+             TOTAL:  83407.385 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     77991627
+new_programs_generated: 3165629
+programs_checked:       9364
+counterexamples:        13
+
+==========
+[53/161] examples/LIA/max15.sl:
+Candidate: x1
+Candidate: x2
+Candidate: 1
+Candidate: (+ x2 x1)
+Candidate: (+ 1 x3)
+Candidate: (ite (<= x5 x8) (+ x2 x1) (+ x2 x3))
+Candidate: (ite (<= x15 1) 1 x15)
+Candidate: (ite (<= x15 x12) (+ 1 x3) x1)
+Candidate: (ite (<= x15 1) (+ 1 x4) x15)
+Candidate: (ite (= x9 x15) (+ 1 x8) (+ x10 x5))
+Candidate: (ite (= x15 x5) (+ 1 x6) (+ x6 x1))
+Candidate: (ite (= x15 x5) (+ 1 x7) (+ x9 x1))
+Candidate: (ite (<= x15 x2) (+ 1 x11) x15)
+Candidate: (ite (<= x15 x5) (+ 1 x13) x15)
+Candidate: (ite (<= x15 x14) (+ 1 x14) x15)
+Candidate: (ite (<= x15 x6) (+ 1 x7) x15)
+Candidate: (ite (not (<= x15 x7)) (- x15 x8) (ite (<= x9 x6) (+ 1 x7) (+ x7 x6)))
+
+== Phase timing ==
+         synth.run:  74809.724 ms   99.43 %  (n=17)
+    problem.verify:    425.449 ms    0.57 %  (n=17)
+   satisfy_inhouse:      2.882 ms    0.00 %  (n=538)
+      expr_to_term:      0.090 ms    0.00 %  (n=1)
+             TOTAL:  75238.146 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     27183492
+new_programs_generated: 3527451
+programs_checked:       41039
+counterexamples:        17
+
+==========
+[54/161] examples/LIA/max2.sl:
+Candidate: x
+Candidate: y
+Candidate: 0
+Candidate: (ite (<= 0 x) x y)
+Candidate: (ite (<= 0 y) y x)
+Candidate: (ite (<= x y) y x)
+Answer: (ite (<= x y) y x)
+
+== Phase timing ==
+    problem.verify:     54.679 ms   96.18 %  (n=6)
+         synth.run:      2.067 ms    3.64 %  (n=6)
+   satisfy_inhouse:      0.093 ms    0.16 %  (n=44)
+      expr_to_term:      0.009 ms    0.02 %  (n=1)
+             TOTAL:     56.849 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     1824
+new_programs_generated: 146
+programs_checked:       73
+counterexamples:        6
+
+==========
+[55/161] examples/LIA/max3.sl:
+Candidate: x
+Candidate: y
+Candidate: 1
+Candidate: (+ y x)
+Candidate: (- (+ x x) (- (+ z x) y))
+Candidate: (ite (<= x y) y x)
+Candidate: (ite (<= y 0) (- x y) y)
+Candidate: (ite (<= z 0) (ite (<= x y) y 1) (ite (= z y) x 1))
+Candidate: (ite (= 1 z) (ite (<= x z) z x) (ite (<= 1 x) x y))
+Candidate: (ite (not (<= x (- z x))) (ite (<= x y) y x) (+ (+ z y) z))
+Candidate: (- (ite (<= x y) y x) (ite (<= z x) 0 y))
+Candidate: (+ (ite (<= z x) 0 1) (ite (<= x y) y x))
+Candidate: (ite (not (<= z (- y z))) (ite (<= x z) z x) (ite (<= x y) y x))
+Candidate: (ite (not (<= y (- z y))) (ite (<= x y) y x) (ite (<= x z) z x))
+Candidate: (ite (and (= z y) (<= z x)) x (ite (<= z y) y z))
+Candidate: (ite (or (= z y) (<= y x)) (ite (<= x z) z x) (ite (<= z y) y z))
+Answer: (ite (or (= z y) (<= y x)) (ite (<= x z) z x) (ite (<= z y) y z))
+
+== Phase timing ==
+         synth.run:  11611.762 ms   97.97 %  (n=16)
+    problem.verify:    240.021 ms    2.03 %  (n=16)
+   satisfy_inhouse:      0.628 ms    0.01 %  (n=504)
+      expr_to_term:      0.008 ms    0.00 %  (n=1)
+             TOTAL:  11852.420 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     3870296
+new_programs_generated: 933836
+programs_checked:       15236
+counterexamples:        16
+
+==========
+[56/161] examples/LIA/max4.sl:
+Candidate: x
+Candidate: y
+Candidate: 1
+Candidate: (+ y w)
+Candidate: (ite (<= 1 w) w y)
+Candidate: (ite (= x w) y 1)
+Candidate: (ite (<= w x) (+ y x) w)
+Candidate: (ite (<= w z) (+ y x) 1)
+Candidate: (ite (not (<= w y)) w (+ y x))
+Candidate: (ite (= y z) w (+ y x))
+Candidate: (ite (not (= y z)) (+ y x) (- w x))
+Candidate: (ite (not (<= (- w x) x)) (+ (+ x z) 1) (+ y x))
+Candidate: (ite (and (<= y (- w x)) (<= y w)) w (+ w 1))
+
+== Phase timing ==
+         synth.run:  30239.241 ms   98.35 %  (n=13)
+    problem.verify:    507.249 ms    1.65 %  (n=13)
+   satisfy_inhouse:      0.974 ms    0.00 %  (n=321)
+      expr_to_term:      0.011 ms    0.00 %  (n=1)
+             TOTAL:  30747.475 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     15587330
+new_programs_generated: 5064340
+programs_checked:       14065
+counterexamples:        13
+
+==========
+[57/161] examples/LIA/max5.sl:
+Candidate: x
+Candidate: y
+Candidate: 1
+Candidate: (+ (+ w x) y)
+Candidate: (ite (<= 1 y) y (+ w x))
+Candidate: (ite (not (= z x)) (+ (- 1 w) 1) 1)
+Candidate: (ite (<= u (- z w)) (+ (- y w) x) (+ w u))
+Candidate: (ite (<= (- w x) x) (+ x y) (+ (+ x 1) y))
+Candidate: (ite (not (<= x (+ w w))) (+ (- y w) x) (+ u 1))
+Candidate: (ite (<= (- w y) u) (+ (- y w) x) (- w y))
+Candidate: (+ (ite (<= w u) y 1) (ite (= y w) x 0))
+Candidate: (ite (not (<= (- w y) u)) (ite (not (<= (- w u) z)) (- w y) (+ (+ x z) y)) (+ (- y w) x))
+
+== Phase timing ==
+         synth.run:  70644.217 ms   98.94 %  (n=12)
+    problem.verify:    754.741 ms    1.06 %  (n=12)
+   satisfy_inhouse:      1.079 ms    0.00 %  (n=393)
+      expr_to_term:      0.017 ms    0.00 %  (n=1)
+             TOTAL:  71400.054 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     33690116
+new_programs_generated: 11242164
+programs_checked:       7800
+counterexamples:        12
+
+==========
+[58/161] examples/LIA/max6.sl:
+Candidate: x1
+Candidate: x2
+Candidate: 1
+Candidate: (+ x2 x1)
+Candidate: (+ (- x1 x4) x2)
+Candidate: (ite (<= x2 x3) x1 x2)
+Candidate: (ite (<= x2 x3) (+ x1 x6) x2)
+Candidate: (ite (<= x1 x3) (+ x2 x6) x1)
+Candidate: (ite (= x2 x1) x6 (+ x4 1))
+Candidate: (ite (= (- x5 x2) x3) (ite (= x1 x6) x2 1) (+ 1 x6))
+Candidate: (ite (= (+ x5 x1) x4) (+ x2 x6) (ite (<= x1 x6) x2 x1))
+Candidate: (ite (not (= (+ x1 x1) x2)) (ite (= x1 x4) x2 x1) (+ x2 x6))
+Candidate: (ite (not (<= x2 (- x1 x6))) (- (+ x4 1) x1) (ite (<= x6 x5) x1 0))
+Candidate: (ite (not (= (+ x1 x1) x2)) (ite (<= x1 x2) x2 x1) (+ (- x2 x3) x6))
+
+== Phase timing ==
+         synth.run:  91267.230 ms   98.98 %  (n=14)
+    problem.verify:    943.482 ms    1.02 %  (n=14)
+   satisfy_inhouse:      1.237 ms    0.00 %  (n=445)
+      expr_to_term:      0.021 ms    0.00 %  (n=1)
+             TOTAL:  92211.970 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     29233085
+new_programs_generated: 7563395
+programs_checked:       18168
+counterexamples:        14
+
+==========
+[59/161] examples/LIA/max7.sl:
+Candidate: x1
+Candidate: x2
+Candidate: 1
+Candidate: (+ x2 x1)
+Candidate: (- (+ x1 x1) (- (+ x3 x1) x2))
+Candidate: (+ (- x1 x6) x2)
+Candidate: (ite (<= x1 x6) x2 x1)
+Candidate: (ite (<= x1 x6) (+ x2 x4) x1)
+Candidate: (ite (<= x2 x5) (+ x1 x4) x2)
+Candidate: (ite (= x1 x2) (+ x2 x4) (+ 1 x4))
+Candidate: (ite (<= x6 (- x3 x6)) (+ (+ x1 x4) x2) x1)
+Candidate: (ite (<= (+ x3 x4) x7) (+ (+ x1 x4) x2) (+ x1 x4))
+Candidate: (ite (not (<= (+ x5 x2) x4)) (+ 1 x4) (+ (+ x1 x4) x2))
+Candidate: (ite (not (<= (+ x5 x2) x4)) (+ x5 x2) (+ (+ x1 x4) x2))
+
+== Phase timing ==
+         synth.run:  76264.420 ms   99.49 %  (n=14)
+    problem.verify:    389.785 ms    0.51 %  (n=14)
+   satisfy_inhouse:      3.830 ms    0.00 %  (n=374)
+      expr_to_term:      0.024 ms    0.00 %  (n=1)
+             TOTAL:  76658.059 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     25846667
+new_programs_generated: 3706627
+programs_checked:       19199
+counterexamples:        14
+
+==========
+[60/161] examples/LIA/max8.sl:
+Candidate: x1
+Candidate: x2
+Candidate: 1
+Candidate: (+ x2 x1)
+Candidate: (ite (<= 1 x1) x1 x2)
+Candidate: (ite (<= x2 x3) x1 x2)
+Candidate: (ite (<= x1 x4) (- x2 x4) x1)
+Candidate: (ite (<= x2 x3) x1 (- x2 x4))
+Candidate: (ite (<= x2 x3) x1 (+ 1 x4))
+Candidate: (ite (not (= x2 x5)) (- x2 x7) (+ (- x7 x4) x1))
+Candidate: (ite (= (- x1 x7) x5) (- x2 x6) (- (+ x6 x1) x3))
+Candidate: (ite (<= x2 (- x3 x6)) (+ (- x2 x3) x1) (+ x2 x7))
+Candidate: (ite (= (+ x1 x1) x4) (+ x2 x7) (- x1 (- x8 x5)))
+Candidate: (ite (<= x2 (- x4 x7)) (+ (- x5 x7) x1) (- x2 x3))
+Candidate: (ite (<= x2 (+ x1 x4)) (+ (- x7 x4) x1) (+ (- x2 x8) x5))
+
+== Phase timing ==
+         synth.run:  32259.695 ms   99.15 %  (n=15)
+    problem.verify:    268.158 ms    0.82 %  (n=15)
+   satisfy_inhouse:      8.064 ms    0.02 %  (n=416)
+      expr_to_term:      0.025 ms    0.00 %  (n=1)
+             TOTAL:  32535.942 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     28782542
+new_programs_generated: 3064270
+programs_checked:       18636
+counterexamples:        15
+
+==========
+[61/161] examples/LIA/max9.sl:
+Candidate: x1
+Candidate: x2
+Candidate: 1
+Candidate: (+ (+ x5 x1) x2)
+Candidate: (ite (= x3 x5) 1 (+ 1 1))
+Candidate: (ite (<= 1 x5) x5 (+ x1 x2))
+Candidate: (ite (<= x1 x3) (+ x5 x2) x1)
+Candidate: (ite (not (<= x1 x5)) x1 (+ x5 x2))
+Candidate: (ite (not (<= x1 x5)) (+ (- x9 x2) x1) (+ x5 x2))
+Candidate: (ite (<= x1 (+ x5 x5)) (+ x5 x2) x1)
+Candidate: (ite (<= x5 (- x3 x6)) (ite (<= x1 x6) x2 x1) (+ x6 x5))
+Candidate: (ite (= (- x1 x3) x4) (+ x5 x2) (- x9 (- x6 x1)))
+
+== Phase timing ==
+         synth.run:   5408.047 ms   96.99 %  (n=12)
+    problem.verify:    160.592 ms    2.88 %  (n=12)
+   satisfy_inhouse:      7.368 ms    0.13 %  (n=384)
+      expr_to_term:      0.028 ms    0.00 %  (n=1)
+             TOTAL:   5576.034 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     37498387
+new_programs_generated: 6315254
+programs_checked:       6542
+counterexamples:        12
+
+==========
+[62/161] examples/LIA/mpg_example1.sl:
+Candidate: x
+Candidate: (+ (+ x x) (+ x 1))
+Candidate: (+ (- (- (- x 1) 1) (+ 1 1)) (- x y))
+Candidate: (ite (<= x 1) (+ (+ x x) (+ x 1)) (+ (+ x x) x))
+Candidate: (- (+ (- (+ x x) y) (+ (+ x x) 1)) (ite (<= 0 y) x (+ (+ x x) x)))
+Candidate: (+ (ite (not (<= 0 y)) (- x y) (+ (+ x x) x)) 1)
+
+== Phase timing ==
+         synth.run:   2219.496 ms   96.49 %  (n=6)
+    problem.verify:     79.252 ms    3.45 %  (n=6)
+   satisfy_inhouse:      1.445 ms    0.06 %  (n=983)
+      expr_to_term:      0.022 ms    0.00 %  (n=1)
+             TOTAL:   2300.216 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     75758345
+new_programs_generated: 2262225
+programs_checked:       1097
+counterexamples:        6
+
+==========
+[63/161] examples/LIA/mpg_example2.sl:
+Candidate: x
+Candidate: y
+Candidate: (+ (+ 1 1) 1)
+Candidate: (ite (= (- y x) x) x y)
+Candidate: (ite (<= (- y x) 1) y (- y x))
+Candidate: (+ (ite (<= (- y x) 1) z y) (- y (ite (<= z 0) y z)))
+Candidate: (ite (<= x (- z x)) (- y x) (ite (<= 0 z) y z))
+Candidate: (ite (and (<= x y) (<= 0 z)) (ite (<= z y) y x) (ite (<= 0 z) y z))
+Candidate: (ite (or (= z 0) (= 1 x)) (ite (<= 0 z) y z) (ite (or (= z 0) (= y z)) y (ite (<= x (- z x)) x y)))
+Candidate: (ite (and (<= 1 y) (<= z y)) (ite (<= 0 z) y z) (ite (<= (- y x) 1) y x))
+Candidate: (ite (or (= z x) (<= y x)) y (ite (<= z y) z x))
+Candidate: (ite (and (<= x 1) (<= z y)) (ite (<= x z) y z) (ite (<= y x) y x))
+
+== Phase timing ==
+         synth.run:  34066.868 ms   98.75 %  (n=12)
+    problem.verify:    424.087 ms    1.23 %  (n=12)
+   satisfy_inhouse:      5.738 ms    0.02 %  (n=915)
+      expr_to_term:      0.037 ms    0.00 %  (n=1)
+             TOTAL:  34496.731 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     40593183
+new_programs_generated: 9853353
+programs_checked:       6531
+counterexamples:        12
+
+==========
+[64/161] examples/LIA/mpg_example3.sl:
+Candidate: x
+Candidate: (- (+ (+ (+ y y) (+ y y)) (+ (+ y y) (+ x y))) (- (- (- z y) (+ y y)) (+ (+ y y) (+ y y))))
+Candidate: (ite (<= z x) (- (+ (+ (+ y y) y) (+ z z)) (- (- (- (- 0 1) 1) (+ (+ y y) (+ y y))) (+ (+ (+ y y) (+ y y)) (+ (+ y y) y)))) (- (- (- (- (- 1 z) z) (+ (+ z z) (+ y z))) (+ (+ (+ z z) (+ y z)) (+ (+ y y) (+ y y)))) (+ (+ (+ y y) (+ y y)) (+ (+ y y) y))))
+
+== Phase timing ==
+         synth.run:   2883.982 ms   97.57 %  (n=3)
+    problem.verify:     39.976 ms    1.35 %  (n=3)
+   satisfy_inhouse:     31.686 ms    1.07 %  (n=11082)
+      expr_to_term:      0.088 ms    0.00 %  (n=1)
+             TOTAL:   2955.731 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     206346757
+new_programs_generated: 191893
+programs_checked:       11096
+counterexamples:        3
+
+==========
+[65/161] examples/LIA/mpg_example4.sl:
+Candidate: x
+Candidate: (+ (+ (+ (+ (+ y y) (+ y y)) (+ (+ y y) y)) (- (+ (+ y y) y) (+ (- z y) (- z y)))) (- (+ (+ (+ y y) (+ y y)) (+ (+ y y) y)) (- (- (- z y) (+ y y)) (+ (+ y y) y))))
+
+== Phase timing ==
+         synth.run:     51.762 ms   61.68 %  (n=2)
+    problem.verify:     27.771 ms   33.09 %  (n=2)
+   satisfy_inhouse:      4.251 ms    5.07 %  (n=856)
+      expr_to_term:      0.141 ms    0.17 %  (n=1)
+             TOTAL:     83.924 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     250671781
+new_programs_generated: 51221
+programs_checked:       862
+counterexamples:        2
+
+==========
+[66/161] examples/LIA/mpg_example5.sl:
+Candidate: x
+Candidate: (- x 1)
+
+== Phase timing ==
+   satisfy_inhouse:    314.776 ms   92.49 %  (n=46173)
+    problem.verify:     25.349 ms    7.45 %  (n=2)
+      expr_to_term:      0.130 ms    0.04 %  (n=1)
+         synth.run:      0.090 ms    0.03 %  (n=2)
+             TOTAL:    340.345 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     291023244
+new_programs_generated: 48881
+programs_checked:       46175
+counterexamples:        2
+
+==========
+[67/161] examples/LIA/mpg_guard1.sl:
+Candidate: x
+Candidate: y
+Candidate: (+ 1 x)
+Candidate: (ite (= y z) (+ y x) (+ 1 x))
+Candidate: (ite (<= 1 y) y (- x y))
+Candidate: (ite (<= x (- z y)) (- x y) 1)
+Candidate: (ite (<= (+ y x) 0) (- x y) 1)
+Candidate: (ite (<= 1 (+ y x)) (+ y x) (- x y))
+Answer: (ite (<= 1 (+ y x)) (+ y x) (- x y))
+
+== Phase timing ==
+         synth.run:    100.428 ms   54.11 %  (n=8)
+    problem.verify:     85.010 ms   45.80 %  (n=8)
+   satisfy_inhouse:      0.160 ms    0.09 %  (n=120)
+      expr_to_term:      0.013 ms    0.01 %  (n=1)
+             TOTAL:    185.611 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     80692
+new_programs_generated: 8378
+programs_checked:       337
+counterexamples:        8
+
+==========
+[68/161] examples/LIA/mpg_guard2.sl:
+Candidate: x
+Candidate: 1
+Candidate: (+ 1 x)
+Candidate: (- x y)
+Candidate: (ite (<= y x) (- x y) 1)
+Candidate: (ite (<= z x) (+ 1 x) (- 1 z))
+Candidate: (ite (= x 1) (- x y) (- 1 z))
+Candidate: (ite (not (<= (- z y) x)) (- 1 z) (ite (<= (- 0 z) y) 1 (+ 1 x)))
+Candidate: (ite (= (- z 1) y) (- x y) (- 1 z))
+Candidate: (ite (<= (+ z x) (- 0 y)) (- x y) (+ y x))
+Answer: (ite (<= (+ z x) (- 0 y)) (- x y) (+ y x))
+
+== Phase timing ==
+         synth.run:   4433.724 ms   97.07 %  (n=10)
+    problem.verify:    133.288 ms    2.92 %  (n=10)
+   satisfy_inhouse:      0.299 ms    0.01 %  (n=182)
+      expr_to_term:      0.013 ms    0.00 %  (n=1)
+             TOTAL:   4567.324 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     2247331
+new_programs_generated: 314317
+programs_checked:       1101
+counterexamples:        10
+
+==========
+[69/161] examples/LIA/mpg_guard3.sl:
+Candidate: x
+Candidate: 1
+Candidate: (+ 1 x)
+Candidate: (- 1 z)
+Candidate: (- x y)
+Candidate: (ite (<= 1 z) z (- 1 z))
+Candidate: (ite (not (= x z)) (- x y) 1)
+Candidate: (ite (= 1 z) (- x y) (- 1 z))
+Candidate: (ite (and (<= x z) (<= y 1)) (- 1 (ite (= 1 z) 0 z)) (- x y))
+Candidate: (ite (<= (ite (= x 0) 1 y) z) (- 1 (ite (= 1 z) 0 z)) (ite (= (- 1 y) z) (+ x y) (- x y)))
+Candidate: (ite (<= (+ x x) (- 1 z)) (ite (= 1 y) y (- x y)) (+ x y))
+
+== Phase timing ==
+         synth.run:  27133.320 ms   99.00 %  (n=11)
+    problem.verify:    274.348 ms    1.00 %  (n=11)
+   satisfy_inhouse:      0.625 ms    0.00 %  (n=380)
+      expr_to_term:      0.015 ms    0.00 %  (n=1)
+             TOTAL:  27408.308 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     42324349
+new_programs_generated: 7444912
+programs_checked:       4025
+counterexamples:        11
+
+==========
+[70/161] examples/LIA/mpg_guard4.sl:
+Candidate: x
+Candidate: 1
+Candidate: (+ 1 x)
+Candidate: (- x y)
+Candidate: (ite (<= x y) (+ 1 x) (- x y))
+Candidate: (ite (<= (- x 1) y) (+ 1 x) (- x y))
+Candidate: (ite (<= y z) (- x y) (+ 1 x))
+Candidate: (ite (<= (- 0 x) y) (+ 1 x) (- x y))
+Candidate: (ite (and (<= z 1) (<= y 0)) (- x y) (+ x y))
+Candidate: (ite (= (+ 1 z) (- x 1)) (- 0 y) (+ (ite (= z 0) 1 y) x))
+
+== Phase timing ==
+         synth.run:   7089.431 ms   97.83 %  (n=10)
+    problem.verify:    156.703 ms    2.16 %  (n=10)
+   satisfy_inhouse:      0.830 ms    0.01 %  (n=454)
+      expr_to_term:      0.019 ms    0.00 %  (n=1)
+             TOTAL:   7246.982 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     38857146
+new_programs_generated: 6044894
+programs_checked:       2289
+counterexamples:        10
+
+==========
+[71/161] examples/LIA/mpg_ite1.sl:
+Candidate: x
+Candidate: (- x 1)
+Candidate: (+ 1 z)
+Candidate: (+ (+ x z) (+ 1 y))
+Candidate: (ite (<= 1 x) (+ (+ x z) (+ 1 y)) (+ 1 z))
+Candidate: (ite (<= z y) (- 0 1) (- (- z y) (- y 1)))
+Candidate: (ite (<= (- 1 z) x) (+ x 1) (+ 1 z))
+Candidate: (ite (<= z (- 1 x)) (+ 1 z) (+ x 1))
+Candidate: (ite (<= x (- 0 y)) (+ 1 z) (+ x 1))
+Candidate: (ite (<= 0 (ite (<= z x) z y)) (- (- z y) (- y 1)) (+ (ite (<= y 0) z y) 1))
+
+== Phase timing ==
+         synth.run:  28517.241 ms   98.92 %  (n=10)
+    problem.verify:    309.902 ms    1.08 %  (n=10)
+   satisfy_inhouse:      0.775 ms    0.00 %  (n=425)
+      expr_to_term:      0.017 ms    0.00 %  (n=1)
+             TOTAL:  28827.935 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     41183917
+new_programs_generated: 9598917
+programs_checked:       2302
+counterexamples:        10
+
+==========
+[72/161] examples/LIA/mpg_ite2.sl:
+Candidate: x
+Candidate: (+ x y)
+Candidate: (+ (+ y y) y)
+Candidate: (+ (+ 1 y) y)
+Candidate: (ite (<= x (+ 1 y)) (+ (+ 1 y) y) (- x z))
+Candidate: (ite (<= 1 x) (+ 1 x) (+ 1 z))
+Candidate: (ite (= (- y z) x) (+ (+ 1 y) y) (ite (<= x 1) 1 (+ 1 x)))
+Candidate: (ite (<= x (+ y y)) (+ (+ 1 y) y) (+ 1 x))
+Candidate: (ite (<= y z) (+ (ite (not (= (+ x z) 1)) (ite (<= 1 z) x 1) (+ (ite (<= y z) 1 (+ 1 1)) (ite (<= x y) z 1))) (ite (<= x 1) 0 1)) (+ (ite (<= y z) 1 (+ 1 1)) (ite (<= x y) z 1)))
+
+== Phase timing ==
+         synth.run: 119007.705 ms   99.90 %  (n=10)
+    problem.verify:    119.342 ms    0.10 %  (n=9)
+   satisfy_inhouse:      0.846 ms    0.00 %  (n=390)
+      expr_to_term:      0.019 ms    0.00 %  (n=1)
+             TOTAL: 119127.912 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     32446442
+new_programs_generated: 5858918
+programs_checked:       1347
+counterexamples:        9
+
+==========
+[73/161] examples/LIA/mpg_plane1.sl:
+Candidate: x
+Candidate: y
+Candidate: 1
+Candidate: (+ y x)
+Answer: (+ y x)
+
+== Phase timing ==
+    problem.verify:     37.931 ms   99.73 %  (n=4)
+         synth.run:      0.095 ms    0.25 %  (n=4)
+   satisfy_inhouse:      0.006 ms    0.01 %  (n=7)
+      expr_to_term:      0.004 ms    0.01 %  (n=1)
+             TOTAL:     38.036 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     14
+new_programs_generated: 9
+programs_checked:       7
+counterexamples:        4
+
+==========
+[74/161] examples/LIA/mpg_plane2.sl:
+Candidate: x
+Candidate: (- y 1)
+Candidate: (+ (+ (+ y y) 1) (+ (+ 1 1) y))
+Candidate: (+ (+ (+ (+ y y) 1) (+ 1 1)) (+ (+ x x) (+ y x)))
+Answer: (+ (+ (+ (+ y y) 1) (+ 1 1)) (+ (+ x x) (+ y x)))
+
+== Phase timing ==
+         synth.run:     91.173 ms   68.50 %  (n=4)
+    problem.verify:     41.824 ms   31.42 %  (n=4)
+   satisfy_inhouse:      0.095 ms    0.07 %  (n=83)
+      expr_to_term:      0.012 ms    0.01 %  (n=1)
+             TOTAL:    133.104 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     146835
+new_programs_generated: 3241
+programs_checked:       97
+counterexamples:        4
+
+==========
+[75/161] examples/LIA/mpg_plane3.sl:
+Candidate: x
+Candidate: (+ (- y 1) y)
+Candidate: (- (- x 1) (- (+ 1 1) y))
+Candidate: (ite (<= (+ x 1) (- (- y 1) 1)) (+ (- (+ x y) 1) (+ x x)) (- (- (- z 1) 1) (+ (+ 1 1) 1)))
+Candidate: (ite (<= (- y 1) (+ x 1)) (+ (+ (- y 1) y) (+ x x)) (+ (- x 1) (+ x x)))
+Candidate: (+ (+ (+ (+ 1 1) (+ 1 1)) (+ (+ y 1) (+ y y))) (+ (+ (+ y y) (+ x x)) (+ (+ x x) x)))
+Answer: (+ (+ (+ (+ 1 1) (+ 1 1)) (+ (+ y 1) (+ y y))) (+ (+ (+ y y) (+ x x)) (+ (+ x x) x)))
+
+== Phase timing ==
+         synth.run:  20359.374 ms   99.31 %  (n=6)
+    problem.verify:    140.169 ms    0.68 %  (n=6)
+   satisfy_inhouse:      0.417 ms    0.00 %  (n=294)
+      expr_to_term:      0.020 ms    0.00 %  (n=1)
+             TOTAL:  20499.980 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     16179198
+new_programs_generated: 288044
+programs_checked:       356
+counterexamples:        6
+
+==========
+[76/161] examples/LIA/MPwL_d1s3.sl:
+Candidate: 0
+Candidate: 1
+Answer: 1
+
+== Phase timing ==
+    problem.verify:     36.762 ms   96.91 %  (n=2)
+      expr_to_term:      0.999 ms    2.63 %  (n=1)
+         synth.run:      0.100 ms    0.26 %  (n=2)
+   satisfy_inhouse:      0.074 ms    0.19 %  (n=2)
+             TOTAL:     37.935 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     3
+new_programs_generated: 3
+programs_checked:       2
+counterexamples:        2
+
+==========
+[77/161] examples/LIA/MPwL_d1s7.sl:
+Candidate: 0
+Candidate: 1
+Answer: 1
+
+== Phase timing ==
+    problem.verify:     82.860 ms   96.47 %  (n=2)
+      expr_to_term:      2.722 ms    3.17 %  (n=1)
+         synth.run:      0.169 ms    0.20 %  (n=2)
+   satisfy_inhouse:      0.143 ms    0.17 %  (n=2)
+             TOTAL:     85.893 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     3
+new_programs_generated: 3
+programs_checked:       2
+counterexamples:        2
+
+==========
+[78/161] examples/LIA/MPwL_d4s3.sl:
+Candidate: 0
+Candidate: 1
+Candidate: 2
+Candidate: 3
+Candidate: 4
+Candidate: (ite (<= 1 (get-x currPoint)) 0 2)
+Candidate: (ite (<= (+ (get-x o0) (get-x currPoint)) (get-y o0)) 0 1)
+Candidate: (ite (<= 2 (get-x currPoint)) 0 2)
+Candidate: (ite (<= 2 (get-x currPoint)) 1 2)
+Candidate: (ite (<= 2 (get-x currPoint)) 3 2)
+Candidate: (ite (<= 2 (get-x currPoint)) 4 2)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 0 2)
+Candidate: (ite (= (get-y currPoint) 1) 0 1)
+Candidate: (ite (<= (get-y o0) (get-y o1)) 0 1)
+Candidate: (ite (<= (get-y o0) 7) 0 4)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 0 3)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 0 4)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 1 0)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 1 2)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 1 3)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 1 4)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 2 0)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 2 1)
+Candidate: (ite (<= (get-y o0) (get-y o1)) 1 0)
+Candidate: (ite (<= (get-y o1) 7) 0 2)
+Candidate: (ite (<= (get-y o1) 7) 0 3)
+Candidate: (ite (<= (get-y o1) 7) 0 4)
+Candidate: (ite (<= (get-y o1) 7) 1 3)
+Candidate: (ite (<= (get-y o1) 7) 2 1)
+Candidate: (ite (<= (get-y o1) 7) 2 3)
+Candidate: (ite (<= (get-x o0) (get-y o1)) 3 0)
+Candidate: (ite (<= (get-y currPoint) 0) 1 4)
+Candidate: (ite (<= 1 (get-x currPoint)) 1 2)
+Answer: (ite (<= 1 (get-x currPoint)) 1 2)
+
+== Phase timing ==
+         synth.run:  18696.805 ms   45.54 %  (n=33)
+   satisfy_inhouse:  17277.118 ms   42.08 %  (n=26741)
+    problem.verify:   5085.358 ms   12.39 %  (n=33)
+      expr_to_term:      0.984 ms    0.00 %  (n=1)
+             TOTAL:  41060.265 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     884183
+new_programs_generated: 28735
+programs_checked:       29639
+counterexamples:        33
+
+==========
+[79/161] examples/LIA/MPwL_d4s7.sl:
+Candidate: 0
+Candidate: 1
+Candidate: 2
+Candidate: 3
+Candidate: 4
+Candidate: (ite (<= (get-x currPoint) 1) 2 0)
+Candidate: (ite (= (- 2 (get-x currPoint)) (get-y currPoint)) 0 1)
+Candidate: (ite (= (get-x currPoint) 2) 1 2)
+Candidate: (ite (= (get-x currPoint) 2) 3 2)
+Candidate: (ite (= (get-x currPoint) 2) 4 2)
+Candidate: (ite (= (get-y currPoint) (get-x currPoint)) 1 0)
+Candidate: (ite (= (get-y currPoint) (get-x currPoint)) 1 2)
+Candidate: (ite (= (get-y currPoint) (get-x currPoint)) 1 3)
+Candidate: (ite (= (get-y currPoint) (get-x currPoint)) 1 4)
+Candidate: (ite (= (get-y currPoint) (get-x currPoint)) 2 0)
+Candidate: (ite (= (get-y currPoint) (get-x currPoint)) 2 1)
+Candidate: (ite (= (get-y currPoint) (get-x currPoint)) 2 3)
+Candidate: (ite (= (get-y currPoint) (get-x currPoint)) 2 4)
+Candidate: (ite (<= (get-y currPoint) 0) 1 2)
+Candidate: (ite (<= (get-x currPoint) 0) 2 1)
+Answer: (ite (<= (get-x currPoint) 0) 2 1)
+
+== Phase timing ==
+         synth.run:   9017.308 ms   42.72 %  (n=20)
+   satisfy_inhouse:   8153.809 ms   38.62 %  (n=9584)
+    problem.verify:   3936.458 ms   18.65 %  (n=20)
+      expr_to_term:      2.703 ms    0.01 %  (n=1)
+             TOTAL:  21110.278 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     236507
+new_programs_generated: 12697
+programs_checked:       12998
+counterexamples:        20
+
+==========
+[80/161] examples/LIA/MPwL_d5s3.sl:
+Candidate: 0
+Candidate: 1
+Candidate: 2
+Candidate: 3
+Candidate: 4
+Candidate: (ite (= (get-y o1) (get-x o1)) 0 1)
+Candidate: (ite (<= (get-x currPoint) (get-y currPoint)) 2 0)
+Candidate: (ite (<= (get-y currPoint) (get-x currPoint)) 1 0)
+Candidate: (ite (= (get-y o1) (get-x o1)) 0 2)
+Candidate: (ite (= (get-y o1) (get-x o1)) 1 0)
+Candidate: (ite (= (get-y o1) (get-x o1)) 1 2)
+Candidate: (ite (= (get-y o1) (get-x o1)) 2 0)
+Candidate: (ite (= (get-y o1) (get-x o1)) 2 1)
+Candidate: (ite (= (get-y o1) (get-x o1)) 3 1)
+Candidate: (ite (<= 1 (get-x currPoint)) 1 2)
+Candidate: (ite (<= 1 (get-x currPoint)) 3 2)
+Candidate: (ite (<= 1 (get-x currPoint)) 4 2)
+Candidate: (ite (<= (get-x currPoint) 1) 2 0)
+Candidate: (ite (<= (get-x currPoint) 1) 2 1)
+Candidate: (ite (<= (get-x currPoint) 1) 2 3)
+Candidate: (ite (<= (get-x currPoint) 1) 2 4)
+Candidate: (ite (= (get-x o1) (get-y o0)) 0 3)
+Candidate: (ite (= (get-y o1) (get-y o0)) 1 0)
+Candidate: (ite (= (get-x o1) (get-y o0)) 0 4)
+Candidate: (ite (<= 1 (get-y currPoint)) 4 1)
+Candidate: (ite (= (get-x o1) (get-y o0)) 1 3)
+Candidate: (ite (= (get-x o1) (get-y o0)) 1 4)
+Candidate: (ite (= (get-y o1) (get-x o1)) 3 2)
+Candidate: (ite (= (get-y o1) (get-x o1)) 4 1)
+Candidate: (ite (= (get-x o1) (get-y o0)) 2 0)
+Candidate: (ite (= (get-x o1) (get-y o0)) 2 3)
+Candidate: (ite (= (get-x o1) (get-y o0)) 2 4)
+Candidate: (ite (= (get-x o1) (get-y o0)) 3 0)
+Candidate: (ite (= (get-x o1) (get-y o0)) 3 4)
+Candidate: (ite (= (get-x o1) (get-y o0)) 4 0)
+Candidate: (ite (= (get-x o1) (get-y o0)) 4 3)
+Candidate: (ite (= (get-y o1) (get-y o0)) 1 2)
+Candidate: (ite (= (get-y o1) (get-y o0)) 1 3)
+Candidate: (ite (= (get-y o1) (get-y o0)) 1 4)
+Candidate: (ite (= (get-y o1) (get-y o0)) 2 0)
+Candidate: (ite (= (get-y o1) (get-y o0)) 2 3)
+Candidate: (ite (= (get-y o1) (get-y o0)) 2 4)
+Candidate: (ite (= (get-y o1) (get-y o0)) 3 0)
+Candidate: (ite (= (get-y o1) (get-y o0)) 3 1)
+Candidate: (ite (= (get-y o1) (get-y o0)) 3 2)
+Candidate: (ite (= (get-y o1) (get-y o0)) 3 4)
+Candidate: (ite (= (get-y o1) (get-y o0)) 4 0)
+Candidate: (ite (= (get-y o1) (get-y o0)) 4 1)
+Candidate: (ite (= (get-y o1) (get-y o0)) 4 2)
+Candidate: (ite (= (get-y o1) (get-y o0)) 4 3)
+
+== Phase timing ==
+         synth.run: 110361.469 ms   50.00 %  (n=50)
+   satisfy_inhouse: 102251.157 ms   46.32 %  (n=113756)
+    problem.verify:   8126.616 ms    3.68 %  (n=50)
+      expr_to_term:      1.000 ms    0.00 %  (n=1)
+             TOTAL: 220740.241 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     5618333
+new_programs_generated: 124201
+programs_checked:       125997
+counterexamples:        50
+
+==========
+[81/161] examples/LIA/MPwL_d5s7.sl:
+Candidate: 0
+Candidate: 1
+Candidate: 2
+Candidate: 3
+Candidate: 4
+Candidate: (ite (= (get-y o1) (get-x o1)) 0 1)
+Candidate: (ite (<= (+ (get-y o0) (get-y currPoint)) 6) 0 2)
+Candidate: (ite (<= 2 (get-y currPoint)) 0 1)
+Candidate: (ite (<= 2 (get-y currPoint)) 2 1)
+Candidate: (ite (<= 2 (get-y currPoint)) 3 1)
+Candidate: (ite (<= 2 (get-y currPoint)) 4 1)
+Candidate: (ite (<= (+ (get-y o0) (get-y currPoint)) 6) 0 3)
+Candidate: (ite (= (get-x currPoint) 1) 0 2)
+Candidate: (ite (<= 6 (get-y currPoint)) 0 1)
+Candidate: (ite (= (get-x currPoint) 5) 0 2)
+Candidate: (ite (= (get-x currPoint) 1) 1 2)
+Candidate: (ite (= (get-x currPoint) 1) 3 2)
+Candidate: (ite (= (get-x currPoint) 1) 4 2)
+Candidate: (ite (= (get-x currPoint) 5) 1 2)
+Candidate: (ite (= (get-x currPoint) (get-y currPoint)) 1 0)
+Candidate: (ite (= (get-x currPoint) (get-y currPoint)) 1 2)
+Candidate: (ite (<= (get-y currPoint) 0) 1 2)
+Candidate: (ite (<= (get-y currPoint) 0) 1 3)
+Candidate: (ite (<= (get-y currPoint) 0) 1 4)
+Candidate: (ite (= (get-x currPoint) (get-y currPoint)) 2 1)
+Candidate: (ite (<= 6 (get-y currPoint)) 2 1)
+Candidate: (ite (<= 6 (get-y currPoint)) 3 1)
+Candidate: (ite (<= 6 (get-y currPoint)) 4 1)
+Candidate: (ite (= (get-x currPoint) 5) 3 2)
+Candidate: (ite (= (get-x currPoint) 5) 4 2)
+Candidate: (ite (= 5 (get-y currPoint)) 0 1)
+Candidate: (ite (= 5 (get-y currPoint)) 2 1)
+Candidate: (ite (= 5 (get-y currPoint)) 3 1)
+Candidate: (ite (= 5 (get-y currPoint)) 4 1)
+Candidate: (ite (<= (get-y currPoint) 2) 1 0)
+Candidate: (ite (<= (get-y currPoint) 2) 1 2)
+Candidate: (ite (<= (get-y currPoint) 2) 1 3)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 0 1)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 0 2)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 0 3)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 0 4)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 1 0)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 1 2)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 1 3)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 3 0)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 3 1)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 3 2)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 3 4)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 4 0)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 4 1)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 4 2)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 4 3)
+Candidate: (ite (<= 3 (get-y currPoint)) 4 1)
+Candidate: (ite (<= (get-y currPoint) 3) 1 0)
+Candidate: (ite (<= (get-y currPoint) 3) 1 2)
+Candidate: (ite (<= (get-y currPoint) 3) 1 3)
+Candidate: (ite (<= (get-y currPoint) 3) 1 4)
+Candidate: (ite (= (+ (get-x currPoint) (get-x currPoint)) (+ -1 (get-y currPoint))) 2 1)
+Candidate: (ite (<= (get-y o0) (get-y currPoint)) 2 1)
+Candidate: (ite (<= (get-y currPoint) (get-y o0)) 1 3)
+Candidate: (ite (<= (get-y o0) (get-y currPoint)) 3 1)
+Candidate: (ite (<= 3 (get-x currPoint)) 0 2)
+Candidate: (ite (<= 3 (get-x currPoint)) 1 2)
+
+== Phase timing ==
+         synth.run:  89579.260 ms   46.24 %  (n=63)
+   satisfy_inhouse:  85833.696 ms   44.30 %  (n=32709)
+    problem.verify:  18318.740 ms    9.46 %  (n=63)
+      expr_to_term:      8.666 ms    0.00 %  (n=1)
+             TOTAL: 193740.362 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     614996
+new_programs_generated: 43339
+programs_checked:       46530
+counterexamples:        63
+
+==========
+[82/161] examples/LIA/MPwoL_d1s3.sl:
+Candidate: 0
+Candidate: 1
+Answer: 1
+
+== Phase timing ==
+    problem.verify:     36.774 ms   96.77 %  (n=2)
+      expr_to_term:      1.055 ms    2.78 %  (n=1)
+         synth.run:      0.100 ms    0.26 %  (n=2)
+   satisfy_inhouse:      0.074 ms    0.20 %  (n=2)
+             TOTAL:     38.003 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     3
+new_programs_generated: 3
+programs_checked:       2
+counterexamples:        2
+
+==========
+[83/161] examples/LIA/MPwoL_d1s7.sl:
+Candidate: 0
+Candidate: 1
+Answer: 1
+
+== Phase timing ==
+    problem.verify:    108.065 ms   92.11 %  (n=2)
+      expr_to_term:      8.025 ms    6.84 %  (n=1)
+         synth.run:      0.630 ms    0.54 %  (n=2)
+   satisfy_inhouse:      0.601 ms    0.51 %  (n=2)
+             TOTAL:    117.321 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     3
+new_programs_generated: 3
+programs_checked:       2
+counterexamples:        2
+
+==========
+[84/161] examples/LIA/MPwoL_d4s3.sl:
+Candidate: 0
+Candidate: 1
+Candidate: 2
+Candidate: 3
+Candidate: 4
+Candidate: (ite (<= (get-y o1) (get-x o1)) 0 1)
+Candidate: (ite (<= (get-x o0) (+ (get-y o0) (get-y currPoint))) 0 1)
+Candidate: (ite (<= 2 (get-y currPoint)) 0 1)
+Candidate: (ite (<= 2 (get-x currPoint)) 0 2)
+Candidate: (ite (<= 2 (get-y currPoint)) 2 1)
+Answer: (ite (<= 2 (get-y currPoint)) 2 1)
+
+== Phase timing ==
+    problem.verify:    583.238 ms   49.02 %  (n=10)
+         synth.run:    315.066 ms   26.48 %  (n=10)
+   satisfy_inhouse:    290.327 ms   24.40 %  (n=1369)
+      expr_to_term:      1.066 ms    0.09 %  (n=1)
+             TOTAL:   1189.697 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     23074
+new_programs_generated: 1428
+programs_checked:       1500
+counterexamples:        10
+
+==========
+[85/161] examples/LIA/MPwoL_d4s7.sl:
+Candidate: 0
+Candidate: 1
+Candidate: 2
+Candidate: 3
+Candidate: 4
+Candidate: (ite (= (get-x currPoint) 1) 0 2)
+Candidate: (ite (= (get-y currPoint) 3) 0 1)
+Candidate: (ite (= (get-x currPoint) 2) 0 2)
+Candidate: (ite (= (get-y o0) 6) 0 1)
+Candidate: (ite (= (get-y o0) 6) 0 2)
+Candidate: (ite (= (get-y o0) 6) 0 4)
+Candidate: (ite (= (get-y o0) 6) 1 2)
+Candidate: (ite (= (get-y o0) 6) 1 4)
+Candidate: (ite (= (get-y o0) 6) 2 1)
+Candidate: (ite (= (get-y o0) 6) 3 1)
+Candidate: (ite (= (get-y o0) 6) 4 1)
+Candidate: (ite (= (get-y currPoint) 3) 2 1)
+Candidate: (ite (= (get-y currPoint) 3) 4 1)
+Candidate: (ite (= (get-x currPoint) 2) 1 2)
+Candidate: (ite (<= (get-x currPoint) (get-y currPoint)) 2 1)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 0 1)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 0 2)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 0 3)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 0 4)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 1 0)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 1 2)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 1 3)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 1 4)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 2 1)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 2 3)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 2 4)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 3 0)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 3 1)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 3 2)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 3 4)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 4 0)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 4 1)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 4 2)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 4 3)
+Candidate: (ite (= (get-x currPoint) 3) 0 2)
+Candidate: (ite (= (get-x currPoint) 3) 1 2)
+Candidate: (ite (= (get-x currPoint) 3) 3 2)
+Candidate: (ite (= (get-x currPoint) 3) 4 2)
+
+== Phase timing ==
+   satisfy_inhouse:  98623.758 ms   49.76 %  (n=12345)
+         synth.run:  88435.627 ms   44.62 %  (n=43)
+    problem.verify:  11135.173 ms    5.62 %  (n=43)
+      expr_to_term:      7.857 ms    0.00 %  (n=1)
+             TOTAL: 198202.415 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     205675
+new_programs_generated: 16015
+programs_checked:       17431
+counterexamples:        43
+
+==========
+[86/161] examples/LIA/MPwoL_d5s3.sl:
+Candidate: 0
+Candidate: 1
+Candidate: 2
+Candidate: 3
+Candidate: 4
+Candidate: (ite (<= (get-y o1) (get-x o1)) 0 1)
+Candidate: (ite (= 1 (get-x currPoint)) 0 2)
+Candidate: (ite (<= (get-y o1) (get-x o1)) 0 3)
+Candidate: (ite (= 1 (get-x currPoint)) 1 2)
+Candidate: (ite (= 1 (get-x currPoint)) 3 2)
+Candidate: (ite (= 1 (get-x currPoint)) 4 2)
+Candidate: (ite (<= (get-y o1) (get-x o1)) 0 4)
+Candidate: (ite (<= (get-y currPoint) (get-x currPoint)) 1 2)
+Candidate: (ite (<= (get-x currPoint) (get-y currPoint)) 2 1)
+Candidate: (ite (<= (get-x o1) (get-y o1)) 0 1)
+Candidate: (ite (<= (get-y o1) (get-x o1)) 1 0)
+Candidate: (ite (<= (get-y o1) (get-x o1)) 1 3)
+Candidate: (ite (<= (get-y o1) (get-x o1)) 1 4)
+Candidate: (ite (<= (get-x o1) (get-y o1)) 0 2)
+Candidate: (ite (<= (get-y o1) (get-x o1)) 2 0)
+Candidate: (ite (<= (get-y o1) (get-x o1)) 2 1)
+Candidate: (ite (<= (get-y o1) (get-x o1)) 2 3)
+Candidate: (ite (<= (get-y o1) (get-x o1)) 2 4)
+Candidate: (ite (<= (get-y o1) (get-x o1)) 3 0)
+Candidate: (ite (<= 2 (get-y currPoint)) 0 1)
+Candidate: (ite (<= 2 (get-y currPoint)) 2 1)
+Candidate: (ite (<= 2 (get-y currPoint)) 3 1)
+Candidate: (ite (<= 2 (get-y currPoint)) 4 1)
+Candidate: (ite (= (get-y currPoint) 1) 3 1)
+Candidate: (ite (<= (get-y currPoint) (get-x currPoint)) 1 4)
+Candidate: (ite (<= 2 (get-x currPoint)) 0 2)
+Candidate: (ite (<= 2 (get-x currPoint)) 1 2)
+Candidate: (ite (<= 2 (get-x currPoint)) 3 2)
+Candidate: (ite (<= 2 (get-x currPoint)) 4 2)
+Candidate: (ite (= (get-y o1) (get-x o1)) 0 1)
+Candidate: (ite (= (get-y o1) (get-x o1)) 0 2)
+Candidate: (ite (= (get-y o1) (get-x o1)) 0 4)
+Candidate: (ite (= (get-y o1) (get-x o1)) 1 0)
+Candidate: (ite (= (get-y o1) (get-x o1)) 1 4)
+Candidate: (ite (= (get-y o1) (get-x o1)) 3 2)
+Candidate: (ite (= (get-y o1) (get-x o1)) 3 4)
+Candidate: (ite (= (get-y o1) (get-x o1)) 4 0)
+Candidate: (ite (= (get-y o1) (get-x o1)) 4 2)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 0 4)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 1 0)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 1 4)
+Candidate: (ite (<= (get-x o0) (get-y o0)) 2 3)
+
+== Phase timing ==
+         synth.run: 110120.851 ms   49.54 %  (n=47)
+   satisfy_inhouse: 105542.223 ms   47.48 %  (n=109723)
+    problem.verify:   6618.279 ms    2.98 %  (n=47)
+      expr_to_term:      1.038 ms    0.00 %  (n=1)
+             TOTAL: 222282.391 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     5471984
+new_programs_generated: 117566
+programs_checked:       119181
+counterexamples:        47
+
+==========
+[87/161] examples/LIA/MPwoL_d5s7.sl:
+Candidate: 0
+Candidate: 1
+Candidate: 2
+Candidate: 3
+Candidate: 4
+Candidate: (ite (= (get-y o1) (get-x o1)) 0 1)
+Candidate: (ite (<= (- (get-y o1) (get-x currPoint)) 6) 0 1)
+Candidate: (ite (<= (get-x currPoint) 2) 2 0)
+Candidate: (ite (<= (get-x currPoint) 2) 2 1)
+Candidate: (ite (<= (get-x currPoint) 2) 2 3)
+Candidate: (ite (<= (get-x currPoint) 2) 2 4)
+Candidate: (ite (<= 2 (get-x currPoint)) 0 2)
+Candidate: (ite (<= 2 (get-x currPoint)) 1 2)
+Candidate: (ite (<= 6 (get-x currPoint)) 0 2)
+Candidate: (ite (<= (get-y o0) (get-y currPoint)) 0 1)
+Candidate: (ite (<= (get-y o0) (get-y currPoint)) 2 1)
+Candidate: (ite (<= (get-y o1) (get-y o0)) 0 1)
+Candidate: (ite (<= (get-y o0) (get-y o1)) 0 1)
+Candidate: (ite (<= (get-x o0) (get-y o1)) 0 1)
+Candidate: (ite (<= (get-y o0) (get-y o1)) 0 2)
+
+== Phase timing ==
+         synth.run: 112050.142 ms   50.01 %  (n=20)
+   satisfy_inhouse: 108015.707 ms   48.21 %  (n=25282)
+    problem.verify:   3976.555 ms    1.77 %  (n=20)
+      expr_to_term:      7.914 ms    0.00 %  (n=1)
+             TOTAL: 224050.318 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     1258572
+new_programs_generated: 32972
+programs_checked:       33348
+counterexamples:        20
+
+==========
+[88/161] examples/LIA/qm_area_sel_2.sl:
+Candidate: x
+Candidate: 1
+Candidate: (- x y)
+Candidate: (- bx y)
+Candidate: (- bx (+ x y))
+Candidate: (+ (- bx (+ x y)) ay)
+Candidate: (ite (< by bx) 1 (- bx ax))
+Candidate: (ite (< by bx) (- 1 ax) (- 0 ax))
+Candidate: (ite (< y (+ ax bx)) (- 1 ax) (- y x))
+Candidate: (- (ite (< by bx) 1 y) (ite (< ax x) bx ax))
+Candidate: (ite (< (- by bx) (+ ay ay)) (+ 1 ax) (ite (< x 0) 1 x))
+Candidate: (ite (< (- bx ax) (+ 1 ax)) (ite (< by 0) 1 y) (- (+ 1 ax) x))
+
+== Phase timing ==
+         synth.run: 102664.354 ms   99.20 %  (n=12)
+    problem.verify:    821.681 ms    0.79 %  (n=12)
+   satisfy_inhouse:      6.393 ms    0.01 %  (n=354)
+      expr_to_term:      0.016 ms    0.00 %  (n=1)
+             TOTAL: 103492.443 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     50331631
+new_programs_generated: 4507093
+programs_checked:       4692
+counterexamples:        12
+
+==========
+[89/161] examples/LIA/qm_choose_01.sl:
+Candidate: x
+Candidate: 0
+Candidate: (- 1 x)
+Candidate: (ite (< 1 x) 0 (- 1 x))
+Candidate: (ite (< 0 x) 0 1)
+Answer: (ite (< 0 x) 0 1)
+
+== Phase timing ==
+    problem.verify:     47.272 ms   97.81 %  (n=5)
+         synth.run:      1.027 ms    2.13 %  (n=5)
+   satisfy_inhouse:      0.023 ms    0.05 %  (n=32)
+      expr_to_term:      0.007 ms    0.01 %  (n=1)
+             TOTAL:     48.329 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     725
+new_programs_generated: 77
+programs_checked:       47
+counterexamples:        5
+
+==========
+[90/161] examples/LIA/qm_choose_yz.sl:
+Candidate: x
+Candidate: y
+Candidate: z
+Candidate: 0
+Candidate: (ite (< 0 z) x z)
+Candidate: (ite (< 0 x) z x)
+Candidate: (ite (< x 1) y z)
+Answer: (ite (< x 1) y z)
+
+== Phase timing ==
+    problem.verify:     64.189 ms   93.55 %  (n=7)
+         synth.run:      4.389 ms    6.40 %  (n=7)
+   satisfy_inhouse:      0.032 ms    0.05 %  (n=55)
+      expr_to_term:      0.005 ms    0.01 %  (n=1)
+             TOTAL:     68.614 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     3328
+new_programs_generated: 410
+programs_checked:       105
+counterexamples:        7
+
+==========
+[91/161] examples/LIA/qm_in_range.sl:
+Candidate: x
+Candidate: y
+Candidate: 1
+Candidate: (- x y)
+Candidate: (ite (< x 1) x 1)
+Candidate: (ite (< y x) 1 x)
+Candidate: (ite (< x 1) (- x y) 1)
+Candidate: (ite (< y x) 1 0)
+Candidate: (ite (< (- x y) 1) 0 (- z x))
+Candidate: (ite (< (- z 1) x) x (ite (< y x) 1 0))
+Candidate: (ite (< (- y x) x) (- z x) (ite (< y x) 1 0))
+Candidate: (ite (< 1 (- z y)) 1 0)
+Candidate: (ite (< 1 (- z y)) (ite (< x z) 1 0) 0)
+Candidate: (- (ite (< y x) 1 0) (ite (< x z) 0 1))
+Candidate: (ite (< (- z x) (- x y)) (- z x) (ite (< y x) 1 0))
+Candidate: (ite (< (- x y) (- z x)) (ite (< y x) 1 0) (ite (< x z) 1 0))
+Answer: (ite (< (- x y) (- z x)) (ite (< y x) 1 0) (ite (< x z) 1 0))
+
+== Phase timing ==
+         synth.run:  10970.608 ms   97.88 %  (n=16)
+    problem.verify:    237.263 ms    2.12 %  (n=16)
+   satisfy_inhouse:      0.700 ms    0.01 %  (n=403)
+      expr_to_term:      0.007 ms    0.00 %  (n=1)
+             TOTAL:  11208.578 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     2676321
+new_programs_generated: 742713
+programs_checked:       4744
+counterexamples:        16
+
+==========
+[92/161] examples/LIA/qm_loop_1.sl:
+Candidate: x
+Candidate: 3
+Candidate: (- x 1)
+Candidate: (ite (< 0 x) (- x 1) 3)
+Answer: (ite (< 0 x) (- x 1) 3)
+
+== Phase timing ==
+    problem.verify:     42.169 ms   94.37 %  (n=4)
+         synth.run:      2.450 ms    5.48 %  (n=4)
+   satisfy_inhouse:      0.059 ms    0.13 %  (n=58)
+      expr_to_term:      0.006 ms    0.01 %  (n=1)
+             TOTAL:     44.684 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     1941
+new_programs_generated: 217
+programs_checked:       68
+counterexamples:        4
+
+==========
+[93/161] examples/LIA/qm_loop_2.sl:
+Candidate: x
+Candidate: y
+Candidate: (- x 1)
+Candidate: (ite (< x 1) 3 (- x 1))
+Candidate: (ite (< (- 0 y) x) (+ (- y 1) x) 3)
+Candidate: (ite (< (- 1 y) (+ x y)) (ite (< x 1) x 1) (ite (< x 1) 3 y))
+Candidate: (ite (< x (- 1 y)) 3 (ite (< x y) x (- x 1)))
+Candidate: (ite (< (- 1 y) (+ x y)) (ite (< 0 y) x (- x 1)) (ite (< x 1) 3 y))
+Answer: (ite (< (- 1 y) (+ x y)) (ite (< 0 y) x (- x 1)) (ite (< x 1) 3 y))
+
+== Phase timing ==
+         synth.run:    975.761 ms   90.37 %  (n=8)
+    problem.verify:    103.693 ms    9.60 %  (n=8)
+   satisfy_inhouse:      0.235 ms    0.02 %  (n=211)
+      expr_to_term:      0.008 ms    0.00 %  (n=1)
+             TOTAL:   1079.697 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     567979
+new_programs_generated: 77613
+programs_checked:       397
+counterexamples:        8
+
+==========
+[94/161] examples/LIA/qm_loop_3.sl:
+Candidate: x
+Candidate: y
+Candidate: z
+Candidate: (+ y z)
+Candidate: (ite (< z 1) y x)
+Candidate: (- (+ y z) (- 1 x))
+Candidate: (ite (< 1 x) x (ite (< y x) z x))
+Candidate: (ite (< z 1) (ite (< z x) y x) x)
+Candidate: (ite (< 1 x) (ite (< z 1) (ite (< y x) 1 x) x) (ite (< z x) y x))
+Candidate: (ite (< (- 0 y) z) x (- x 1))
+Candidate: (ite (< y (ite (< x 1) 1 z)) (ite (< x 1) 3 x) (- y (- 1 x)))
+Candidate: (ite (< (- z x) (- y z)) (ite (< (- 0 y) z) x (- x 1)) (ite (< x 1) 3 x))
+
+== Phase timing ==
+         synth.run:  18991.706 ms   98.03 %  (n=12)
+    problem.verify:    378.667 ms    1.95 %  (n=12)
+   satisfy_inhouse:      2.496 ms    0.01 %  (n=410)
+      expr_to_term:      0.016 ms    0.00 %  (n=1)
+             TOTAL:  19372.885 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     35254150
+new_programs_generated: 6493216
+programs_checked:       4663
+counterexamples:        12
+
+==========
+[95/161] examples/LIA/qm_max2.sl:
+Candidate: x
+Candidate: y
+Candidate: (ite (< x y) y x)
+Answer: (ite (< x y) y x)
+
+== Phase timing ==
+    problem.verify:     32.068 ms   98.30 %  (n=3)
+         synth.run:      0.427 ms    1.31 %  (n=3)
+   satisfy_inhouse:      0.123 ms    0.38 %  (n=15)
+      expr_to_term:      0.005 ms    0.01 %  (n=1)
+             TOTAL:     32.623 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     254
+new_programs_generated: 27
+programs_checked:       19
+counterexamples:        3
+
+==========
+[96/161] examples/LIA/qm_max3.sl:
+Candidate: x
+Candidate: z
+Candidate: (ite (< x z) z x)
+Candidate: (ite (< y x) x 0)
+Candidate: (ite (< y x) (ite (< x z) y x) (+ (+ y x) (+ 1 1)))
+Candidate: (ite (< z (+ x 1)) x (+ (+ 1 y) z))
+Candidate: (- (ite (< x 1) y z) (ite (< y z) y 0))
+Candidate: (+ (ite (< z y) 1 0) (ite (< x z) z x))
+Candidate: (+ (ite (< y z) 1 0) (ite (< x 1) y z))
+Candidate: (ite (< 0 x) (ite (< y z) 1 y) (ite (< y z) z y))
+Candidate: (+ (ite (< y x) 0 y) (ite (< y z) 1 0))
+Candidate: (ite (< (- y x) (+ x 1)) (ite (< x z) z x) (ite (< y z) z y))
+Candidate: (ite (< (- y 1) z) (ite (< x z) z x) y)
+Candidate: (ite (< (+ z z) (+ x 1)) (ite (< x y) y x) (ite (< y z) z y))
+Candidate: (ite (< (+ y x) (+ z z)) z (ite (< x y) y x))
+Candidate: (ite (< (- y z) (+ x 1)) (ite (< x z) z x) (ite (< x y) y x))
+Candidate: (ite (< (+ x 1) (+ y y)) y (ite (< x z) z x))
+Candidate: (ite (< (+ z x) (+ y y)) (ite (< y z) z y) (ite (< x z) z x))
+Candidate: (ite (< (+ x 1) (+ y y)) (ite (< y z) z y) (ite (< x z) z x))
+Candidate: (ite (< (- z y) (+ 1 y)) (ite (< x y) y x) (ite (< x z) z x))
+Candidate: (ite (< (+ y x) (+ z z)) (ite (< y z) z y) (ite (< x y) y x))
+Candidate: (ite (< (- y (- z 1)) (- (- z y) y)) (ite (< x z) z x) (ite (< x y) y x))
+Candidate: (ite (< (+ 1 z) x) (ite (< x y) y x) (ite (< (- y 1) z) (ite (< x z) z x) y))
+Answer: (ite (< (+ 1 z) x) (ite (< x y) y x) (ite (< (- y 1) z) (ite (< x z) z x) y))
+
+== Phase timing ==
+         synth.run:  62157.233 ms   98.93 %  (n=23)
+    problem.verify:    671.981 ms    1.07 %  (n=23)
+   satisfy_inhouse:      1.925 ms    0.00 %  (n=1079)
+      expr_to_term:      0.007 ms    0.00 %  (n=1)
+             TOTAL:  62831.146 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     8584954
+new_programs_generated: 4045519
+programs_checked:       34185
+counterexamples:        23
+
+==========
+[97/161] examples/LIA/qm_max4.sl:
+Candidate: w
+Candidate: y
+Candidate: z
+Candidate: (+ x x)
+Candidate: (ite (< z 1) x y)
+Candidate: (ite (< x y) y x)
+Candidate: (ite (< x y) z x)
+Candidate: (ite (< y x) x z)
+Candidate: (ite (< z x) x z)
+Candidate: (ite (< w (+ z z)) z (+ 1 z))
+Candidate: (ite (< y (+ z x)) (ite (< z x) x z) w)
+Candidate: (ite (< (- x 1) w) w (ite (< z x) x z))
+Candidate: (ite (< (- w y) (- y x)) y (ite (< x w) w x))
+Candidate: (ite (< (- w x) (+ 1 z)) (ite (< z x) x z) (ite (< w 0) 0 w))
+Candidate: (ite (< (- y 1) (- w y)) (ite (< x w) w x) y)
+Candidate: (ite (< (- w y) (+ y y)) (ite (< w y) y w) (ite (< x w) w x))
+Candidate: (ite (< (- w y) (- y x)) (ite (< w y) y w) (ite (< x w) w x))
+Candidate: (ite (< (- y 1) (- w y)) (ite (< x w) w x) (ite (< x y) y x))
+Candidate: (ite (< (- x 1) (+ y w)) (ite (< w y) y w) (ite (< x w) w x))
+Candidate: (ite (< (+ x x) (+ y z)) (ite (< w y) y w) (ite (< x w) w x))
+
+== Phase timing ==
+         synth.run: 101835.205 ms   98.77 %  (n=20)
+    problem.verify:   1264.505 ms    1.23 %  (n=20)
+   satisfy_inhouse:      1.375 ms    0.00 %  (n=672)
+      expr_to_term:      0.008 ms    0.00 %  (n=1)
+             TOTAL: 103101.093 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     17157939
+new_programs_generated: 10271110
+programs_checked:       10825
+counterexamples:        20
+
+==========
+[98/161] examples/LIA/qm_max5.sl:
+Candidate: v
+Candidate: w
+Candidate: z
+Candidate: (+ z v)
+Candidate: (+ (+ x x) v)
+Candidate: (ite (< w v) v w)
+Candidate: (ite (< z v) v z)
+Candidate: (ite (< w v) (ite (< y v) v y) (ite (< v y) w v))
+Candidate: (ite (< w v) (ite (< z v) v z) (ite (< v x) z 0))
+Candidate: (ite (< z v) (ite (< z v) v z) (ite (< w v) x w))
+Candidate: (ite (< z v) (ite (< z v) v z) (ite (< z 1) 0 z))
+Candidate: (ite (< (ite (< x w) w z) v) v (ite (< z w) w z))
+Candidate: (ite (< (- z w) v) v (ite (< w x) x w))
+Candidate: (ite (< (- x w) (+ v v)) (+ y 1) (ite (< w x) x w))
+Candidate: (ite (< (- y v) (+ w v)) (+ y 1) (ite (< w x) x w))
+Candidate: (ite (< (- y v) (+ v v)) (ite (< x v) v x) (ite (< w x) x w))
+Candidate: (ite (< (ite (< z v) z 1) v) v (ite (< w x) x w))
+Candidate: (ite (< (- z y) (+ w y)) (ite (< w x) z w) (ite (< x v) v x))
+Candidate: (ite (< (ite (< z v) z 1) v) (ite (< z v) v z) (ite (< w x) x w))
+
+== Phase timing ==
+         synth.run:  91084.481 ms   98.88 %  (n=19)
+    problem.verify:   1028.904 ms    1.12 %  (n=19)
+   satisfy_inhouse:      1.657 ms    0.00 %  (n=707)
+      expr_to_term:      0.012 ms    0.00 %  (n=1)
+             TOTAL:  92115.053 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     15170455
+new_programs_generated: 8286263
+programs_checked:       12806
+counterexamples:        19
+
+==========
+[99/161] examples/LIA/qm_neg_1.sl:
+Candidate: x
+Candidate: 1
+Candidate: (- 0 x)
+Candidate: (ite (< x 0) 1 x)
+Candidate: (ite (< x 0) 1 0)
+Answer: (ite (< x 0) 1 0)
+
+== Phase timing ==
+    problem.verify:     47.003 ms   97.54 %  (n=5)
+         synth.run:      1.160 ms    2.41 %  (n=5)
+   satisfy_inhouse:      0.018 ms    0.04 %  (n=29)
+      expr_to_term:      0.008 ms    0.02 %  (n=1)
+             TOTAL:     48.189 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     745
+new_programs_generated: 77
+programs_checked:       43
+counterexamples:        5
+
+==========
+[100/161] examples/LIA/qm_neg_2.sl:
+Candidate: x
+Candidate: 1
+Candidate: (- 0 x)
+Candidate: (ite (< y x) x 1)
+Candidate: (ite (< y x) 0 1)
+Candidate: (ite (< x 0) 1 0)
+Candidate: (ite (< (- 0 1) x) 0 (- 0 y))
+Candidate: (ite (< (- 0 1) x) 0 (ite (< y 0) 1 0))
+Answer: (ite (< (- 0 1) x) 0 (ite (< y 0) 1 0))
+
+== Phase timing ==
+    problem.verify:     74.458 ms   80.88 %  (n=8)
+         synth.run:     17.484 ms   18.99 %  (n=8)
+   satisfy_inhouse:      0.108 ms    0.12 %  (n=98)
+      expr_to_term:      0.008 ms    0.01 %  (n=1)
+             TOTAL:     92.057 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     10947
+new_programs_generated: 1946
+programs_checked:       184
+counterexamples:        8
+
+==========
+[101/161] examples/LIA/qm_neg_3.sl:
+Candidate: x
+Candidate: 1
+Candidate: (- 0 x)
+Candidate: (ite (< y x) x 1)
+Candidate: (ite (< x 0) 1 x)
+Candidate: (ite (< y (- z x)) 1 0)
+Candidate: (ite (< y (- x y)) (- 0 x) (- z x))
+Candidate: (ite (< y 0) (ite (< x 0) 1 x) (ite (< y 0) 1 y))
+Candidate: (ite (< y 0) (ite (< x 0) 1 x) (ite (< y 0) 1 0))
+Candidate: (ite (< (- x z) (- y x)) (- (- 0 x) 1) (- 0 x))
+Candidate: (ite (< (- z x) (- y z)) (- (- 0 z) 1) (- 0 z))
+Candidate: (ite (< (- y z) (- x y)) (- (- 0 y) 1) (ite (< y 0) 1 0))
+Candidate: (- (ite (< y 0) 0 x) (ite (< z x) x z))
+Candidate: (- (ite (< x 0) 0 y) (ite (< z y) y z))
+Candidate: (ite (< (- (- y 1) z) x) (- 0 (ite (< z x) x z)) (ite (< y 0) 1 0))
+Candidate: (ite (< (- (- x 1) z) y) (- (ite (< z y) z 0) z) (ite (< x 0) 1 x))
+Candidate: (ite (< (- (- z 1) y) x) (- 0 (ite (< z x) x y)) (ite (< z 0) 1 z))
+Candidate: (ite (< (ite (< y z) 0 y) 0) (ite (< x 0) 1 x) (ite (< y (- x z)) 1 0))
+Candidate: (ite (< (ite (< y z) 0 y) 0) (ite (< x 0) 1 x) (ite (< y (- 0 1)) 1 0))
+Candidate: (ite (< (ite (< z 0) y 1) 0) (ite (< x 0) 1 x) 0)
+
+== Phase timing ==
+         synth.run: 102739.956 ms   99.40 %  (n=20)
+    problem.verify:    621.296 ms    0.60 %  (n=20)
+   satisfy_inhouse:      1.499 ms    0.00 %  (n=1021)
+      expr_to_term:      0.008 ms    0.00 %  (n=1)
+             TOTAL: 103362.760 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     17935911
+new_programs_generated: 5533429
+programs_checked:       28189
+counterexamples:        20
+
+==========
+[102/161] examples/LIA/qm_neg_4.sl:
+Candidate: w
+Candidate: 1
+Candidate: (qm w 1)
+Candidate: (- (- x z) w)
+Candidate: (qm w (qm z 1))
+Candidate: (qm (qm y w) (qm z 1))
+Candidate: (qm (qm w (qm y x)) (qm z 1))
+Candidate: (qm w (- (qm x 0) (qm x (qm z y))))
+Candidate: (- (- (qm x 0) (qm x (qm z y))) (qm (- w y) y))
+Candidate: (- (- (qm x 0) (qm y (qm x w))) (- (qm z x) x))
+Candidate: (qm (qm (- x 1) y) (qm w (- 0 (qm x z))))
+Candidate: (qm (qm (qm y w) (- 0 (qm x z))) 0)
+Candidate: (qm (qm z y) (- (qm x 0) (qm x (qm w z))))
+Candidate: (qm (qm (qm w y) (- x 1)) (qm z (qm x 1)))
+Candidate: (qm (- x (qm x 0)) (qm (qm y w) (qm z 1)))
+Candidate: (qm (- x (qm x (- 0 z))) (qm (qm z w) (qm y 1)))
+Candidate: (qm (- w (qm (- z y) z)) (qm (- 0 (qm x z)) 0))
+memory allocation of 4608 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 3397544 Aborted                 prlimit --as=10737418240 timeout 120s target/release/liasynth "$f"
+
+==========
+[103/161] examples/LIA/qm_neg_5.sl:
+Candidate: v
+Candidate: 1
+Candidate: (- 0 v)
+Candidate: (ite (< w v) v 1)
+Candidate: (ite (< x v) v 1)
+Candidate: (ite (< v 0) 1 v)
+Candidate: (ite (< v 0) 1 0)
+Candidate: (- (- z x) (ite (< x v) 0 y))
+Candidate: (ite (< y v) 0 (- 0 y))
+Candidate: (ite (< v 0) (ite (< y 0) 1 y) (ite (< v 0) 1 0))
+Candidate: (ite (< v (- z y)) 1 (- w x))
+Candidate: (ite (< v (- w y)) 1 (- x w))
+Candidate: (ite (< (- v 1) w) (ite (< y 0) 1 0) (- y w))
+Candidate: (ite (< (- v 1) z) (ite (< y 0) 1 0) (- y z))
+Candidate: (ite (< x (- w v)) (ite (< y 0) 1 0) (- x w))
+Candidate: (ite (< z (- x v)) (ite (< y 0) 1 0) (- z x))
+Candidate: (ite (< w (- y v)) (ite (< y 0) 1 0) (- w y))
+Candidate: (ite (< (- v y) y) 0 (ite (< v 0) 1 0))
+Candidate: (ite (< x v) (ite (< v 0) 1 0) (ite (< y 0) 1 0))
+Candidate: (- (ite (< z v) w 0) (ite (< y 0) z 0))
+Candidate: (- (ite (< v (- z y)) 1 (- w z)) (ite (< x 0) 0 1))
+Candidate: (ite (< (- (- w 1) y) z) (ite (< w v) 1 0) (ite (< v 0) 1 0))
+
+== Phase timing ==
+         synth.run: 107160.052 ms   99.47 %  (n=22)
+    problem.verify:    568.022 ms    0.53 %  (n=22)
+   satisfy_inhouse:      1.495 ms    0.00 %  (n=847)
+      expr_to_term:      0.009 ms    0.00 %  (n=1)
+             TOTAL: 107729.577 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     13573440
+new_programs_generated: 3424091
+programs_checked:       33765
+counterexamples:        22
+
+==========
+[104/161] examples/LIA/qm_neg_eq_1.sl:
+Candidate: x
+Candidate: 0
+Candidate: (- 1 x)
+Candidate: (ite (< x 1) 1 0)
+Answer: (ite (< x 1) 1 0)
+
+== Phase timing ==
+    problem.verify:     41.295 ms   98.79 %  (n=4)
+         synth.run:      0.488 ms    1.17 %  (n=4)
+   satisfy_inhouse:      0.012 ms    0.03 %  (n=15)
+      expr_to_term:      0.005 ms    0.01 %  (n=1)
+             TOTAL:     41.800 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     251
+new_programs_generated: 34
+programs_checked:       24
+counterexamples:        4
+
+==========
+[105/161] examples/LIA/qm_neg_eq_2.sl:
+Candidate: x
+Candidate: y
+Candidate: (- 1 x)
+Candidate: (ite (< x 1) 1 y)
+Candidate: (ite (< x 1) 1 0)
+Candidate: (ite (< x 1) (- 1 y) 0)
+Candidate: (ite (< x (- 1 y)) (- 1 x) 0)
+Candidate: (- (ite (< y 0) x 1) (ite (< 0 x) 1 y))
+Candidate: (ite (< x (- 1 y)) (ite (< x 1) 1 0) 0)
+Candidate: (- (ite (< y 1) 1 0) (ite (< x 1) 0 1))
+Candidate: (- (ite (< x 1) 1 0) (ite (< x y) y 0))
+Candidate: (ite (< x (- (- 1 x) y)) (ite (< y 1) 1 0) 0)
+Candidate: (ite (< (- (- 0 y) y) x) 0 (ite (< x 1) 1 0))
+Candidate: (ite (< (- (- y x) x) 1) (ite (< x 1) 1 0) (- 1 y))
+Candidate: (ite (< x (- (- y x) x)) (- 1 y) (ite (< x 1) 1 0))
+Candidate: (ite (< (- (- y x) x) 1) (ite (< x 1) 1 0) (ite (< y 1) 1 0))
+Answer: (ite (< (- (- y x) x) 1) (ite (< x 1) 1 0) (ite (< y 1) 1 0))
+
+== Phase timing ==
+         synth.run:   2243.315 ms   89.94 %  (n=16)
+    problem.verify:    250.087 ms   10.03 %  (n=16)
+   satisfy_inhouse:      0.836 ms    0.03 %  (n=366)
+      expr_to_term:      0.008 ms    0.00 %  (n=1)
+             TOTAL:   2494.246 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     460834
+new_programs_generated: 122174
+programs_checked:       2791
+counterexamples:        16
+
+==========
+[106/161] examples/LIA/qm_neg_eq_3.sl:
+Candidate: x
+Candidate: y
+Candidate: z
+Candidate: 0
+Candidate: (- (- 1 z) (- y (- 0 x)))
+Candidate: (ite (< z (- 1 y)) (- 1 x) x)
+Candidate: (ite (< x (- 1 y)) (- (- 1 z) x) z)
+Candidate: (ite (< x (- 1 z)) (- 1 y) 0)
+Candidate: (- (ite (< x 1) 1 0) (ite (< z y) y z))
+Candidate: (- (ite (< x 1) 1 z) (ite (< x y) y z))
+Candidate: (- (ite (< x 1) 1 y) (ite (< x z) z y))
+Candidate: (- (ite (< y x) y 1) (ite (< 0 z) 1 y))
+Candidate: (- (ite (< y 1) 1 z) (ite (< y x) 1 z))
+Candidate: (ite (< (- (- 0 z) x) y) 0 (ite (< x 1) 1 0))
+Candidate: (ite (< (- (- z x) x) y) 0 (ite (< z 1) 1 0))
+Candidate: (ite (< (- (- 0 z) x) x) 0 (- x (- y 1)))
+Candidate: (ite (< (- (- 0 z) x) x) 0 (ite (< y 1) 1 0))
+Candidate: (ite (< (- (- 0 y) x) x) 0 (ite (< z 1) 1 0))
+Candidate: (ite (< (- (- 0 y) y) z) 0 (ite (< y x) 0 1))
+Candidate: (ite (< (- (- 0 y) y) z) 0 (ite (< x 1) 1 0))
+
+== Phase timing ==
+         synth.run:  72515.306 ms   99.12 %  (n=20)
+    problem.verify:    640.022 ms    0.87 %  (n=20)
+   satisfy_inhouse:      1.231 ms    0.00 %  (n=780)
+      expr_to_term:      0.008 ms    0.00 %  (n=1)
+             TOTAL:  73156.567 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     29263297
+new_programs_generated: 7230133
+programs_checked:       27957
+counterexamples:        20
+
+==========
+[107/161] examples/LIA/qm_neg_eq_4.sl:
+Candidate: w
+Candidate: 1
+Candidate: (- 1 w)
+Candidate: (ite (< x w) x 1)
+Candidate: (ite (< x w) (- y x) 1)
+Candidate: (ite (< w 1) 1 x)
+Candidate: (ite (< x (- 1 w)) 1 y)
+Candidate: (- (ite (< x w) w 1) (ite (< w 1) x w))
+Candidate: (- (ite (< y w) z 1) (ite (< w x) x y))
+Candidate: (ite (< y (- 1 x)) (ite (< w 1) 1 y) w)
+Candidate: (ite (< (- w y) x) w (ite (< w 1) 1 y))
+Candidate: (- (ite (< x 1) 1 w) (ite (< (- z y) w) 1 z))
+Candidate: (ite (< (- w y) (- x w)) (- z w) (ite (< w 1) 1 y))
+Candidate: (ite (< (- w y) (- x w)) (- z w) (ite (< z w) z 1))
+Candidate: (ite (< (- w y) (- x w)) (- z w) (ite (< z w) 0 1))
+Candidate: (ite (< (- w y) (- x w)) (ite (< w 0) 1 0) (ite (< z w) 0 1))
+Candidate: (ite (< (- w y) (- x w)) (ite (< w 0) 1 0) (ite (< w 1) 1 0))
+Candidate: (ite (< z (ite (< y x) 1 y)) (- 0 (ite (< x w) x z)) (ite (< w 1) 1 0))
+
+== Phase timing ==
+         synth.run:  75448.738 ms   99.26 %  (n=18)
+    problem.verify:    563.237 ms    0.74 %  (n=18)
+   satisfy_inhouse:      0.923 ms    0.00 %  (n=540)
+      expr_to_term:      0.010 ms    0.00 %  (n=1)
+             TOTAL:  76012.909 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     34788301
+new_programs_generated: 5364458
+programs_checked:       30837
+counterexamples:        18
+
+==========
+[108/161] examples/LIA/qm_neg_eq_5.sl:
+Candidate: v
+Candidate: 1
+Candidate: (- 1 v)
+Candidate: (ite (< w v) w 1)
+Candidate: (ite (< 1 v) w (- 1 v))
+Candidate: (ite (< x v) w 1)
+Candidate: (ite (< w v) (- x w) (- 1 w))
+Candidate: (ite (< x (- 1 v)) (- 1 (ite (< w v) v w)) w)
+Candidate: (ite (< w (- 1 v)) (- 1 x) x)
+Candidate: (ite (< w (- 1 v)) (- 1 x) y)
+Candidate: (ite (< (- v w) x) (- y v) (ite (< v 1) 1 w))
+Candidate: (ite (< (- x w) v) (- y x) (- 1 x))
+Candidate: (ite (< (- z w) x) y (ite (< v 1) 1 w))
+Candidate: (ite (< (- z w) x) (- y z) (ite (< v 1) 1 w))
+Candidate: (ite (< (- z w) x) (- 0 z) (ite (< 0 v) z 1))
+Candidate: (ite (< (- (- v w) y) x) (- y v) (ite (< 0 v) z 1))
+
+== Phase timing ==
+         synth.run:   7472.443 ms   97.32 %  (n=16)
+    problem.verify:    205.194 ms    2.67 %  (n=16)
+   satisfy_inhouse:      0.716 ms    0.01 %  (n=485)
+      expr_to_term:      0.008 ms    0.00 %  (n=1)
+             TOTAL:   7678.361 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     18401772
+new_programs_generated: 5559958
+programs_checked:       5188
+counterexamples:        16
+
+==========
+[109/161] examples/LIA/s0_d0.sl:
+Candidate: x
+
+== Phase timing ==
+   satisfy_inhouse:     51.191 ms   78.28 %  (n=21707)
+    problem.verify:     14.181 ms   21.68 %  (n=1)
+      expr_to_term:      0.020 ms    0.03 %  (n=1)
+         synth.run:      0.003 ms    0.00 %  (n=1)
+             TOTAL:     65.394 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     78815503
+new_programs_generated: 21721
+programs_checked:       21720
+counterexamples:        1
+
+==========
+[110/161] examples/LIA/s0_d1.sl:
+Candidate: x
+
+== Phase timing ==
+   satisfy_inhouse:     46.999 ms   76.59 %  (n=17380)
+    problem.verify:     14.345 ms   23.38 %  (n=1)
+      expr_to_term:      0.019 ms    0.03 %  (n=1)
+         synth.run:      0.003 ms    0.00 %  (n=1)
+             TOTAL:     61.366 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     54608661
+new_programs_generated: 17405
+programs_checked:       17404
+counterexamples:        1
+
+==========
+[111/161] examples/LIA/s0_d2.sl:
+Candidate: x
+
+== Phase timing ==
+   satisfy_inhouse:     28.138 ms   66.21 %  (n=14565)
+    problem.verify:     14.336 ms   33.73 %  (n=1)
+      expr_to_term:      0.020 ms    0.05 %  (n=1)
+         synth.run:      0.003 ms    0.01 %  (n=1)
+             TOTAL:     42.496 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     35679933
+new_programs_generated: 14954
+programs_checked:       14953
+counterexamples:        1
+
+==========
+[112/161] examples/LIA/s0.sl:
+Candidate: x
+
+== Phase timing ==
+   satisfy_inhouse:     16.657 ms   50.79 %  (n=8480)
+    problem.verify:     16.106 ms   49.11 %  (n=1)
+      expr_to_term:      0.030 ms    0.09 %  (n=1)
+         synth.run:      0.004 ms    0.01 %  (n=1)
+             TOTAL:     32.796 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     19331061
+new_programs_generated: 9975
+programs_checked:       9974
+counterexamples:        1
+
+==========
+[113/161] examples/LIA/s1.sl:
+Candidate: x
+Candidate: (+ (+ (+ (+ x x) x) (+ x x)) (+ (+ (+ x x) x) (+ x x)))
+
+== Phase timing ==
+         synth.run:   1152.631 ms   93.45 %  (n=2)
+   satisfy_inhouse:     53.764 ms    4.36 %  (n=24159)
+    problem.verify:     26.944 ms    2.18 %  (n=2)
+      expr_to_term:      0.018 ms    0.00 %  (n=1)
+             TOTAL:   1233.358 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     36943196
+new_programs_generated: 24308
+programs_checked:       24312
+counterexamples:        2
+
+==========
+[114/161] examples/LIA/s2.sl:
+Candidate: x
+Candidate: y
+Candidate: -1
+Answer: -1
+
+== Phase timing ==
+    problem.verify:     31.566 ms   99.64 %  (n=3)
+         synth.run:      0.096 ms    0.30 %  (n=3)
+   satisfy_inhouse:      0.011 ms    0.03 %  (n=7)
+      expr_to_term:      0.008 ms    0.02 %  (n=1)
+             TOTAL:     31.681 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     8
+new_programs_generated: 7
+programs_checked:       7
+counterexamples:        3
+
+==========
+[115/161] examples/LIA/s3.sl:
+Candidate: x
+Candidate: y
+Candidate: -1
+Answer: -1
+
+== Phase timing ==
+    problem.verify:     30.682 ms   99.22 %  (n=3)
+         synth.run:      0.206 ms    0.67 %  (n=3)
+      expr_to_term:      0.025 ms    0.08 %  (n=1)
+   satisfy_inhouse:      0.011 ms    0.04 %  (n=7)
+             TOTAL:     30.923 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     8
+new_programs_generated: 7
+programs_checked:       7
+counterexamples:        3
+
+==========
+[116/161] examples/LIA/t10.sl:
+Candidate: (>= this.total this.total)
+Candidate: (>= this.num this.total)
+Answer: (>= this.num this.total)
+
+== Phase timing ==
+    problem.verify:     23.306 ms   99.24 %  (n=2)
+         synth.run:      0.170 ms    0.72 %  (n=2)
+      expr_to_term:      0.007 ms    0.03 %  (n=1)
+   satisfy_inhouse:      0.002 ms    0.01 %  (n=2)
+             TOTAL:     23.485 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     19
+new_programs_generated: 6
+programs_checked:       5
+counterexamples:        2
+
+==========
+[117/161] examples/LIA/t11.sl:
+Candidate: NCK_NEQ_741360
+Candidate: (not NCK_NEQ_741360)
+Answer: (not NCK_NEQ_741360)
+
+== Phase timing ==
+    problem.verify:     24.036 ms   99.39 %  (n=2)
+      expr_to_term:      0.102 ms    0.42 %  (n=1)
+         synth.run:      0.038 ms    0.16 %  (n=2)
+   satisfy_inhouse:      0.007 ms    0.03 %  (n=2)
+             TOTAL:     24.183 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     16
+new_programs_generated: 3
+programs_checked:       2
+counterexamples:        2
+
+==========
+[118/161] examples/LIA/t12.sl:
+Candidate: (> pair.length pair.length)
+Candidate: (> pair.length 0)
+Answer: (> pair.length 0)
+
+== Phase timing ==
+    problem.verify:     22.513 ms   99.21 %  (n=2)
+         synth.run:      0.162 ms    0.71 %  (n=2)
+      expr_to_term:      0.014 ms    0.06 %  (n=1)
+   satisfy_inhouse:      0.003 ms    0.01 %  (n=2)
+             TOTAL:     22.692 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     9
+new_programs_generated: 6
+programs_checked:       5
+counterexamples:        2
+
+==========
+[119/161] examples/LIA/t14.sl:
+Candidate: (> newLength newLength)
+Candidate: (> newLength 0)
+Answer: (> newLength 0)
+
+== Phase timing ==
+    problem.verify:     28.645 ms   99.19 %  (n=2)
+      expr_to_term:      0.152 ms    0.53 %  (n=1)
+         synth.run:      0.072 ms    0.25 %  (n=2)
+   satisfy_inhouse:      0.011 ms    0.04 %  (n=2)
+             TOTAL:     28.879 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     12
+new_programs_generated: 7
+programs_checked:       6
+counterexamples:        2
+
+==========
+[120/161] examples/LIA/t15.sl:
+Candidate: enabled
+Answer: enabled
+
+== Phase timing ==
+    problem.verify:     13.375 ms   99.92 %  (n=1)
+      expr_to_term:      0.008 ms    0.06 %  (n=1)
+         synth.run:      0.003 ms    0.02 %  (n=1)
+             TOTAL:     13.386 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     1
+new_programs_generated: 1
+programs_checked:       0
+counterexamples:        1
+
+==========
+[121/161] examples/LIA/t17.sl:
+Candidate: (= j j)
+Answer: (= j j)
+
+== Phase timing ==
+    problem.verify:     13.774 ms   99.83 %  (n=1)
+         synth.run:      0.017 ms    0.12 %  (n=1)
+      expr_to_term:      0.007 ms    0.05 %  (n=1)
+             TOTAL:     13.798 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     5
+new_programs_generated: 2
+programs_checked:       0
+counterexamples:        1
+
+==========
+[122/161] examples/LIA/t18.sl:
+Candidate: (> entry entry)
+Candidate: (> entry 0)
+Answer: (> entry 0)
+
+== Phase timing ==
+    problem.verify:     31.495 ms   95.66 %  (n=2)
+      expr_to_term:      1.321 ms    4.01 %  (n=1)
+         synth.run:      0.087 ms    0.26 %  (n=2)
+   satisfy_inhouse:      0.022 ms    0.07 %  (n=2)
+             TOTAL:     32.925 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     18
+new_programs_generated: 6
+programs_checked:       5
+counterexamples:        2
+
+==========
+[123/161] examples/LIA/t1.sl:
+Candidate: (= stopTime stopTime)
+Candidate: (= stopTime org.apache.commons.lang.time.StopWatch.STATE_RUNNING)
+Answer: (= stopTime org.apache.commons.lang.time.StopWatch.STATE_RUNNING)
+
+== Phase timing ==
+    problem.verify:     22.316 ms   99.04 %  (n=2)
+         synth.run:      0.184 ms    0.82 %  (n=2)
+      expr_to_term:      0.026 ms    0.12 %  (n=1)
+   satisfy_inhouse:      0.005 ms    0.02 %  (n=2)
+             TOTAL:     22.532 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     32
+new_programs_generated: 9
+programs_checked:       8
+counterexamples:        2
+
+==========
+[124/161] examples/LIA/t20.sl:
+Candidate: MC_741360
+Candidate: (not MC_741360)
+Candidate: (= 46 46)
+Answer: (= 46 46)
+
+== Phase timing ==
+    problem.verify:     30.498 ms   97.90 %  (n=3)
+         synth.run:      0.385 ms    1.24 %  (n=3)
+   satisfy_inhouse:      0.245 ms    0.79 %  (n=4)
+      expr_to_term:      0.023 ms    0.07 %  (n=1)
+             TOTAL:     31.151 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     43
+new_programs_generated: 23
+programs_checked:       22
+counterexamples:        3
+
+==========
+[125/161] examples/LIA/t2.sl:
+Candidate: (> data.length data.length)
+Candidate: (> data.length 0)
+Answer: (> data.length 0)
+
+== Phase timing ==
+    problem.verify:     32.423 ms   99.27 %  (n=2)
+         synth.run:      0.208 ms    0.64 %  (n=2)
+   satisfy_inhouse:      0.015 ms    0.05 %  (n=2)
+      expr_to_term:      0.015 ms    0.05 %  (n=1)
+             TOTAL:     32.661 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     9
+new_programs_generated: 5
+programs_checked:       4
+counterexamples:        2
+
+==========
+[126/161] examples/LIA/t3.sl:
+Candidate: (= this.y this.y)
+Candidate: (= this.y this.x)
+Candidate: (= this.y y)
+Answer: (= this.y y)
+
+== Phase timing ==
+    problem.verify:     30.260 ms   99.20 %  (n=3)
+         synth.run:      0.226 ms    0.74 %  (n=3)
+      expr_to_term:      0.012 ms    0.04 %  (n=1)
+   satisfy_inhouse:      0.006 ms    0.02 %  (n=4)
+             TOTAL:     30.504 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     24
+new_programs_generated: 11
+programs_checked:       12
+counterexamples:        3
+
+==========
+[127/161] examples/LIA/t4.sl:
+Candidate: (= x.end x.end)
+Candidate: (= x.end i)
+Candidate: (> x.end size)
+Candidate: (> x.end elem.end)
+Answer: (> x.end elem.end)
+
+== Phase timing ==
+    problem.verify:     46.456 ms   98.32 %  (n=4)
+         synth.run:      0.566 ms    1.20 %  (n=4)
+   satisfy_inhouse:      0.188 ms    0.40 %  (n=6)
+      expr_to_term:      0.039 ms    0.08 %  (n=1)
+             TOTAL:     47.250 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     62
+new_programs_generated: 20
+programs_checked:       22
+counterexamples:        4
+
+==========
+[128/161] examples/LIA/t5.sl:
+Candidate: MC_741360
+Answer: MC_741360
+
+== Phase timing ==
+    problem.verify:     13.769 ms   99.88 %  (n=1)
+      expr_to_term:      0.014 ms    0.10 %  (n=1)
+         synth.run:      0.003 ms    0.02 %  (n=1)
+             TOTAL:     13.786 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     1
+new_programs_generated: 1
+programs_checked:       0
+counterexamples:        1
+
+==========
+[129/161] examples/LIA/t6.sl:
+Candidate: (< i i)
+Candidate: (< i MC_741360)
+Candidate: (< 0 i)
+Candidate: (<= i MC_741360)
+Answer: (<= i MC_741360)
+
+== Phase timing ==
+    problem.verify:     50.243 ms   97.98 %  (n=4)
+         synth.run:      0.514 ms    1.00 %  (n=4)
+   satisfy_inhouse:      0.336 ms    0.65 %  (n=6)
+      expr_to_term:      0.188 ms    0.37 %  (n=1)
+             TOTAL:     51.281 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     39
+new_programs_generated: 15
+programs_checked:       18
+counterexamples:        4
+
+==========
+[130/161] examples/LIA/t7.sl:
+Candidate: (>= bufferIndex bufferIndex)
+Candidate: (>= MC_741360 bufferIndex)
+Answer: (>= MC_741360 bufferIndex)
+
+== Phase timing ==
+    problem.verify:     21.858 ms   99.21 %  (n=2)
+         synth.run:      0.163 ms    0.74 %  (n=2)
+      expr_to_term:      0.008 ms    0.04 %  (n=1)
+   satisfy_inhouse:      0.002 ms    0.01 %  (n=2)
+             TOTAL:     22.031 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     16
+new_programs_generated: 5
+programs_checked:       4
+counterexamples:        2
+
+==========
+[131/161] examples/LIA/t8.sl:
+Candidate: (< x2 x2)
+Candidate: (< parentNode x2)
+Answer: (< parentNode x2)
+
+== Phase timing ==
+    problem.verify:     21.662 ms   99.20 %  (n=2)
+         synth.run:      0.163 ms    0.75 %  (n=2)
+      expr_to_term:      0.009 ms    0.04 %  (n=1)
+   satisfy_inhouse:      0.003 ms    0.01 %  (n=2)
+             TOTAL:     21.837 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     23
+new_programs_generated: 6
+programs_checked:       5
+counterexamples:        2
+
+==========
+[132/161] examples/LIA/t9.sl:
+Candidate: (< yearInt yearInt)
+Candidate: (< yearInt 9999)
+Answer: (< yearInt 9999)
+
+== Phase timing ==
+    problem.verify:     29.690 ms   99.59 %  (n=2)
+         synth.run:      0.066 ms    0.22 %  (n=2)
+      expr_to_term:      0.052 ms    0.17 %  (n=1)
+   satisfy_inhouse:      0.006 ms    0.02 %  (n=2)
+             TOTAL:     29.814 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     13
+new_programs_generated: 7
+programs_checked:       6
+counterexamples:        2
+
+==========
+[133/161] examples/LIA/unbdd_inv_gen_array.sl:
+Candidate: (and (<= (+ (* 0 m) (* 0 m)) 0) (<= (+ (* 0 m) (* 0 m)) 0))
+Candidate: (and (= (+ (* 1 j) (* 1 j)) 1) (<= (+ (* -1 a0) (* -1 j)) 0))
+Candidate: (and (= (+ (* -1 a0) (* -1 j)) 0) (<= (+ (* 0 m) (* 0 m)) 0))
+Candidate: (or (= (+ (* 1 m) (* 1 j)) 1) (<= (+ (* 1 a0) (* 1 j)) 0))
+Candidate: (or (<= (+ (* 1 a0) (* 1 j)) 0) (= (+ (* 1 a0) (* 1 j)) 1))
+Candidate: (or (= (+ (* 1 a0) (* 1 j)) (+ 1 1)) (<= (+ (* 1 a0) (* 1 j)) 1))
+Candidate: (or (<= (+ (* 1 j) (* 1 j)) 0) (<= (+ (* -1 a0) (* 1 m)) 0))
+Answer: (or (<= (+ (* 1 j) (* 1 j)) 0) (<= (+ (* -1 a0) (* 1 m)) 0))
+
+== Phase timing ==
+    problem.verify:     69.000 ms   79.25 %  (n=7)
+         synth.run:     14.986 ms   17.21 %  (n=7)
+   satisfy_inhouse:      3.010 ms    3.46 %  (n=285)
+      expr_to_term:      0.072 ms    0.08 %  (n=1)
+             TOTAL:     87.069 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     10225
+new_programs_generated: 559
+programs_checked:       688
+counterexamples:        7
+
+==========
+[134/161] examples/LIA/unbdd_inv_gen_cegar2.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* -1 x) (* -1 x)) 1) (= (+ (* 0 x) (* 1 x)) 1))
+Candidate: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+Candidate: (and (= (+ (* -1 n) (* -1 x)) 0) (= (+ (* -1 n) (* -1 x)) 0))
+Candidate: (and (= (+ (* -1 n) (* -1 n)) 0) (= (+ (* -1 n) (* -1 n)) 0))
+Candidate: (and (= (+ (* 1 m) (* 1 m)) 0) (= (+ (* 1 m) (* 1 m)) 0))
+Candidate: (and (<= (+ (* -1 m) (* 1 n)) 1) (<= (+ (* -1 m) (* 1 n)) 1))
+Candidate: (and (<= (+ (* 0 x) (* -1 m)) 0) (<= (+ (* 0 x) (* -1 m)) 0))
+Candidate: (and (= (+ (* 1 m) (* -1 x)) 0) (<= (+ (* -1 m) (* -1 x)) 1))
+Candidate: (and (<= (+ (* -1 m) (* -1 x)) 0) (<= (+ (* 0 x) (* -1 m)) 0))
+
+== Phase timing ==
+    problem.verify:     94.668 ms   75.69 %  (n=10)
+         synth.run:     15.541 ms   12.43 %  (n=10)
+   satisfy_inhouse:     14.841 ms   11.87 %  (n=1628)
+      expr_to_term:      0.024 ms    0.02 %  (n=1)
+             TOTAL:    125.073 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     92078946
+new_programs_generated: 15387
+programs_checked:       15663
+counterexamples:        10
+
+==========
+[135/161] examples/LIA/unbdd_inv_gen_cgr1.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* -1 x) (* -1 x)) 1) (= (+ (* -1 x) (* -1 x)) 1))
+Candidate: (and (= (+ (* -1 x) (* -1 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (<= (+ (* -1 y) (* -1 y)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+Candidate: (or (= (+ (* 1 x) (* 0 x)) (+ 1 1)) (= (+ (* -1 x) (* -1 x)) 0))
+Candidate: (and (= (+ (* 1 x) (* -1 y)) 0) (= (+ (* 1 x) (* -1 y)) 0))
+Candidate: (or (= (+ (* 1 x) (* -1 y)) 1) (= (+ (* 1 x) (* -1 y)) 0))
+Candidate: (and (<= (+ (* 1 x) (* -1 y)) 1) (<= (+ (* -1 y) (* -1 y)) 0))
+Candidate: (and (<= (+ (* 1 x) (* -1 y)) (+ 1 1)) (<= (+ (* -1 y) (* -1 y)) 0))
+Answer: (and (<= (+ (* 1 x) (* -1 y)) (+ 1 1)) (<= (+ (* -1 y) (* -1 y)) 0))
+
+== Phase timing ==
+    problem.verify:     86.046 ms   81.86 %  (n=9)
+         synth.run:     17.256 ms   16.42 %  (n=9)
+   satisfy_inhouse:      1.793 ms    1.71 %  (n=280)
+      expr_to_term:      0.022 ms    0.02 %  (n=1)
+             TOTAL:    105.118 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     14773
+new_programs_generated: 682
+programs_checked:       840
+counterexamples:        9
+
+==========
+[136/161] examples/LIA/unbdd_inv_gen_ex14.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* 0 x) (* -1 y)) 1) (= (+ (* 0 x) (* -1 y)) 1))
+Candidate: (and (<= (+ (* -1 x) (* -1 y)) (- 0 1)) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (or (= (+ (* 0 x) (* -1 y)) 1) (= (+ (* 1 x) (* 1 y)) 1))
+Candidate: (or (= (+ (* 0 x) (* 1 x)) (+ 1 1)) (= (+ (* 0 x) (* 1 x)) 1))
+Candidate: (or (<= (+ (* 1 x) (* -1 y)) (- 0 1)) (= (+ (* 0 x) (* 1 x)) 1))
+Candidate: (or (<= (+ (* -1 y) (* -1 y)) (- 0 1)) (= (+ (* 0 x) (* 1 x)) 1))
+Candidate: (or (<= (+ (* 0 x) (* -1 y)) (- (- 0 1) 1)) (= (+ (* 0 x) (* 1 x)) 1))
+Candidate: (or (<= (+ (* -1 x) (* 0 x)) (- (- 0 1) 1)) (= (+ (* 0 x) (* 1 x)) 1))
+Answer: (or (<= (+ (* -1 x) (* 0 x)) (- (- 0 1) 1)) (= (+ (* 0 x) (* 1 x)) 1))
+
+== Phase timing ==
+    problem.verify:     90.363 ms   70.44 %  (n=9)
+         synth.run:     33.344 ms   25.99 %  (n=9)
+   satisfy_inhouse:      4.550 ms    3.55 %  (n=1107)
+      expr_to_term:      0.026 ms    0.02 %  (n=1)
+             TOTAL:    128.282 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     22571
+new_programs_generated: 1474
+programs_checked:       1583
+counterexamples:        9
+
+==========
+[137/161] examples/LIA/unbdd_inv_gen_ex23.sl:
+Candidate: (and (<= (+ (* 0 y) (* 0 y)) -5000) (<= (+ (* 0 y) (* 0 y)) -5000))
+
+== Phase timing ==
+    problem.verify:     14.152 ms   61.70 %  (n=1)
+         synth.run:      8.645 ms   37.69 %  (n=1)
+   satisfy_inhouse:      0.111 ms    0.48 %  (n=1)
+      expr_to_term:      0.028 ms    0.12 %  (n=1)
+             TOTAL:     22.937 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     351246461
+new_programs_generated: 20009
+programs_checked:       20008
+counterexamples:        1
+
+==========
+[138/161] examples/LIA/unbdd_inv_gen_ex7.sl:
+Candidate: (and (<= (+ (* 0 i) (* 0 i)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Candidate: (and (= (+ (* -1 i) (* -1 i)) 1) (= (+ (* -1 i) (* 0 i)) 1))
+Candidate: (and (= (+ (* 1 i) (* 1 i)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Candidate: (and (<= (+ (* 1 y) (* -1 i)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Candidate: (and (<= (+ (* -1 l) (* 1 y)) 0) (<= (+ (* -1 l) (* -1 i)) 0))
+Candidate: (and (= (+ (* -1 l) (* 1 y)) 0) (<= (+ (* -1 i) (* -1 i)) 0))
+Candidate: (and (<= (+ (* -1 l) (* 1 y)) 0) (<= (+ (* -1 i) (* -1 i)) 0))
+Answer: (and (<= (+ (* -1 l) (* 1 y)) 0) (<= (+ (* -1 i) (* -1 i)) 0))
+
+== Phase timing ==
+    problem.verify:     70.178 ms   66.37 %  (n=7)
+         synth.run:     34.267 ms   32.41 %  (n=7)
+   satisfy_inhouse:      1.269 ms    1.20 %  (n=235)
+      expr_to_term:      0.030 ms    0.03 %  (n=1)
+             TOTAL:    105.745 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     52132
+new_programs_generated: 812
+programs_checked:       931
+counterexamples:        7
+
+==========
+[139/161] examples/LIA/unbdd_inv_gen_fig1.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* 0 x) (* 0 x)) 1) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (<= (+ (* 1 x) (* 1 x)) (- 0 1)) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (<= (+ (* 1 x) (* 1 x)) (- 0 1)) (<= (+ (* 1 y) (* 1 y)) 0))
+Candidate: (or (<= (+ (* -1 y) (* 0 x)) (- (- 0 1) 1)) (<= (+ (* 0 x) (* 1 x)) (- (- 0 1) 1)))
+Answer: (or (<= (+ (* -1 y) (* 0 x)) (- (- 0 1) 1)) (<= (+ (* 0 x) (* 1 x)) (- (- 0 1) 1)))
+
+== Phase timing ==
+    problem.verify:     49.370 ms   89.91 %  (n=5)
+         synth.run:      5.230 ms    9.52 %  (n=5)
+   satisfy_inhouse:      0.278 ms    0.51 %  (n=82)
+      expr_to_term:      0.031 ms    0.06 %  (n=1)
+             TOTAL:     54.909 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     4191
+new_programs_generated: 229
+programs_checked:       272
+counterexamples:        5
+
+==========
+[140/161] examples/LIA/unbdd_inv_gen_fig3.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* 0 x) (* -1 l)) 1) (= (+ (* 0 x) (* -1 l)) 1))
+Candidate: (and (<= (+ (* 0 x) (* -1 l)) 0) (<= (+ (* 1 l) (* 1 l)) 0))
+Candidate: (and (= (+ (* -1 l) (* 1 y)) 1) (= (+ (* 1 x) (* 1 y)) 1))
+Candidate: (or (= (+ (* 1 x) (* 1 l)) 1) (= (+ (* 1 l) (* 1 l)) 0))
+Candidate: (and (= (+ (* -1 x) (* -1 y)) 1) (= (+ (* -1 l) (* -1 x)) 1))
+Candidate: (and (= (+ (* 1 y) (* 1 l)) 0) (<= (+ (* 1 x) (* -1 l)) 0))
+Candidate: (and (= (+ (* -1 x) (* 1 l)) 1) (= (+ (* -1 x) (* 1 l)) 1))
+Candidate: (or (= (+ (* 0 x) (* 1 l)) 1) (= (+ (* 1 y) (* -1 x)) 1))
+Answer: (or (= (+ (* 0 x) (* 1 l)) 1) (= (+ (* 1 y) (* -1 x)) 1))
+
+== Phase timing ==
+    problem.verify:     83.912 ms   78.66 %  (n=9)
+         synth.run:     19.205 ms   18.00 %  (n=9)
+   satisfy_inhouse:      3.537 ms    3.32 %  (n=566)
+      expr_to_term:      0.026 ms    0.02 %  (n=1)
+             TOTAL:    106.680 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     8482
+new_programs_generated: 816
+programs_checked:       1032
+counterexamples:        9
+
+==========
+[141/161] examples/LIA/unbdd_inv_gen_fig6.sl:
+Candidate: (and (<= (+ (* 0 y) (* 0 y)) 0) (<= (+ (* 0 y) (* 0 y)) 0))
+Answer: (and (<= (+ (* 0 y) (* 0 y)) 0) (<= (+ (* 0 y) (* 0 y)) 0))
+
+== Phase timing ==
+    problem.verify:     14.432 ms   98.74 %  (n=1)
+         synth.run:      0.166 ms    1.14 %  (n=1)
+      expr_to_term:      0.018 ms    0.12 %  (n=1)
+             TOTAL:     14.616 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     25
+new_programs_generated: 7
+programs_checked:       0
+counterexamples:        1
+
+==========
+[142/161] examples/LIA/unbdd_inv_gen_fig8.sl:
+Candidate: (and (<= (+ (* 0 l) (* 0 l)) 0) (<= (+ (* 0 l) (* 0 l)) 0))
+Candidate: (and (= (+ (* -1 l) (* -1 l)) 0) (= (+ (* -1 l) (* -1 l)) 0))
+Answer: (and (= (+ (* -1 l) (* -1 l)) 0) (= (+ (* -1 l) (* -1 l)) 0))
+
+== Phase timing ==
+    problem.verify:     22.718 ms   93.41 %  (n=2)
+         synth.run:      1.460 ms    6.00 %  (n=2)
+   satisfy_inhouse:      0.118 ms    0.48 %  (n=2)
+      expr_to_term:      0.025 ms    0.10 %  (n=1)
+             TOTAL:     24.322 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     1494
+new_programs_generated: 74
+programs_checked:       72
+counterexamples:        2
+
+==========
+[143/161] examples/LIA/unbdd_inv_gen_fig9.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (<= (+ (* 0 x) (* -1 y)) 0) (= (+ (* 0 x) (* -1 y)) 1))
+Candidate: (and (<= (+ (* 0 x) (* -1 y)) 0) (<= (+ (* 0 x) (* -1 y)) 0))
+Candidate: (and (<= (+ (* -1 x) (* -1 y)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* -1 x) (* 1 y)) 0) (= (+ (* -1 x) (* 1 y)) 0))
+Candidate: (and (<= (+ (* -1 x) (* -1 x)) 0) (<= (+ (* 0 x) (* -1 y)) 0))
+Answer: (and (<= (+ (* -1 x) (* -1 x)) 0) (<= (+ (* 0 x) (* -1 y)) 0))
+
+== Phase timing ==
+    problem.verify:     57.700 ms   91.57 %  (n=6)
+         synth.run:      5.137 ms    8.15 %  (n=6)
+   satisfy_inhouse:      0.154 ms    0.24 %  (n=76)
+      expr_to_term:      0.018 ms    0.03 %  (n=1)
+             TOTAL:     63.010 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     3561
+new_programs_generated: 221
+programs_checked:       290
+counterexamples:        6
+
+==========
+[144/161] examples/LIA/unbdd_inv_gen_finf1.sl:
+Candidate: (and (<= (+ (* 0 i) (* 0 i)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Candidate: (and (= (+ (* 0 i) (* -1 x)) 0) (= (+ (* 0 i) (* -1 x)) 0))
+Answer: (and (= (+ (* 0 i) (* -1 x)) 0) (= (+ (* 0 i) (* -1 x)) 0))
+
+== Phase timing ==
+    problem.verify:     22.462 ms   92.32 %  (n=2)
+         synth.run:      1.639 ms    6.74 %  (n=2)
+   satisfy_inhouse:      0.162 ms    0.67 %  (n=3)
+      expr_to_term:      0.067 ms    0.27 %  (n=1)
+             TOTAL:     24.329 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     1508
+new_programs_generated: 71
+programs_checked:       70
+counterexamples:        2
+
+==========
+[145/161] examples/LIA/unbdd_inv_gen_finf2.sl:
+Candidate: (and (<= (+ (* 0 i) (* 0 i)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Candidate: (and (= (+ (* 0 i) (* -1 x)) 0) (= (+ (* 0 i) (* -1 x)) 0))
+Answer: (and (= (+ (* 0 i) (* -1 x)) 0) (= (+ (* 0 i) (* -1 x)) 0))
+
+== Phase timing ==
+    problem.verify:     22.579 ms   92.93 %  (n=2)
+         synth.run:      1.569 ms    6.46 %  (n=2)
+   satisfy_inhouse:      0.127 ms    0.52 %  (n=3)
+      expr_to_term:      0.024 ms    0.10 %  (n=1)
+             TOTAL:     24.298 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     1402
+new_programs_generated: 68
+programs_checked:       67
+counterexamples:        2
+
+==========
+[146/161] examples/LIA/unbdd_inv_gen_n_c11.sl:
+Candidate: (and (<= (+ (* 0 i) (* 0 i)) -7) (<= (+ (* 0 i) (* 0 i)) -7))
+Candidate: (and (<= (+ (* 0 i) (* 0 i)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Candidate: (and (<= (+ (* -1 l) (* -1 l)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Candidate: (and (<= (+ (* 1 l) (* 0 i)) 0) (<= (+ (* -1 l) (* -1 l)) 0))
+Candidate: (or (= (+ (* 1 l) (* 0 i)) 1) (= (+ (* -1 l) (* 0 i)) 0))
+Candidate: (and (<= (+ (* 1 l) (* 0 i)) 4) (<= (+ (* -1 l) (* -1 l)) 0))
+Answer: (and (<= (+ (* 1 l) (* 0 i)) 4) (<= (+ (* -1 l) (* -1 l)) 0))
+
+== Phase timing ==
+         synth.run:     56.792 ms   49.94 %  (n=6)
+    problem.verify:     56.241 ms   49.45 %  (n=6)
+   satisfy_inhouse:      0.664 ms    0.58 %  (n=121)
+      expr_to_term:      0.030 ms    0.03 %  (n=1)
+             TOTAL:    113.727 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     129942
+new_programs_generated: 1412
+programs_checked:       1480
+counterexamples:        6
+
+==========
+[147/161] examples/LIA/unbdd_inv_gen_sum1.sl:
+Candidate: (and (<= (+ (* 0 s) (* 0 s)) 0) (<= (+ (* 0 s) (* 0 s)) 0))
+Candidate: (and (= (+ (* 1 i) (* 1 i)) 1) (<= (+ (* -1 s) (* 1 n)) 1))
+Candidate: (and (= (+ (* 1 i) (* 1 n)) 1) (= (+ (* 1 i) (* 1 n)) 1))
+Candidate: (and (= (+ (* 1 s) (* 1 i)) 1) (= (+ (* 1 s) (* 1 i)) 1))
+Candidate: (and (= (+ (* 1 s) (* -1 i)) (- 0 1)) (= (+ (* 1 s) (* -1 i)) (- 0 1)))
+Candidate: (and (= (+ (* 1 s) (* 1 s)) 0) (= (+ (* 1 s) (* 1 s)) 0))
+Candidate: (and (<= (+ (* -1 i) (* -1 s)) (- 0 1)) (= (+ (* 0 s) (* 1 i)) 1))
+Candidate: (and (= (+ (* -1 n) (* -1 s)) 0) (= (+ (* -1 n) (* -1 s)) 0))
+Candidate: (and (<= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* -1 s) (* -1 s)) 0))
+Candidate: (and (= (+ (* 1 n) (* 1 n)) 0) (= (+ (* -1 s) (* 1 i)) 1))
+Candidate: (and (<= (+ (* -1 s) (* -1 s)) 0) (= (+ (* -1 s) (* 1 i)) 1))
+Candidate: (and (<= (+ (* -1 n) (* 1 i)) 1) (= (+ (* -1 s) (* 1 i)) 1))
+
+== Phase timing ==
+    problem.verify:    119.945 ms   74.40 %  (n=12)
+         synth.run:     25.219 ms   15.64 %  (n=12)
+   satisfy_inhouse:     16.042 ms    9.95 %  (n=5021)
+      expr_to_term:      0.020 ms    0.01 %  (n=1)
+             TOTAL:    161.227 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     75317388
+new_programs_generated: 17901
+programs_checked:       17912
+counterexamples:        12
+
+==========
+[148/161] examples/LIA/unbdd_inv_gen_sum3.sl:
+Candidate: (and (<= (+ (* 0 s) (* 0 s)) 0) (<= (+ (* 0 s) (* 0 s)) 0))
+Candidate: (and (= (+ (* 1 s) (* 1 s)) 1) (= (+ (* 1 s) (* 1 s)) 1))
+Candidate: (and (<= (+ (* 1 x) (* 0 s)) 0) (<= (+ (* 1 s) (* 1 s)) 0))
+Candidate: (and (= (+ (* 1 s) (* -1 x)) 0) (= (+ (* 1 s) (* -1 x)) 0))
+Answer: (and (= (+ (* 1 s) (* -1 x)) 0) (= (+ (* 1 s) (* -1 x)) 0))
+
+== Phase timing ==
+    problem.verify:     39.134 ms   86.11 %  (n=4)
+         synth.run:      6.226 ms   13.70 %  (n=4)
+   satisfy_inhouse:      0.067 ms    0.15 %  (n=35)
+      expr_to_term:      0.018 ms    0.04 %  (n=1)
+             TOTAL:     45.446 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     7490
+new_programs_generated: 241
+programs_checked:       269
+counterexamples:        4
+
+==========
+[149/161] examples/LIA/unbdd_inv_gen_sum4.sl:
+Candidate: (and (<= (+ (* 0 s) (* 0 s)) -15) (<= (+ (* 0 s) (* 0 s)) -15))
+Candidate: (and (= (+ (* 1 i) (* 0 s)) 1) (= (+ (* 1 i) (* 0 s)) 1))
+Candidate: (and (<= (+ (* -1 s) (* -1 s)) 0) (<= (+ (* -1 s) (* -1 s)) 0))
+Candidate: (and (= (+ (* -1 s) (* -1 s)) 0) (= (+ (* -1 s) (* -1 s)) 0))
+Candidate: (and (= (+ (* -1 i) (* -1 s)) (+ -7 6)) (= (+ (* -1 i) (* -1 s)) (+ -7 6)))
+Candidate: (or (= (+ (* 1 s) (* -1 i)) (+ -7 5)) (= (+ (* 1 i) (* 0 s)) 1))
+Candidate: (or (= (+ (* -1 i) (* -1 s)) (+ -7 5)) (= (+ (* 1 i) (* 0 s)) 1))
+Candidate: (and (<= (+ (* 1 s) (* 0 s)) 4) (<= (+ (* -1 s) (* 1 i)) 4))
+Candidate: (and (<= (+ (* 1 s) (* 0 s)) 5) (<= (+ (* -1 s) (* 1 i)) 4))
+Candidate: (and (<= (+ (* 1 s) (* 1 s)) 4) (<= (+ (* -1 s) (* 1 i)) 4))
+Candidate: (and (<= (+ (* 1 s) (* 1 s)) 6) (<= (+ (* -1 s) (* 1 i)) 4))
+Candidate: (and (<= (+ (* 1 i) (* 1 s)) 4) (<= (+ (* 1 s) (* -1 i)) 0))
+Candidate: (and (<= (+ (* 1 i) (* 1 s)) 1) (= (+ (* -1 s) (* -1 s)) 0))
+Candidate: (and (<= (+ (* 1 i) (* 1 s)) 5) (<= (+ (* 1 s) (* -1 i)) 0))
+Candidate: (and (<= (+ (* 1 i) (* 1 s)) 12) (<= (+ (* -1 s) (* 1 i)) 4))
+Candidate: (and (<= (+ (* 1 i) (* 0 s)) 5) (<= (+ (* -1 i) (* 0 s)) 0))
+Candidate: (or (<= (+ (* 1 i) (* 0 s)) 5) (= (+ (* -1 i) (* -1 s)) -7))
+Candidate: (or (= (+ (* -1 i) (* -1 i)) -12) (<= (+ (* 1 i) (* 0 s)) 5))
+Candidate: (and (<= (+ (* 1 i) (* 0 s)) 1) (<= (+ (* -1 s) (* -1 s)) 0))
+Candidate: (and (<= (+ (* 1 i) (* 0 s)) 6) (<= (+ (* -1 s) (* 1 i)) 4))
+Candidate: (or (= (+ (* -1 i) (* -1 i)) -14) (<= (+ (* 1 i) (* 0 s)) 6))
+Candidate: (and (<= (+ (* 1 i) (* 1 s)) 8) (<= (+ (* -1 s) (* 1 i)) 4))
+Candidate: (and (<= (+ (* 1 i) (* 0 s)) 7) (<= (+ (* -1 s) (* 1 i)) 4))
+Candidate: (and (= (+ (* 1 s) (* -1 i)) (+ -7 6)) (= (+ (* 1 s) (* -1 i)) (+ -7 6)))
+Candidate: (and (= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* 1 i) (* 0 s)) 4))
+Candidate: (and (<= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* 1 i) (* 0 s)) 5))
+Candidate: (and (<= (+ (* 1 i) (* 1 s)) 10) (<= (+ (* -1 s) (* 1 i)) 7))
+Candidate: (and (<= (+ (* -1 s) (* 1 i)) 7) (<= (+ (* 1 i) (* 1 s)) 11))
+Candidate: (and (<= (+ (* -1 s) (* 1 i)) 5) (<= (+ (* 1 i) (* 1 s)) 11))
+Candidate: (and (= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* 1 i) (* 1 i)) 4))
+Candidate: (and (= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* 1 i) (* 1 s)) 13))
+Candidate: (and (<= (+ (* 1 i) (* 0 s)) 8) (<= (+ (* -1 s) (* 1 i)) 4))
+Candidate: (and (<= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* 1 s) (* 1 s)) 14))
+Candidate: (and (= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* 1 i) (* 1 s)) 15))
+Candidate: (and (<= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* 1 s) (* 0 s)) 5))
+Candidate: (and (<= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* 1 i) (* 0 s)) 9))
+Candidate: (and (= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* 1 i) (* 1 i)) 6))
+Candidate: (and (= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* 1 i) (* 0 s)) 5))
+Candidate: (and (= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* 1 i) (* 1 s)) 11))
+Candidate: (and (= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* 1 i) (* 0 s)) 9))
+Answer: (and (= (+ (* -1 s) (* 1 i)) 1) (<= (+ (* 1 i) (* 0 s)) 9))
+
+== Phase timing ==
+         synth.run:   8064.608 ms   76.03 %  (n=40)
+   satisfy_inhouse:   2143.430 ms   20.21 %  (n=101453)
+    problem.verify:    398.696 ms    3.76 %  (n=40)
+      expr_to_term:      0.020 ms    0.00 %  (n=1)
+             TOTAL:  10606.754 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     2265397
+new_programs_generated: 109687
+programs_checked:       112531
+counterexamples:        40
+
+==========
+[150/161] examples/LIA/unbdd_inv_gen_tcs.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* 0 x) (* -1 y)) 0) (= (+ (* 0 x) (* 1 y)) 1))
+Candidate: (and (= (+ (* 0 x) (* -1 y)) 0) (= (+ (* 0 x) (* -1 y)) 0))
+Candidate: (and (<= (+ (* 0 x) (* 1 y)) 0) (<= (+ (* 0 x) (* 1 y)) 0))
+Candidate: (and (<= (+ (* -1 j) (* 1 y)) 0) (<= (+ (* -1 j) (* 1 y)) 0))
+Candidate: (or (= (+ (* -1 j) (* 1 y)) 0) (= (+ (* -1 y) (* 1 i)) (+ 1 1)))
+Candidate: (and (<= (+ (* -1 y) (* -1 i)) 0) (<= (+ (* -1 j) (* 1 y)) 0))
+Candidate: (or (= (+ (* 1 i) (* 1 x)) 1) (= (+ (* -1 j) (* 1 y)) 0))
+Candidate: (or (<= (+ (* 1 x) (* -1 i)) (- 0 1)) (= (+ (* -1 j) (* 1 y)) 0))
+Candidate: (or (<= (+ (* 0 x) (* -1 i)) (- 0 1)) (= (+ (* -1 j) (* 1 y)) 0))
+Candidate: (or (<= (+ (* -1 j) (* -1 i)) (- 0 1)) (= (+ (* -1 x) (* 1 y)) 0))
+
+== Phase timing ==
+         synth.run:    250.883 ms   51.22 %  (n=11)
+   satisfy_inhouse:    127.495 ms   26.03 %  (n=16337)
+    problem.verify:    111.435 ms   22.75 %  (n=11)
+      expr_to_term:      0.024 ms    0.00 %  (n=1)
+             TOTAL:    489.837 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     86526904
+new_programs_generated: 30035
+programs_checked:       30364
+counterexamples:        11
+
+==========
+[151/161] examples/LIA/unbdd_inv_gen_term2.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+
+== Phase timing ==
+    problem.verify:     13.540 ms   99.09 %  (n=1)
+         synth.run:      0.099 ms    0.72 %  (n=1)
+      expr_to_term:      0.026 ms    0.19 %  (n=1)
+             TOTAL:     13.664 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     27
+new_programs_generated: 7
+programs_checked:       0
+counterexamples:        1
+
+==========
+[152/161] examples/LIA/unbdd_inv_gen_term3.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+
+== Phase timing ==
+    problem.verify:     12.921 ms   99.13 %  (n=1)
+         synth.run:      0.090 ms    0.69 %  (n=1)
+      expr_to_term:      0.024 ms    0.18 %  (n=1)
+             TOTAL:     13.035 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     26
+new_programs_generated: 7
+programs_checked:       0
+counterexamples:        1
+
+==========
+[153/161] examples/LIA/unbdd_inv_gen_trex1.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* 0 x) (* 0 x)) 1) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* 1 z) (* 0 x)) 1) (= (+ (* 1 z) (* 0 x)) 1))
+Candidate: (or (= (+ (* 1 z) (* 0 x)) (+ 1 1)) (= (+ (* 1 z) (* 0 x)) 1))
+Candidate: (or (= (+ (* 1 k) (* 0 x)) (+ 1 1)) (= (+ (* 1 z) (* 1 k)) 1))
+Candidate: (or (= (+ (* 1 k) (* 0 x)) (+ 1 1)) (= (+ (* 1 z) (* 0 x)) 1))
+Candidate: (or (<= (+ (* -1 k) (* -1 k)) (- 0 1)) (= (+ (* 1 z) (* 0 x)) 1))
+Answer: (or (<= (+ (* -1 k) (* -1 k)) (- 0 1)) (= (+ (* 1 z) (* 0 x)) 1))
+
+== Phase timing ==
+    problem.verify:     63.304 ms   83.79 %  (n=7)
+         synth.run:     10.869 ms   14.39 %  (n=7)
+   satisfy_inhouse:      1.365 ms    1.81 %  (n=368)
+      expr_to_term:      0.014 ms    0.02 %  (n=1)
+             TOTAL:     75.552 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     6322
+new_programs_generated: 524
+programs_checked:       616
+counterexamples:        7
+
+==========
+[154/161] examples/LIA/unbdd_inv_gen_trex2.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+
+== Phase timing ==
+    problem.verify:     12.396 ms   99.00 %  (n=1)
+         synth.run:      0.103 ms    0.82 %  (n=1)
+      expr_to_term:      0.022 ms    0.18 %  (n=1)
+             TOTAL:     12.521 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     25
+new_programs_generated: 7
+programs_checked:       0
+counterexamples:        1
+
+==========
+[155/161] examples/LIA/unbdd_inv_gen_trex4.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+
+== Phase timing ==
+    problem.verify:     12.679 ms   99.10 %  (n=1)
+         synth.run:      0.089 ms    0.70 %  (n=1)
+      expr_to_term:      0.026 ms    0.20 %  (n=1)
+             TOTAL:     12.794 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     26
+new_programs_generated: 7
+programs_checked:       0
+counterexamples:        1
+
+==========
+[156/161] examples/LIA/unbdd_inv_gen_vmail.sl:
+Candidate: (and (<= (+ (* 0 i) (* 0 i)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Candidate: (and (= (+ (* -1 i) (* -1 i)) 1) (= (+ (* -1 i) (* 0 i)) 1))
+Candidate: (and (= (+ (* 1 i) (* 1 i)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Candidate: (or (= (+ (* 1 i) (* 1 i)) 0) (= (+ (* 0 i) (* 1 i)) 1))
+Candidate: (and (<= (+ (* -1 i) (* -1 i)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Answer: (and (<= (+ (* -1 i) (* -1 i)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+
+== Phase timing ==
+    problem.verify:     46.850 ms   91.28 %  (n=5)
+         synth.run:      4.146 ms    8.08 %  (n=5)
+   satisfy_inhouse:      0.307 ms    0.60 %  (n=47)
+      expr_to_term:      0.021 ms    0.04 %  (n=1)
+             TOTAL:     51.324 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     3643
+new_programs_generated: 192
+programs_checked:       244
+counterexamples:        5
+
+==========
+[157/161] examples/LIA/unbdd_inv_gen_w1.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (<= (+ (* 0 x) (* -1 n)) 0) (<= (+ (* 0 x) (* -1 n)) 0))
+Candidate: (and (<= (+ (* 1 x) (* 1 n)) 0) (= (+ (* 1 x) (* 1 n)) 1))
+Candidate: (and (<= (+ (* 1 x) (* 1 n)) 0) (<= (+ (* 0 x) (* -1 n)) 0))
+Candidate: (and (= (+ (* 1 x) (* 1 n)) 0) (<= (+ (* -1 x) (* 1 n)) 1))
+Candidate: (or (<= (+ (* 1 x) (* -1 n)) (- 0 1)) (= (+ (* 1 x) (* -1 n)) 0))
+Answer: (or (<= (+ (* 1 x) (* -1 n)) (- 0 1)) (= (+ (* 1 x) (* -1 n)) 0))
+
+== Phase timing ==
+    problem.verify:     51.648 ms   85.21 %  (n=6)
+         synth.run:      8.418 ms   13.89 %  (n=6)
+   satisfy_inhouse:      0.531 ms    0.88 %  (n=178)
+      expr_to_term:      0.016 ms    0.03 %  (n=1)
+             TOTAL:     60.612 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     7244
+new_programs_generated: 377
+programs_checked:       455
+counterexamples:        6
+
+==========
+[158/161] examples/LIA/unbdd_inv_gen_w2.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* 0 x) (* 1 x)) 1) (= (+ (* 0 x) (* 1 x)) 1))
+Candidate: (and (= (+ (* 0 x) (* 1 x)) (+ 1 1)) (<= (+ (* 0 x) (* 1 x)) 1))
+Candidate: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* 0 x) (* 1 n)) 1))
+Candidate: (or (= (+ (* -1 x) (* 1 n)) (+ 1 1)) (= (+ (* -1 x) (* 1 n)) 1))
+Candidate: (or (<= (+ (* 0 x) (* -1 n)) (- (- 0 1) 1)) (= (+ (* -1 x) (* 1 n)) 1))
+Candidate: (or (<= (+ (* -1 n) (* 1 x)) (- (- 0 1) 1)) (= (+ (* -1 x) (* 1 n)) 1))
+Answer: (or (<= (+ (* -1 n) (* 1 x)) (- (- 0 1) 1)) (= (+ (* -1 x) (* 1 n)) 1))
+
+== Phase timing ==
+    problem.verify:     59.602 ms   76.44 %  (n=7)
+         synth.run:     16.137 ms   20.69 %  (n=7)
+   satisfy_inhouse:      2.215 ms    2.84 %  (n=630)
+      expr_to_term:      0.022 ms    0.03 %  (n=1)
+             TOTAL:     77.976 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     10333
+new_programs_generated: 840
+programs_checked:       945
+counterexamples:        7
+
+==========
+[159/161] examples/LIA/unbdd_inv_gen_winf1.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+Answer: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+
+== Phase timing ==
+    problem.verify:     21.161 ms   93.93 %  (n=2)
+         synth.run:      1.354 ms    6.01 %  (n=2)
+      expr_to_term:      0.012 ms    0.05 %  (n=1)
+   satisfy_inhouse:      0.003 ms    0.01 %  (n=2)
+             TOTAL:     22.529 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     1094
+new_programs_generated: 67
+programs_checked:       65
+counterexamples:        2
+
+==========
+[160/161] examples/LIA/unbdd_inv_gen_winf2.sl:
+Candidate: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Candidate: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+Answer: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+
+== Phase timing ==
+    problem.verify:     21.645 ms   92.99 %  (n=2)
+         synth.run:      1.612 ms    6.93 %  (n=2)
+      expr_to_term:      0.016 ms    0.07 %  (n=1)
+   satisfy_inhouse:      0.003 ms    0.01 %  (n=2)
+             TOTAL:     23.276 ms  100.00 %
+
+== Synthesis stats ==
+programs_generated:     1494
+new_programs_generated: 73
+programs_checked:       71
+counterexamples:        2
+
+Completed 99/161
