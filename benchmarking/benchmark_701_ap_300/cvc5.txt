@@ -1,0 +1,188 @@
+
+==========
+[0/34] examples/agent_problems_clean/cliff_walking.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300002ms
+
+==========
+[1/34] examples/agent_problems_clean/frozen_lake/frozen_lake_size4_1.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300003ms
+
+==========
+[2/34] examples/agent_problems_clean/frozen_lake/frozen_lake_size4_2.sl:
+(
+(define-fun move ((currPoint Int)) Int (ite (= (get-x currPoint) 3) 1 2))
+)
+Time: 66834ms
+
+==========
+[3/34] examples/agent_problems_clean/frozen_lake/frozen_lake_size4_3.sl:
+(
+(define-fun move ((currPoint Int)) Int (ite (= (get-y currPoint) (get-x currPoint)) 1 2))
+)
+Time: 59524ms
+
+==========
+[4/34] examples/agent_problems_clean/frozen_lake/frozen_lake_size4_4.sl:
+(
+(define-fun move ((currPoint Int)) Int (ite (= (get-x currPoint) (get-y currPoint)) 1 2))
+)
+Time: 72931ms
+
+==========
+[5/34] examples/agent_problems_clean/frozen_lake/frozen_lake_size5_1.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300010ms
+
+==========
+[6/34] examples/agent_problems_clean/frozen_lake/frozen_lake_size5_2.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300009ms
+
+==========
+[7/34] examples/agent_problems_clean/frozen_lake/frozen_lake_size5_3.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300010ms
+
+==========
+[8/34] examples/agent_problems_clean/frozen_lake/frozen_lake_size5_4.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300009ms
+
+==========
+[9/34] examples/agent_problems_clean/frozen_lake/frozen_lake_size6_1.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300002ms
+
+==========
+[10/34] examples/agent_problems_clean/frozen_lake/frozen_lake_size6_2.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300003ms
+
+==========
+[11/34] examples/agent_problems_clean/frozen_lake/frozen_lake_size6_3.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300003ms
+
+==========
+[12/34] examples/agent_problems_clean/frozen_lake/frozen_lake_size7_1.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300002ms
+
+==========
+[13/34] examples/agent_problems_clean/frozen_lake/frozen_lake_size7_2.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300002ms
+
+==========
+[14/34] examples/agent_problems_clean/pitfall/pitfall_box0.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300005ms
+
+==========
+[15/34] examples/agent_problems_clean/pitfall/pitfall_box1.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300005ms
+
+==========
+[16/34] examples/agent_problems_clean/pitfall/pitfall_box2.sl:
+(
+(define-fun move ((curr-state Int)) Int (ite (= curr-state 0) 1 (ite (= curr-state 1) 5 (ite (= curr-state 2) 1 (ite (= curr-state 3) 7 (ite (= curr-state 4) 7 (ite (= curr-state 5) 7 (ite (= curr-state 6) 5 (ite (= curr-state 7) 3 (ite (= curr-state 8) 5 (ite (= curr-state 9) 5 (ite (= curr-state 10) 5 (ite (= curr-state 11) 0 (ite (= curr-state 12) 2 (- 1)))))))))))))))
+)
+Time: 40491ms
+
+==========
+[17/34] examples/agent_problems_clean/pitfall/pitfall_box3.sl:
+(
+(define-fun move ((curr-state Int)) Int (ite (= curr-state 0) 1 (ite (= curr-state 1) 7 (ite (= curr-state 2) 1 (ite (= curr-state 3) 2 (ite (= curr-state 4) 4 (ite (= curr-state 5) 4 (ite (= curr-state 6) 1 (ite (= curr-state 7) 4 (ite (= curr-state 8) 3 (ite (= curr-state 9) 4 (ite (= curr-state 10) 1 (ite (= curr-state 11) 1 (ite (= curr-state 12) 1 (- 1)))))))))))))))
+)
+Time: 6313ms
+
+==========
+[18/34] examples/agent_problems_clean/pitfall/pitfall_box4.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300005ms
+
+==========
+[19/34] examples/agent_problems_clean/pitfall/pitfall_box5.sl:
+(
+(define-fun move ((curr-state Int)) Int (ite (= curr-state 0) 1 (ite (= curr-state 1) 5 (ite (= curr-state 2) 5 (ite (= curr-state 3) 6 (ite (= curr-state 4) 0 (ite (= curr-state 5) 0 (ite (= curr-state 6) 4 (ite (= curr-state 7) 0 (ite (= curr-state 8) 5 (ite (= curr-state 9) 6 (ite (= curr-state 10) 5 (ite (= curr-state 11) 0 (ite (= curr-state 12) 2 (- 1)))))))))))))))
+)
+Time: 51813ms
+
+==========
+[20/34] examples/agent_problems_clean/pitfall/pitfall_box6.sl:
+(
+(define-fun move ((curr-state Int)) Int (ite (= curr-state 0) 1 (ite (= curr-state 1) 1 (ite (= curr-state 2) 0 (ite (= curr-state 3) 3 (ite (= curr-state 4) 1 (ite (= curr-state 5) 1 (ite (= curr-state 6) 1 (ite (= curr-state 7) 1 (ite (= curr-state 8) 1 (ite (= curr-state 9) 1 (ite (= curr-state 10) 1 (ite (= curr-state 11) 1 (ite (= curr-state 12) 1 (- 1)))))))))))))))
+)
+Time: 1572ms
+
+==========
+[21/34] examples/agent_problems_clean/pitfall/pitfall_map_left.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300003ms
+
+==========
+[22/34] examples/agent_problems_clean/pitfall/pitfall_map_right.sl:
+(
+(define-fun move ((curr-position Int) (underground Bool)) Int (ite (treasure curr-position) 0 1))
+)
+Time: 1231ms
+
+==========
+[23/34] examples/agent_problems_clean/pong_trajectory.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300098ms
+
+==========
+[24/34] examples/agent_problems_clean/taxi/taxi_dropoff1.sl:
+infeasible
+Time: 21ms
+
+==========
+[25/34] examples/agent_problems_clean/taxi/taxi_dropoff2.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300002ms
+
+==========
+[26/34] examples/agent_problems_clean/taxi/taxi_dropoff3.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300003ms
+
+==========
+[27/34] examples/agent_problems_clean/taxi/taxi_dropoff4.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300003ms
+
+==========
+[28/34] examples/agent_problems_clean/taxi/taxi_dropoff5.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300003ms
+
+==========
+[29/34] examples/agent_problems_clean/taxi/taxi_pickup1.sl:
+infeasible
+Time: 20ms
+
+==========
+[30/34] examples/agent_problems_clean/taxi/taxi_pickup2.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300002ms
+
+==========
+[31/34] examples/agent_problems_clean/taxi/taxi_pickup3.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300002ms
+
+==========
+[32/34] examples/agent_problems_clean/taxi/taxi_pickup4.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300002ms
+
+==========
+[33/34] examples/agent_problems_clean/taxi/taxi_pickup5.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300003ms
+
+Completed 8/34
