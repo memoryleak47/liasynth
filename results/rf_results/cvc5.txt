@@ -1,0 +1,684 @@
+
+==========
+[0/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010cousot9RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int (ite (< arg2 arg1) (- 0 arg1) (ite (< arg0 1) 0 arg0)))
+)
+Time: 194114ms
+
+==========
+[1/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010easy1RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int (- arg2 arg1))
+)
+Time: 43ms
+
+==========
+[2/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010easy21RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int arg0)
+)
+Time: 14ms
+
+==========
+[3/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010easy22RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int arg0)
+)
+Time: 14ms
+
+==========
+[4/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010ndecrRFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int arg1)
+)
+Time: 8ms
+
+==========
+[5/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010speedpldi2RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int) (arg3 Int)) Int (+ arg3 arg2))
+)
+Time: 68ms
+
+==========
+[6/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010speedpldi3RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int) (arg3 Int)) Int (+ arg2 arg3))
+)
+Time: 79ms
+
+==========
+[7/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010speedpldi4RFSynt.noassumptions.sl:
+infeasible
+Time: 8ms
+
+==========
+[8/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010terminateRFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300011ms
+
+==========
+[9/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010wiseRFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (ite (< arg1 arg0) (- arg0 arg1) (- arg1 arg0)))
+)
+Time: 12080ms
+
+==========
+[10/106] examples/RF_no_assumptions/AviadRFSynt.noassumptions.sl:
+(error "Parse Error: examples/RF_no_assumptions/AviadRFSynt.noassumptions.sl:41.201: Symbol '/' not declared as a variable")
+Time: 17ms
+
+==========
+[11/106] examples/RF_no_assumptions/BradleyMannaSipmaCAV2005Fig1RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (+ arg0 arg1))
+)
+Time: 40ms
+
+==========
+[12/106] examples/RF_no_assumptions/BrockschmidtCookFuhsCAV2013IntroductionRFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int arg0)
+)
+Time: 11ms
+
+==========
+[13/106] examples/RF_no_assumptions/ChawdharyCookGulwaniSagivYangESOP2008easy1RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int (- arg2 arg1))
+)
+Time: 43ms
+
+==========
+[14/106] examples/RF_no_assumptions/ChawdharyCookGulwaniSagivYangESOP2008easy2RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int arg0)
+)
+Time: 14ms
+
+==========
+[15/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex101RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int)) Int (ite (< (+ (+ (+ 1 1) 1) 1) arg0) 1 arg0))
+)
+Time: 41816ms
+
+==========
+[16/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex201RFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300010ms
+
+==========
+[17/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex206RFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300010ms
+
+==========
+[18/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex207RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (- arg1 arg0))
+)
+Time: 21ms
+
+==========
+[19/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex208RFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300009ms
+
+==========
+[20/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex209RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int (- arg2 arg0))
+)
+Time: 37ms
+
+==========
+[21/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex210RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int arg0)
+)
+Time: 12ms
+
+==========
+[22/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex213RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (- 1 arg1))
+)
+Time: 18ms
+
+==========
+[23/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex216RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (ite (< 0 arg1) (+ arg1 arg1) arg0))
+)
+Time: 1011ms
+
+==========
+[24/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex218RFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300011ms
+
+==========
+[25/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex219RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int arg0)
+)
+Time: 13ms
+
+==========
+[26/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex221RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (+ (+ arg0 arg0) arg1))
+)
+Time: 56ms
+
+==========
+[27/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex301RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int (ite (< arg2 arg1) (- arg1 arg0) (- arg2 arg0)))
+)
+Time: 55463ms
+
+==========
+[28/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex303RFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300010ms
+
+==========
+[29/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex304RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int (- arg2 arg0))
+)
+Time: 54ms
+
+==========
+[30/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex305RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int (- (+ 1 arg2) arg1))
+)
+Time: 352ms
+
+==========
+[31/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex307RFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300010ms
+
+==========
+[32/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex308RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int (- 1 arg2))
+)
+Time: 27ms
+
+==========
+[33/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex310RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int (+ arg1 arg0))
+)
+Time: 52ms
+
+==========
+[34/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex401RFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300010ms
+
+==========
+[35/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Fig1RFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300010ms
+
+==========
+[36/106] examples/RF_no_assumptions/ColonSipmaTACAS2001Fig1RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int) (arg3 Int)) Int (- (+ arg1 1) arg2))
+)
+Time: 363ms
+
+==========
+[37/106] examples/RF_no_assumptions/CookSeeZulegerTACAS2013Fig8aRFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int)) Int (ite (< arg0 1) (- 0 arg0) arg0))
+)
+Time: 630ms
+
+==========
+[38/106] examples/RF_no_assumptions/CookSeeZulegerTACAS2013Fig8bRFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (ite (< arg1 arg0) arg0 (- arg1 arg0)))
+)
+Time: 2871ms
+
+==========
+[39/106] examples/RF_no_assumptions/CountUpRoundRFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (- arg0 arg1))
+)
+Time: 37ms
+
+==========
+[40/106] examples/RF_no_assumptions/DivMinusRFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int arg0)
+)
+Time: 11ms
+
+==========
+[41/106] examples/RF_no_assumptions/DynamiteEx2VarsRFSynt.noassumptions.sl:
+(error "A non-linear fact was asserted to arithmetic in a linear logic.
+The fact in question: (>= (+ rsk_4 (* 8 rsk_7) (* (- 4) (* rsk_7 rsk_7))) 4)
+")
+Time: 27ms
+
+==========
+[42/106] examples/RF_no_assumptions/DynamiteExampleRFSynt.noassumptions.sl:
+(error "A non-linear fact was asserted to arithmetic in a linear logic.
+The fact in question: (>= (+ rsk_4 (* (- 1) (* rsk_5 rsk_5))) 0)
+")
+Time: 15ms
+
+==========
+[43/106] examples/RF_no_assumptions/DynamiteExampleX4RFSynt.noassumptions.sl:
+(error "A non-linear fact was asserted to arithmetic in a linear logic.
+The fact in question: (>= (+ rsk_4 (* 8 rsk_5) (* (- 4) (* rsk_5 rsk_5))) 4)
+")
+Time: 15ms
+
+==========
+[44/106] examples/RF_no_assumptions/DynExUpTo2VarsConjRFSynt.noassumptions.sl:
+(error "A non-linear fact was asserted to arithmetic in a linear logic.
+The fact in question: (>= (+ rsk_5 (* 8 rsk_6) (* (- 4) (* rsk_6 rsk_6))) 4)
+")
+Time: 15ms
+
+==========
+[45/106] examples/RF_no_assumptions/DynExUpTo2VarsDisjRFSynt.noassumptions.sl:
+(error "A non-linear fact was asserted to arithmetic in a linear logic.
+The fact in question: (>= (+ rsk_5 (* 8 rsk_6) (* (- 4) (* rsk_6 rsk_6))) 4)
+")
+Time: 15ms
+
+==========
+[46/106] examples/RF_no_assumptions/DynExUpTo3VarsDisjRFSynt.noassumptions.sl:
+(error "A non-linear fact was asserted to arithmetic in a linear logic.
+The fact in question: (>= (+ rsk_5 (* 8 rsk_7) (* (- 4) (* rsk_7 rsk_7))) 4)
+")
+Time: 16ms
+
+==========
+[47/106] examples/RF_no_assumptions/DynExUpTo4VarsDisjRFSynt.noassumptions.sl:
+(error "A non-linear fact was asserted to arithmetic in a linear logic.
+The fact in question: (>= (+ rsk_6 (* 8 rsk_8) (* (- 4) (* rsk_8 rsk_8))) 4)
+")
+Time: 16ms
+
+==========
+[48/106] examples/RF_no_assumptions/GCD5RFSynt.noassumptions.sl:
+(error "A non-linear fact was asserted to arithmetic in a linear logic.
+The fact in question: (mod rsk_4 rsk_6)
+")
+Time: 17ms
+
+==========
+[49/106] examples/RF_no_assumptions/GenadyRFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int arg0)
+)
+Time: 11ms
+
+==========
+[50/106] examples/RF_no_assumptions/GopanRepsCAV2006Fig1aRFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300009ms
+
+==========
+[51/106] examples/RF_no_assumptions/GulavaniGulwaniCAV2008Fig1aRFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300010ms
+
+==========
+[52/106] examples/RF_no_assumptions/GulavaniGulwaniCAV2008Fig1cRFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int (- arg2 arg0))
+)
+Time: 50ms
+
+==========
+[53/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig1RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int arg0)
+)
+Time: 10ms
+
+==========
+[54/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig2RFSynt.noassumptions.sl:
+(error "Parse Error: examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig2RFSynt.noassumptions.sl:25.139: Symbol '/' not declared as a variable")
+Time: 12ms
+
+==========
+[55/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig4RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int arg0)
+)
+Time: 11ms
+
+==========
+[56/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig5RFSynt.noassumptions.sl:
+(error "Parse Error: examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig5RFSynt.noassumptions.sl:27.139: Symbol '/' not declared as a variable")
+Time: 11ms
+
+==========
+[57/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig8RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int arg0)
+)
+Time: 10ms
+
+==========
+[58/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig9RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int arg0)
+)
+Time: 11ms
+
+==========
+[59/106] examples/RF_no_assumptions/KroeningSharyginaTsitovichWintersteigerCAV2010Fig1RFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300007ms
+
+==========
+[60/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Ex1RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int arg0)
+)
+Time: 12ms
+
+==========
+[61/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Ex7RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (+ (+ arg0 arg0) arg1))
+)
+Time: 269ms
+
+==========
+[62/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Ex9RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (+ arg0 arg1))
+)
+Time: 41ms
+
+==========
+[63/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Fig1RFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300010ms
+
+==========
+[64/106] examples/RF_no_assumptions/LeikeHeizmannWST2014Ex9RFSynt.noassumptions.sl:
+(error "Parse Error: examples/RF_no_assumptions/LeikeHeizmannWST2014Ex9RFSynt.noassumptions.sl:19.73: Symbol '/' not declared as a variable")
+Time: 12ms
+
+==========
+[65/106] examples/RF_no_assumptions/LogBuiltInRFSynt.noassumptions.sl:
+(error "Parse Error: examples/RF_no_assumptions/LogBuiltInRFSynt.noassumptions.sl:27.88: Symbol '/' not declared as a variable")
+Time: 11ms
+
+==========
+[66/106] examples/RF_no_assumptions/LogIterativeRFSynt.noassumptions.sl:
+(error "Parse Error: examples/RF_no_assumptions/LogIterativeRFSynt.noassumptions.sl:33.153: Symbol '/' not declared as a variable")
+Time: 11ms
+
+==========
+[67/106] examples/RF_no_assumptions/LogMultRFSynt.noassumptions.sl:
+(error "A non-linear fact was asserted to arithmetic in a linear logic.
+The fact in question: (>= (+ rsk_5 rsk_6 (* (- 1) (* rsk_5 rsk_5))) 1)
+")
+Time: 158843ms
+
+==========
+[68/106] examples/RF_no_assumptions/MasseVMCAI2014Ex6RFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300010ms
+
+==========
+[69/106] examples/RF_no_assumptions/MasseVMCAI2014Fig1aRFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300009ms
+
+==========
+[70/106] examples/RF_no_assumptions/McCarthyIterativeRFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300009ms
+
+==========
+[71/106] examples/RF_no_assumptions/MinusBuiltInRFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int (- arg0 arg1))
+)
+Time: 50ms
+
+==========
+[72/106] examples/RF_no_assumptions/MultDisjRFSynt.noassumptions.sl:
+(error "A non-linear fact was asserted to arithmetic in a linear logic.
+The fact in question: (>= (+ rsk_4 rsk_6 rsk_7 (* (- 1) (* rsk_6 rsk_7))) 1)
+")
+Time: 16ms
+
+==========
+[73/106] examples/RF_no_assumptions/NoriSharmaFSE2013Fig7RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int) (arg3 Int) (arg4 Int) (arg5 Int) (arg6 Int)) Int (- arg4 arg0))
+)
+Time: 128ms
+
+==========
+[74/106] examples/RF_no_assumptions/NoriSharmaFSE2013Fig8RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int) (arg3 Int) (arg4 Int) (arg5 Int) (arg6 Int)) Int (ite (< 1 arg2) arg2 (- arg5 arg1)))
+)
+Time: 10402ms
+
+==========
+[75/106] examples/RF_no_assumptions/PastaA10RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (ite (< arg1 arg0) (- arg0 arg1) (- arg1 arg0)))
+)
+Time: 6120ms
+
+==========
+[76/106] examples/RF_no_assumptions/PastaA4RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (- arg0 arg1))
+)
+Time: 32ms
+
+==========
+[77/106] examples/RF_no_assumptions/PastaA5RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (- arg0 arg1))
+)
+Time: 32ms
+
+==========
+[78/106] examples/RF_no_assumptions/PastaA6RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int (- arg0 (+ arg2 arg1)))
+)
+Time: 1241ms
+
+==========
+[79/106] examples/RF_no_assumptions/PastaA7RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int (- arg0 arg1))
+)
+Time: 51ms
+
+==========
+[80/106] examples/RF_no_assumptions/PastaA9RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int (- arg0 arg2))
+)
+Time: 30ms
+
+==========
+[81/106] examples/RF_no_assumptions/PastaB10RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (+ arg0 arg1))
+)
+Time: 33ms
+
+==========
+[82/106] examples/RF_no_assumptions/PastaB11RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (+ arg1 arg0))
+)
+Time: 42ms
+
+==========
+[83/106] examples/RF_no_assumptions/PastaB12RFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300011ms
+
+==========
+[84/106] examples/RF_no_assumptions/PastaB13RFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300011ms
+
+==========
+[85/106] examples/RF_no_assumptions/PastaB1RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (- arg0 arg1))
+)
+Time: 48ms
+
+==========
+[86/106] examples/RF_no_assumptions/PastaB2RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (- arg0 arg1))
+)
+Time: 21ms
+
+==========
+[87/106] examples/RF_no_assumptions/PastaB3RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (- arg0 arg1))
+)
+Time: 29ms
+
+==========
+[88/106] examples/RF_no_assumptions/PastaB4RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int arg1)
+)
+Time: 7ms
+
+==========
+[89/106] examples/RF_no_assumptions/PastaB5RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int)) Int 0)
+)
+Time: 7ms
+
+==========
+[90/106] examples/RF_no_assumptions/PastaB6RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int arg1)
+)
+Time: 6ms
+
+==========
+[91/106] examples/RF_no_assumptions/PastaB7RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int)) Int (- arg0 arg2))
+)
+Time: 40ms
+
+==========
+[92/106] examples/RF_no_assumptions/PastaB8RFSynt.noassumptions.sl:
+(error "Parse Error: examples/RF_no_assumptions/PastaB8RFSynt.noassumptions.sl:23.146: Symbol '/' not declared as a variable")
+Time: 11ms
+
+==========
+[93/106] examples/RF_no_assumptions/PastaC3RFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300009ms
+
+==========
+[94/106] examples/RF_no_assumptions/PastaC5RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int)) Int (+ arg0 arg1))
+)
+Time: 41ms
+
+==========
+[95/106] examples/RF_no_assumptions/PastaC7RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int) (arg1 Int) (arg2 Int) (arg3 Int)) Int (- arg3 arg1))
+)
+Time: 72ms
+
+==========
+[96/106] examples/RF_no_assumptions/PlusSwapRFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300010ms
+
+==========
+[97/106] examples/RF_no_assumptions/PodelskiRybalchenkoTACAS2011Fig1RFSynt.noassumptions.sl:
+(
+(define-fun rankingFunction!0 ((arg0 Int)) Int arg0)
+)
+Time: 11ms
+
+==========
+[98/106] examples/RF_no_assumptions/PodelskiRybalchenkoVMCAI2004Ex2RFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300009ms
+
+==========
+[99/106] examples/RF_no_assumptions/Poly2VarsCondBreakRFSynt.noassumptions.sl:
+(error "A non-linear fact was asserted to arithmetic in a linear logic.
+The fact in question: (>= (+ rsk_4 (* 8 rsk_6) (* (- 4) (* rsk_6 rsk_6))) 4)
+")
+Time: 16ms
+
+==========
+[100/106] examples/RF_no_assumptions/PolyClosingInRFSynt.noassumptions.sl:
+(error "A non-linear fact was asserted to arithmetic in a linear logic.
+The fact in question: (>= (+ rsk_4 (* 2 rsk_6) (* (- 1) (* rsk_6 rsk_6))) 0)
+")
+Time: 15ms
+
+==========
+[101/106] examples/RF_no_assumptions/Round3RFSynt.noassumptions.sl:
+cvc5 interrupted by SIGTERM.
+Time: 300008ms
+
+==========
+[102/106] examples/RF_no_assumptions/Square2VarsDisjRFSynt.noassumptions.sl:
+(error "A non-linear fact was asserted to arithmetic in a linear logic.
+The fact in question: (>= (+ rsk_4 (* 2 rsk_6) (* (- 1) (* rsk_6 rsk_6))) 1)
+")
+Time: 17ms
+
+==========
+[103/106] examples/RF_no_assumptions/SquareDisj2VarsRFSynt.noassumptions.sl:
+(error "A non-linear fact was asserted to arithmetic in a linear logic.
+The fact in question: (>= (+ rsk_4 (* 2 rsk_5) (* (- 1) (* rsk_5 rsk_5))) 1)
+")
+Time: 16ms
+
+==========
+[104/106] examples/RF_no_assumptions/TwoPol4VarsConjRFSynt.noassumptions.sl:
+(error "A non-linear fact was asserted to arithmetic in a linear logic.
+The fact in question: (>= (+ rsk_4 (* (- 1) (* rsk_7 rsk_7))) 0)
+")
+Time: 15ms
+
+==========
+[105/106] examples/RF_no_assumptions/TwoPol4VarsDisjRFSynt.noassumptions.sl:
+(error "A non-linear fact was asserted to arithmetic in a linear logic.
+The fact in question: (>= (+ rsk_4 (* (- 1) (* rsk_6 rsk_6))) 0)
+")
+Time: 16ms
+
+Completed 60/106
