@@ -1,0 +1,740 @@
+
+==========
+[0/161] benchmarks/LIA/array_search_10.sl:
+Time: 130427ms
+
+==========
+[1/161] benchmarks/LIA/array_search_11.sl:
+Time: 120089ms
+
+==========
+[2/161] benchmarks/LIA/array_search_12.sl:
+Time: 120083ms
+
+==========
+[3/161] benchmarks/LIA/array_search_13.sl:
+Time: 120081ms
+
+==========
+[4/161] benchmarks/LIA/array_search_14.sl:
+Time: 120086ms
+
+==========
+[5/161] benchmarks/LIA/array_search_15.sl:
+Time: 120084ms
+
+==========
+[6/161] benchmarks/LIA/array_search_2.sl:
+Time: 120382ms
+
+==========
+[7/161] benchmarks/LIA/array_search_3.sl:
+Time: 120421ms
+
+==========
+[8/161] benchmarks/LIA/array_search_4.sl:
+memory allocation of 1409286160 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 11: 12519 Aborted                 prlimit --as=10737418240 timeout 120s target/release/enum_program -f "$f"
+Time: 56532ms
+
+==========
+[9/161] benchmarks/LIA/array_search_5.sl:
+memory allocation of 1409286160 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 11: 12547 Aborted                 prlimit --as=10737418240 timeout 120s target/release/enum_program -f "$f"
+Time: 64060ms
+
+==========
+[10/161] benchmarks/LIA/array_search_6.sl:
+memory allocation of 1409286160 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 11: 12576 Aborted                 prlimit --as=10737418240 timeout 120s target/release/enum_program -f "$f"
+Time: 80883ms
+
+==========
+[11/161] benchmarks/LIA/array_search_7.sl:
+memory allocation of 1409286160 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 11: 12605 Aborted                 prlimit --as=10737418240 timeout 120s target/release/enum_program -f "$f"
+Time: 113280ms
+
+==========
+[12/161] benchmarks/LIA/array_search_8.sl:
+Time: 120083ms
+
+==========
+[13/161] benchmarks/LIA/array_search_9.sl:
+Time: 120083ms
+
+==========
+[14/161] benchmarks/LIA/commutative.sl:
+Answer: "(+ x y)"
+Time: 92ms
+
+==========
+[15/161] benchmarks/LIA/constant.sl:
+Answer: "0"
+Time: 86ms
+
+==========
+[16/161] benchmarks/LIA/inv_gen_array.sl:
+Answer: "(or (= j 0) (<= m a0))"
+Time: 1869ms
+
+==========
+[17/161] benchmarks/LIA/inv_gen_cegar2.sl:
+Time: 120086ms
+
+==========
+[18/161] benchmarks/LIA/inv_gen_cgr1.sl:
+Answer: "(<= x (+ y 2))"
+Time: 100ms
+
+==========
+[19/161] benchmarks/LIA/inv_gen_ex14.sl:
+Answer: "(<= 1 x)"
+Time: 94ms
+
+==========
+[20/161] benchmarks/LIA/inv_gen_ex23.sl:
+Time: 120098ms
+
+==========
+[21/161] benchmarks/LIA/inv_gen_ex7.sl:
+Answer: "(and (<= y l) (<= 0 i))"
+Time: 684ms
+
+==========
+[22/161] benchmarks/LIA/inv_gen_fig1.sl:
+Answer: "(or (<= x (- 2)) (<= 2 y))"
+Time: 238ms
+
+==========
+[23/161] benchmarks/LIA/inv_gen_fig3.sl:
+Answer: "(= (+ x 1) (+ y l))"
+Time: 2969ms
+
+==========
+[24/161] benchmarks/LIA/inv_gen_fig6.sl:
+Answer: "(<= (- 3) 3)"
+Time: 85ms
+
+==========
+[25/161] benchmarks/LIA/inv_gen_fig8.sl:
+Answer: "(= l 0)"
+Time: 84ms
+
+==========
+[26/161] benchmarks/LIA/inv_gen_fig9.sl:
+Answer: "(and (<= 0 y) (<= 0 x))"
+Time: 109ms
+
+==========
+[27/161] benchmarks/LIA/inv_gen_finf1.sl:
+Answer: "(= x 0)"
+Time: 91ms
+
+==========
+[28/161] benchmarks/LIA/inv_gen_finf2.sl:
+Answer: "(= x 0)"
+Time: 92ms
+
+==========
+[29/161] benchmarks/LIA/inv_gen_n_c11.sl:
+Answer: "(and (<= 0 l) (<= l 4))"
+Time: 2736ms
+
+==========
+[30/161] benchmarks/LIA/inv_gen_sum1.sl:
+Time: 120087ms
+
+==========
+[31/161] benchmarks/LIA/inv_gen_sum3.sl:
+Answer: "(= s x)"
+Time: 98ms
+
+==========
+[32/161] benchmarks/LIA/inv_gen_sum4.sl:
+Time: 120082ms
+
+==========
+[33/161] benchmarks/LIA/inv_gen_tcs.sl:
+Answer: "(= (+ x j) (+ y i))"
+Time: 771ms
+
+==========
+[34/161] benchmarks/LIA/inv_gen_term2.sl:
+Answer: "(<= (- 2) 1)"
+Time: 90ms
+
+==========
+[35/161] benchmarks/LIA/inv_gen_term3.sl:
+Answer: "(<= 2 3)"
+Time: 90ms
+
+==========
+[36/161] benchmarks/LIA/inv_gen_trex1.sl:
+Answer: "(<= 1 z)"
+Time: 99ms
+
+==========
+[37/161] benchmarks/LIA/inv_gen_trex2.sl:
+Answer: "(<= (- 3) 3)"
+Time: 85ms
+
+==========
+[38/161] benchmarks/LIA/inv_gen_trex4.sl:
+Answer: "(<= 2 3)"
+Time: 89ms
+
+==========
+[39/161] benchmarks/LIA/inv_gen_vmail.sl:
+Answer: "(<= 0 i)"
+Time: 92ms
+
+==========
+[40/161] benchmarks/LIA/inv_gen_w1.sl:
+Answer: "(<= x n)"
+Time: 87ms
+
+==========
+[41/161] benchmarks/LIA/inv_gen_w2.sl:
+Answer: "(<= x (+ n (- 1)))"
+Time: 96ms
+
+==========
+[42/161] benchmarks/LIA/inv_gen_winf1.sl:
+Answer: "(= x 0)"
+Time: 86ms
+
+==========
+[43/161] benchmarks/LIA/inv_gen_winf2.sl:
+Answer: "(= x 0)"
+Time: 86ms
+
+==========
+[44/161] benchmarks/LIA/LinExpr_eq1ex.sl:
+Time: 120088ms
+
+==========
+[45/161] benchmarks/LIA/LinExpr_eq2ex.sl:
+Time: 120093ms
+
+==========
+[46/161] benchmarks/LIA/LinExpr_inv1_ex.sl:
+Time: 120106ms
+
+==========
+[47/161] benchmarks/LIA/LinExpr_inv1.sl:
+Answer: "(+ x (ite (<= x y) (+ y y) (+ x y)))"
+Time: 1085ms
+
+==========
+[48/161] benchmarks/LIA/max10.sl:
+Time: 120257ms
+
+==========
+[49/161] benchmarks/LIA/max_11.sl:
+Time: 120375ms
+
+==========
+[50/161] benchmarks/LIA/max12.sl:
+Time: 120359ms
+
+==========
+[51/161] benchmarks/LIA/max13.sl:
+Time: 120385ms
+
+==========
+[52/161] benchmarks/LIA/max14.sl:
+Time: 120373ms
+
+==========
+[53/161] benchmarks/LIA/max15.sl:
+Time: 120281ms
+
+==========
+[54/161] benchmarks/LIA/max2.sl:
+Answer: "(ite (<= x y) y x)"
+Time: 147ms
+
+==========
+[55/161] benchmarks/LIA/max3.sl:
+Time: 120133ms
+
+==========
+[56/161] benchmarks/LIA/max4.sl:
+Time: 120130ms
+
+==========
+[57/161] benchmarks/LIA/max5.sl:
+Time: 120127ms
+
+==========
+[58/161] benchmarks/LIA/max6.sl:
+Time: 120131ms
+
+==========
+[59/161] benchmarks/LIA/max7.sl:
+Time: 120156ms
+
+==========
+[60/161] benchmarks/LIA/max8.sl:
+Time: 120173ms
+
+==========
+[61/161] benchmarks/LIA/max9.sl:
+Time: 120236ms
+
+==========
+[62/161] benchmarks/LIA/mpg_example1.sl:
+Time: 120158ms
+
+==========
+[63/161] benchmarks/LIA/mpg_example2.sl:
+Time: 120126ms
+
+==========
+[64/161] benchmarks/LIA/mpg_example3.sl:
+Time: 120126ms
+
+==========
+[65/161] benchmarks/LIA/mpg_example4.sl:
+Time: 120129ms
+
+==========
+[66/161] benchmarks/LIA/mpg_example5.sl:
+Time: 120128ms
+
+==========
+[67/161] benchmarks/LIA/mpg_guard1.sl:
+Time: 120130ms
+
+==========
+[68/161] benchmarks/LIA/mpg_guard2.sl:
+Time: 120129ms
+
+==========
+[69/161] benchmarks/LIA/mpg_guard3.sl:
+Time: 120134ms
+
+==========
+[70/161] benchmarks/LIA/mpg_guard4.sl:
+Time: 120132ms
+
+==========
+[71/161] benchmarks/LIA/mpg_ite1.sl:
+Time: 120123ms
+
+==========
+[72/161] benchmarks/LIA/mpg_ite2.sl:
+Time: 120127ms
+
+==========
+[73/161] benchmarks/LIA/mpg_plane1.sl:
+Answer: "(+ x y)"
+Time: 90ms
+
+==========
+[74/161] benchmarks/LIA/mpg_plane2.sl:
+Time: 120160ms
+
+==========
+[75/161] benchmarks/LIA/mpg_plane3.sl:
+Time: 120169ms
+
+==========
+[76/161] benchmarks/LIA/MPwL_d1s3.sl:
+Answer: "1"
+Time: 104ms
+
+==========
+[77/161] benchmarks/LIA/MPwL_d1s7.sl:
+Answer: "1"
+Time: 185ms
+
+==========
+[78/161] benchmarks/LIA/MPwL_d4s3.sl:
+Time: 120077ms
+
+==========
+[79/161] benchmarks/LIA/MPwL_d4s7.sl:
+Time: 120090ms
+
+==========
+[80/161] benchmarks/LIA/MPwL_d5s3.sl:
+Time: 120082ms
+
+==========
+[81/161] benchmarks/LIA/MPwL_d5s7.sl:
+Time: 120092ms
+
+==========
+[82/161] benchmarks/LIA/MPwoL_d1s3.sl:
+Answer: "1"
+Time: 102ms
+
+==========
+[83/161] benchmarks/LIA/MPwoL_d1s7.sl:
+Answer: "1"
+Time: 212ms
+
+==========
+[84/161] benchmarks/LIA/MPwoL_d4s3.sl:
+Time: 120076ms
+
+==========
+[85/161] benchmarks/LIA/MPwoL_d4s7.sl:
+Time: 120088ms
+
+==========
+[86/161] benchmarks/LIA/MPwoL_d5s3.sl:
+Time: 120086ms
+
+==========
+[87/161] benchmarks/LIA/MPwoL_d5s7.sl:
+Time: 120091ms
+
+==========
+[88/161] benchmarks/LIA/qm_area_sel_2.sl:
+Time: 120120ms
+
+==========
+[89/161] benchmarks/LIA/qm_choose_01.sl:
+Answer: "(- x (ite (< x 1) (- x 1) x))"
+Time: 122ms
+
+==========
+[90/161] benchmarks/LIA/qm_choose_yz.sl:
+Answer: "(+ x (ite (< 0 x) (- z x) (- y x)))"
+Time: 399ms
+
+==========
+[91/161] benchmarks/LIA/qm_in_range.sl:
+Time: 120113ms
+
+==========
+[92/161] benchmarks/LIA/qm_loop_1.sl:
+Answer: "(+ x (ite (< 0 x) (- 0 1) (- 3 x)))"
+Time: 289ms
+
+==========
+[93/161] benchmarks/LIA/qm_loop_2.sl:
+Time: 120120ms
+
+==========
+[94/161] benchmarks/LIA/qm_loop_3.sl:
+Time: 120121ms
+
+==========
+[95/161] benchmarks/LIA/qm_max2.sl:
+Answer: "(ite (< y x) x y)"
+Time: 117ms
+
+==========
+[96/161] benchmarks/LIA/qm_max3.sl:
+Time: 120118ms
+
+==========
+[97/161] benchmarks/LIA/qm_max4.sl:
+Time: 120120ms
+
+==========
+[98/161] benchmarks/LIA/qm_max5.sl:
+Time: 120116ms
+
+==========
+[99/161] benchmarks/LIA/qm_neg_1.sl:
+Answer: "(- x (ite (< x 0) (- x 1) x))"
+Time: 101ms
+
+==========
+[100/161] benchmarks/LIA/qm_neg_2.sl:
+Time: 120120ms
+
+==========
+[101/161] benchmarks/LIA/qm_neg_3.sl:
+Time: 120128ms
+
+==========
+[102/161] benchmarks/LIA/qm_neg_4.sl:
+Time: 120110ms
+
+==========
+[103/161] benchmarks/LIA/qm_neg_5.sl:
+Time: 120120ms
+
+==========
+[104/161] benchmarks/LIA/qm_neg_eq_1.sl:
+Answer: "(- x (ite (< x 1) (- x 1) x))"
+Time: 105ms
+
+==========
+[105/161] benchmarks/LIA/qm_neg_eq_2.sl:
+Time: 120121ms
+
+==========
+[106/161] benchmarks/LIA/qm_neg_eq_3.sl:
+Time: 120126ms
+
+==========
+[107/161] benchmarks/LIA/qm_neg_eq_4.sl:
+Time: 120132ms
+
+==========
+[108/161] benchmarks/LIA/qm_neg_eq_5.sl:
+Time: 120125ms
+
+==========
+[109/161] benchmarks/LIA/s0_d0.sl:
+Time: 120129ms
+
+==========
+[110/161] benchmarks/LIA/s0_d1.sl:
+Time: 120132ms
+
+==========
+[111/161] benchmarks/LIA/s0_d2.sl:
+Time: 120128ms
+
+==========
+[112/161] benchmarks/LIA/s0.sl:
+Time: 120190ms
+
+==========
+[113/161] benchmarks/LIA/s1.sl:
+Time: 120233ms
+
+==========
+[114/161] benchmarks/LIA/s2.sl:
+Answer: "(- 1)"
+Time: 90ms
+
+==========
+[115/161] benchmarks/LIA/s3.sl:
+Answer: "(- 1)"
+Time: 85ms
+
+==========
+[116/161] benchmarks/LIA/t10.sl:
+Answer: "(>= this.start this.total)"
+Time: 84ms
+
+==========
+[117/161] benchmarks/LIA/t11.sl:
+Answer: "(not NCK_NEQ_741360)"
+Time: 85ms
+
+==========
+[118/161] benchmarks/LIA/t12.sl:
+Answer: "(> pair.length 0)"
+Time: 86ms
+
+==========
+[119/161] benchmarks/LIA/t14.sl:
+Answer: "(> newLength 0)"
+Time: 88ms
+
+==========
+[120/161] benchmarks/LIA/t15.sl:
+Answer: "enabled"
+Time: 87ms
+
+==========
+[121/161] benchmarks/LIA/t17.sl:
+Answer: "(= j (+ 1 1))"
+Time: 86ms
+
+==========
+[122/161] benchmarks/LIA/t18.sl:
+Answer: "(>= entry 1)"
+Time: 101ms
+
+==========
+[123/161] benchmarks/LIA/t1.sl:
+Answer: "(= stopTime 1)"
+Time: 86ms
+
+==========
+[124/161] benchmarks/LIA/t20.sl:
+Answer: "(not (= 0 10))"
+Time: 89ms
+
+==========
+[125/161] benchmarks/LIA/t2.sl:
+Answer: "(> data.length 0)"
+Time: 87ms
+
+==========
+[126/161] benchmarks/LIA/t3.sl:
+Answer: "(= this.y y)"
+Time: 83ms
+
+==========
+[127/161] benchmarks/LIA/t4.sl:
+Answer: "(> x.end elem.end)"
+Time: 88ms
+
+==========
+[128/161] benchmarks/LIA/t5.sl:
+Answer: "MC_741360"
+Time: 85ms
+
+==========
+[129/161] benchmarks/LIA/t6.sl:
+Answer: "(<= i MC_741360)"
+Time: 93ms
+
+==========
+[130/161] benchmarks/LIA/t7.sl:
+Answer: "(> bufferIndex 1)"
+Time: 86ms
+
+==========
+[131/161] benchmarks/LIA/t8.sl:
+Answer: "(= x2 1)"
+Time: 85ms
+
+==========
+[132/161] benchmarks/LIA/t9.sl:
+Answer: "(>= yearInt 0)"
+Time: 86ms
+
+==========
+[133/161] benchmarks/LIA/unbdd_inv_gen_array.sl:
+Answer: "(or (<= j 0) (<= m a0))"
+Time: 364ms
+
+==========
+[134/161] benchmarks/LIA/unbdd_inv_gen_cegar2.sl:
+Time: 120086ms
+
+==========
+[135/161] benchmarks/LIA/unbdd_inv_gen_cgr1.sl:
+Answer: "(<= (- (- 1) 1) (- y x))"
+Time: 178ms
+
+==========
+[136/161] benchmarks/LIA/unbdd_inv_gen_ex14.sl:
+Answer: "(<= 1 x)"
+Time: 87ms
+
+==========
+[137/161] benchmarks/LIA/unbdd_inv_gen_ex23.sl:
+Time: 120102ms
+
+==========
+[138/161] benchmarks/LIA/unbdd_inv_gen_ex7.sl:
+Answer: "(and (<= 0 i) (<= y l))"
+Time: 504ms
+
+==========
+[139/161] benchmarks/LIA/unbdd_inv_gen_fig1.sl:
+Answer: "(or (<= x (- 1)) (<= 1 y))"
+Time: 216ms
+
+==========
+[140/161] benchmarks/LIA/unbdd_inv_gen_fig3.sl:
+Answer: "(= (- l x) (- 1 y))"
+Time: 146ms
+
+==========
+[141/161] benchmarks/LIA/unbdd_inv_gen_fig6.sl:
+Answer: "(<= 0 1)"
+Time: 85ms
+
+==========
+[142/161] benchmarks/LIA/unbdd_inv_gen_fig8.sl:
+Answer: "(= l 0)"
+Time: 85ms
+
+==========
+[143/161] benchmarks/LIA/unbdd_inv_gen_fig9.sl:
+Answer: "(and (<= x y) (= x 0))"
+Time: 134ms
+
+==========
+[144/161] benchmarks/LIA/unbdd_inv_gen_finf1.sl:
+Answer: "(= x 0)"
+Time: 90ms
+
+==========
+[145/161] benchmarks/LIA/unbdd_inv_gen_finf2.sl:
+Answer: "(= x 0)"
+Time: 92ms
+
+==========
+[146/161] benchmarks/LIA/unbdd_inv_gen_n_c11.sl:
+Answer: "(and (<= l 4) (<= 0 l))"
+Time: 6322ms
+
+==========
+[147/161] benchmarks/LIA/unbdd_inv_gen_sum1.sl:
+Time: 120086ms
+
+==========
+[148/161] benchmarks/LIA/unbdd_inv_gen_sum3.sl:
+Answer: "(= s x)"
+Time: 90ms
+
+==========
+[149/161] benchmarks/LIA/unbdd_inv_gen_sum4.sl:
+Time: 120080ms
+
+==========
+[150/161] benchmarks/LIA/unbdd_inv_gen_tcs.sl:
+Answer: "(= (- x y) (- i j))"
+Time: 451ms
+
+==========
+[151/161] benchmarks/LIA/unbdd_inv_gen_term2.sl:
+Answer: "(<= (- 1) 1)"
+Time: 92ms
+
+==========
+[152/161] benchmarks/LIA/unbdd_inv_gen_term3.sl:
+Answer: "(<= 0 y)"
+Time: 86ms
+
+==========
+[153/161] benchmarks/LIA/unbdd_inv_gen_trex1.sl:
+Answer: "(<= 1 z)"
+Time: 90ms
+
+==========
+[154/161] benchmarks/LIA/unbdd_inv_gen_trex2.sl:
+Answer: "(<= 0 1)"
+Time: 85ms
+
+==========
+[155/161] benchmarks/LIA/unbdd_inv_gen_trex4.sl:
+Answer: "(<= 0 1)"
+Time: 88ms
+
+==========
+[156/161] benchmarks/LIA/unbdd_inv_gen_vmail.sl:
+Answer: "(<= 0 i)"
+Time: 88ms
+
+==========
+[157/161] benchmarks/LIA/unbdd_inv_gen_w1.sl:
+Answer: "(<= x n)"
+Time: 85ms
+
+==========
+[158/161] benchmarks/LIA/unbdd_inv_gen_w2.sl:
+Answer: "(<= x (+ n (- 1)))"
+Time: 91ms
+
+==========
+[159/161] benchmarks/LIA/unbdd_inv_gen_winf1.sl:
+Answer: "(= x 0)"
+Time: 85ms
+
+==========
+[160/161] benchmarks/LIA/unbdd_inv_gen_winf2.sl:
+Answer: "(= x 0)"
+Time: 87ms
+
+Completed 82/161
