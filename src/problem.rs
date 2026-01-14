@@ -338,7 +338,7 @@ fn build_sygus(synth_problem: SynthProblem) -> Problem {
     }
 
     let (constraint, instvars) = {
-        time_block!("expr_to_term");
+        // time_block!("expr_to_term");
         expr_to_term(constraint, &defs, &context_vars, &progname, rettype)
     };
 
@@ -376,7 +376,7 @@ impl Problem {
 
 impl Problem {
     pub fn verify(&self, term: &Term) -> Option<Sigma> {
-        time_block!("problem.verify");
+        // time_block!("problem.verify");
         let mut query = self.context.clone();
         let retty = self.rettype.to_string();
         let progname = &self.progname;

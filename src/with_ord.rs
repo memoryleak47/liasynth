@@ -14,4 +14,3 @@ impl<T: Eq, U: Ord> Ord for WithOrd<T, U> {
         self.partial_cmp(&other).unwrap()
     }
 }
-

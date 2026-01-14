@@ -22,14 +22,16 @@ priority-queue = "2.7.0"
 hashbrown = "0.16.1"
 rand_distr = "0.5.1"
 
-[profile.release]
-debug = true
+# [profile.release]
+# lto = "thin"
+# codegen-units = 1
 
 [features]
 default = []
 ignore-grammar = []
 learned = []
 random = []
+size = []
 simple = []
 winning = []
 total = []

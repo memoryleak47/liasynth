@@ -16,7 +16,13 @@ function run() {
         echo
         echo ==========
         echo "[$i/$all] $f:"
-        timeout 10s cvc5 "$f" --force-logic=NIA
+
+	start_ts=$(date +%s%3N)
+
+        timeout 120s cvc5 "$f" --force-logic=NIA
+
+	end_ts=$(date +%s%3N)
+	echo "Time: $((end_ts - start_ts))ms"
         i=$(($i+1))
     done
 

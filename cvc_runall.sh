@@ -16,11 +16,17 @@ function run() {
         echo
         echo ==========
         echo "[$i/$all] $f:"
-        timeout 120s cvc5 "$f"
+
+	start_ts=$(date +%s%3N)
+
+        timeout 300s cvc5 "$f"
+
+	end_ts=$(date +%s%3N)
+	echo "Time: $((end_ts - start_ts))ms"
         i=$(($i+1))
     done
 
-    success=$(cat $outfile | grep unsat | wc -l)
+    success=$(grep -c "define-fun" $outfile || true)
 
     echo
     echo "Completed $success/$all"

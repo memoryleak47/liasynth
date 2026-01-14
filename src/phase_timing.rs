@@ -1,11 +1,17 @@
-use once_cell::sync::Lazy;
-use dashmap::DashMap;
-use std::sync::atomic::{AtomicBool, AtomicU64, Ordering::{Relaxed, SeqCst}};
-use std::sync::Arc;
-use std::time::Instant;
 use crate::GLOBAL_STATS;
+use dashmap::DashMap;
+use once_cell::sync::Lazy;
+use std::sync::Arc;
+use std::sync::atomic::{
+    AtomicBool, AtomicU64,
+    Ordering::{Relaxed, SeqCst},
+};
+use std::time::Instant;
 
-struct PhaseStats { ns: AtomicU64, count: AtomicU64 }
+struct PhaseStats {
+    ns: AtomicU64,
+    count: AtomicU64,
+}
 
 static PHASES: Lazy<DashMap<&'static str, Arc<PhaseStats>>> = Lazy::new(DashMap::new);
 static REPORTED: AtomicBool = AtomicBool::new(false);
@@ -15,7 +21,13 @@ pub struct PhaseTimer {
     start: Instant,
 }
 impl PhaseTimer {
-    #[inline] pub fn new(name: &'static str) -> Self { Self { name, start: Instant::now() } }
+    #[inline]
+    pub fn new(name: &'static str) -> Self {
+        Self {
+            name,
+            start: Instant::now(),
+        }
+    }
 }
 impl Drop for PhaseTimer {
     fn drop(&mut self) {
@@ -23,9 +35,12 @@ impl Drop for PhaseTimer {
         let ns = self.start.elapsed().as_nanos() as u64;
         let entry = PHASES
             .entry(self.name)
-            .or_insert_with(|| Arc::new(PhaseStats {
-                ns: AtomicU64::new(0), count: AtomicU64::new(0)
-            }))
+            .or_insert_with(|| {
+                Arc::new(PhaseStats {
+                    ns: AtomicU64::new(0),
+                    count: AtomicU64::new(0),
+                })
+            })
             .clone();
         entry.ns.fetch_add(ns, Relaxed);
         entry.count.fetch_add(1, Relaxed);
@@ -40,7 +55,9 @@ macro_rules! time_block {
 }
 
 pub fn print_timing_report_once() {
-    if REPORTED.swap(true, SeqCst) { return; }
+    if REPORTED.swap(true, SeqCst) {
+        return;
+    }
     print_timing_report();
 }
 
@@ -57,7 +74,7 @@ pub fn print_timing_report() {
     for r in PHASES.iter() {
         let s = r.value();
         let ns = s.ns.load(Relaxed);
-        let c  = s.count.load(Relaxed);
+        let c = s.count.load(Relaxed);
         total_ns += ns as u128;
         rows.push((*r.key(), ns, c));
     }
@@ -65,8 +82,12 @@ pub fn print_timing_report() {
 
     eprintln!("\n== Phase timing ==");
     for (name, ns, c) in &rows {
-        let ms  = (*ns as f64) / 1_000_000.0;
-        let pct = if total_ns == 0 { 0.0 } else { (*ns as f64) * 100.0 / (total_ns as f64) };
+        let ms = (*ns as f64) / 1_000_000.0;
+        let pct = if total_ns == 0 {
+            0.0
+        } else {
+            (*ns as f64) * 100.0 / (total_ns as f64)
+        };
         eprintln!("{:>18}: {:>10.3} ms  {:>6.2} %  (n={})", name, ms, pct, c);
     }
     let total_ms = (total_ns as f64) / 1_000_000.0;

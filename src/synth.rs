@@ -16,7 +16,7 @@ type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 6 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 4 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
@@ -141,7 +141,7 @@ pub fn synth(
 }
 
 fn run(ctxt: &mut Ctxt) -> Term {
-    time_block!("synth.run");
+    // time_block!("synth.run");
 
     // ctxt.olinr.on_curriculum_change(0.0, 1.00);
 
@@ -691,7 +691,11 @@ pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
     t
 }
 
-#[cfg(all(not(feature = "learned"), not(feature = "random")))]
+#[cfg(all(
+    not(feature = "learned"),
+    not(feature = "random"),
+    not(feature = "size")
+))]
 fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     default_heuristic(x, ctxt)
 }
@@ -801,4 +805,9 @@ fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
 #[cfg(feature = "random")]
 fn heuristic(_x: Id, _ctxt: &mut Ctxt) -> Score {
     OrderedFloat(rand::random::<f64>())
+}
+
+#[cfg(feature = "size")]
+fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
+    OrderedFloat(1.0 / ctxt.classes[x].complex as f64)
 }

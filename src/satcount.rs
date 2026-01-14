@@ -61,7 +61,7 @@ pub fn satisfy(
 }
 
 pub fn satisfy_inhouse_incr(ty: Ty, vals: &Box<[Value]>, id: usize, ctxt: &Ctxt) -> bool {
-    time_block!("satisfy_inhouse");
+    // time_block!("satisfy_inhouse");
 
     if ctxt
         .problem
@@ -95,7 +95,7 @@ pub fn satisfy_inhouse(
     ce_indices: impl IntoIterator<Item = usize>,
     ctxt: &Ctxt,
 ) -> Vec<bool> {
-    time_block!("satisfy_inhouse");
+    // time_block!("satisfy_inhouse");
 
     if ctxt.problem.nt_mapping[&Ty::NonTerminal(nt)] != ctxt.problem.rettype {
         panic!("r?");
@@ -126,7 +126,7 @@ pub fn satisfy_inhouse(
 }
 
 pub fn satisfy_z3(x: Id, ce_indices: impl IntoIterator<Item = usize>, ctxt: &Ctxt) -> Vec<bool> {
-    time_block!("satisfy_z3");
+    // time_block!("satisfy_z3");
 
     let term = &extract(x, ctxt);
     let p = &ctxt.problem;

@@ -1,6 +1,6 @@
+use crate::Ty;
 use indexmap::IndexMap;
 use std::fmt::*;
-use crate::Ty;
 
 #[derive(PartialEq, Eq, Clone)]
 pub enum SExpr {
@@ -16,12 +16,12 @@ impl Debug for SExpr {
 
 fn print(expr: &SExpr, f: &mut Formatter<'_>, indent: usize) -> Result {
     match expr {
-        SExpr::Ident(id) => write!(f, "{id}", ),
+        SExpr::Ident(id) => write!(f, "{id}",),
         SExpr::List(l) => {
             write!(f, "(")?;
             for (i, x) in l.iter().enumerate() {
-                print(x, f, indent+2);
-                if i != l.len()-1 {
+                print(x, f, indent + 2);
+                if i != l.len() - 1 {
                     write!(f, " ")?;
                 }
             }
@@ -30,7 +30,7 @@ fn print(expr: &SExpr, f: &mut Formatter<'_>, indent: usize) -> Result {
                 write!(f, " ")?;
             }
             Ok(())
-        },
+        }
     }
 }
 
@@ -53,15 +53,18 @@ pub fn tokenize(s: &str) -> Vec<Token> {
             ')' => tokens.push(Token::RParen),
             ';' => {
                 let i = s.iter().position(|c| *c == '\n').unwrap();
-                s = &s[i+1..];
-            },
-            x if x.is_whitespace() => {},
+                s = &s[i + 1..];
+            }
+            x if x.is_whitespace() => {}
             x => {
-                let i = s.iter().position(|x| x.is_whitespace() || *x == '(' || *x == ')').unwrap();
+                let i = s
+                    .iter()
+                    .position(|x| x.is_whitespace() || *x == '(' || *x == ')')
+                    .unwrap();
                 tokens.push(Token::Ident(s[0..i].iter().collect()));
                 s = &s[i..];
                 continue;
-            },
+            }
         }
         s = &s[1..];
     }
@@ -71,19 +74,21 @@ pub fn tokenize(s: &str) -> Vec<Token> {
 
 pub fn assemble(toks: &[Token]) -> Option<(SExpr, &[Token])> {
     match toks {
-        [Token::LParen, toks@..] => {
+        [Token::LParen, toks @ ..] => {
             let mut toks = toks;
             let mut subexprs = Vec::new();
             while let Some((expr, toks2)) = assemble(toks) {
                 toks = toks2;
                 subexprs.push(expr);
             }
-            if toks[0] != Token::RParen { return None; }
+            if toks[0] != Token::RParen {
+                return None;
+            }
             let toks = &toks[1..];
 
             Some((SExpr::List(subexprs), toks))
-        },
-        [Token::Ident(id), toks@..] => Some((SExpr::Ident(id.clone()), toks)),
+        }
+        [Token::Ident(id), toks @ ..] => Some((SExpr::Ident(id.clone()), toks)),
         [Token::RParen, ..] => None,
         [] => None,
     }

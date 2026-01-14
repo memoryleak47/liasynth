@@ -1,5 +1,5 @@
-use indexmap::IndexMap;
 use crate::*;
+use indexmap::IndexMap;
 
 mod sexpr;
 use sexpr::*;
@@ -96,4 +96,3 @@ pub fn parse_synth(s: &str) -> SynthProblem {
     assert!(toks.is_empty());
     build_synth(exprs)
 }
-
