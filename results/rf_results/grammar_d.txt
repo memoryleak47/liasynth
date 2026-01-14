@@ -2,569 +2,503 @@
 ==========
 [0/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010cousot9RFSynt.noassumptions.sl:
 Answer: (ite (= arg2 arg1) (ite (< arg0 0) (- arg1 arg0) arg0) (ite (= arg2 arg0) arg0 (- arg0)))
-Time: 15013ms
+Time: 12758ms
 
 ==========
 [1/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010easy1RFSynt.noassumptions.sl:
 Answer: (+ (- (- arg0 arg1) arg0) arg2)
-Time: 3914ms
+Time: 5686ms
 
 ==========
 [2/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010easy21RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 4053ms
+Time: 5083ms
 
 ==========
 [3/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010easy22RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 3425ms
+Time: 3203ms
 
 ==========
 [4/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010ndecrRFSynt.noassumptions.sl:
 Answer: arg1
-Time: 3413ms
+Time: 5815ms
 
 ==========
 [5/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010speedpldi2RFSynt.noassumptions.sl:
 Answer: (+ arg2 arg3)
-Time: 4731ms
+Time: 4424ms
 
 ==========
 [6/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010speedpldi3RFSynt.noassumptions.sl:
 Answer: (+ arg2 arg3)
-Time: 5154ms
+Time: 7539ms
 
 ==========
 [7/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010speedpldi4RFSynt.noassumptions.sl:
-Time: 124876ms
+Time: 126189ms
 
 ==========
 [8/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010terminateRFSynt.noassumptions.sl:
-Time: 123104ms
+Time: 123120ms
 
 ==========
 [9/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010wiseRFSynt.noassumptions.sl:
 Answer: (ite (< arg0 arg1) (- arg1 arg0) (- arg0 arg1))
-Time: 2975ms
+Time: 3030ms
 
 ==========
 [10/106] examples/RF_no_assumptions/AviadRFSynt.noassumptions.sl:
-
-thread 'main' (4057144) panicked at src/parser/build.rs:248:17:
-invalid op: /
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3004ms
+Answer: arg1
+Time: 3157ms
 
 ==========
 [11/106] examples/RF_no_assumptions/BradleyMannaSipmaCAV2005Fig1RFSynt.noassumptions.sl:
 Answer: (+ arg0 arg1)
-Time: 3363ms
+Time: 4049ms
 
 ==========
 [12/106] examples/RF_no_assumptions/BrockschmidtCookFuhsCAV2013IntroductionRFSynt.noassumptions.sl:
 Answer: arg0
-Time: 3470ms
+Time: 3894ms
 
 ==========
 [13/106] examples/RF_no_assumptions/ChawdharyCookGulwaniSagivYangESOP2008easy1RFSynt.noassumptions.sl:
 Answer: (+ (- (- arg0 arg1) arg0) arg2)
-Time: 3655ms
+Time: 4037ms
 
 ==========
 [14/106] examples/RF_no_assumptions/ChawdharyCookGulwaniSagivYangESOP2008easy2RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 4159ms
+Time: 3926ms
 
 ==========
 [15/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex101RFSynt.noassumptions.sl:
 Answer: (ite (= (- (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (+ (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) 1 (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (+ (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (- (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0))))))) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) 1 (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (+ (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (- (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0))))))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0))))))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (+ (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (+ (- (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) 1 (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (+ (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (- (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0))))))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0))))))) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (- (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))))))) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (- (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) 1 (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (+ (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (- (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0))))))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)) (ite (< 1 (- (ite (< arg0 0) 1 arg0) 1)) (- (ite (< arg0 0) 1 arg0) 1) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) (ite (not (< 1 (- (ite (< arg0 0) 1 arg0) 1))) (- 1 (ite (< 0 arg0) 0 arg0)) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0)))) (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) (- (- 1 (ite (< 0 arg0) 0 arg0)) (- (ite (< 0 arg0) 0 arg0) (ite (< arg0 0) 1 arg0))) (ite (< 0 arg0) 0 arg0)))))))) arg0 (ite (= (- (ite (< arg0 0) 1 arg0) 1) 1) 1 (ite (< 0 arg0) 0 arg0)))
-Time: 4462ms
+Time: 4860ms
 
 ==========
 [16/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex201RFSynt.noassumptions.sl:
-Time: 124563ms
+Time: 124799ms
 
 ==========
 [17/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex206RFSynt.noassumptions.sl:
-Time: 123498ms
+Time: 123042ms
 
 ==========
 [18/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex207RFSynt.noassumptions.sl:
 Answer: (- arg1 arg0)
-Time: 3016ms
+Time: 2935ms
 
 ==========
 [19/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex208RFSynt.noassumptions.sl:
-Time: 122870ms
+Time: 123075ms
 
 ==========
 [20/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex209RFSynt.noassumptions.sl:
-
-thread 'main' (4065614) panicked at src/parser/build.rs:248:17:
-invalid op: +
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2753ms
+Answer: (- arg2 arg0)
+Time: 2937ms
 
 ==========
 [21/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex210RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 2795ms
+Time: 2940ms
 
 ==========
 [22/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex213RFSynt.noassumptions.sl:
 Answer: (- (- arg0 arg1) arg0)
-Time: 2950ms
+Time: 3011ms
 
 ==========
 [23/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex216RFSynt.noassumptions.sl:
 Answer: (ite (< 0 arg1) (+ arg1 1) arg0)
-Time: 3396ms
+Time: 3424ms
 
 ==========
 [24/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex218RFSynt.noassumptions.sl:
-
-thread 'main' (4066154) panicked at src/parser/build.rs:248:17:
-invalid op: +
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3335ms
+Time: 123404ms
 
 ==========
 [25/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex219RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 3782ms
+Time: 2929ms
 
 ==========
 [26/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex221RFSynt.noassumptions.sl:
-Time: 123604ms
+Time: 122874ms
 
 ==========
 [27/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex301RFSynt.noassumptions.sl:
 Answer: (+ (- arg1 arg0) (ite (< arg2 arg1) 1 (- arg2 arg1)))
-Time: 2933ms
+Time: 2923ms
 
 ==========
 [28/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex303RFSynt.noassumptions.sl:
-Time: 122913ms
+Time: 122954ms
 
 ==========
 [29/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex304RFSynt.noassumptions.sl:
 Answer: (- arg2 arg0)
-Time: 2890ms
+Time: 2968ms
 
 ==========
 [30/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex305RFSynt.noassumptions.sl:
 Answer: (ite (< arg1 (- 1 arg0)) arg0 (- arg2 arg0))
-Time: 2854ms
+Time: 2961ms
 
 ==========
 [31/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex307RFSynt.noassumptions.sl:
-Time: 122917ms
+Time: 122965ms
 
 ==========
 [32/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex308RFSynt.noassumptions.sl:
 Answer: (- (- arg0 arg1) arg0)
-Time: 2891ms
+Time: 2876ms
 
 ==========
 [33/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex310RFSynt.noassumptions.sl:
-
-thread 'main' (4072782) panicked at src/parser/build.rs:248:17:
-invalid op: +
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2834ms
+Answer: (+ arg1 arg0)
+Time: 2938ms
 
 ==========
 [34/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex401RFSynt.noassumptions.sl:
-Time: 122885ms
+Time: 122952ms
 
 ==========
 [35/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Fig1RFSynt.noassumptions.sl:
-Time: 123038ms
+Time: 123501ms
 
 ==========
 [36/106] examples/RF_no_assumptions/ColonSipmaTACAS2001Fig1RFSynt.noassumptions.sl:
 Answer: (+ (- arg1 arg2) 1)
-Time: 3146ms
+Time: 3028ms
 
 ==========
 [37/106] examples/RF_no_assumptions/CookSeeZulegerTACAS2013Fig8aRFSynt.noassumptions.sl:
 Answer: (ite (< arg0 0) (- (ite (or (= arg0 0) (< 1 arg0)) (- (ite (< arg0 0) 1 arg0) 1) (ite (< arg0 0) 1 arg0)) arg0) (ite (< arg0 0) 1 arg0))
-Time: 3028ms
+Time: 2945ms
 
 ==========
 [38/106] examples/RF_no_assumptions/CookSeeZulegerTACAS2013Fig8bRFSynt.noassumptions.sl:
 Answer: (ite (< arg1 arg0) arg0 (- arg1 arg0))
-Time: 2954ms
+Time: 3339ms
 
 ==========
 [39/106] examples/RF_no_assumptions/CountUpRoundRFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 2903ms
+Time: 2918ms
 
 ==========
 [40/106] examples/RF_no_assumptions/DivMinusRFSynt.noassumptions.sl:
 Answer: arg0
-Time: 2892ms
+Time: 2972ms
 
 ==========
 [41/106] examples/RF_no_assumptions/DynamiteEx2VarsRFSynt.noassumptions.sl:
-Time: 123433ms
+Time: 122951ms
 
 ==========
 [42/106] examples/RF_no_assumptions/DynamiteExampleRFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 2909ms
+Time: 2903ms
 
 ==========
 [43/106] examples/RF_no_assumptions/DynamiteExampleX4RFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 2896ms
+Time: 2906ms
 
 ==========
 [44/106] examples/RF_no_assumptions/DynExUpTo2VarsConjRFSynt.noassumptions.sl:
 Answer: (- arg0 arg2)
-Time: 2941ms
+Time: 2912ms
 
 ==========
 [45/106] examples/RF_no_assumptions/DynExUpTo2VarsDisjRFSynt.noassumptions.sl:
 Answer: (ite (< arg0 arg1) (ite (not (< (- arg0 arg2) arg2)) (+ (- arg0 arg2) arg1) (- (+ (- arg0 arg2) arg1) arg0)) (+ (- arg0 arg2) 1))
-Time: 3991ms
+Time: 3400ms
 
 ==========
 [46/106] examples/RF_no_assumptions/DynExUpTo3VarsDisjRFSynt.noassumptions.sl:
-
-thread 'main' (4080246) panicked at src/parser/build.rs:248:17:
-invalid op: or
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2903ms
+Time: 122959ms
 
 ==========
 [47/106] examples/RF_no_assumptions/DynExUpTo4VarsDisjRFSynt.noassumptions.sl:
-
-thread 'main' (4080417) panicked at src/parser/build.rs:248:17:
-invalid op: or
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3304ms
+Time: 123027ms
 
 ==========
 [48/106] examples/RF_no_assumptions/GCD5RFSynt.noassumptions.sl:
-Time: 123869ms
+Time: 123490ms
 
 ==========
 [49/106] examples/RF_no_assumptions/GenadyRFSynt.noassumptions.sl:
 Answer: arg0
-Time: 2952ms
+Time: 3464ms
 
 ==========
 [50/106] examples/RF_no_assumptions/GopanRepsCAV2006Fig1aRFSynt.noassumptions.sl:
-Time: 122990ms
+Time: 123546ms
 
 ==========
 [51/106] examples/RF_no_assumptions/GulavaniGulwaniCAV2008Fig1aRFSynt.noassumptions.sl:
-Time: 123510ms
+Time: 123415ms
 
 ==========
 [52/106] examples/RF_no_assumptions/GulavaniGulwaniCAV2008Fig1cRFSynt.noassumptions.sl:
 Answer: (- arg2 arg0)
-Time: 2947ms
+Time: 2965ms
 
 ==========
 [53/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig1RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 3387ms
+Time: 2911ms
 
 ==========
 [54/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig2RFSynt.noassumptions.sl:
-
-thread 'main' (4086710) panicked at src/parser/build.rs:248:17:
-invalid op: /
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3310ms
+Answer: arg1
+Time: 2943ms
 
 ==========
 [55/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig4RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 3497ms
+Time: 2887ms
 
 ==========
 [56/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig5RFSynt.noassumptions.sl:
-
-thread 'main' (4086997) panicked at src/parser/build.rs:248:17:
-invalid op: /
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2973ms
+Answer: arg0
+Time: 3615ms
 
 ==========
 [57/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig8RFSynt.noassumptions.sl:
-
-thread 'main' (4087168) panicked at src/parser/build.rs:248:17:
-invalid op: +
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3507ms
+Answer: arg0
+Time: 3743ms
 
 ==========
 [58/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig9RFSynt.noassumptions.sl:
-
-thread 'main' (4087338) panicked at src/parser/build.rs:248:17:
-invalid op: +
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3483ms
+Answer: arg0
+Time: 3817ms
 
 ==========
 [59/106] examples/RF_no_assumptions/KroeningSharyginaTsitovichWintersteigerCAV2010Fig1RFSynt.noassumptions.sl:
-Time: 123756ms
+Time: 123943ms
 
 ==========
 [60/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Ex1RFSynt.noassumptions.sl:
-
-thread 'main' (4089862) panicked at src/parser/build.rs:248:17:
-invalid op: +
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2938ms
+Answer: arg0
+Time: 3336ms
 
 ==========
 [61/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Ex7RFSynt.noassumptions.sl:
-
-thread 'main' (4089947) panicked at src/parser/build.rs:248:17:
-invalid op: +
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2940ms
+Answer: (+ (+ arg0 arg1) arg0)
+Time: 2953ms
 
 ==========
 [62/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Ex9RFSynt.noassumptions.sl:
-
-thread 'main' (4090032) panicked at src/parser/build.rs:248:17:
-invalid op: and
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2968ms
+Answer: (+ arg0 arg1)
+Time: 3498ms
 
 ==========
 [63/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Fig1RFSynt.noassumptions.sl:
-Time: 123007ms
+Time: 122980ms
 
 ==========
 [64/106] examples/RF_no_assumptions/LeikeHeizmannWST2014Ex9RFSynt.noassumptions.sl:
-
-thread 'main' (4091397) panicked at src/parser/build.rs:248:17:
-invalid op: /
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2835ms
+Answer: arg0
+Time: 3338ms
 
 ==========
 [65/106] examples/RF_no_assumptions/LogBuiltInRFSynt.noassumptions.sl:
-
-thread 'main' (4091482) panicked at src/parser/build.rs:248:17:
-invalid op: /
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2901ms
+Answer: arg0
+Time: 3459ms
 
 ==========
 [66/106] examples/RF_no_assumptions/LogIterativeRFSynt.noassumptions.sl:
-
-thread 'main' (4091567) panicked at src/parser/build.rs:248:17:
-invalid op: /
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2901ms
+Answer: arg0
+Time: 3042ms
 
 ==========
 [67/106] examples/RF_no_assumptions/LogMultRFSynt.noassumptions.sl:
-Time: 122975ms
+Time: 123015ms
 
 ==========
 [68/106] examples/RF_no_assumptions/MasseVMCAI2014Ex6RFSynt.noassumptions.sl:
-Time: 122906ms
+Time: 122932ms
 
 ==========
 [69/106] examples/RF_no_assumptions/MasseVMCAI2014Fig1aRFSynt.noassumptions.sl:
-Time: 123547ms
+Time: 123487ms
 
 ==========
 [70/106] examples/RF_no_assumptions/McCarthyIterativeRFSynt.noassumptions.sl:
-Time: 123430ms
+Time: 123719ms
 
 ==========
 [71/106] examples/RF_no_assumptions/MinusBuiltInRFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 3788ms
+Time: 3581ms
 
 ==========
 [72/106] examples/RF_no_assumptions/MultDisjRFSynt.noassumptions.sl:
-Time: 124003ms
+Time: 123493ms
 
 ==========
 [73/106] examples/RF_no_assumptions/NoriSharmaFSE2013Fig7RFSynt.noassumptions.sl:
 Answer: (- arg4 arg0)
-Time: 2945ms
+Time: 3884ms
 
 ==========
 [74/106] examples/RF_no_assumptions/NoriSharmaFSE2013Fig8RFSynt.noassumptions.sl:
 Answer: (- (+ (- arg2 arg1) arg4) arg6)
-Time: 3032ms
+Time: 4032ms
 
 ==========
 [75/106] examples/RF_no_assumptions/PastaA10RFSynt.noassumptions.sl:
 Answer: (ite (< arg0 arg1) (- arg1 arg0) (- arg0 arg1))
-Time: 2982ms
+Time: 3606ms
 
 ==========
 [76/106] examples/RF_no_assumptions/PastaA4RFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 3379ms
+Time: 3408ms
 
 ==========
 [77/106] examples/RF_no_assumptions/PastaA5RFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 3062ms
+Time: 3959ms
 
 ==========
 [78/106] examples/RF_no_assumptions/PastaA6RFSynt.noassumptions.sl:
 Answer: (- (- arg0 arg1) arg2)
-Time: 3041ms
+Time: 4234ms
 
 ==========
 [79/106] examples/RF_no_assumptions/PastaA7RFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 3540ms
+Time: 4075ms
 
 ==========
 [80/106] examples/RF_no_assumptions/PastaA9RFSynt.noassumptions.sl:
 Answer: (- arg0 arg2)
-Time: 3258ms
+Time: 3393ms
 
 ==========
 [81/106] examples/RF_no_assumptions/PastaB10RFSynt.noassumptions.sl:
-
-thread 'main' (4103462) panicked at src/parser/build.rs:248:17:
-invalid op: and
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3313ms
+Answer: (+ arg0 arg1)
+Time: 3461ms
 
 ==========
 [82/106] examples/RF_no_assumptions/PastaB11RFSynt.noassumptions.sl:
-
-thread 'main' (4103714) panicked at src/parser/build.rs:248:17:
-invalid op: and
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3983ms
+Answer: (+ arg0 arg1)
+Time: 3509ms
 
 ==========
 [83/106] examples/RF_no_assumptions/PastaB12RFSynt.noassumptions.sl:
-
-thread 'main' (4103994) panicked at src/parser/build.rs:248:17:
-invalid op: and
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3876ms
+Answer: (+ (ite (< arg0 0) arg1 arg0) (ite (< 0 arg1) arg1 arg0))
+Time: 2943ms
 
 ==========
 [84/106] examples/RF_no_assumptions/PastaB13RFSynt.noassumptions.sl:
-
-thread 'main' (4104306) panicked at src/parser/build.rs:248:17:
-invalid op: and
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 4664ms
+Answer: (+ (ite (< arg0 arg2) (- arg1 arg2) (- arg0 arg2)) (- (ite (< arg0 arg1) arg1 arg0) arg2))
+Time: 6257ms
 
 ==========
 [85/106] examples/RF_no_assumptions/PastaB1RFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 3965ms
+Time: 3245ms
 
 ==========
 [86/106] examples/RF_no_assumptions/PastaB2RFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 4002ms
+Time: 3459ms
 
 ==========
 [87/106] examples/RF_no_assumptions/PastaB3RFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 3854ms
+Time: 3299ms
 
 ==========
 [88/106] examples/RF_no_assumptions/PastaB4RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 3884ms
+Time: 3275ms
 
 ==========
 [89/106] examples/RF_no_assumptions/PastaB5RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 4380ms
+Time: 2935ms
 
 ==========
 [90/106] examples/RF_no_assumptions/PastaB6RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 4565ms
+Time: 2891ms
 
 ==========
 [91/106] examples/RF_no_assumptions/PastaB7RFSynt.noassumptions.sl:
 Answer: (- arg0 arg2)
-Time: 4389ms
+Time: 2904ms
 
 ==========
 [92/106] examples/RF_no_assumptions/PastaB8RFSynt.noassumptions.sl:
-
-thread 'main' (4106546) panicked at src/parser/build.rs:248:17:
-invalid op: /
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3971ms
+Answer: arg0
+Time: 2831ms
 
 ==========
 [93/106] examples/RF_no_assumptions/PastaC3RFSynt.noassumptions.sl:
 Answer: (+ (+ (- (ite (< 1 (- arg2 arg0)) 1 (- arg0 arg2)) arg0) (+ (+ (- 1 arg0) 1) arg1)) arg1)
-Time: 105947ms
+Time: 106155ms
 
 ==========
 [94/106] examples/RF_no_assumptions/PastaC5RFSynt.noassumptions.sl:
 Answer: (+ arg0 arg1)
-Time: 2929ms
+Time: 3286ms
 
 ==========
 [95/106] examples/RF_no_assumptions/PastaC7RFSynt.noassumptions.sl:
 Answer: (- arg3 arg1)
-Time: 2972ms
+Time: 3175ms
 
 ==========
 [96/106] examples/RF_no_assumptions/PlusSwapRFSynt.noassumptions.sl:
-Time: 123005ms
+Time: 123374ms
 
 ==========
 [97/106] examples/RF_no_assumptions/PodelskiRybalchenkoTACAS2011Fig1RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 2950ms
+Time: 2990ms
 
 ==========
 [98/106] examples/RF_no_assumptions/PodelskiRybalchenkoVMCAI2004Ex2RFSynt.noassumptions.sl:
-Time: 123376ms
+Time: 123515ms
 
 ==========
 [99/106] examples/RF_no_assumptions/Poly2VarsCondBreakRFSynt.noassumptions.sl:
 Answer: (- arg0 arg2)
-Time: 2983ms
+Time: 3059ms
 
 ==========
 [100/106] examples/RF_no_assumptions/PolyClosingInRFSynt.noassumptions.sl:
 Answer: arg1
-Time: 3004ms
+Time: 3064ms
 
 ==========
 [101/106] examples/RF_no_assumptions/Round3RFSynt.noassumptions.sl:
-Time: 123978ms
+Time: 124500ms
 
 ==========
 [102/106] examples/RF_no_assumptions/Square2VarsDisjRFSynt.noassumptions.sl:
 Answer: (ite (< arg0 arg2) (ite (not (< arg1 (- arg0 arg2))) (- (+ (ite (= (- arg0 arg2) arg2) arg2 (- arg0 arg3)) arg1) arg0) (- arg0 arg2)) (ite (< arg0 arg1) (+ (- arg0 arg2) arg1) (+ (- arg0 arg2) arg0)))
-Time: 12207ms
+Time: 10931ms
 
 ==========
 [103/106] examples/RF_no_assumptions/SquareDisj2VarsRFSynt.noassumptions.sl:
 Answer: (ite (not (< arg0 arg1)) (+ (- arg0 arg1) arg0) (- arg0 arg2))
-Time: 3568ms
+Time: 3043ms
 
 ==========
 [104/106] examples/RF_no_assumptions/TwoPol4VarsConjRFSynt.noassumptions.sl:
 Answer: (- arg0 arg2)
-Time: 3418ms
+Time: 2867ms
 
 ==========
 [105/106] examples/RF_no_assumptions/TwoPol4VarsDisjRFSynt.noassumptions.sl:
-Time: 123417ms
+Time: 122974ms
 
-Completed 60/106
+Completed 78/106

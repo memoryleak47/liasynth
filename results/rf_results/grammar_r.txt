@@ -1,564 +1,505 @@
 
 ==========
 [0/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010cousot9RFSynt.noassumptions.sl:
-Time: 134393ms
+Time: 131893ms
 
 ==========
 [1/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010easy1RFSynt.noassumptions.sl:
-Answer: (+ (- 0 arg1) arg2)
-Time: 4118ms
+Answer: (- arg2 arg1)
+Time: 3078ms
 
 ==========
 [2/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010easy21RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 4015ms
+Time: 2993ms
 
 ==========
 [3/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010easy22RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 4015ms
+Time: 3035ms
 
 ==========
 [4/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010ndecrRFSynt.noassumptions.sl:
 Answer: arg1
-Time: 4099ms
+Time: 3113ms
 
 ==========
 [5/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010speedpldi2RFSynt.noassumptions.sl:
-Answer: (- arg2 (- (+ arg0 1) arg3))
-Time: 3841ms
+Answer: (+ (- arg2 arg0) arg3)
+Time: 3066ms
 
 ==========
 [6/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010speedpldi3RFSynt.noassumptions.sl:
-Answer: (+ arg3 arg2)
-Time: 4083ms
+Answer: (- arg3 (- 1 arg2))
+Time: 3053ms
 
 ==========
 [7/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010speedpldi4RFSynt.noassumptions.sl:
-Time: 123861ms
+Time: 123652ms
 
 ==========
 [8/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010terminateRFSynt.noassumptions.sl:
 memory allocation of 21474836480 bytes failed
 timeout: the monitored command dumped core
-./runall_dir.sh: line 12: 4056940 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
-Time: 95904ms
+./runall_dir.sh: line 12: 210125 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 63349ms
 
 ==========
 [9/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010wiseRFSynt.noassumptions.sl:
-Time: 124020ms
+Time: 124203ms
 
 ==========
 [10/106] examples/RF_no_assumptions/AviadRFSynt.noassumptions.sl:
-
-thread 'main' (4062792) panicked at src/parser/build.rs:248:17:
-invalid op: /
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3511ms
+Answer: arg1
+Time: 2909ms
 
 ==========
 [11/106] examples/RF_no_assumptions/BradleyMannaSipmaCAV2005Fig1RFSynt.noassumptions.sl:
-Answer: (- arg0 (- 1 arg1))
-Time: 2941ms
+Answer: (+ arg0 arg1)
+Time: 2997ms
 
 ==========
 [12/106] examples/RF_no_assumptions/BrockschmidtCookFuhsCAV2013IntroductionRFSynt.noassumptions.sl:
 Answer: arg0
-Time: 2986ms
+Time: 3238ms
 
 ==========
 [13/106] examples/RF_no_assumptions/ChawdharyCookGulwaniSagivYangESOP2008easy1RFSynt.noassumptions.sl:
 Answer: (- arg2 arg1)
-Time: 2947ms
+Time: 3182ms
 
 ==========
 [14/106] examples/RF_no_assumptions/ChawdharyCookGulwaniSagivYangESOP2008easy2RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 3005ms
+Time: 3037ms
 
 ==========
 [15/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex101RFSynt.noassumptions.sl:
-Time: 123516ms
+Time: 123807ms
 
 ==========
 [16/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex201RFSynt.noassumptions.sl:
-Time: 124210ms
+Time: 123270ms
 
 ==========
 [17/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex206RFSynt.noassumptions.sl:
-Time: 123987ms
+Time: 124026ms
 
 ==========
 [18/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex207RFSynt.noassumptions.sl:
-Answer: (- arg1 (+ 1 arg0))
-Time: 3989ms
+Answer: (+ (- 1 arg0) arg1)
+Time: 3497ms
 
 ==========
 [19/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex208RFSynt.noassumptions.sl:
-Time: 124593ms
+Time: 124249ms
 
 ==========
 [20/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex209RFSynt.noassumptions.sl:
-
-thread 'main' (4071588) panicked at src/parser/build.rs:248:17:
-invalid op: +
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3402ms
+Answer: (- arg2 arg0)
+Time: 3378ms
 
 ==========
 [21/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex210RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 3360ms
+Time: 3042ms
 
 ==========
 [22/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex213RFSynt.noassumptions.sl:
 Answer: (- 0 arg1)
-Time: 3389ms
+Time: 3473ms
 
 ==========
 [23/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex216RFSynt.noassumptions.sl:
-Time: 123930ms
+Answer: (ite (< arg1 arg0) arg0 (+ arg1 1))
+Time: 3878ms
 
 ==========
 [24/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex218RFSynt.noassumptions.sl:
-
-thread 'main' (4073897) panicked at src/parser/build.rs:248:17:
-invalid op: +
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3442ms
+Time: 123154ms
 
 ==========
 [25/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex219RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 4785ms
+Time: 3507ms
 
 ==========
 [26/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex221RFSynt.noassumptions.sl:
-Answer: (+ (- arg1 (- 1 arg0)) arg0)
-Time: 4920ms
+Answer: (+ (+ arg0 arg1) arg0)
+Time: 3124ms
 
 ==========
 [27/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex301RFSynt.noassumptions.sl:
-Time: 125439ms
+Time: 123255ms
 
 ==========
 [28/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex303RFSynt.noassumptions.sl:
-Time: 123863ms
+Time: 123427ms
 
 ==========
 [29/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex304RFSynt.noassumptions.sl:
 Answer: (- arg2 arg0)
-Time: 3500ms
+Time: 3291ms
 
 ==========
 [30/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex305RFSynt.noassumptions.sl:
-Answer: (- (+ arg2 1) arg1)
-Time: 3547ms
+Time: 123809ms
 
 ==========
 [31/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex307RFSynt.noassumptions.sl:
-Time: 123506ms
+Time: 123632ms
 
 ==========
 [32/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex308RFSynt.noassumptions.sl:
-Answer: (- arg1)
-Time: 2971ms
+Answer: (- arg2)
+Time: 2858ms
 
 ==========
 [33/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex310RFSynt.noassumptions.sl:
-
-thread 'main' (4081158) panicked at src/parser/build.rs:248:17:
-invalid op: +
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2913ms
+Answer: (+ arg1 arg0)
+Time: 2912ms
 
 ==========
 [34/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex401RFSynt.noassumptions.sl:
-Time: 123286ms
+Time: 123536ms
 
 ==========
 [35/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Fig1RFSynt.noassumptions.sl:
-Time: 123402ms
+Time: 123597ms
 
 ==========
 [36/106] examples/RF_no_assumptions/ColonSipmaTACAS2001Fig1RFSynt.noassumptions.sl:
-Time: 123266ms
+Answer: (+ (- 1 arg2) arg1)
+Time: 3091ms
 
 ==========
 [37/106] examples/RF_no_assumptions/CookSeeZulegerTACAS2013Fig8aRFSynt.noassumptions.sl:
-Time: 123685ms
+Time: 123734ms
 
 ==========
 [38/106] examples/RF_no_assumptions/CookSeeZulegerTACAS2013Fig8bRFSynt.noassumptions.sl:
-Time: 123219ms
+Time: 123506ms
 
 ==========
 [39/106] examples/RF_no_assumptions/CountUpRoundRFSynt.noassumptions.sl:
-Answer: (- (+ (- 0 1) arg0) arg1)
-Time: 3402ms
+Answer: (- arg0 arg1)
+Time: 3434ms
 
 ==========
 [40/106] examples/RF_no_assumptions/DivMinusRFSynt.noassumptions.sl:
 Answer: arg0
-Time: 2955ms
+Time: 3116ms
 
 ==========
 [41/106] examples/RF_no_assumptions/DynamiteEx2VarsRFSynt.noassumptions.sl:
-Time: 123477ms
+Time: 123794ms
 
 ==========
 [42/106] examples/RF_no_assumptions/DynamiteExampleRFSynt.noassumptions.sl:
-Answer: (- (- arg0 1) arg1)
-Time: 2927ms
+Answer: (- (+ 1 arg0) arg1)
+Time: 4056ms
 
 ==========
 [43/106] examples/RF_no_assumptions/DynamiteExampleX4RFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 3002ms
+Time: 4213ms
 
 ==========
 [44/106] examples/RF_no_assumptions/DynExUpTo2VarsConjRFSynt.noassumptions.sl:
-Answer: (- arg1 arg2)
-Time: 2929ms
+Answer: (- arg0 arg2)
+Time: 3451ms
 
 ==========
 [45/106] examples/RF_no_assumptions/DynExUpTo2VarsDisjRFSynt.noassumptions.sl:
-Time: 123460ms
+Time: 124081ms
 
 ==========
 [46/106] examples/RF_no_assumptions/DynExUpTo3VarsDisjRFSynt.noassumptions.sl:
-
-thread 'main' (4095580) panicked at src/parser/build.rs:248:17:
-invalid op: or
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2919ms
+Time: 124612ms
 
 ==========
 [47/106] examples/RF_no_assumptions/DynExUpTo4VarsDisjRFSynt.noassumptions.sl:
-
-thread 'main' (4095665) panicked at src/parser/build.rs:248:17:
-invalid op: or
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2826ms
+memory allocation of 512 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 247434 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 103900ms
 
 ==========
 [48/106] examples/RF_no_assumptions/GCD5RFSynt.noassumptions.sl:
-Time: 123236ms
+Time: 123398ms
 
 ==========
 [49/106] examples/RF_no_assumptions/GenadyRFSynt.noassumptions.sl:
 Answer: arg0
-Time: 2864ms
+Time: 2956ms
 
 ==========
 [50/106] examples/RF_no_assumptions/GopanRepsCAV2006Fig1aRFSynt.noassumptions.sl:
-Time: 123465ms
+Time: 123569ms
 
 ==========
 [51/106] examples/RF_no_assumptions/GulavaniGulwaniCAV2008Fig1aRFSynt.noassumptions.sl:
-Time: 124131ms
+Time: 123703ms
 
 ==========
 [52/106] examples/RF_no_assumptions/GulavaniGulwaniCAV2008Fig1cRFSynt.noassumptions.sl:
 Answer: (- arg2 arg0)
-Time: 4682ms
+Time: 3002ms
 
 ==========
 [53/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig1RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 4094ms
+Time: 2926ms
 
 ==========
 [54/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig2RFSynt.noassumptions.sl:
-
-thread 'main' (4104701) panicked at src/parser/build.rs:248:17:
-invalid op: /
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3683ms
+Answer: arg1
+Time: 2980ms
 
 ==========
 [55/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig4RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 4433ms
+Time: 2976ms
 
 ==========
 [56/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig5RFSynt.noassumptions.sl:
-
-thread 'main' (4105248) panicked at src/parser/build.rs:248:17:
-invalid op: /
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3992ms
+Answer: arg0
+Time: 2870ms
 
 ==========
 [57/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig8RFSynt.noassumptions.sl:
-
-thread 'main' (4105525) panicked at src/parser/build.rs:248:17:
-invalid op: +
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 4013ms
+Answer: arg0
+Time: 2922ms
 
 ==========
 [58/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig9RFSynt.noassumptions.sl:
-
-thread 'main' (4105859) panicked at src/parser/build.rs:248:17:
-invalid op: +
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 4382ms
+Answer: arg0
+Time: 2996ms
 
 ==========
 [59/106] examples/RF_no_assumptions/KroeningSharyginaTsitovichWintersteigerCAV2010Fig1RFSynt.noassumptions.sl:
-Time: 124947ms
+Time: 124161ms
 
 ==========
 [60/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Ex1RFSynt.noassumptions.sl:
-
-thread 'main' (4110059) panicked at src/parser/build.rs:248:17:
-invalid op: +
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2862ms
+Answer: arg0
+Time: 4051ms
 
 ==========
 [61/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Ex7RFSynt.noassumptions.sl:
-
-thread 'main' (4110144) panicked at src/parser/build.rs:248:17:
-invalid op: +
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2951ms
+Answer: (+ (+ arg0 arg1) arg0)
+Time: 3541ms
 
 ==========
 [62/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Ex9RFSynt.noassumptions.sl:
-
-thread 'main' (4110229) panicked at src/parser/build.rs:248:17:
-invalid op: and
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2927ms
+Answer: (+ arg0 arg1)
+Time: 3522ms
 
 ==========
 [63/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Fig1RFSynt.noassumptions.sl:
 memory allocation of 21474836480 bytes failed
 timeout: the monitored command dumped core
-./runall_dir.sh: line 12: 4110346 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
-Time: 87937ms
+./runall_dir.sh: line 12: 261179 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 91333ms
 
 ==========
 [64/106] examples/RF_no_assumptions/LeikeHeizmannWST2014Ex9RFSynt.noassumptions.sl:
-
-thread 'main' (4111256) panicked at src/parser/build.rs:248:17:
-invalid op: /
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2852ms
+Answer: arg0
+Time: 2937ms
 
 ==========
 [65/106] examples/RF_no_assumptions/LogBuiltInRFSynt.noassumptions.sl:
-
-thread 'main' (4111341) panicked at src/parser/build.rs:248:17:
-invalid op: /
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2924ms
+Answer: arg0
+Time: 3515ms
 
 ==========
 [66/106] examples/RF_no_assumptions/LogIterativeRFSynt.noassumptions.sl:
-
-thread 'main' (4111426) panicked at src/parser/build.rs:248:17:
-invalid op: /
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2976ms
+Answer: arg0
+Time: 3277ms
 
 ==========
 [67/106] examples/RF_no_assumptions/LogMultRFSynt.noassumptions.sl:
-Time: 123351ms
+Time: 124084ms
 
 ==========
 [68/106] examples/RF_no_assumptions/MasseVMCAI2014Ex6RFSynt.noassumptions.sl:
-Time: 123181ms
+Time: 123899ms
 
 ==========
 [69/106] examples/RF_no_assumptions/MasseVMCAI2014Fig1aRFSynt.noassumptions.sl:
-Time: 123775ms
+Time: 123344ms
 
 ==========
 [70/106] examples/RF_no_assumptions/McCarthyIterativeRFSynt.noassumptions.sl:
-Time: 123994ms
+Time: 123012ms
 
 ==========
 [71/106] examples/RF_no_assumptions/MinusBuiltInRFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 3006ms
+Time: 3444ms
 
 ==========
 [72/106] examples/RF_no_assumptions/MultDisjRFSynt.noassumptions.sl:
-Time: 123481ms
+Time: 123722ms
 
 ==========
 [73/106] examples/RF_no_assumptions/NoriSharmaFSE2013Fig7RFSynt.noassumptions.sl:
-Answer: (- arg4 arg0)
-Time: 2568ms
+Answer: (- arg5 arg1)
+Time: 2957ms
 
 ==========
 [74/106] examples/RF_no_assumptions/NoriSharmaFSE2013Fig8RFSynt.noassumptions.sl:
-Answer: (+ (- (- (- arg4 1) arg1) arg0) (+ 1 arg4))
-Time: 3226ms
+Time: 123385ms
 
 ==========
 [75/106] examples/RF_no_assumptions/PastaA10RFSynt.noassumptions.sl:
-Time: 122739ms
+Time: 123186ms
 
 ==========
 [76/106] examples/RF_no_assumptions/PastaA4RFSynt.noassumptions.sl:
-Answer: (- arg0 arg1)
-Time: 3648ms
+Answer: (- (- arg0 1) arg1)
+Time: 2746ms
 
 ==========
 [77/106] examples/RF_no_assumptions/PastaA5RFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 3100ms
+Time: 2790ms
 
 ==========
 [78/106] examples/RF_no_assumptions/PastaA6RFSynt.noassumptions.sl:
-Answer: (- (- arg0 arg1) arg2)
-Time: 2967ms
+Answer: (- (+ (- 0 arg1) arg0) arg2)
+Time: 2796ms
 
 ==========
 [79/106] examples/RF_no_assumptions/PastaA7RFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 2975ms
+Time: 2712ms
 
 ==========
 [80/106] examples/RF_no_assumptions/PastaA9RFSynt.noassumptions.sl:
 Answer: (- arg0 arg2)
-Time: 2939ms
+Time: 2818ms
 
 ==========
 [81/106] examples/RF_no_assumptions/PastaB10RFSynt.noassumptions.sl:
-
-thread 'main' (4123311) panicked at src/parser/build.rs:248:17:
-invalid op: and
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2736ms
+Answer: (+ (+ 1 arg0) arg1)
+Time: 2881ms
 
 ==========
 [82/106] examples/RF_no_assumptions/PastaB11RFSynt.noassumptions.sl:
-
-thread 'main' (4123464) panicked at src/parser/build.rs:248:17:
-invalid op: and
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2809ms
+Answer: (- arg1 (- 0 arg0))
+Time: 2785ms
 
 ==========
 [83/106] examples/RF_no_assumptions/PastaB12RFSynt.noassumptions.sl:
-
-thread 'main' (4123635) panicked at src/parser/build.rs:248:17:
-invalid op: and
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3074ms
+Time: 123260ms
 
 ==========
 [84/106] examples/RF_no_assumptions/PastaB13RFSynt.noassumptions.sl:
-
-thread 'main' (4123806) panicked at src/parser/build.rs:248:17:
-invalid op: and
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 3037ms
+memory allocation of 1107296272 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 280354 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 90846ms
 
 ==========
 [85/106] examples/RF_no_assumptions/PastaB1RFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 3047ms
+Time: 3292ms
 
 ==========
 [86/106] examples/RF_no_assumptions/PastaB2RFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 2491ms
+Time: 3231ms
 
 ==========
 [87/106] examples/RF_no_assumptions/PastaB3RFSynt.noassumptions.sl:
 Answer: (- arg0 arg1)
-Time: 2529ms
+Time: 2753ms
 
 ==========
 [88/106] examples/RF_no_assumptions/PastaB4RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 2481ms
+Time: 2727ms
 
 ==========
 [89/106] examples/RF_no_assumptions/PastaB5RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 2507ms
+Time: 3164ms
 
 ==========
 [90/106] examples/RF_no_assumptions/PastaB6RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 2496ms
+Time: 3227ms
 
 ==========
 [91/106] examples/RF_no_assumptions/PastaB7RFSynt.noassumptions.sl:
 Answer: (- arg0 arg2)
-Time: 2546ms
+Time: 3321ms
 
 ==========
 [92/106] examples/RF_no_assumptions/PastaB8RFSynt.noassumptions.sl:
-
-thread 'main' (4124546) panicked at src/parser/build.rs:248:17:
-invalid op: /
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-Time: 2494ms
+Answer: arg0
+Time: 3290ms
 
 ==========
 [93/106] examples/RF_no_assumptions/PastaC3RFSynt.noassumptions.sl:
-Time: 122964ms
+Time: 123734ms
 
 ==========
 [94/106] examples/RF_no_assumptions/PastaC5RFSynt.noassumptions.sl:
 Answer: (+ arg0 arg1)
-Time: 2398ms
+Time: 2845ms
 
 ==========
 [95/106] examples/RF_no_assumptions/PastaC7RFSynt.noassumptions.sl:
-Answer: (- arg3 arg1)
-Time: 2367ms
+Answer: (- (ite (= 0 arg1) arg2 arg3) arg1)
+Time: 2837ms
 
 ==========
 [96/106] examples/RF_no_assumptions/PlusSwapRFSynt.noassumptions.sl:
-Time: 122707ms
+Time: 123085ms
 
 ==========
 [97/106] examples/RF_no_assumptions/PodelskiRybalchenkoTACAS2011Fig1RFSynt.noassumptions.sl:
 Answer: arg0
-Time: 2416ms
+Time: 2712ms
 
 ==========
 [98/106] examples/RF_no_assumptions/PodelskiRybalchenkoVMCAI2004Ex2RFSynt.noassumptions.sl:
-Time: 123203ms
+Time: 123527ms
 
 ==========
 [99/106] examples/RF_no_assumptions/Poly2VarsCondBreakRFSynt.noassumptions.sl:
-Answer: (- arg0 (- arg2 1))
-Time: 2415ms
+Answer: (- arg0 arg2)
+Time: 2675ms
 
 ==========
 [100/106] examples/RF_no_assumptions/PolyClosingInRFSynt.noassumptions.sl:
 Answer: arg1
-Time: 2404ms
+Time: 2749ms
 
 ==========
 [101/106] examples/RF_no_assumptions/Round3RFSynt.noassumptions.sl:
-Time: 123051ms
+Time: 122862ms
 
 ==========
 [102/106] examples/RF_no_assumptions/Square2VarsDisjRFSynt.noassumptions.sl:
-Time: 123028ms
+Time: 122872ms
 
 ==========
 [103/106] examples/RF_no_assumptions/SquareDisj2VarsRFSynt.noassumptions.sl:
-Time: 122948ms
+memory allocation of 21474836480 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 289932 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 11606ms
 
 ==========
 [104/106] examples/RF_no_assumptions/TwoPol4VarsConjRFSynt.noassumptions.sl:
-Answer: (- arg1 arg3)
-Time: 2383ms
+Answer: (- arg0 arg2)
+Time: 2706ms
 
 ==========
 [105/106] examples/RF_no_assumptions/TwoPol4VarsDisjRFSynt.noassumptions.sl:
-Time: 123003ms
+Time: 123278ms
 
-Completed 48/106
+Completed 64/106
