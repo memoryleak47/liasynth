@@ -245,6 +245,7 @@ fn as_expr(
                     .collect();
                 Expr::SynthFunCall(op.clone(), rst)
             } else {
+                println!("{:?}", l);
                 panic!("invalid op: {op}")
             }
         }

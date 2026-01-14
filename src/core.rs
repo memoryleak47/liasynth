@@ -40,7 +40,7 @@ pub static GLOBAL_STATS: Lazy<Mutex<Stats>> = Lazy::new(|| Mutex::new(Stats::def
 
 pub type Int = i64; // TODO add bigint.
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum Value {
     Int(Int),
     Bool(bool),
