@@ -407,20 +407,20 @@ fn handle(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     grow(nt, x, ctxt)
 }
 
-type Sat = u64; 
+type Sat = u64;
 
 #[inline(always)]
 fn is_subset(a: Sat, b: Sat) -> bool {
     (a & b) == a
 }
 
-fn seen_insert_maximal(seen: &mut Vec<Sat>, new: Sat) {
+fn seen_insert_maximal(seen: &mut HashSet<Sat>, new: Sat) {
     if seen.iter().any(|&sc| is_subset(new, sc)) {
         return;
     }
 
     seen.retain(|&sc| !is_subset(sc, new));
-    seen.push(new);
+    seen.insert(new);
 }
 
 #[inline(always)]
@@ -440,11 +440,7 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
             let rt = rule.signature().1.into_nt().unwrap();
 
             let cond_vals = &ctxt.classes[*cond].vals;
-            if cond_vals.len() > 1
-                && cond_vals.iter().all_equal()
-                && rt == *tt
-                && rt == *te
-            {
+            if cond_vals.len() > 1 && cond_vals.iter().all_equal() && rt == *tt && rt == *te {
                 return true;
             }
 
@@ -501,9 +497,7 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
             false
         }
         _ => match rule.signature() {
-            (_, Ty::Bool) if rule.children().len() > 1 => {
-                children.iter().all_equal()
-            }
+            (_, Ty::Bool) if rule.children().len() > 1 => children.iter().all_equal(),
             _ => false,
         },
     }
@@ -515,6 +509,13 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
 
     for (pnt, rule) in ctxt.problem.prod_rules() {
         let (in_types, _) = rule.signature();
+
+        let mut nt_by_pos = vec![usize::MAX; in_types.len()];
+        for (pos, ty) in in_types.iter().enumerate() {
+            if matches!(ty, Ty::PRule(_)) {
+                nt_by_pos[pos] = ty.into_nt().unwrap();
+            }
+        }
 
         'rule: for (i, child) in rule.children().iter().enumerate() {
             if !matches!(child, Child::Hole(_, _)) {
@@ -567,31 +568,39 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
                 continue 'rule;
             }
 
+            let mut child_ids: Vec<(usize, Id)> = Vec::with_capacity(rel_children.len() + 1);
+
             for combination in rel_children
                 .iter()
                 .map(|(pos, ids)| ids.iter().map(move |id| (*pos, *id)))
                 .multi_cartesian_product()
             {
-                let mut new_children = combination.clone();
-                new_children.push((i, x));
-                let child_ids: Vec<(usize, Id)> = new_children
-                    .iter()
-                    .map(|(pos, id)| (in_types[*pos].into_nt().unwrap(), *id))
-                    .collect();
+                // Build child_ids without cloning combination / pushing into new_children.
+                child_ids.clear();
+                for (pos, id) in &combination {
+                    let nt2 = nt_by_pos[*pos];
+                    // nt2 should be valid because we only stored PRule positions.
+                    child_ids.push((nt2, *id));
+                }
+                child_ids.push((child_nt, x));
 
-                if !prune(nt, rule, &child_ids, ctxt) {
-                    let mut prog = base_prog.clone();
-                    for (pos, c_idx) in &combination {
-                        let ty_nt = in_types[*pos].into_nt().unwrap();
-                        prog.children_mut()[*pos] = Child::Hole(ty_nt, *c_idx);
-                    }
+                if prune(nt, rule, &child_ids, ctxt) {
+                    continue;
+                }
 
-                    let (id, is_sol, satcount) = add_node(*pnt, prog.clone(), ctxt, None);
+                // Build the program (still needs work per combination)
+                let mut prog = base_prog.clone();
+                for (pos, c_idx) in &combination {
+                    let nt2 = nt_by_pos[*pos];
+                    prog.children_mut()[*pos] = Child::Hole(nt2, *c_idx);
+                }
 
-                    max_sat = max_sat.max(satcount.count_ones());
-                    if is_sol {
-                        return (Some(id), max_sat as usize);
-                    }
+                // Don’t clone prog unless add_node requires it.
+                let (id, is_sol, satcount) = add_node(*pnt, prog, ctxt, None);
+
+                max_sat = max_sat.max(satcount.count_ones());
+                if is_sol {
+                    return (Some(id), max_sat as usize);
                 }
             }
         }
@@ -611,7 +620,7 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
         _ => panic!("Could not generate vals"),
     });
 
-    GLOBAL_STATS.lock().unwrap().programs_generated += 1;
+    // GLOBAL_STATS.lock().unwrap().programs_generated += 1;
 
     let (id, satcount) = if let Some(&_id) = ctxt.vals_lookup.get(&(nt, vals.clone())) {
         let newcomplex = mincomplexity(&node, ctxt);
@@ -629,7 +638,7 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
         }
         (_id, _satcount)
     } else {
-        GLOBAL_STATS.lock().unwrap().new_programs_generated += 1;
+        // GLOBAL_STATS.lock().unwrap().new_programs_generated += 1;
         let _id = ctxt.classes.len();
         let complexity = mincomplexity(&node, ctxt);
         let c = Class::default_class(complexity, node, vals.clone());
@@ -657,7 +666,7 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
             _satcount |= sc;
         }
 
-        ctxt.seen_scs[nt].insert(_satcount.clone());
+        seen_insert_maximal(&mut ctxt.seen_scs[nt], _satcount);
         let sc = _satcount.count_ones();
         ctxt.classes[_id].satcount = _satcount;
         ctxt.vals_lookup.insert((nt, vals), _id);

@@ -190,12 +190,12 @@ pub fn cegis(problem: &Problem) -> Term {
         );
         classes = Some(clss);
         cxs_cache = Some(cxsc);
-        // println!(
-        //     "Candidate: {}",
-        //     term_to_z3(&term, &problem.vars.keys().cloned().collect::<Box<[_]>>())
-        // );
+        println!(
+            "Candidate: {}",
+            term_to_z3(&term, &problem.vars.keys().cloned().collect::<Box<[_]>>())
+        );
 
-        GLOBAL_STATS.lock().unwrap().counterexamples += 1;
+        // GLOBAL_STATS.lock().unwrap().counterexamples += 1;
         // TODO check this later: assert!(problem.sat(&..., &sigmas));
         if let Some(sigma) = problem.verify(&term) {
             // println!("CE: {:?}", &sigma);

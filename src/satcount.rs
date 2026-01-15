@@ -3,7 +3,7 @@ use crate::*;
 const USE_INHOUSE_SATCOUNT: bool = true;
 
 pub fn satcount(nt: usize, x: Id, ctxt: &mut Ctxt, idxs: Option<Vec<usize>>) -> u64 {
-    GLOBAL_STATS.lock().unwrap().programs_checked += 1;
+    // GLOBAL_STATS.lock().unwrap().programs_checked += 1;
     let ty = ctxt.classes[x].node.ty();
     if ctxt
         .problem
