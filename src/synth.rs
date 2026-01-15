@@ -569,6 +569,7 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
             }
 
             let mut child_ids: Vec<(usize, Id)> = Vec::with_capacity(rel_children.len() + 1);
+            let base_children = base_prog.children().to_vec();
 
             for combination in rel_children
                 .iter()
@@ -588,15 +589,15 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
                     continue;
                 }
 
-                // Build the program (still needs work per combination)
                 let mut prog = base_prog.clone();
+                prog.children_mut().copy_from_slice(&base_children);
                 for (pos, c_idx) in &combination {
                     let nt2 = nt_by_pos[*pos];
                     prog.children_mut()[*pos] = Child::Hole(nt2, *c_idx);
                 }
 
                 // Don’t clone prog unless add_node requires it.
-                let (id, is_sol, satcount) = add_node(*pnt, prog, ctxt, None);
+                let (id, is_sol, satcount) = add_node(*pnt, prog.clone(), ctxt, None);
 
                 max_sat = max_sat.max(satcount.count_ones());
                 if is_sol {
