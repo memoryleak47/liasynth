@@ -407,41 +407,59 @@ fn handle(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     grow(nt, x, ctxt)
 }
 
+type Sat = u64; 
+
+#[inline(always)]
+fn is_subset(a: Sat, b: Sat) -> bool {
+    (a & b) == a
+}
+
+fn seen_insert_maximal(seen: &mut Vec<Sat>, new: Sat) {
+    if seen.iter().any(|&sc| is_subset(new, sc)) {
+        return;
+    }
+
+    seen.retain(|&sc| !is_subset(sc, new));
+    seen.push(new);
+}
+
+#[inline(always)]
+fn dominated_by_superset(sat: Sat, seen: &HashSet<Sat>) -> bool {
+    seen.iter().any(|&sc| (sat & sc) == sat && sc != sat)
+}
+
 fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool {
     let rt = &rule.signature().1.into_nt().unwrap();
+    let seen = &ctxt.seen_scs[nt];
     match rule.template() {
         Some("(ite ? ? ?)") => {
             let [(_, cond), (tt, b_then), (te, b_else)] = children else {
                 return false;
             };
 
+            let rt = rule.signature().1.into_nt().unwrap();
+
             let cond_vals = &ctxt.classes[*cond].vals;
             if cond_vals.len() > 1
-                && cond_vals.iter().all(|v| *v == cond_vals[0])
-                && rt == tt
-                && rt == te
+                && cond_vals.iter().all_equal()
+                && rt == *tt
+                && rt == *te
             {
                 return true;
             }
 
-            let satcount = ctxt.classes[*b_then].satcount;
-            if ctxt.seen_scs[nt]
-                .iter()
-                .any(|&sc| (satcount & sc) == satcount && sc != satcount)
-            {
+            let then_sc = ctxt.classes[*b_then].satcount;
+            if dominated_by_superset(then_sc, seen) {
                 return true;
             }
 
-            let satcount = ctxt.classes[*b_else].satcount;
-            if ctxt.seen_scs[nt]
-                .iter()
-                .any(|&sc| (satcount & sc) == satcount && sc != satcount)
-            {
+            let else_sc = ctxt.classes[*b_else].satcount;
+            if dominated_by_superset(else_sc, seen) {
                 return true;
             }
 
-            (rt == tt && ctxt.classes[*b_then].satcount.count_ones() == 0)
-                || (rt == te && ctxt.classes[*b_else].satcount.count_ones() == 0)
+            (rt == *tt && ctxt.classes[*b_then].satcount == 0)
+                || (rt == *te && ctxt.classes[*b_else].satcount == 0)
         }
         Some("(+ ? ?)") => {
             if let [(at, a), (bt, b)] = children {
@@ -484,7 +502,7 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
         }
         _ => match rule.signature() {
             (_, Ty::Bool) if rule.children().len() > 1 => {
-                children.iter().all(|c| *c == children[0])
+                children.iter().all_equal()
             }
             _ => false,
         },
@@ -657,17 +675,6 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
 
     (id, false, satcount)
 }
-
-// fn gen_vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
-//     ctxt.small_sigmas
-//         .iter()
-//         .enumerate()
-//         .map(|(i, sigma)| {
-//             let f = |id: Id| Some(ctxt.classes[id].vals[i].clone());
-//             node.eval(&f, sigma)
-//         })
-//         .collect()
-// }
 
 fn gen_vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
     let mut out = Vec::with_capacity(ctxt.small_sigmas.len());
