@@ -59,6 +59,7 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
     let get_children_cases = get_children_cases(&edef);
     let get_children_mut_cases = get_children_mut_cases(&edef);
     let eval_cases = eval_cases(&edef);
+    let eval_idx_cases = eval_idx_cases(&edef);
     let extract_cases = extract_cases(&edef);
     let parse_cases = parse_cases(&edef);
     let parse_prod_cases = parse_prod_cases(&edef);
@@ -152,6 +153,20 @@ pub fn define_language(input: TokenStream1) -> TokenStream1 {
                     Node::False(_) => Value::Bool(false),
                     Node::VarInt(v, _) | Node::VarBool(v, _) => sigma.get(*v).unwrap_or_else(|| panic!("Failed {sigma:?} index with {v}")).clone(),
                     #(#eval_cases),*
+                })
+            }
+
+            pub fn eval_idx(&self, ctxt: &Ctxt, sigma_idx: usize, sigma: &Sigma) -> Option<Value> {
+                Some(match self {
+                    Node::PlaceHolder(_, _) => Value::Int(0),
+                    Node::ConstInt(i, _) => Value::Int(*i),
+                    Node::True(_) => Value::Bool(true),
+                    Node::False(_) => Value::Bool(false),
+                    Node::VarInt(v, _) | Node::VarBool(v, _) => sigma
+                        .get(*v)
+                        .unwrap_or_else(|| panic!("Failed {sigma:?} index with {v}"))
+                        .clone(),
+                    #(#eval_idx_cases),*
                 })
             }
 
@@ -280,6 +295,29 @@ fn eval_cases(edef: &EnumDef) -> Vec<TokenStream2> {
                         (_,                   &Child::Constant(c)) => Some(Value::Int(c)),
                         (_,                   &Child::VarInt(v))   => Some(sigma.get(v).cloned().unwrap_or_else(|| panic!("sigma miss {v}"))),
                         (_,                   &Child::VarBool(v))  => Some(sigma.get(v).cloned().unwrap_or_else(|| panic!("sigma miss {v}"))),
+                    }
+                };
+                #compute
+            }
+        });
+    }
+    cases
+}
+
+fn eval_idx_cases(edef: &EnumDef) -> Vec<TokenStream2> {
+    let mut cases = Vec::new();
+    for c in edef.cases.iter() {
+        let ident = &c.ident;
+        let compute = &c.compute;
+
+        cases.push(quote! {
+            Node::#ident(s) => {
+                let ev = |x: usize| -> Option<Value> {
+                    match &s[x] {
+                        &Child::Hole(_, id)     => Some(ctxt.classes[id].vals[sigma_idx].clone()),
+                        &Child::Constant(c)     => Some(Value::Int(c)),
+                        &Child::VarInt(v)       => Some(sigma.get(v).cloned().unwrap_or_else(|| panic!("sigma miss {v}"))),
+                        &Child::VarBool(v)      => Some(sigma.get(v).cloned().unwrap_or_else(|| panic!("sigma miss {v}"))),
                     }
                 };
                 #compute

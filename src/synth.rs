@@ -658,15 +658,25 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
     (id, false, satcount)
 }
 
+// fn gen_vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
+//     ctxt.small_sigmas
+//         .iter()
+//         .enumerate()
+//         .map(|(i, sigma)| {
+//             let f = |id: Id| Some(ctxt.classes[id].vals[i].clone());
+//             node.eval(&f, sigma)
+//         })
+//         .collect()
+// }
+
 fn gen_vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
-    ctxt.small_sigmas
-        .iter()
-        .enumerate()
-        .map(|(i, sigma)| {
-            let f = |id: Id| Some(ctxt.classes[id].vals[i].clone());
-            node.eval(&f, sigma)
-        })
-        .collect()
+    let mut out = Vec::with_capacity(ctxt.small_sigmas.len());
+
+    for (sigma_idx, sigma) in ctxt.small_sigmas.iter().enumerate() {
+        out.push(node.eval_idx(ctxt, sigma_idx, sigma)?);
+    }
+
+    Some(out.into_boxed_slice())
 }
 
 fn mincomplexity(node: &Node, ctxt: &Ctxt) -> usize {
