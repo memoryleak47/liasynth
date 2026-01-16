@@ -427,7 +427,7 @@ fn seen_insert_maximal(seen: &mut HashSet<Sat>, new: Sat) {
 
 #[inline(always)]
 fn dominated_by_superset(sat: Sat, seen: &HashSet<Sat>) -> bool {
-    seen.iter().any(|&sc| is_subset(sc, sat) && sc != sat)
+    seen.iter().any(|&sc| is_subset(sat, sc) && sc != sat)
 }
 
 fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool {
@@ -561,7 +561,6 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                 }
             }
         }
-
         Some("(= ? ?)") | Some("(xor ? ?)") | Some("(distinct ? ?)") => {
             if let [(at, a), (bt, b)] = children {
                 if a >= b && at == bt {
