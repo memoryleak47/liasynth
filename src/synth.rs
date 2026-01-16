@@ -247,7 +247,8 @@ fn update_class(
     let new_sat = satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
     if new_sat != 0 {
         ctxt.classes[id].satcount |= new_sat;
-        ctxt.seen_scs[nt].insert(ctxt.classes[id].satcount.clone());
+        // ctxt.seen_scs[nt].insert(ctxt.classes[id].satcount.clone());
+        seen_insert_maximal(&mut ctxt.seen_scs[nt], ctxt.classes[id].satcount);
     }
     enqueue(nt, id, ctxt);
 
@@ -303,7 +304,8 @@ fn add_incremental_nodes(
 
         if !ctxt.vals_lookup.contains_key(&(nt, new_vals.clone())) {
             let (id, is_sol, satcount) = add_node(nt, new_node, ctxt, Some(new_vals));
-            ctxt.seen_scs[nt].insert(satcount.clone());
+            // ctxt.seen_scs[nt].insert(satcount.clone());
+            seen_insert_maximal(&mut ctxt.seen_scs[nt], satcount);
             seen.get_mut(&oid).unwrap().push(id);
             ctxt.classes[id].prev_sol = ctxt.classes[oid].prev_sol;
             ctxt.classes[id].satcount = satcount;
