@@ -16,7 +16,7 @@ type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 4 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 10 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
@@ -442,6 +442,10 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                 return false;
             };
 
+            if ctxt.classes[*cond].node.template() == Some("(not ?)") {
+                return true;
+            }
+
             if b_then == b_else && tt == te {
                 return true;
             }
@@ -484,7 +488,6 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
 
         Some("(+ ? ?)") => {
             if let [(at, a), (bt, b)] = children {
-                // commutative pruning: same args / canonical order
                 if a == b && at == bt {
                     return true;
                 }
@@ -492,7 +495,6 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                     return true;
                 }
 
-                // identity: x + 0 = x
                 match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
                     (_, Node::ConstInt(0, ty)) | (Node::ConstInt(0, ty), _) => {
                         return nt == ty.into_nt().unwrap();
@@ -525,7 +527,6 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
 
         Some("(* ? ?)") => {
             if let [(at, a), (bt, b)] = children {
-                // commutative pruning: same args / canonical order
                 if a == b && at == bt {
                     return true;
                 }
@@ -533,7 +534,6 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                     return true;
                 }
 
-                // identities / annihilators: x*0, x*1
                 match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
                     (_, Node::ConstInt(0, ty) | Node::ConstInt(1, ty))
                     | (Node::ConstInt(0, ty) | Node::ConstInt(1, ty), _) => {
@@ -556,7 +556,6 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
 
         Some("(and ? ?)") | Some("(or ? ?)") => {
             if let [(at, a), (bt, b)] = children {
-                // commutative pruning: same args / canonical order
                 if a == b && at == bt {
                     return true;
                 }
@@ -564,11 +563,9 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                     return true;
                 }
 
-                // detect (x AND (not x)) / (x OR (not x)) via value-traces:
                 let a_vals = &ctxt.classes[*a].vals;
                 let b_vals = &ctxt.classes[*b].vals;
 
-                // only if both sides are booleans for all sigmas
                 if a_vals.len() == b_vals.len()
                     && a_vals.iter().zip(b_vals.iter()).all(|(i, j)| match (i, j) {
                         (Value::Bool(x), Value::Bool(y)) => x == &(!*y),
@@ -598,7 +595,6 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
             }
             false
         }
-
         _ => match rule.signature() {
             (_, Ty::Bool) if rule.children().len() > 1 => children.iter().all_equal(),
             _ => false,
