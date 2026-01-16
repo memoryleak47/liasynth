@@ -1,0 +1,778 @@
+
+==========
+[0/161] examples/LIA/array_search_10.sl:
+Time: 139497ms
+
+==========
+[1/161] examples/LIA/array_search_11.sl:
+Time: 126855ms
+
+==========
+[2/161] examples/LIA/array_search_12.sl:
+Time: 126191ms
+
+==========
+[3/161] examples/LIA/array_search_13.sl:
+Time: 125323ms
+
+==========
+[4/161] examples/LIA/array_search_14.sl:
+Time: 124882ms
+
+==========
+[5/161] examples/LIA/array_search_15.sl:
+Time: 124914ms
+
+==========
+[6/161] examples/LIA/array_search_2.sl:
+Answer: (ite (< (ite (< k1 y2) y1 k1) k1) 1 (ite (< k1 y1) 0 2))
+Time: 21388ms
+
+==========
+[7/161] examples/LIA/array_search_3.sl:
+Answer: (ite (< k1 (ite (< y2 k1) y3 y1)) (ite (< k1 y2) 0 2) (ite (< y3 k1) 3 1))
+Time: 23996ms
+
+==========
+[8/161] examples/LIA/array_search_4.sl:
+Time: 123528ms
+
+==========
+[9/161] examples/LIA/array_search_5.sl:
+Time: 123982ms
+
+==========
+[10/161] examples/LIA/array_search_6.sl:
+Time: 123753ms
+
+==========
+[11/161] examples/LIA/array_search_7.sl:
+Time: 123467ms
+
+==========
+[12/161] examples/LIA/array_search_8.sl:
+Time: 123597ms
+
+==========
+[13/161] examples/LIA/array_search_9.sl:
+Time: 125205ms
+
+==========
+[14/161] examples/LIA/commutative.sl:
+Answer: (+ x y)
+Time: 4392ms
+
+==========
+[15/161] examples/LIA/constant.sl:
+Answer: 0
+Time: 4348ms
+
+==========
+[16/161] examples/LIA/inv_gen_array.sl:
+Answer: (or (<= (+ (* 1 m) (* -1 a0)) 0) (<= (+ (* 1 j) (* 1 j)) 0))
+Time: 5855ms
+
+==========
+[17/161] examples/LIA/inv_gen_cegar2.sl:
+
+thread 'main' (722119) panicked at src/synth.rs:163:9:
+infeasible
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+Time: 3656ms
+
+==========
+[18/161] examples/LIA/inv_gen_cgr1.sl:
+Answer: (or (<= (+ (* -1 y) (* 1 x)) 1) (= (+ (* -1 y) (* 1 x)) 2))
+Time: 4358ms
+
+==========
+[19/161] examples/LIA/inv_gen_ex14.sl:
+Answer: (and (<= (+ (* -1 x) (* 0 x)) -1) (<= (+ (* -1 x) (* 0 x)) -1))
+Time: 4447ms
+
+==========
+[20/161] examples/LIA/inv_gen_ex23.sl:
+Answer: (and (<= (+ (* 1 z) (* -1 c)) 4572) (<= (+ (* -1 z) (* -1 z)) 0))
+Time: 32042ms
+
+==========
+[21/161] examples/LIA/inv_gen_ex7.sl:
+Answer: (and (<= (+ (* -1 i) (* -1 i)) 0) (<= (+ (* -1 l) (* 1 y)) 0))
+Time: 4356ms
+
+==========
+[22/161] examples/LIA/inv_gen_fig1.sl:
+Answer: (or (<= (+ (* 1 x) (* 1 x)) -2) (<= (+ (* 1 x) (* -1 y)) -2))
+Time: 4076ms
+
+==========
+[23/161] examples/LIA/inv_gen_fig3.sl:
+Answer: (or (= (+ (* 1 y) (* -1 x)) 1) (= (+ (* 1 l) (* 1 l)) 2))
+Time: 4319ms
+
+==========
+[24/161] examples/LIA/inv_gen_fig6.sl:
+Answer: (and (<= (+ (* 0 y) (* 0 y)) 0) (<= (+ (* 0 y) (* 0 y)) 0))
+Time: 4193ms
+
+==========
+[25/161] examples/LIA/inv_gen_fig8.sl:
+Answer: (and (= (+ (* -1 l) (* -1 l)) 0) (= (+ (* -1 l) (* -1 l)) 0))
+Time: 4682ms
+
+==========
+[26/161] examples/LIA/inv_gen_fig9.sl:
+Answer: (and (= (+ (* 0 x) (* 1 y)) 0) (= (+ (* 1 x) (* 1 x)) 0))
+Time: 4130ms
+
+==========
+[27/161] examples/LIA/inv_gen_finf1.sl:
+Answer: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+Time: 4179ms
+
+==========
+[28/161] examples/LIA/inv_gen_finf2.sl:
+Answer: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+Time: 4293ms
+
+==========
+[29/161] examples/LIA/inv_gen_n_c11.sl:
+Answer: (and (<= (+ (* 0 i) (* 1 l)) 4) (<= (+ (* 0 i) (* -1 l)) 0))
+Time: 4245ms
+
+==========
+[30/161] examples/LIA/inv_gen_sum1.sl:
+
+thread 'main' (727101) panicked at src/synth.rs:163:9:
+infeasible
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+Time: 4214ms
+
+==========
+[31/161] examples/LIA/inv_gen_sum3.sl:
+Answer: (and (<= (+ (* 1 s) (* -1 x)) 0) (<= (+ (* 1 x) (* -1 s)) 0))
+Time: 4698ms
+
+==========
+[32/161] examples/LIA/inv_gen_sum4.sl:
+Answer: (and (= (+ (* -1 i) (* 1 s)) -1) (<= (+ (* 1 i) (* 0 s)) 9))
+Time: 9219ms
+
+==========
+[33/161] examples/LIA/inv_gen_tcs.sl:
+
+thread 'main' (728068) panicked at src/synth.rs:163:9:
+infeasible
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+Time: 3820ms
+
+==========
+[34/161] examples/LIA/inv_gen_term2.sl:
+Answer: (or (<= (+ (* -1 x) (* -1 x)) -3) (<= (+ (* 1 x) (* 1 x)) 2))
+Time: 3727ms
+
+==========
+[35/161] examples/LIA/inv_gen_term3.sl:
+Answer: (and (<= (+ (* 0 x) (* -1 y)) -1) (<= (+ (* 0 x) (* -1 y)) -1))
+Time: 3451ms
+
+==========
+[36/161] examples/LIA/inv_gen_trex1.sl:
+Answer: (and (<= (+ (* -1 z) (* -1 z)) -2) (<= (+ (* 0 x) (* -1 z)) 0))
+Time: 3131ms
+
+==========
+[37/161] examples/LIA/inv_gen_trex2.sl:
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 3402ms
+
+==========
+[38/161] examples/LIA/inv_gen_trex4.sl:
+Answer: (or (<= (+ (* -1 d) (* -1 d)) 0) (<= (+ (* 1 d) (* 1 d)) -2))
+Time: 3515ms
+
+==========
+[39/161] examples/LIA/inv_gen_vmail.sl:
+Answer: (and (<= (+ (* -1 i) (* 0 i)) 0) (<= (+ (* -1 i) (* 0 i)) 0))
+Time: 3634ms
+
+==========
+[40/161] examples/LIA/inv_gen_w1.sl:
+Answer: (and (<= (+ (* 1 x) (* -1 n)) 0) (<= (+ (* 1 x) (* -1 n)) 0))
+Time: 3543ms
+
+==========
+[41/161] examples/LIA/inv_gen_w2.sl:
+Answer: (and (<= (+ (* -1 n) (* 1 x)) -1) (<= (+ (* -1 n) (* -1 x)) -1))
+Time: 3499ms
+
+==========
+[42/161] examples/LIA/inv_gen_winf1.sl:
+Answer: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+Time: 3538ms
+
+==========
+[43/161] examples/LIA/inv_gen_winf2.sl:
+Answer: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+Time: 3515ms
+
+==========
+[44/161] examples/LIA/LinExpr_eq1ex.sl:
+Time: 124365ms
+
+==========
+[45/161] examples/LIA/LinExpr_eq2ex.sl:
+Time: 124486ms
+
+==========
+[46/161] examples/LIA/LinExpr_inv1_ex.sl:
+Answer: (ite (or (<= y 1) (<= x 1)) (+ (+ 1 1) 1) 1)
+Time: 3331ms
+
+==========
+[47/161] examples/LIA/LinExpr_inv1.sl:
+Answer: (+ (ite (<= y x) x y) (+ y x))
+Time: 11968ms
+
+==========
+[48/161] examples/LIA/max10.sl:
+Time: 123699ms
+
+==========
+[49/161] examples/LIA/max_11.sl:
+Time: 123481ms
+
+==========
+[50/161] examples/LIA/max12.sl:
+Time: 123509ms
+
+==========
+[51/161] examples/LIA/max13.sl:
+Time: 123488ms
+
+==========
+[52/161] examples/LIA/max14.sl:
+Time: 123612ms
+
+==========
+[53/161] examples/LIA/max15.sl:
+Time: 123660ms
+
+==========
+[54/161] examples/LIA/max2.sl:
+Answer: (ite (<= x y) y x)
+Time: 3335ms
+
+==========
+[55/161] examples/LIA/max3.sl:
+Answer: (ite (and (<= x y) (<= z y)) y (ite (<= z x) x z))
+Time: 118993ms
+
+==========
+[56/161] examples/LIA/max4.sl:
+Time: 124098ms
+
+==========
+[57/161] examples/LIA/max5.sl:
+Time: 124021ms
+
+==========
+[58/161] examples/LIA/max6.sl:
+Time: 124149ms
+
+==========
+[59/161] examples/LIA/max7.sl:
+Time: 123930ms
+
+==========
+[60/161] examples/LIA/max8.sl:
+Time: 124184ms
+
+==========
+[61/161] examples/LIA/max9.sl:
+Time: 124180ms
+
+==========
+[62/161] examples/LIA/mpg_example1.sl:
+Time: 123389ms
+
+==========
+[63/161] examples/LIA/mpg_example2.sl:
+memory allocation of 268435456 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 749004 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 97547ms
+
+==========
+[64/161] examples/LIA/mpg_example3.sl:
+Time: 123207ms
+
+==========
+[65/161] examples/LIA/mpg_example4.sl:
+Time: 123192ms
+
+==========
+[66/161] examples/LIA/mpg_example5.sl:
+Time: 123250ms
+
+==========
+[67/161] examples/LIA/mpg_guard1.sl:
+Answer: (ite (<= x (- 0 y)) (- x y) (+ y x))
+Time: 3596ms
+
+==========
+[68/161] examples/LIA/mpg_guard2.sl:
+Answer: (ite (<= (+ y x) (- 0 z)) (- x y) (+ y x))
+Time: 4937ms
+
+==========
+[69/161] examples/LIA/mpg_guard3.sl:
+memory allocation of 1107296272 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 752338 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 118912ms
+
+==========
+[70/161] examples/LIA/mpg_guard4.sl:
+Time: 123964ms
+
+==========
+[71/161] examples/LIA/mpg_ite1.sl:
+Time: 123853ms
+
+==========
+[72/161] examples/LIA/mpg_ite2.sl:
+Time: 123996ms
+
+==========
+[73/161] examples/LIA/mpg_plane1.sl:
+Answer: (+ y x)
+Time: 3753ms
+
+==========
+[74/161] examples/LIA/mpg_plane2.sl:
+Answer: (+ (+ (+ (+ 1 1) y) (+ y 1)) (+ (+ y x) (+ x x)))
+Time: 3241ms
+
+==========
+[75/161] examples/LIA/mpg_plane3.sl:
+Answer: (+ (+ (+ (+ y 1) (+ x x)) (+ (+ y 1) (+ x x))) (+ (+ (+ y 1) (+ 1 1)) (+ (+ y y) x)))
+Time: 77578ms
+
+==========
+[76/161] examples/LIA/MPwL_d1s3.sl:
+Answer: 1
+Time: 4119ms
+
+==========
+[77/161] examples/LIA/MPwL_d1s7.sl:
+Answer: 1
+Time: 4433ms
+
+==========
+[78/161] examples/LIA/MPwL_d4s3.sl:
+Answer: (ite (<= 2 (get-y currPoint)) 2 1)
+Time: 5754ms
+
+==========
+[79/161] examples/LIA/MPwL_d4s7.sl:
+Answer: (ite (<= (get-x currPoint) 0) 2 1)
+Time: 11953ms
+
+==========
+[80/161] examples/LIA/MPwL_d5s3.sl:
+Time: 123952ms
+
+==========
+[81/161] examples/LIA/MPwL_d5s7.sl:
+Time: 123609ms
+
+==========
+[82/161] examples/LIA/MPwoL_d1s3.sl:
+Answer: 1
+Time: 4418ms
+
+==========
+[83/161] examples/LIA/MPwoL_d1s7.sl:
+Answer: 1
+Time: 4454ms
+
+==========
+[84/161] examples/LIA/MPwoL_d4s3.sl:
+Answer: (ite (<= 2 (get-y currPoint)) 2 1)
+Time: 5752ms
+
+==========
+[85/161] examples/LIA/MPwoL_d4s7.sl:
+Answer: (ite (<= 1 (get-x currPoint)) 1 2)
+Time: 8448ms
+
+==========
+[86/161] examples/LIA/MPwoL_d5s3.sl:
+Time: 124182ms
+
+==========
+[87/161] examples/LIA/MPwoL_d5s7.sl:
+Time: 123757ms
+
+==========
+[88/161] examples/LIA/qm_area_sel_2.sl:
+Time: 124480ms
+
+==========
+[89/161] examples/LIA/qm_choose_01.sl:
+Answer: (ite (< x 1) 1 0)
+Time: 4049ms
+
+==========
+[90/161] examples/LIA/qm_choose_yz.sl:
+Answer: (ite (< x 1) y z)
+Time: 3635ms
+
+==========
+[91/161] examples/LIA/qm_in_range.sl:
+Answer: (ite (< (+ y z) (+ x x)) (ite (< x z) 1 0) (ite (< y x) 1 0))
+Time: 27361ms
+
+==========
+[92/161] examples/LIA/qm_loop_1.sl:
+Answer: (ite (< x 1) 3 (- x 1))
+Time: 3242ms
+
+==========
+[93/161] examples/LIA/qm_loop_2.sl:
+Answer: (ite (< (ite (< 0 y) x y) x) (- x 1) (ite (< y 1) 3 x))
+Time: 13252ms
+
+==========
+[94/161] examples/LIA/qm_loop_3.sl:
+Time: 124184ms
+
+==========
+[95/161] examples/LIA/qm_max2.sl:
+Answer: (ite (< x y) y x)
+Time: 3346ms
+
+==========
+[96/161] examples/LIA/qm_max3.sl:
+memory allocation of 1107296272 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 768538 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 100771ms
+
+==========
+[97/161] examples/LIA/qm_max4.sl:
+Time: 124707ms
+
+==========
+[98/161] examples/LIA/qm_max5.sl:
+Time: 124477ms
+
+==========
+[99/161] examples/LIA/qm_neg_1.sl:
+Answer: (ite (< x 0) 1 0)
+Time: 3576ms
+
+==========
+[100/161] examples/LIA/qm_neg_2.sl:
+Answer: (ite (< (- (- x 1) y) y) (ite (< y 0) 1 0) (ite (< x 0) 1 0))
+Time: 3709ms
+
+==========
+[101/161] examples/LIA/qm_neg_3.sl:
+memory allocation of 304 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 772731 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 108296ms
+
+==========
+[102/161] examples/LIA/qm_neg_4.sl:
+memory allocation of 320 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 773671 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 107360ms
+
+==========
+[103/161] examples/LIA/qm_neg_5.sl:
+Time: 124135ms
+
+==========
+[104/161] examples/LIA/qm_neg_eq_1.sl:
+Answer: (ite (< x 1) 1 0)
+Time: 3608ms
+
+==========
+[105/161] examples/LIA/qm_neg_eq_2.sl:
+Answer: (ite (< (- x y) (- y 1)) (ite (< y 1) 1 0) (ite (< x 1) 1 0))
+Time: 4045ms
+
+==========
+[106/161] examples/LIA/qm_neg_eq_3.sl:
+memory allocation of 6442450944 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 775977 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 102692ms
+
+==========
+[107/161] examples/LIA/qm_neg_eq_4.sl:
+memory allocation of 6442450944 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 776580 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 118905ms
+
+==========
+[108/161] examples/LIA/qm_neg_eq_5.sl:
+Time: 124001ms
+
+==========
+[109/161] examples/LIA/s0_d0.sl:
+Time: 123028ms
+
+==========
+[110/161] examples/LIA/s0_d1.sl:
+Time: 123756ms
+
+==========
+[111/161] examples/LIA/s0_d2.sl:
+Time: 123239ms
+
+==========
+[112/161] examples/LIA/s0.sl:
+Time: 123885ms
+
+==========
+[113/161] examples/LIA/s1.sl:
+Time: 123801ms
+
+==========
+[114/161] examples/LIA/s2.sl:
+Answer: -1
+Time: 3415ms
+
+==========
+[115/161] examples/LIA/s3.sl:
+Answer: -1
+Time: 3833ms
+
+==========
+[116/161] examples/LIA/t10.sl:
+Answer: (>= this.num this.total)
+Time: 4064ms
+
+==========
+[117/161] examples/LIA/t11.sl:
+Answer: (not NCK_NEQ_741360)
+Time: 3861ms
+
+==========
+[118/161] examples/LIA/t12.sl:
+Answer: (> pair.length 0)
+Time: 4570ms
+
+==========
+[119/161] examples/LIA/t14.sl:
+Answer: (> newLength 0)
+Time: 4489ms
+
+==========
+[120/161] examples/LIA/t15.sl:
+Answer: enabled
+Time: 4648ms
+
+==========
+[121/161] examples/LIA/t17.sl:
+Answer: (= j j)
+Time: 4867ms
+
+==========
+[122/161] examples/LIA/t18.sl:
+Answer: (> entry 0)
+Time: 4952ms
+
+==========
+[123/161] examples/LIA/t1.sl:
+Answer: (= stopTime org.apache.commons.lang.time.StopWatch.STATE_RUNNING)
+Time: 4476ms
+
+==========
+[124/161] examples/LIA/t20.sl:
+Answer: (= 46 46)
+Time: 4796ms
+
+==========
+[125/161] examples/LIA/t2.sl:
+Answer: (> data.length 0)
+Time: 4508ms
+
+==========
+[126/161] examples/LIA/t3.sl:
+Answer: (= this.y y)
+Time: 4758ms
+
+==========
+[127/161] examples/LIA/t4.sl:
+Answer: (> x.end elem.end)
+Time: 5158ms
+
+==========
+[128/161] examples/LIA/t5.sl:
+Answer: MC_741360
+Time: 4165ms
+
+==========
+[129/161] examples/LIA/t6.sl:
+Answer: (<= i MC_741360)
+Time: 4415ms
+
+==========
+[130/161] examples/LIA/t7.sl:
+Answer: (>= MC_741360 bufferIndex)
+Time: 4725ms
+
+==========
+[131/161] examples/LIA/t8.sl:
+Answer: (< parentNode x2)
+Time: 5727ms
+
+==========
+[132/161] examples/LIA/t9.sl:
+Answer: (< yearInt 9999)
+Time: 5239ms
+
+==========
+[133/161] examples/LIA/unbdd_inv_gen_array.sl:
+Answer: (or (<= (+ (* 1 m) (* -1 a0)) 0) (<= (+ (* 1 j) (* 1 j)) 0))
+Time: 5457ms
+
+==========
+[134/161] examples/LIA/unbdd_inv_gen_cegar2.sl:
+Time: 124978ms
+
+==========
+[135/161] examples/LIA/unbdd_inv_gen_cgr1.sl:
+Answer: (and (<= (+ (* -1 y) (* 1 x)) (+ 1 1)) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 3657ms
+
+==========
+[136/161] examples/LIA/unbdd_inv_gen_ex14.sl:
+Answer: (and (<= (+ (* -1 x) (* 0 x)) (- 0 1)) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 3947ms
+
+==========
+[137/161] examples/LIA/unbdd_inv_gen_ex23.sl:
+Time: 124388ms
+
+==========
+[138/161] examples/LIA/unbdd_inv_gen_ex7.sl:
+Answer: (and (<= (+ (* -1 l) (* 1 y)) 0) (<= (+ (* -1 i) (* 0 i)) 0))
+Time: 3862ms
+
+==========
+[139/161] examples/LIA/unbdd_inv_gen_fig1.sl:
+Answer: (or (<= (+ (* -1 y) (* 0 x)) (- 0 1)) (<= (+ (* 1 x) (* 1 x)) (- 0 1)))
+Time: 4158ms
+
+==========
+[140/161] examples/LIA/unbdd_inv_gen_fig3.sl:
+Answer: (or (= (+ (* 1 y) (* -1 x)) 1) (= (+ (* 1 l) (* 0 x)) 1))
+Time: 4484ms
+
+==========
+[141/161] examples/LIA/unbdd_inv_gen_fig6.sl:
+Answer: (and (<= (+ (* 0 y) (* 0 y)) 0) (<= (+ (* 0 y) (* 0 y)) 0))
+Time: 4359ms
+
+==========
+[142/161] examples/LIA/unbdd_inv_gen_fig8.sl:
+Answer: (and (= (+ (* -1 l) (* -1 l)) 0) (= (+ (* -1 l) (* -1 l)) 0))
+Time: 4375ms
+
+==========
+[143/161] examples/LIA/unbdd_inv_gen_fig9.sl:
+Answer: (and (= (+ (* 1 y) (* -1 x)) 0) (= (+ (* 1 x) (* 1 x)) 0))
+Time: 4397ms
+
+==========
+[144/161] examples/LIA/unbdd_inv_gen_finf1.sl:
+Answer: (and (= (+ (* 0 i) (* -1 x)) 0) (= (+ (* 0 i) (* -1 x)) 0))
+Time: 4218ms
+
+==========
+[145/161] examples/LIA/unbdd_inv_gen_finf2.sl:
+Answer: (and (= (+ (* 0 i) (* -1 x)) 0) (= (+ (* 0 i) (* -1 x)) 0))
+Time: 4159ms
+
+==========
+[146/161] examples/LIA/unbdd_inv_gen_n_c11.sl:
+Answer: (and (<= (+ (* 0 i) (* -1 l)) 0) (<= (+ (* 1 l) (* 0 i)) 4))
+Time: 4339ms
+
+==========
+[147/161] examples/LIA/unbdd_inv_gen_sum1.sl:
+Time: 124149ms
+
+==========
+[148/161] examples/LIA/unbdd_inv_gen_sum3.sl:
+Answer: (and (= (+ (* 1 s) (* -1 x)) 0) (<= (+ (* 0 s) (* 0 s)) 0))
+Time: 3679ms
+
+==========
+[149/161] examples/LIA/unbdd_inv_gen_sum4.sl:
+Answer: (and (= (+ (* 1 i) (* -1 s)) 1) (<= (+ (* 1 i) (* 0 s)) 9))
+Time: 6296ms
+
+==========
+[150/161] examples/LIA/unbdd_inv_gen_tcs.sl:
+Time: 124027ms
+
+==========
+[151/161] examples/LIA/unbdd_inv_gen_term2.sl:
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 4584ms
+
+==========
+[152/161] examples/LIA/unbdd_inv_gen_term3.sl:
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 3576ms
+
+==========
+[153/161] examples/LIA/unbdd_inv_gen_trex1.sl:
+Answer: (or (<= (+ (* -1 k) (* 0 x)) (- 0 1)) (= (+ (* 0 x) (* 1 z)) 1))
+Time: 4354ms
+
+==========
+[154/161] examples/LIA/unbdd_inv_gen_trex2.sl:
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 4297ms
+
+==========
+[155/161] examples/LIA/unbdd_inv_gen_trex4.sl:
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 4234ms
+
+==========
+[156/161] examples/LIA/unbdd_inv_gen_vmail.sl:
+Answer: (and (<= (+ (* -1 i) (* 0 i)) 0) (<= (+ (* -1 i) (* 0 i)) 0))
+Time: 4139ms
+
+==========
+[157/161] examples/LIA/unbdd_inv_gen_w1.sl:
+Answer: (and (<= (+ (* 1 x) (* -1 n)) 0) (<= (+ (* 1 x) (* -1 n)) 0))
+Time: 4404ms
+
+==========
+[158/161] examples/LIA/unbdd_inv_gen_w2.sl:
+Answer: (and (<= (+ (* 1 x) (* -1 n)) (- 0 1)) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 5099ms
+
+==========
+[159/161] examples/LIA/unbdd_inv_gen_winf1.sl:
+Answer: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+Time: 4375ms
+
+==========
+[160/161] examples/LIA/unbdd_inv_gen_winf2.sl:
+Answer: (and (= (+ (* -1 x) (* -1 x)) 0) (= (+ (* -1 x) (* -1 x)) 0))
+Time: 4585ms
+
+Completed 99/161

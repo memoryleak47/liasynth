@@ -1,0 +1,864 @@
+
+==========
+[0/161] examples/LIA/array_search_10.sl:
+Time: 125811ms
+
+==========
+[1/161] examples/LIA/array_search_11.sl:
+Time: 123064ms
+
+==========
+[2/161] examples/LIA/array_search_12.sl:
+Time: 123276ms
+
+==========
+[3/161] examples/LIA/array_search_13.sl:
+Time: 123102ms
+
+==========
+[4/161] examples/LIA/array_search_14.sl:
+Time: 123183ms
+
+==========
+[5/161] examples/LIA/array_search_15.sl:
+Time: 124943ms
+
+==========
+[6/161] examples/LIA/array_search_2.sl:
+Time: 123126ms
+
+==========
+[7/161] examples/LIA/array_search_3.sl:
+Time: 123005ms
+
+==========
+[8/161] examples/LIA/array_search_4.sl:
+Time: 123110ms
+
+==========
+[9/161] examples/LIA/array_search_5.sl:
+Time: 122958ms
+
+==========
+[10/161] examples/LIA/array_search_6.sl:
+Time: 123094ms
+
+==========
+[11/161] examples/LIA/array_search_7.sl:
+Time: 123081ms
+
+==========
+[12/161] examples/LIA/array_search_8.sl:
+Time: 123391ms
+
+==========
+[13/161] examples/LIA/array_search_9.sl:
+Time: 123519ms
+
+==========
+[14/161] examples/LIA/commutative.sl:
+Answer: (+ x y)
+Time: 3290ms
+
+==========
+[15/161] examples/LIA/constant.sl:
+Answer: 0
+Time: 3550ms
+
+==========
+[16/161] examples/LIA/inv_gen_array.sl:
+Answer: (or (<= (+ (* -1 a0) (* 1 m)) 0) (= (+ (* -1 j) (* 0 m)) 0))
+Time: 3777ms
+
+==========
+[17/161] examples/LIA/inv_gen_cegar2.sl:
+
+thread 'main' (815724) panicked at src/synth.rs:163:9:
+infeasible
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+Time: 3630ms
+
+==========
+[18/161] examples/LIA/inv_gen_cgr1.sl:
+Answer: (or (= (+ (* 1 x) (* -1 y)) 2) (<= (+ (* 1 x) (* -1 y)) 1))
+Time: 3314ms
+
+==========
+[19/161] examples/LIA/inv_gen_ex14.sl:
+Answer: (and (<= (+ (* -1 x) (* -1 x)) -2) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 3589ms
+
+==========
+[20/161] examples/LIA/inv_gen_ex23.sl:
+Time: 123705ms
+
+==========
+[21/161] examples/LIA/inv_gen_ex7.sl:
+Answer: (and (<= (+ (* -1 i) (* -1 i)) 0) (<= (+ (* -1 l) (* 1 y)) 0))
+Time: 3049ms
+
+==========
+[22/161] examples/LIA/inv_gen_fig1.sl:
+Answer: (or (<= (+ (* 0 x) (* -1 y)) -1) (<= (+ (* 1 x) (* 1 x)) -3))
+Time: 3007ms
+
+==========
+[23/161] examples/LIA/inv_gen_fig3.sl:
+Answer: (or (<= (+ (* 1 x) (* -1 y)) -1) (= (+ (* 1 l) (* 1 l)) 2))
+Time: 3111ms
+
+==========
+[24/161] examples/LIA/inv_gen_fig6.sl:
+Answer: (and (<= (+ (* 0 y) (* 0 y)) 0) (<= (+ (* 0 y) (* 0 y)) 0))
+Time: 2956ms
+
+==========
+[25/161] examples/LIA/inv_gen_fig8.sl:
+Answer: (and (= (+ (* 0 l) (* -1 l)) 0) (<= (+ (* 0 l) (* 0 l)) 0))
+Time: 3001ms
+
+==========
+[26/161] examples/LIA/inv_gen_fig9.sl:
+Answer: (and (= (+ (* 0 x) (* 1 x)) 0) (= (+ (* 1 y) (* 1 y)) 0))
+Time: 2983ms
+
+==========
+[27/161] examples/LIA/inv_gen_finf1.sl:
+Answer: (and (= (+ (* -1 x) (* -1 x)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Time: 3007ms
+
+==========
+[28/161] examples/LIA/inv_gen_finf2.sl:
+Answer: (and (<= (+ (* -1 x) (* -1 x)) 0) (<= (+ (* 0 i) (* 1 x)) 0))
+Time: 3051ms
+
+==========
+[29/161] examples/LIA/inv_gen_n_c11.sl:
+Answer: (and (<= (+ (* 1 l) (* 0 i)) 4) (<= (+ (* 0 i) (* -1 l)) 0))
+Time: 3074ms
+
+==========
+[30/161] examples/LIA/inv_gen_sum1.sl:
+
+thread 'main' (818583) panicked at src/synth.rs:163:9:
+infeasible
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+Time: 3259ms
+
+==========
+[31/161] examples/LIA/inv_gen_sum3.sl:
+Answer: (and (= (+ (* 1 x) (* -1 s)) 0) (= (+ (* 1 x) (* -1 s)) 0))
+Time: 3104ms
+
+==========
+[32/161] examples/LIA/inv_gen_sum4.sl:
+Answer: (and (<= (+ (* 1 i) (* 0 s)) 9) (= (+ (* -1 i) (* 1 s)) -1))
+Time: 3346ms
+
+==========
+[33/161] examples/LIA/inv_gen_tcs.sl:
+
+thread 'main' (818925) panicked at src/synth.rs:163:9:
+infeasible
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+Time: 3533ms
+
+==========
+[34/161] examples/LIA/inv_gen_term2.sl:
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 2939ms
+
+==========
+[35/161] examples/LIA/inv_gen_term3.sl:
+Answer: (and (<= (+ (* -1 y) (* -1 y)) -2) (<= (+ (* -1 y) (* -1 y)) -2))
+Time: 3506ms
+
+==========
+[36/161] examples/LIA/inv_gen_trex1.sl:
+Answer: (and (<= (+ (* -1 z) (* 0 x)) -1) (<= (+ (* -1 z) (* 0 x)) -1))
+Time: 3038ms
+
+==========
+[37/161] examples/LIA/inv_gen_trex2.sl:
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 2951ms
+
+==========
+[38/161] examples/LIA/inv_gen_trex4.sl:
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 3457ms
+
+==========
+[39/161] examples/LIA/inv_gen_vmail.sl:
+Answer: (and (<= (+ (* -1 i) (* -1 i)) 0) (<= (+ (* 0 i) (* 0 i)) 0))
+Time: 3037ms
+
+==========
+[40/161] examples/LIA/inv_gen_w1.sl:
+Answer: (and (<= (+ (* 1 x) (* -1 n)) 0) (<= (+ (* -1 n) (* -1 n)) 0))
+Time: 3044ms
+
+==========
+[41/161] examples/LIA/inv_gen_w2.sl:
+Answer: (and (<= (+ (* 1 x) (* -1 n)) -1) (<= (+ (* 1 x) (* -1 n)) -1))
+Time: 3066ms
+
+==========
+[42/161] examples/LIA/inv_gen_winf1.sl:
+Answer: (and (= (+ (* 1 x) (* 1 x)) 0) (<= (+ (* 1 x) (* 1 x)) 0))
+Time: 3025ms
+
+==========
+[43/161] examples/LIA/inv_gen_winf2.sl:
+Answer: (and (= (+ (* -1 x) (* -1 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 2975ms
+
+==========
+[44/161] examples/LIA/LinExpr_eq1ex.sl:
+Time: 123349ms
+
+==========
+[45/161] examples/LIA/LinExpr_eq2ex.sl:
+Time: 123273ms
+
+==========
+[46/161] examples/LIA/LinExpr_inv1_ex.sl:
+Time: 123465ms
+
+==========
+[47/161] examples/LIA/LinExpr_inv1.sl:
+Time: 123418ms
+
+==========
+[48/161] examples/LIA/max10.sl:
+Time: 123975ms
+
+==========
+[49/161] examples/LIA/max_11.sl:
+Time: 124551ms
+
+==========
+[50/161] examples/LIA/max12.sl:
+Time: 124876ms
+
+==========
+[51/161] examples/LIA/max13.sl:
+Time: 123980ms
+
+==========
+[52/161] examples/LIA/max14.sl:
+Time: 124369ms
+
+==========
+[53/161] examples/LIA/max15.sl:
+Time: 123816ms
+
+==========
+[54/161] examples/LIA/max2.sl:
+memory allocation of 838860816 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 832947 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 115248ms
+
+==========
+[55/161] examples/LIA/max3.sl:
+Time: 124079ms
+
+==========
+[56/161] examples/LIA/max4.sl:
+Time: 124095ms
+
+==========
+[57/161] examples/LIA/max5.sl:
+Time: 124058ms
+
+==========
+[58/161] examples/LIA/max6.sl:
+Time: 123741ms
+
+==========
+[59/161] examples/LIA/max7.sl:
+Time: 123710ms
+
+==========
+[60/161] examples/LIA/max8.sl:
+Time: 123656ms
+
+==========
+[61/161] examples/LIA/max9.sl:
+Time: 123728ms
+
+==========
+[62/161] examples/LIA/mpg_example1.sl:
+Time: 123983ms
+
+==========
+[63/161] examples/LIA/mpg_example2.sl:
+Time: 123701ms
+
+==========
+[64/161] examples/LIA/mpg_example3.sl:
+Time: 123550ms
+
+==========
+[65/161] examples/LIA/mpg_example4.sl:
+Time: 123601ms
+
+==========
+[66/161] examples/LIA/mpg_example5.sl:
+Time: 123534ms
+
+==========
+[67/161] examples/LIA/mpg_guard1.sl:
+memory allocation of 838860816 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 840195 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 120183ms
+
+==========
+[68/161] examples/LIA/mpg_guard2.sl:
+memory allocation of 512 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 841271 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 106813ms
+
+==========
+[69/161] examples/LIA/mpg_guard3.sl:
+Time: 123976ms
+
+==========
+[70/161] examples/LIA/mpg_guard4.sl:
+memory allocation of 268435456 bytes failed
+timeout: the monitored command dumped core
+Time: 123701ms
+
+==========
+[71/161] examples/LIA/mpg_ite1.sl:
+memory allocation of 352 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 842903 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 117411ms
+
+==========
+[72/161] examples/LIA/mpg_ite2.sl:
+Time: 123808ms
+
+==========
+[73/161] examples/LIA/mpg_plane1.sl:
+Answer: (- (+ (+ (+ (+ (- y (- z 1)) 1) (+ (- y (- z 1)) 1)) x) y) (+ (+ (- y (- z 1)) 1) (+ (- y (- z 1)) 1)))
+Time: 2798ms
+
+==========
+[74/161] examples/LIA/mpg_plane2.sl:
+memory allocation of 96 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 844628 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 103682ms
+
+==========
+[75/161] examples/LIA/mpg_plane3.sl:
+memory allocation of 352 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 845313 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 114933ms
+
+==========
+[76/161] examples/LIA/MPwL_d1s3.sl:
+Answer: 1
+Time: 3125ms
+
+==========
+[77/161] examples/LIA/MPwL_d1s7.sl:
+Answer: 1
+Time: 3193ms
+
+==========
+[78/161] examples/LIA/MPwL_d4s3.sl:
+Time: 123165ms
+
+==========
+[79/161] examples/LIA/MPwL_d4s7.sl:
+Answer: (ite (<= 1 (+ (get-y currPoint) (get-x currPoint))) 1 2)
+Time: 8679ms
+
+==========
+[80/161] examples/LIA/MPwL_d5s3.sl:
+Time: 123146ms
+
+==========
+[81/161] examples/LIA/MPwL_d5s7.sl:
+Time: 123220ms
+
+==========
+[82/161] examples/LIA/MPwoL_d1s3.sl:
+Answer: 1
+Time: 3280ms
+
+==========
+[83/161] examples/LIA/MPwoL_d1s7.sl:
+Answer: 1
+Time: 3257ms
+
+==========
+[84/161] examples/LIA/MPwoL_d4s3.sl:
+Time: 123196ms
+
+==========
+[85/161] examples/LIA/MPwoL_d4s7.sl:
+Time: 123253ms
+
+==========
+[86/161] examples/LIA/MPwoL_d5s3.sl:
+Time: 123160ms
+
+==========
+[87/161] examples/LIA/MPwoL_d5s7.sl:
+Time: 123250ms
+
+==========
+[88/161] examples/LIA/qm_area_sel_2.sl:
+memory allocation of 838860816 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 850109 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 121649ms
+
+==========
+[89/161] examples/LIA/qm_choose_01.sl:
+memory allocation of 128 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 850623 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 92380ms
+
+==========
+[90/161] examples/LIA/qm_choose_yz.sl:
+memory allocation of 6442450944 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 850966 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 115169ms
+
+==========
+[91/161] examples/LIA/qm_in_range.sl:
+memory allocation of 838860816 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 851225 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 96679ms
+
+==========
+[92/161] examples/LIA/qm_loop_1.sl:
+memory allocation of 838860816 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 851740 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 93489ms
+
+==========
+[93/161] examples/LIA/qm_loop_2.sl:
+memory allocation of 256 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 852085 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 98139ms
+
+==========
+[94/161] examples/LIA/qm_loop_3.sl:
+memory allocation of 352 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 852257 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 101572ms
+
+==========
+[95/161] examples/LIA/qm_max2.sl:
+memory allocation of 2214592528 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 852605 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 94959ms
+
+==========
+[96/161] examples/LIA/qm_max3.sl:
+memory allocation of 28040 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 854427 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 117461ms
+
+==========
+[97/161] examples/LIA/qm_max4.sl:
+memory allocation of 838860816 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 856530 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 111075ms
+
+==========
+[98/161] examples/LIA/qm_max5.sl:
+Time: 123766ms
+
+==========
+[99/161] examples/LIA/qm_neg_1.sl:
+Answer: (ite (< (- 0 x) 1) 0 1)
+Time: 3368ms
+
+==========
+[100/161] examples/LIA/qm_neg_2.sl:
+memory allocation of 2214592528 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 859178 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 116242ms
+
+==========
+[101/161] examples/LIA/qm_neg_3.sl:
+Time: 123814ms
+
+==========
+[102/161] examples/LIA/qm_neg_4.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 861684 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 89626ms
+
+==========
+[103/161] examples/LIA/qm_neg_5.sl:
+Time: 123587ms
+
+==========
+[104/161] examples/LIA/qm_neg_eq_1.sl:
+Answer: (ite (< (- (- 0 1) x) (- 0 1)) 0 1)
+Time: 2538ms
+
+==========
+[105/161] examples/LIA/qm_neg_eq_2.sl:
+memory allocation of 2214592528 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 863962 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 110732ms
+
+==========
+[106/161] examples/LIA/qm_neg_eq_3.sl:
+memory allocation of 128 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 864908 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 115313ms
+
+==========
+[107/161] examples/LIA/qm_neg_eq_4.sl:
+memory allocation of 256 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 865168 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 114625ms
+
+==========
+[108/161] examples/LIA/qm_neg_eq_5.sl:
+memory allocation of 38544 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 865341 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 116181ms
+
+==========
+[109/161] examples/LIA/s0_d0.sl:
+memory allocation of 6442450944 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 866286 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 62737ms
+
+==========
+[110/161] examples/LIA/s0_d1.sl:
+memory allocation of 6442450944 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 866373 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 62673ms
+
+==========
+[111/161] examples/LIA/s0_d2.sl:
+memory allocation of 6442450944 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 866460 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 63634ms
+
+==========
+[112/161] examples/LIA/s0.sl:
+memory allocation of 6442450944 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 866548 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 72584ms
+
+==========
+[113/161] examples/LIA/s1.sl:
+memory allocation of 352 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 866635 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 71799ms
+
+==========
+[114/161] examples/LIA/s2.sl:
+Answer: -1
+Time: 2535ms
+
+==========
+[115/161] examples/LIA/s3.sl:
+Answer: -1
+Time: 2505ms
+
+==========
+[116/161] examples/LIA/t10.sl:
+Answer: (>= this.num this.total)
+Time: 2352ms
+
+==========
+[117/161] examples/LIA/t11.sl:
+Answer: (not NCK_NEQ_741360)
+Time: 2332ms
+
+==========
+[118/161] examples/LIA/t12.sl:
+Answer: (> pair.length 0)
+Time: 2304ms
+
+==========
+[119/161] examples/LIA/t14.sl:
+Answer: (> offset newLength)
+Time: 2315ms
+
+==========
+[120/161] examples/LIA/t15.sl:
+Answer: enabled
+Time: 2347ms
+
+==========
+[121/161] examples/LIA/t17.sl:
+Answer: (= j j)
+Time: 2314ms
+
+==========
+[122/161] examples/LIA/t18.sl:
+Answer: (> entry 0)
+Time: 2342ms
+
+==========
+[123/161] examples/LIA/t1.sl:
+Answer: (= org.apache.commons.lang.time.StopWatch.STATE_SPLIT stopTime)
+Time: 2323ms
+
+==========
+[124/161] examples/LIA/t20.sl:
+Answer: (= 1 1)
+Time: 2347ms
+
+==========
+[125/161] examples/LIA/t2.sl:
+Answer: (> data.length 0)
+Time: 2372ms
+
+==========
+[126/161] examples/LIA/t3.sl:
+Answer: (= this.y y)
+Time: 2344ms
+
+==========
+[127/161] examples/LIA/t4.sl:
+Answer: (> x.end elem.end)
+Time: 2356ms
+
+==========
+[128/161] examples/LIA/t5.sl:
+Answer: MC_741360
+Time: 2336ms
+
+==========
+[129/161] examples/LIA/t6.sl:
+Answer: (<= i MC_741360)
+Time: 2268ms
+
+==========
+[130/161] examples/LIA/t7.sl:
+Answer: (>= MC_741360 bufferIndex)
+Time: 2331ms
+
+==========
+[131/161] examples/LIA/t8.sl:
+Answer: (< parentNode x2)
+Time: 2399ms
+
+==========
+[132/161] examples/LIA/t9.sl:
+Answer: (< yearInt 9999)
+Time: 2422ms
+
+==========
+[133/161] examples/LIA/unbdd_inv_gen_array.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 868339 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 47069ms
+
+==========
+[134/161] examples/LIA/unbdd_inv_gen_cegar2.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 868425 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 46359ms
+
+==========
+[135/161] examples/LIA/unbdd_inv_gen_cgr1.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 868513 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 49495ms
+
+==========
+[136/161] examples/LIA/unbdd_inv_gen_ex14.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 868602 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 46349ms
+
+==========
+[137/161] examples/LIA/unbdd_inv_gen_ex23.sl:
+memory allocation of 80 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 868691 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 55870ms
+
+==========
+[138/161] examples/LIA/unbdd_inv_gen_ex7.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 868778 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 47385ms
+
+==========
+[139/161] examples/LIA/unbdd_inv_gen_fig1.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 868865 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 44137ms
+
+==========
+[140/161] examples/LIA/unbdd_inv_gen_fig3.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 868952 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 46501ms
+
+==========
+[141/161] examples/LIA/unbdd_inv_gen_fig6.sl:
+Answer: (and (<= (+ (* 0 y) (* 0 y)) 0) (<= (+ (* 0 y) (* 0 y)) 0))
+Time: 2461ms
+
+==========
+[142/161] examples/LIA/unbdd_inv_gen_fig8.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 869123 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 47365ms
+
+==========
+[143/161] examples/LIA/unbdd_inv_gen_fig9.sl:
+memory allocation of 320 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 869212 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 51618ms
+
+==========
+[144/161] examples/LIA/unbdd_inv_gen_finf1.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 869298 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 44007ms
+
+==========
+[145/161] examples/LIA/unbdd_inv_gen_finf2.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 869385 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 44216ms
+
+==========
+[146/161] examples/LIA/unbdd_inv_gen_n_c11.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 869471 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 44087ms
+
+==========
+[147/161] examples/LIA/unbdd_inv_gen_sum1.sl:
+memory allocation of 2214592528 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 869560 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 42907ms
+
+==========
+[148/161] examples/LIA/unbdd_inv_gen_sum3.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 869646 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 45942ms
+
+==========
+[149/161] examples/LIA/unbdd_inv_gen_sum4.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 869733 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 47658ms
+
+==========
+[150/161] examples/LIA/unbdd_inv_gen_tcs.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 869821 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 46296ms
+
+==========
+[151/161] examples/LIA/unbdd_inv_gen_term2.sl:
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 2390ms
+
+==========
+[152/161] examples/LIA/unbdd_inv_gen_term3.sl:
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 2453ms
+
+==========
+[153/161] examples/LIA/unbdd_inv_gen_trex1.sl:
+Answer: (and (<= (+ (* -1 z) (* -1 z)) (- 0 1)) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 2443ms
+
+==========
+[154/161] examples/LIA/unbdd_inv_gen_trex2.sl:
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 2377ms
+
+==========
+[155/161] examples/LIA/unbdd_inv_gen_trex4.sl:
+Answer: (and (<= (+ (* 0 x) (* 0 x)) 0) (<= (+ (* 0 x) (* 0 x)) 0))
+Time: 2488ms
+
+==========
+[156/161] examples/LIA/unbdd_inv_gen_vmail.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 870332 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 46115ms
+
+==========
+[157/161] examples/LIA/unbdd_inv_gen_w1.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 870419 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 43331ms
+
+==========
+[158/161] examples/LIA/unbdd_inv_gen_w2.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 870508 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 46681ms
+
+==========
+[159/161] examples/LIA/unbdd_inv_gen_winf1.sl:
+memory allocation of 12348030976 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 870595 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 47564ms
+
+==========
+[160/161] examples/LIA/unbdd_inv_gen_winf2.sl:
+Answer: (and (= (+ (* 1 x) (* 0 x)) 0) (<= (+ (* 1 x) (* 0 x)) 0))
+Time: 2453ms
+
+Completed 60/161
