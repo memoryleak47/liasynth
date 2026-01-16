@@ -16,7 +16,7 @@ type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 10 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 14 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
@@ -427,12 +427,10 @@ fn seen_insert_maximal(seen: &mut HashSet<Sat>, new: Sat) {
 
 #[inline(always)]
 fn dominated_by_superset(sat: Sat, seen: &HashSet<Sat>) -> bool {
-    seen.iter().any(|&sc| (sat & sc) == sat && sc != sat)
+    seen.iter().any(|&sc| is_subset(sc, sat) && sc != sat)
 }
 
 fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool {
-    use itertools::Itertools;
-
     let rt = &rule.signature().1.into_nt().unwrap();
     let seen = &ctxt.seen_scs[nt];
 
@@ -465,33 +463,28 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                 return true;
             }
 
-            (rt == tt && ctxt.classes[*b_then].satcount == 0)
-                || (rt == te && ctxt.classes[*b_else].satcount == 0)
+            return (rt == tt && ctxt.classes[*b_then].satcount == 0)
+                || (rt == te && ctxt.classes[*b_else].satcount == 0);
         }
 
         Some("(div ? ?)") | Some("(mod ? ?)") => {
-            if let [(_at, a), (bt, b)] = children {
+            if let [(at, a), (_bt, b)] = children {
                 match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
-                    (_, Node::ConstInt(0, ty) | Node::ConstInt(1, ty)) => {
-                        return nt == ty.into_nt().unwrap();
+                    (_, Node::ConstInt(0, _) | Node::ConstInt(1, _)) => {
+                        return nt == *at;
                     }
                     _ => {}
                 }
 
                 let b_vals = &ctxt.classes[*b].vals;
-                return (rt == bt)
+                return (rt == at)
                     && (b_vals.iter().all(|v| *v == Value::Int(0))
                         || b_vals.iter().all(|v| *v == Value::Int(1)));
             }
-            false
         }
-
         Some("(+ ? ?)") => {
             if let [(at, a), (bt, b)] = children {
-                if a == b && at == bt {
-                    return true;
-                }
-                if a >= b && at == bt {
+                if a > b && at == bt {
                     return true;
                 }
 
@@ -507,30 +500,18 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                 return (rt == at && a_vals.iter().all(|v| *v == Value::Int(0)))
                     || (rt == bt && b_vals.iter().all(|v| *v == Value::Int(0)));
             }
-            false
         }
 
         Some("(- ? ?)") => {
-            if let [(_at, a), (bt, b)] = children {
-                match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
-                    (_, Node::ConstInt(0, ty)) => {
-                        return nt == ty.into_nt().unwrap();
-                    }
-                    _ => {}
-                }
-
+            if let [(at, _a), (_bt, b)] = children {
                 let b_vals = &ctxt.classes[*b].vals;
-                return (rt == bt) && b_vals.iter().all(|v| *v == Value::Int(0));
+                return (rt == at) && b_vals.iter().all(|v| *v == Value::Int(0));
             }
-            false
         }
 
         Some("(* ? ?)") => {
             if let [(at, a), (bt, b)] = children {
-                if a == b && at == bt {
-                    return true;
-                }
-                if a >= b && at == bt {
+                if a > b && at == bt {
                     return true;
                 }
 
@@ -551,14 +532,10 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                         && (b_vals.iter().all(|v| *v == Value::Int(0))
                             || b_vals.iter().all(|v| *v == Value::Int(1))));
             }
-            false
         }
 
         Some("(and ? ?)") | Some("(or ? ?)") => {
             if let [(at, a), (bt, b)] = children {
-                if a == b && at == bt {
-                    return true;
-                }
                 if a >= b && at == bt {
                     return true;
                 }
@@ -575,30 +552,29 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                     return true;
                 }
             }
-            false
         }
 
-        Some("(= ? ?)")
-        | Some("(> ? ?)")
-        | Some("(>= ? ?)")
-        | Some("(< ? ?)")
-        | Some("(<= ? ?)")
-        | Some("(xor ? ?)")
-        | Some("(distinct ? ?)") => {
+        Some("(> ? ?)") | Some("(>= ? ?)") | Some("(< ? ?)") | Some("(<= ? ?)") => {
             if let [(at, a), (bt, b)] = children {
                 if a == b && at == bt {
                     return true;
                 }
+            }
+        }
+
+        Some("(= ? ?)") | Some("(xor ? ?)") | Some("(distinct ? ?)") => {
+            if let [(at, a), (bt, b)] = children {
                 if a >= b && at == bt {
                     return true;
                 }
             }
-            false
         }
-        _ => match rule.signature() {
-            (_, Ty::Bool) if rule.children().len() > 1 => children.iter().all_equal(),
-            _ => false,
-        },
+        _ => {}
+    }
+
+    match rule.signature() {
+        (_, Ty::Bool) if rule.children().len() > 1 => children.iter().all_equal(),
+        _ => false,
     }
 }
 
