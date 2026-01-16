@@ -431,18 +431,23 @@ fn dominated_by_superset(sat: Sat, seen: &HashSet<Sat>) -> bool {
 }
 
 fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool {
+    use itertools::Itertools;
+
     let rt = &rule.signature().1.into_nt().unwrap();
     let seen = &ctxt.seen_scs[nt];
+
     match rule.template() {
         Some("(ite ? ? ?)") => {
             let [(_, cond), (tt, b_then), (te, b_else)] = children else {
                 return false;
             };
 
-            let rt = rule.signature().1.into_nt().unwrap();
+            if b_then == b_else && tt == te {
+                return true;
+            }
 
             let cond_vals = &ctxt.classes[*cond].vals;
-            if cond_vals.len() > 1 && cond_vals.iter().all_equal() && rt == *tt && rt == *te {
+            if cond_vals.len() > 1 && cond_vals.iter().all_equal() && rt == tt && rt == te {
                 return true;
             }
 
@@ -456,11 +461,38 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                 return true;
             }
 
-            (rt == *tt && ctxt.classes[*b_then].satcount == 0)
-                || (rt == *te && ctxt.classes[*b_else].satcount == 0)
+            (rt == tt && ctxt.classes[*b_then].satcount == 0)
+                || (rt == te && ctxt.classes[*b_else].satcount == 0)
         }
+
+        Some("(div ? ?)") | Some("(mod ? ?)") => {
+            if let [(_at, a), (bt, b)] = children {
+                match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
+                    (_, Node::ConstInt(0, ty) | Node::ConstInt(1, ty)) => {
+                        return nt == ty.into_nt().unwrap();
+                    }
+                    _ => {}
+                }
+
+                let b_vals = &ctxt.classes[*b].vals;
+                return (rt == bt)
+                    && (b_vals.iter().all(|v| *v == Value::Int(0))
+                        || b_vals.iter().all(|v| *v == Value::Int(1)));
+            }
+            false
+        }
+
         Some("(+ ? ?)") => {
             if let [(at, a), (bt, b)] = children {
+                // commutative pruning: same args / canonical order
+                if a == b && at == bt {
+                    return true;
+                }
+                if a >= b && at == bt {
+                    return true;
+                }
+
+                // identity: x + 0 = x
                 match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
                     (_, Node::ConstInt(0, ty)) | (Node::ConstInt(0, ty), _) => {
                         return nt == ty.into_nt().unwrap();
@@ -468,16 +500,40 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                     _ => {}
                 }
 
-                let rt = &rule.signature().1.into_nt().unwrap();
                 let a_vals = &ctxt.classes[*a].vals;
                 let b_vals = &ctxt.classes[*b].vals;
-                return (rt == at && (a_vals.iter().all(|v| *v == Value::Int(0))))
-                    || (rt == bt) && (b_vals.iter().all(|v| *v == Value::Int(0)));
+                return (rt == at && a_vals.iter().all(|v| *v == Value::Int(0)))
+                    || (rt == bt && b_vals.iter().all(|v| *v == Value::Int(0)));
             }
             false
         }
+
+        Some("(- ? ?)") => {
+            if let [(_at, a), (bt, b)] = children {
+                match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
+                    (_, Node::ConstInt(0, ty)) => {
+                        return nt == ty.into_nt().unwrap();
+                    }
+                    _ => {}
+                }
+
+                let b_vals = &ctxt.classes[*b].vals;
+                return (rt == bt) && b_vals.iter().all(|v| *v == Value::Int(0));
+            }
+            false
+        }
+
         Some("(* ? ?)") => {
             if let [(at, a), (bt, b)] = children {
+                // commutative pruning: same args / canonical order
+                if a == b && at == bt {
+                    return true;
+                }
+                if a >= b && at == bt {
+                    return true;
+                }
+
+                // identities / annihilators: x*0, x*1
                 match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
                     (_, Node::ConstInt(0, ty) | Node::ConstInt(1, ty))
                     | (Node::ConstInt(0, ty) | Node::ConstInt(1, ty), _) => {
@@ -486,18 +542,63 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                     _ => {}
                 }
 
-                let rt = &rule.signature().1.into_nt().unwrap();
                 let a_vals = &ctxt.classes[*a].vals;
                 let b_vals = &ctxt.classes[*b].vals;
                 return (rt == at
                     && (a_vals.iter().all(|v| *v == Value::Int(0))
                         || a_vals.iter().all(|v| *v == Value::Int(1))))
-                    || (rt == bt)
+                    || (rt == bt
                         && (b_vals.iter().all(|v| *v == Value::Int(0))
-                            || b_vals.iter().all(|v| *v == Value::Int(1)));
+                            || b_vals.iter().all(|v| *v == Value::Int(1))));
             }
             false
         }
+
+        Some("(and ? ?)") | Some("(or ? ?)") => {
+            if let [(at, a), (bt, b)] = children {
+                // commutative pruning: same args / canonical order
+                if a == b && at == bt {
+                    return true;
+                }
+                if a >= b && at == bt {
+                    return true;
+                }
+
+                // detect (x AND (not x)) / (x OR (not x)) via value-traces:
+                let a_vals = &ctxt.classes[*a].vals;
+                let b_vals = &ctxt.classes[*b].vals;
+
+                // only if both sides are booleans for all sigmas
+                if a_vals.len() == b_vals.len()
+                    && a_vals.iter().zip(b_vals.iter()).all(|(i, j)| match (i, j) {
+                        (Value::Bool(x), Value::Bool(y)) => x == &(!*y),
+                        _ => false,
+                    })
+                {
+                    return true;
+                }
+            }
+            false
+        }
+
+        Some("(= ? ?)")
+        | Some("(> ? ?)")
+        | Some("(>= ? ?)")
+        | Some("(< ? ?)")
+        | Some("(<= ? ?)")
+        | Some("(xor ? ?)")
+        | Some("(distinct ? ?)") => {
+            if let [(at, a), (bt, b)] = children {
+                if a == b && at == bt {
+                    return true;
+                }
+                if a >= b && at == bt {
+                    return true;
+                }
+            }
+            false
+        }
+
         _ => match rule.signature() {
             (_, Ty::Bool) if rule.children().len() > 1 => children.iter().all_equal(),
             _ => false,
