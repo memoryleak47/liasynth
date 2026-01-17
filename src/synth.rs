@@ -536,21 +536,21 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
 
         Some("(and ? ?)") | Some("(or ? ?)") => {
             if let [(at, a), (bt, b)] = children {
-                if a >= b && at == bt {
+                if a > b && at == bt {
                     return true;
                 }
 
-                let a_vals = &ctxt.classes[*a].vals;
-                let b_vals = &ctxt.classes[*b].vals;
+                // let a_vals = &ctxt.classes[*a].vals;
+                // let b_vals = &ctxt.classes[*b].vals;
 
-                if a_vals.len() == b_vals.len()
-                    && a_vals.iter().zip(b_vals.iter()).all(|(i, j)| match (i, j) {
-                        (Value::Bool(x), Value::Bool(y)) => x == &(!*y),
-                        _ => false,
-                    })
-                {
-                    return true;
-                }
+                // if a_vals.len() == b_vals.len()
+                //     && a_vals.iter().zip(b_vals.iter()).all(|(i, j)| match (i, j) {
+                //         (Value::Bool(x), Value::Bool(y)) => x == &(!*y),
+                //         _ => false,
+                //     })
+                // {
+                //     return true;
+                // }
             }
         }
 
@@ -563,7 +563,7 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
         }
         Some("(= ? ?)") | Some("(xor ? ?)") | Some("(distinct ? ?)") => {
             if let [(at, a), (bt, b)] = children {
-                if a >= b && at == bt {
+                if a > b && at == bt {
                     return true;
                 }
             }
