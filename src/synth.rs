@@ -5,6 +5,7 @@ use indexmap::IndexSet;
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
 use priority_queue::PriorityQueue;
+use rand::seq::IndexedRandom;
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet};
 
@@ -489,15 +490,19 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                 }
 
                 match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
-                    (_, Node::ConstInt(0, ty)) | (Node::ConstInt(0, ty), _) => {
-                        return nt == ty.into_nt().unwrap();
+                    (_, Node::ConstInt(0, _)) => {
+                        return nt == *at;
+                    }
+                    (Node::ConstInt(0, _), _) => {
+                        return nt == *bt;
                     }
                     _ => {}
                 }
 
                 let a_vals = &ctxt.classes[*a].vals;
                 let b_vals = &ctxt.classes[*b].vals;
-                return (rt == at && a_vals.iter().all(|v| *v == Value::Int(0)))
+                return !a_vals.is_empty()
+                    && (rt == at && a_vals.iter().all(|v| *v == Value::Int(0)))
                     || (rt == bt && b_vals.iter().all(|v| *v == Value::Int(0)));
             }
         }
@@ -516,9 +521,11 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                 }
 
                 match (&ctxt.classes[*a].node, &ctxt.classes[*b].node) {
-                    (_, Node::ConstInt(0, ty) | Node::ConstInt(1, ty))
-                    | (Node::ConstInt(0, ty) | Node::ConstInt(1, ty), _) => {
-                        return nt == ty.into_nt().unwrap();
+                    (_, Node::ConstInt(0, _) | Node::ConstInt(1, _)) => {
+                        return *at == nt;
+                    }
+                    (Node::ConstInt(0, _) | Node::ConstInt(1, _), _) => {
+                        return nt == *bt;
                     }
                     _ => {}
                 }
@@ -533,30 +540,30 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                             || b_vals.iter().all(|v| *v == Value::Int(1))));
             }
         }
-
         Some("(and ? ?)") | Some("(or ? ?)") => {
             if let [(at, a), (bt, b)] = children {
                 if a > b && at == bt {
                     return true;
                 }
 
-                // let a_vals = &ctxt.classes[*a].vals;
-                // let b_vals = &ctxt.classes[*b].vals;
+                let a_vals = &ctxt.classes[*a].vals;
+                let b_vals = &ctxt.classes[*b].vals;
 
-                // if a_vals.len() == b_vals.len()
-                //     && a_vals.iter().zip(b_vals.iter()).all(|(i, j)| match (i, j) {
-                //         (Value::Bool(x), Value::Bool(y)) => x == &(!*y),
-                //         _ => false,
-                //     })
-                // {
-                //     return true;
-                // }
+                if !a_vals.is_empty()
+                    && a_vals.len() == b_vals.len()
+                    && a_vals.iter().zip(b_vals.iter()).all(|(i, j)| match (i, j) {
+                        (Value::Bool(x), Value::Bool(y)) => x == &(!*y),
+                        _ => false,
+                    })
+                {
+                    return true;
+                }
             }
         }
 
         Some("(> ? ?)") | Some("(>= ? ?)") | Some("(< ? ?)") | Some("(<= ? ?)") => {
             if let [(at, a), (bt, b)] = children {
-                if a == b && at == bt {
+                if a == b && at == bt && !ctxt.classes[*a].vals.is_empty() {
                     return true;
                 }
             }
@@ -642,22 +649,30 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
                 continue 'rule;
             }
 
-            let mut child_ids: Vec<(usize, Id)> = Vec::with_capacity(rel_children.len() + 1);
             let base_children = base_prog.children().to_vec();
+
+            let hole_pos: Vec<usize> = rule
+                .children()
+                .iter()
+                .enumerate()
+                .filter_map(|(p, ch)| matches!(ch, Child::Hole(_, _)).then_some(p))
+                .collect();
+
+            let mut by_pos: Vec<(usize, Id)> = vec![(usize::MAX, 0); in_types.len()];
+            let mut child_ids: Vec<(usize, Id)> = Vec::with_capacity(hole_pos.len());
 
             for combination in rel_children
                 .iter()
                 .map(|(pos, ids)| ids.iter().map(move |id| (*pos, *id)))
                 .multi_cartesian_product()
             {
-                // Build child_ids without cloning combination / pushing into new_children.
-                child_ids.clear();
+                by_pos[i] = (child_nt, x);
                 for (pos, id) in &combination {
-                    let nt2 = nt_by_pos[*pos];
-                    // nt2 should be valid because we only stored PRule positions.
-                    child_ids.push((nt2, *id));
+                    by_pos[*pos] = (nt_by_pos[*pos], *id);
                 }
-                child_ids.push((child_nt, x));
+
+                child_ids.clear();
+                child_ids.extend(hole_pos.iter().map(|&p| by_pos[p]));
 
                 if prune(nt, rule, &child_ids, ctxt) {
                     continue;
@@ -670,7 +685,6 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
                     prog.children_mut()[*pos] = Child::Hole(nt2, *c_idx);
                 }
 
-                // Don’t clone prog unless add_node requires it.
                 let (id, is_sol, satcount) = add_node(*pnt, prog.clone(), ctxt, None);
 
                 max_sat = max_sat.max(satcount.count_ones());
