@@ -17,7 +17,7 @@ type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
 compile_error!("simple is incompatible with winning");
 
 const WINNING: bool = cfg!(feature = "winning");
-const MAXSIZE: usize = if cfg!(feature = "total") { 14 } else { 0 };
+const MAXSIZE: usize = if cfg!(feature = "total") { 100 } else { 0 };
 // TODO: find a better way to only do incremental on certain nodes/for certain programs
 
 fn push_bounded<T: Ord>(heap: &mut BinaryHeap<T>, val: T) {
@@ -169,8 +169,8 @@ fn incremental_comp(ctxt: &mut Ctxt) -> Option<Term> {
     let mut seen: HashMap<Id, Vec<Id>> = HashMap::new();
 
     for id in 0..ctxt.classes.len() {
-        if insert_if_absent(&mut seen, id)
-            && (!WINNING || (ctxt.classes[id].prev_sol > 0 || ctxt.classes[id].in_sol))
+        if (!WINNING || (ctxt.classes[id].prev_sol > 0 || ctxt.classes[id].in_sol)) 
+            && insert_if_absent(&mut seen, id)
         {
             if let Some(id) = incremental_add_class(id, &mut seen, ctxt) {
                 handle_solution(id, ctxt);
@@ -299,7 +299,7 @@ fn add_incremental_nodes(
             new_node.children_mut()[*pos] = Child::Hole(ty_nt, *c_idx);
         }
 
-        let Ok(new_vals) = update_vals(&node, vals, ctxt) else {
+        let Ok(new_vals) = update_vals(&new_node, vals, ctxt) else {
             return None;
         };
 
