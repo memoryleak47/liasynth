@@ -1,19 +1,6 @@
 """
-table 1: message = full config of cegraph is better than baseline, regardless of heyristic.
-
-cvc5
-egraph
-us (incremental computation + keeping n programs) [size, expert, learned, random]
-table 2: message = number of programs stored matters. only for size heuristic
-
-us no incremental
-us incremental winning
-us incremental + n programs
 graph1: uniquely solved visual compariso
-
 graph2: time. cactus plot unless we come up with anything better (try scatter 1 v 1: cvc5 vs best us, various versions of us v us)
-
-appendix table: current table 1.
 """
 
 import pandas as pd
@@ -25,7 +12,7 @@ from matplotlib.colors import ListedColormap
 from extract_data import *
 
 
-def one_v_one(x, y, xl, yl):
+def one_v_one(x, y, xl, yl, b=None):
     valid = x.notna() & y.notna()
     x_only = x.notna() & y.isna()
     y_only = x.isna() & y.notna()
@@ -38,12 +25,22 @@ def one_v_one(x, y, xl, yl):
     lims = [min(ax.get_xlim()[0], ax.get_ylim()[0]), 
             max(ax.get_xlim()[1], ax.get_ylim()[1])]
 
+    log_lims = [np.log10(lims[0]), np.log10(lims[1])]
+    log_range = log_lims[1] - log_lims[0]
+    rect_size_log = log_range * 0.040 
+    rect_size = 10**rect_size_log  
+
     for xi in x[x_only]:
-        ax.add_patch(mpatches.Rectangle((xi*0.9, lims[0]), xi*0.2, lims[0]*0.1, 
-                                        color='C1', alpha=0.7))
+        width = xi * (rect_size - 1) 
+        height = lims[0] * (rect_size - 1)
+        ax.add_patch(mpatches.Rectangle((xi/np.sqrt(rect_size), lims[0]/np.sqrt(rect_size)), 
+                                         width, height, color='C1', alpha=0.7))
+
     for yi in y[y_only]:
-        ax.add_patch(mpatches.Rectangle((lims[0], yi*0.9), lims[0]*0.1, yi*0.2,
-                                        color='C2', alpha=0.7))
+        width = lims[0] * (rect_size - 1)
+        height = yi * (rect_size - 1)
+        ax.add_patch(mpatches.Rectangle((lims[0]/np.sqrt(rect_size), yi/np.sqrt(rect_size)), 
+                                         width, height, color='C2', alpha=0.7))
 
     ax.plot(lims, lims, 'k--', alpha=0.75, zorder=0)
     ax.set_aspect('equal')
@@ -51,12 +48,12 @@ def one_v_one(x, y, xl, yl):
     ax.set_ylim(lims)
     ax.set_xlabel(xl)
     ax.set_ylabel(yl)
-
     ax.legend(handles=[
         mpatches.Patch(color=f'C{i}', label=lbl, alpha=0.7)
         for i, lbl in enumerate(['Both solved', xl, yl])
     ])
-    plt.show()
+    # plt.show()
+    plt.savefig(f"cvc5vbest_{'lia' if b == 'lia' else 'rf' }.pdf")
 
 
 def cvb(b=None):
@@ -64,7 +61,7 @@ def cvb(b=None):
     best = df.count().argmax()
     df = df.dropna(how='all')
     x, y = df['cvc5'], df.iloc[:, best]
-    one_v_one(x, y, 'cvc5', df.columns[best])
+    one_v_one(x, y, 'cvc5', df.columns[best], b)
 
 
 def unique_solve(b=None):
@@ -96,7 +93,7 @@ def unique_solve(b=None):
     ax.set_ylabel('Benchmarks', fontsize=10, fontweight='bold')
 
     plt.tight_layout()
-    plt.show()
+    plt.savefig(f"unique_{'lia' if b == 'lia' else 'rf' }.pdf")
 
 
 def not_solve(b=None):
@@ -124,4 +121,4 @@ def not_solve(b=None):
     ax.set_ylabel('Benchmarks', fontsize=10, fontweight='bold')
 
     plt.tight_layout()
-    plt.show()
+    plt.savefig(f"nosolve_{'lia' if b == 'lia' else 'rf' }.pdf")
