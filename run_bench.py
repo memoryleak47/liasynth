@@ -14,8 +14,8 @@ base_dir = os.getcwd()
 outdir = os.path.abspath(outdir)
 os.makedirs(outdir, exist_ok=True)
 
-g1 = [None, "size", "random", "learned"]
-# g1 = ["size"]
+# g1 = [None, "size", "random", "learned"]
+g1 = [None, "size", "learned"]
 g2 = [None, "winning"]
 g3 = [None, "total"]
 
@@ -58,7 +58,7 @@ for o1, o2, o3 in itertools.product(g1, g2, g3):
 
     jobs.append((cmd, rundir))
 
-max_workers = 8
+max_workers = 2
 
 with ThreadPoolExecutor(max_workers=max_workers) as ex:
     futures = {

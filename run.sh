@@ -1,2 +1,2 @@
-python3 python_frontend.py "$1"
-cargo r --release -- "$1"
+python python_frontend.py "$1"
+ RUSTFLAGS="-Awarnings" cargo run --release --features default "$1"
