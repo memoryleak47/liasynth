@@ -172,7 +172,7 @@ pub fn eval_term_partial(i: Id, term: &[Node], sigma: &Sigma) -> Option<Value> {
     term[i].eval(&f, sigma)
 }
 
-pub fn cegis(problem: &Problem) -> Term {
+pub fn cegis(problem: &Problem) -> Option<Term> {
     let mut sigmas = Vec::new();
     let mut cxs_cache = None;
     let mut classes = None;
@@ -204,7 +204,7 @@ pub fn cegis(problem: &Problem) -> Term {
             }
             sigmas.push(sigma);
         } else {
-            return term;
+            return Some(term);
         }
     }
 }

@@ -41,12 +41,14 @@ fn main() {
 
     let arg = std::env::args()
         .nth(1)
-        .unwrap_or(String::from("examples/LIA/max3.sl"));
+        .unwrap_or_else(|| "examples/LIA/max3.sl".to_string());
     let problem = mk_sygus_problem(&arg);
 
-    let term = cegis(&problem);
-    println!(
-        "Answer: {}",
-        term_to_z3(&term, &problem.vars.keys().cloned().collect::<Box<[_]>>())
-    );
+    match cegis(&problem) {
+        Some(term) => {
+            let vars = problem.vars.keys().cloned().collect::<Box<[_]>>();
+            println!("Answer: {}", term_to_z3(&term, &vars));
+        }
+        None => {}
+    }
 }

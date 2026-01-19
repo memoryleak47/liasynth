@@ -571,7 +571,7 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
 
         Some("(> ? ?)") | Some("(>= ? ?)") | Some("(< ? ?)") | Some("(<= ? ?)") => {
             if let [(at, a), (bt, b)] = children {
-                if a == b && at == bt && !ctxt.classes[*a].vals.is_empty() {
+                if a == b && at == bt && !ctxt.classes[*a].vals.len() <= 1 {
                     return true;
                 }
 
