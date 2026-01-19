@@ -442,7 +442,12 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
             };
 
             if ctxt.classes[*cond].node.template() == Some("(not ?)") {
-                return true;
+                if let Some(Child::Hole(_, c)) = ctxt.classes[*cond].node.children().first() {
+                    if ctxt.classes[*c].node.signature().1 == ctxt.classes[*cond].node.signature().1
+                    {
+                        return true;
+                    }
+                }
             }
 
             if b_then == b_else && tt == te {
@@ -549,14 +554,17 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                 let a_vals = &ctxt.classes[*a].vals;
                 let b_vals = &ctxt.classes[*b].vals;
 
-                if !a_vals.is_empty()
-                    && a_vals.len() == b_vals.len()
-                    && a_vals.iter().zip(b_vals.iter()).all(|(i, j)| match (i, j) {
+                if !a_vals.len() <= 1 && a_vals.iter().all_equal() && b_vals.iter().all_equal() {
+                    return true;
+                }
+
+                if !a_vals.is_empty() {
+                    if a_vals.iter().zip(b_vals.iter()).all(|(i, j)| match (i, j) {
                         (Value::Bool(x), Value::Bool(y)) => x == &(!*y),
                         _ => false,
-                    })
-                {
-                    return true;
+                    }) {
+                        return true;
+                    }
                 }
             }
         }
@@ -566,12 +574,27 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                 if a == b && at == bt && !ctxt.classes[*a].vals.is_empty() {
                     return true;
                 }
+
+                let a_vals = &ctxt.classes[*a].vals;
+                let b_vals = &ctxt.classes[*b].vals;
+                if !a_vals.len() <= 1 {
+                    if a_vals.iter().all_equal() && b_vals.iter().all_equal() {
+                        return true;
+                    }
+                }
             }
         }
         Some("(= ? ?)") | Some("(xor ? ?)") | Some("(distinct ? ?)") => {
             if let [(at, a), (bt, b)] = children {
                 if a > b && at == bt {
                     return true;
+                }
+                let a_vals = &ctxt.classes[*a].vals;
+                let b_vals = &ctxt.classes[*b].vals;
+                if !a_vals.len() <= 1 {
+                    if a_vals.iter().all_equal() && b_vals.iter().all_equal() {
+                        return true;
+                    }
                 }
             }
         }
