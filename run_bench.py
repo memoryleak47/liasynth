@@ -14,11 +14,11 @@ base_dir = os.getcwd()
 outdir = os.path.abspath(outdir)
 os.makedirs(outdir, exist_ok=True)
 
-g1 = ["expert lia", "expert rf", "size", "random", "learned"]
+g1 = ["expert, lia", "expert, rf", "size", "random", "learned"]
 g2 = [None, "winning"]
 g3 = [None, "total"]
 
-heur_tag = lambda v: "l" if v == "learned" else "r" if v == "random" else "s" if v == "size" else "d"
+heur_tag = lambda v: "l" if v == "learned" else "r" if v == "random" else "s" if v == "size" else "el" if 'lia' in v else 'er'
 inc_tag = lambda v: "_w" if v == "winning" else "_s" if v == "simple" else ""
 tot_tag = lambda x: "t" if x == "total" else ""
 
