@@ -842,8 +842,8 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
         .expect("this never happens")
         != &ctxt.problem.rettype
     {
-        let half = l / 0.3;
-        let score = 2.0 - (-2.0 * (1.0 * half) / (l * l)).exp();
+        let half = l / 3.0;
+        let score = 1.2 - (-0.5 * (1.0 * half) / (l * l)).exp();
         return OrderedFloat(score / normaliser);
     }
 
@@ -864,7 +864,7 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
         });
 
     let sc = c.satcount.count_ones() as f64;
-    let score = 3.3 - (-2.8 * (sc * (add_value - lost_value)) / (l * l)).exp();
+    let score = 1.3 - (-0.4 * (sc * (add_value - lost_value)) / (l * l)).exp();
 
     OrderedFloat(score / normaliser)
 }
@@ -947,9 +947,27 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
 
     let diff = f64::max(sc - max_subterm_satcount, 0.0);
 
+    // let (add_value, lost_value) = c
+    //     .node
+    //     .children()
+    //     .iter()
+    //     .filter_map(|ch| match ch {
+    //         Child::Hole(_, i) => Some(*i),
+    //         _ => None,
+    //     })
+    //     .fold((0.0f64, 0.0f64), |(add, lost), s| {
+    //         let sc = ctxt.classes[s].satcount;
+    //         (
+    //             add + (c.satcount & !sc).count_ones() as f64,
+    //             lost + (!c.satcount & sc).count_ones() as f64,
+    //         )
+    //     });
+
     vec![
         expm1_norm(sc, l, 1.7),
         expm1_norm(diff, l, 3.5),
+        // expm1_norm(add_value, sc, 3.5),
+        // expm1_norm(sc / lost_value, l, 0.5),
         (1.0 / c.complex as f64).exp(),
     ]
     .into_iter()
