@@ -834,7 +834,7 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let ty = ctxt.classes[x].node.ty();
     let l = ctxt.big_sigmas.len() as f64;
     let normaliser = c.complex as f64;
-
+    
     if ctxt
         .problem
         .nt_mapping
@@ -846,8 +846,8 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
         let score = 1.2 - (-0.5 * half / (l * l)).exp();
         return OrderedFloat(score / normaliser);
     }
-
-    let children_or = c
+    
+    let children_diff = c
         .node
         .children()
         .iter()
@@ -855,18 +855,56 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
             Child::Hole(_, i) => Some(ctxt.classes[*i].satcount),
             _ => None,
         })
-        .fold(0u64, |acc, sc| acc | sc);
-
-    let add_value  = (c.satcount & !children_or).count_ones() as f64;
-    let lost_value = (!c.satcount & children_or).count_ones() as f64;
-
-    let diff = (add_value - lost_value).max(1.0);
-
+        .fold(0u64, |acc, sc| acc | (sc & !c.satcount));
+    
+    let diff = children_diff.count_ones() as f64;
     let sc = c.satcount.count_ones() as f64;
-    let score = 1.2 - (-0.4 * (sc / diff) / (l * l)).exp();
-
+    
+    let k = 0.7; 
+    let coverage_metric = sc + k * diff;
+    
+    let dampening_factor = l.max(1.0); 
+    let score = 1.3 - (-0.4 * coverage_metric / dampening_factor).exp();
+    
     OrderedFloat(score / normaliser)
 }
+
+// #[cfg(all(feature = "rf", feature = "expert"))]
+// fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
+//     let c = &ctxt.classes[x];
+//     let ty = ctxt.classes[x].node.ty();
+//     let l = ctxt.big_sigmas.len() as f64;
+//     let normaliser = (c.complex as f64).sqrt();
+// 
+//     if ctxt
+//         .problem
+//         .nt_mapping
+//         .get(&ty)
+//         .expect("this never happens")
+//         != &ctxt.problem.rettype
+//     {
+//         let half = l / 3.0;
+//         let score = 1.2 - (-0.5 * half / (l * l)).exp();
+//         return OrderedFloat(score / normaliser);
+//     }
+// 
+//     let children_diff = c
+//         .node
+//         .children()
+//         .iter()
+//         .filter_map(|ch| match ch {
+//             Child::Hole(_, i) => Some(ctxt.classes[*i].satcount),
+//             _ => None,
+//         })
+//         .fold(0u64, |acc, sc| acc | (sc & !c.satcount));
+// 
+//     let diff = children_diff.count_ones() as f64;
+// 
+//     let sc = c.satcount.count_ones() as f64;
+//     let score = 1.3 - (-0.5 * (sc * diff) / (l * l)).exp();
+// 
+//     OrderedFloat(score / normaliser)
+// }
 
 #[cfg(all(feature = "lia", feature = "expert"))]
 fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
