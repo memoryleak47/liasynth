@@ -860,8 +860,10 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let add_value  = (c.satcount & !children_or).count_ones() as f64;
     let lost_value = (!c.satcount & children_or).count_ones() as f64;
 
+    let diff = (add_value - lost_value).max(1.0);
+
     let sc = c.satcount.count_ones() as f64;
-    let score = 1.3 - (-0.4 * (sc  + add_value - lost_value) / (l * l)).exp();
+    let score = 1.2 - (-0.4 * (sc / diff) / (l * l)).exp();
 
     OrderedFloat(score / normaliser)
 }
