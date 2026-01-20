@@ -895,7 +895,7 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
             Child::Hole(_, i) => Some(*i),
             _ => None,
         })
-        .map(|s| ctxt.classes[*s].satcount.count_ones())
+        .map(|s| ctxt.classes[s].satcount.count_ones())
         .max()
         .unwrap_or_else(|| 0);
 
