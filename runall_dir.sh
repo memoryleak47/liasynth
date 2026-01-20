@@ -17,7 +17,7 @@ run() {
 	start_ts=$(date +%s%3N)
 
         python3 python_frontend.py "$f"
-        if ! cargo b --release --features "$feature" >/dev/null 2>&1; then
+        if ! cargo b --release --no-default-features --features "$feature" >/dev/null 2>&1; then
             echo "[build failed] $f"
             i=$((i+1))
             continue
