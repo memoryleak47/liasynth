@@ -1,0 +1,509 @@
+
+==========
+[0/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010cousot9RFSynt.noassumptions.sl:
+Answer: (+ (ite (< arg0 0) arg2 arg0) (ite (= arg2 arg1) (+ arg2 arg2) arg2))
+Time: 27882ms
+
+==========
+[1/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010easy1RFSynt.noassumptions.sl:
+Answer: (- arg2 arg1)
+Time: 7370ms
+
+==========
+[2/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010easy21RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7132ms
+
+==========
+[3/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010easy22RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7128ms
+
+==========
+[4/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010ndecrRFSynt.noassumptions.sl:
+Answer: arg1
+Time: 7025ms
+
+==========
+[5/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010speedpldi2RFSynt.noassumptions.sl:
+Answer: (+ arg3 arg2)
+Time: 7182ms
+
+==========
+[6/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010speedpldi3RFSynt.noassumptions.sl:
+Answer: (+ arg2 arg3)
+Time: 7526ms
+
+==========
+[7/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010speedpldi4RFSynt.noassumptions.sl:
+Time: 127194ms
+
+==========
+[8/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010terminateRFSynt.noassumptions.sl:
+Time: 127518ms
+
+==========
+[9/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010wiseRFSynt.noassumptions.sl:
+Answer: (ite (< arg0 arg1) (- arg1 arg0) (- arg0 arg1))
+Time: 7855ms
+
+==========
+[10/106] examples/RF_no_assumptions/AviadRFSynt.noassumptions.sl:
+Answer: arg1
+Time: 7516ms
+
+==========
+[11/106] examples/RF_no_assumptions/BradleyMannaSipmaCAV2005Fig1RFSynt.noassumptions.sl:
+Answer: (+ arg1 arg0)
+Time: 7371ms
+
+==========
+[12/106] examples/RF_no_assumptions/BrockschmidtCookFuhsCAV2013IntroductionRFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7470ms
+
+==========
+[13/106] examples/RF_no_assumptions/ChawdharyCookGulwaniSagivYangESOP2008easy1RFSynt.noassumptions.sl:
+Answer: (- arg2 arg1)
+Time: 7328ms
+
+==========
+[14/106] examples/RF_no_assumptions/ChawdharyCookGulwaniSagivYangESOP2008easy2RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7218ms
+
+==========
+[15/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex101RFSynt.noassumptions.sl:
+Answer: (ite (< (+ 1 1) (- (- arg0 1) 1)) arg0 (+ (+ arg0 arg0) (+ arg0 1)))
+Time: 7258ms
+
+==========
+[16/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex201RFSynt.noassumptions.sl:
+Time: 127421ms
+
+==========
+[17/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex206RFSynt.noassumptions.sl:
+Answer: (+ (ite (< arg0 1) arg0 arg2) (ite (< arg2 (- arg1 arg2)) (- arg2) arg2))
+Time: 10493ms
+
+==========
+[18/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex207RFSynt.noassumptions.sl:
+Answer: (- arg1 arg0)
+Time: 7284ms
+
+==========
+[19/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex208RFSynt.noassumptions.sl:
+Time: 127502ms
+
+==========
+[20/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex209RFSynt.noassumptions.sl:
+Answer: (- arg2 arg0)
+Time: 7552ms
+
+==========
+[21/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex210RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7535ms
+
+==========
+[22/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex213RFSynt.noassumptions.sl:
+Answer: (- 1 arg1)
+Time: 7202ms
+
+==========
+[23/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex216RFSynt.noassumptions.sl:
+Answer: (ite (< arg1 0) (- arg0 1) arg1)
+Time: 7169ms
+
+==========
+[24/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex218RFSynt.noassumptions.sl:
+Answer: (ite (< (+ arg0 arg0) (- 1 arg1)) arg0 (+ (+ arg1 arg0) (+ arg0 arg0)))
+Time: 7382ms
+
+==========
+[25/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex219RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7450ms
+
+==========
+[26/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex221RFSynt.noassumptions.sl:
+Answer: (+ arg1 (+ arg0 arg0))
+Time: 7213ms
+
+==========
+[27/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex301RFSynt.noassumptions.sl:
+Answer: (ite (< arg2 arg1) (- arg1 arg0) (- arg2 arg0))
+Time: 7920ms
+
+==========
+[28/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex303RFSynt.noassumptions.sl:
+Time: 127553ms
+
+==========
+[29/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex304RFSynt.noassumptions.sl:
+Answer: (- arg2 arg0)
+Time: 7408ms
+
+==========
+[30/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex305RFSynt.noassumptions.sl:
+Answer: (+ 1 (- arg2 arg1))
+Time: 7566ms
+
+==========
+[31/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex307RFSynt.noassumptions.sl:
+Time: 127922ms
+
+==========
+[32/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex308RFSynt.noassumptions.sl:
+Answer: (- arg1)
+Time: 7243ms
+
+==========
+[33/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex310RFSynt.noassumptions.sl:
+Answer: (+ arg1 arg0)
+Time: 7244ms
+
+==========
+[34/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex401RFSynt.noassumptions.sl:
+Time: 127512ms
+
+==========
+[35/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Fig1RFSynt.noassumptions.sl:
+Time: 128002ms
+
+==========
+[36/106] examples/RF_no_assumptions/ColonSipmaTACAS2001Fig1RFSynt.noassumptions.sl:
+Answer: (- arg1 (- arg2 1))
+Time: 7536ms
+
+==========
+[37/106] examples/RF_no_assumptions/CookSeeZulegerTACAS2013Fig8aRFSynt.noassumptions.sl:
+Answer: (ite (< (- 1) arg0) arg0 (- arg0))
+Time: 7743ms
+
+==========
+[38/106] examples/RF_no_assumptions/CookSeeZulegerTACAS2013Fig8bRFSynt.noassumptions.sl:
+Answer: (ite (< arg1 arg0) arg0 (- arg1 arg0))
+Time: 7807ms
+
+==========
+[39/106] examples/RF_no_assumptions/CountUpRoundRFSynt.noassumptions.sl:
+Answer: (- arg0 arg1)
+Time: 7537ms
+
+==========
+[40/106] examples/RF_no_assumptions/DivMinusRFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7323ms
+
+==========
+[41/106] examples/RF_no_assumptions/DynamiteEx2VarsRFSynt.noassumptions.sl:
+Answer: (+ (ite (< arg0 arg2) (- arg3) (- arg0 arg2)) (ite (< arg1 arg3) (- arg2) (- arg1 arg3)))
+Time: 71703ms
+
+==========
+[42/106] examples/RF_no_assumptions/DynamiteExampleRFSynt.noassumptions.sl:
+Answer: (- arg0 arg1)
+Time: 7376ms
+
+==========
+[43/106] examples/RF_no_assumptions/DynamiteExampleX4RFSynt.noassumptions.sl:
+Answer: (- arg0 arg1)
+Time: 7297ms
+
+==========
+[44/106] examples/RF_no_assumptions/DynExUpTo2VarsConjRFSynt.noassumptions.sl:
+Answer: (- arg0 arg2)
+Time: 7262ms
+
+==========
+[45/106] examples/RF_no_assumptions/DynExUpTo2VarsDisjRFSynt.noassumptions.sl:
+Answer: (ite (< arg1 arg0) (- arg0 arg2) (- arg1 arg2))
+Time: 7338ms
+
+==========
+[46/106] examples/RF_no_assumptions/DynExUpTo3VarsDisjRFSynt.noassumptions.sl:
+Time: 127713ms
+
+==========
+[47/106] examples/RF_no_assumptions/DynExUpTo4VarsDisjRFSynt.noassumptions.sl:
+Time: 127965ms
+
+==========
+[48/106] examples/RF_no_assumptions/GCD5RFSynt.noassumptions.sl:
+Time: 127117ms
+
+==========
+[49/106] examples/RF_no_assumptions/GenadyRFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7191ms
+
+==========
+[50/106] examples/RF_no_assumptions/GopanRepsCAV2006Fig1aRFSynt.noassumptions.sl:
+Time: 127219ms
+
+==========
+[51/106] examples/RF_no_assumptions/GulavaniGulwaniCAV2008Fig1aRFSynt.noassumptions.sl:
+Time: 128066ms
+
+==========
+[52/106] examples/RF_no_assumptions/GulavaniGulwaniCAV2008Fig1cRFSynt.noassumptions.sl:
+Answer: (- arg2 arg0)
+Time: 7206ms
+
+==========
+[53/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig1RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7080ms
+
+==========
+[54/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig2RFSynt.noassumptions.sl:
+Answer: arg1
+Time: 7253ms
+
+==========
+[55/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig4RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7195ms
+
+==========
+[56/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig5RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7226ms
+
+==========
+[57/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig8RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7139ms
+
+==========
+[58/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig9RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7203ms
+
+==========
+[59/106] examples/RF_no_assumptions/KroeningSharyginaTsitovichWintersteigerCAV2010Fig1RFSynt.noassumptions.sl:
+Time: 127600ms
+
+==========
+[60/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Ex1RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7245ms
+
+==========
+[61/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Ex7RFSynt.noassumptions.sl:
+Answer: (+ arg1 (+ arg0 arg0))
+Time: 7343ms
+
+==========
+[62/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Ex9RFSynt.noassumptions.sl:
+Answer: (+ arg1 arg0)
+Time: 7235ms
+
+==========
+[63/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Fig1RFSynt.noassumptions.sl:
+Time: 127673ms
+
+==========
+[64/106] examples/RF_no_assumptions/LeikeHeizmannWST2014Ex9RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7087ms
+
+==========
+[65/106] examples/RF_no_assumptions/LogBuiltInRFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7072ms
+
+==========
+[66/106] examples/RF_no_assumptions/LogIterativeRFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7254ms
+
+==========
+[67/106] examples/RF_no_assumptions/LogMultRFSynt.noassumptions.sl:
+Time: 127551ms
+
+==========
+[68/106] examples/RF_no_assumptions/MasseVMCAI2014Ex6RFSynt.noassumptions.sl:
+Time: 128420ms
+
+==========
+[69/106] examples/RF_no_assumptions/MasseVMCAI2014Fig1aRFSynt.noassumptions.sl:
+Time: 128044ms
+
+==========
+[70/106] examples/RF_no_assumptions/McCarthyIterativeRFSynt.noassumptions.sl:
+Time: 127966ms
+
+==========
+[71/106] examples/RF_no_assumptions/MinusBuiltInRFSynt.noassumptions.sl:
+Answer: (- arg0 arg1)
+Time: 7464ms
+
+==========
+[72/106] examples/RF_no_assumptions/MultDisjRFSynt.noassumptions.sl:
+Time: 128455ms
+
+==========
+[73/106] examples/RF_no_assumptions/NoriSharmaFSE2013Fig7RFSynt.noassumptions.sl:
+Answer: (- arg4 arg0)
+Time: 7713ms
+
+==========
+[74/106] examples/RF_no_assumptions/NoriSharmaFSE2013Fig8RFSynt.noassumptions.sl:
+Answer: (- (+ arg4 arg5) (+ arg0 arg1))
+Time: 7724ms
+
+==========
+[75/106] examples/RF_no_assumptions/PastaA10RFSynt.noassumptions.sl:
+Answer: (ite (< arg1 arg0) (- arg0 arg1) (- arg1 arg0))
+Time: 7393ms
+
+==========
+[76/106] examples/RF_no_assumptions/PastaA4RFSynt.noassumptions.sl:
+Answer: (- arg0 arg1)
+Time: 7144ms
+
+==========
+[77/106] examples/RF_no_assumptions/PastaA5RFSynt.noassumptions.sl:
+Answer: (- arg0 arg1)
+Time: 7093ms
+
+==========
+[78/106] examples/RF_no_assumptions/PastaA6RFSynt.noassumptions.sl:
+Answer: (+ (- arg1) (- arg0 arg2))
+Time: 7243ms
+
+==========
+[79/106] examples/RF_no_assumptions/PastaA7RFSynt.noassumptions.sl:
+Answer: (- arg0 arg1)
+Time: 7177ms
+
+==========
+[80/106] examples/RF_no_assumptions/PastaA9RFSynt.noassumptions.sl:
+Answer: (- arg0 arg2)
+Time: 7228ms
+
+==========
+[81/106] examples/RF_no_assumptions/PastaB10RFSynt.noassumptions.sl:
+Answer: (+ arg1 arg0)
+Time: 7306ms
+
+==========
+[82/106] examples/RF_no_assumptions/PastaB11RFSynt.noassumptions.sl:
+Answer: (+ arg1 arg0)
+Time: 7160ms
+
+==========
+[83/106] examples/RF_no_assumptions/PastaB12RFSynt.noassumptions.sl:
+Answer: (+ (ite (< arg0 arg1) arg1 arg0) (ite (< arg0 0) arg1 arg0))
+Time: 7818ms
+
+==========
+[84/106] examples/RF_no_assumptions/PastaB13RFSynt.noassumptions.sl:
+Answer: (+ (- (ite (< arg0 arg2) arg1 arg0) arg2) (- (ite (< arg0 arg1) arg1 arg0) arg2))
+Time: 12433ms
+
+==========
+[85/106] examples/RF_no_assumptions/PastaB1RFSynt.noassumptions.sl:
+Answer: (- arg0 arg1)
+Time: 7181ms
+
+==========
+[86/106] examples/RF_no_assumptions/PastaB2RFSynt.noassumptions.sl:
+Answer: (- arg0 arg1)
+Time: 7143ms
+
+==========
+[87/106] examples/RF_no_assumptions/PastaB3RFSynt.noassumptions.sl:
+Answer: (- arg0 arg1)
+Time: 7276ms
+
+==========
+[88/106] examples/RF_no_assumptions/PastaB4RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7502ms
+
+==========
+[89/106] examples/RF_no_assumptions/PastaB5RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7746ms
+
+==========
+[90/106] examples/RF_no_assumptions/PastaB6RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7407ms
+
+==========
+[91/106] examples/RF_no_assumptions/PastaB7RFSynt.noassumptions.sl:
+Answer: (- arg1 arg2)
+Time: 7203ms
+
+==========
+[92/106] examples/RF_no_assumptions/PastaB8RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7486ms
+
+==========
+[93/106] examples/RF_no_assumptions/PastaC3RFSynt.noassumptions.sl:
+Answer: (+ (- (+ arg1 arg1) arg0) (ite (< arg2 arg1) (- 1 arg2) (- arg0)))
+Time: 19589ms
+
+==========
+[94/106] examples/RF_no_assumptions/PastaC5RFSynt.noassumptions.sl:
+Answer: (+ arg1 arg0)
+Time: 7154ms
+
+==========
+[95/106] examples/RF_no_assumptions/PastaC7RFSynt.noassumptions.sl:
+Answer: (- arg3 arg1)
+Time: 7138ms
+
+==========
+[96/106] examples/RF_no_assumptions/PlusSwapRFSynt.noassumptions.sl:
+Time: 127582ms
+
+==========
+[97/106] examples/RF_no_assumptions/PodelskiRybalchenkoTACAS2011Fig1RFSynt.noassumptions.sl:
+Answer: arg0
+Time: 7262ms
+
+==========
+[98/106] examples/RF_no_assumptions/PodelskiRybalchenkoVMCAI2004Ex2RFSynt.noassumptions.sl:
+Answer: (ite (< (+ 1 1) (- (- arg0 1) 1)) (- arg0 (ite (< arg0 1) (- arg0) arg0)) (+ arg0 1))
+Time: 7449ms
+
+==========
+[99/106] examples/RF_no_assumptions/Poly2VarsCondBreakRFSynt.noassumptions.sl:
+Answer: (- arg0 arg2)
+Time: 7170ms
+
+==========
+[100/106] examples/RF_no_assumptions/PolyClosingInRFSynt.noassumptions.sl:
+Answer: arg1
+Time: 7159ms
+
+==========
+[101/106] examples/RF_no_assumptions/Round3RFSynt.noassumptions.sl:
+Time: 127326ms
+
+==========
+[102/106] examples/RF_no_assumptions/Square2VarsDisjRFSynt.noassumptions.sl:
+Time: 127836ms
+
+==========
+[103/106] examples/RF_no_assumptions/SquareDisj2VarsRFSynt.noassumptions.sl:
+Answer: (ite (< (- arg2 arg1) arg1) (- arg0 arg2) (- arg0 arg1))
+Time: 7440ms
+
+==========
+[104/106] examples/RF_no_assumptions/TwoPol4VarsConjRFSynt.noassumptions.sl:
+Answer: (- arg0 arg2)
+Time: 7145ms
+
+==========
+[105/106] examples/RF_no_assumptions/TwoPol4VarsDisjRFSynt.noassumptions.sl:
+Answer: (+ (ite (< arg2 arg0) (- arg0 arg2) (- arg3)) (ite (< arg3 arg1) (- arg1 arg3) (- arg2)))
+Time: 68461ms
+
+Completed 83/106
