@@ -169,7 +169,7 @@ fn incremental_comp(ctxt: &mut Ctxt) -> Option<Term> {
     let mut seen: HashMap<Id, Vec<Id>> = HashMap::new();
 
     for id in 0..ctxt.classes.len() {
-        if (!WINNING || (ctxt.classes[id].prev_sol > 0 || ctxt.classes[id].in_sol)) 
+        if (!WINNING || (ctxt.classes[id].prev_sol > 0 || ctxt.classes[id].in_sol))
             && insert_if_absent(&mut seen, id)
         {
             if let Some(id) = incremental_add_class(id, &mut seen, ctxt) {
@@ -829,16 +829,49 @@ pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
     t
 }
 
-#[cfg(all(
-    not(feature = "learned"),
-    not(feature = "random"),
-    not(feature = "size")
-))]
+#[cfg(all(feature = "rf", feature = "expert"))]
 fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
-    default_heuristic(x, ctxt)
+    let c = &ctxt.classes[x];
+    let ty = ctxt.classes[x].node.ty();
+    let l = ctxt.big_sigmas.len() as f64;
+    let normaliser = c.complex as f64;
+
+    if ctxt
+        .problem
+        .nt_mapping
+        .get(&ty)
+        .expect("this never happens")
+        != &ctxt.problem.rettype
+    {
+        let half = l / 0.3;
+        let score = 2.0 - (-2.0 * (1.0 * half) / (l * l)).exp();
+        return OrderedFloat(score / normaliser);
+    }
+
+    let (add_value, lost_value) = c
+        .node
+        .children()
+        .iter()
+        .filter_map(|ch| match ch {
+            Child::Hole(_, i) => Some(*i),
+            _ => None,
+        })
+        .fold((0.0f64, 0.0f64), |(add, lost), s| {
+            let sc = ctxt.classes[s].satcount;
+            (
+                add + (c.satcount & !sc).count_ones() as f64,
+                lost + (!c.satcount & sc).count_ones() as f64,
+            )
+        });
+
+    let sc = c.satcount.count_ones() as f64;
+    let score = 3.3 - (-2.8 * (sc * (add_value - lost_value)) / (l * l)).exp();
+
+    OrderedFloat(score / normaliser)
 }
 
-fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
+#[cfg(all(feature = "lia", feature = "expert"))]
+fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
     let ty = ctxt.classes[x].node.ty();
     let l = ctxt.big_sigmas.len() as f64;
@@ -855,17 +888,13 @@ fn default_heuristic(x: Id, ctxt: &Ctxt) -> Score {
         let score = 1.0 - (-2.0 * (1.0 * half) / (l * l)).exp();
         return OrderedFloat(score / normaliser);
     }
-
     let max_subterm_satcount = c
         .node
         .children()
         .iter()
-        .filter_map(|c| {
-            if let Child::Hole(_, i) = c {
-                Some(i)
-            } else {
-                None
-            }
+        .filter_map(|ch| match ch {
+            Child::Hole(_, i) => Some(*i),
+            _ => None,
         })
         .map(|s| ctxt.classes[*s].satcount.count_ones())
         .max()

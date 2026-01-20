@@ -39,9 +39,10 @@ fn main() {
     // init_timing_hooks();
     // let _report = ReportOnDrop;
 
-    let arg = std::env::args()
-        .nth(1)
-        .unwrap_or_else(|| "examples/LIA/max3.sl".to_string());
+    let arg = std::env::args().nth(1).unwrap_or_else(|| {
+        "examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex206RFSynt.noassumptions.sl"
+            .to_string()
+    });
     let problem = mk_sygus_problem(&arg);
 
     match cegis(&problem) {

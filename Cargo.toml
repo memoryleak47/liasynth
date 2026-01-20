@@ -23,13 +23,17 @@ hashbrown = "0.16.1"
 rand_distr = "0.5.1"
 
 [profile.release]
-debug = true
-# lto = "thin"
-# codegen-units = 1
+# debug = true
+opt-level = 3
+lto = "thin"
+codegen-units = 1
 
 [features]
-default = []
+default = ['rf', 'expert']
+lia = []
+rf = []
 ignore-grammar = []
+expert = []
 learned = []
 random = []
 size = []
