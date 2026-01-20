@@ -843,28 +843,25 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
         != &ctxt.problem.rettype
     {
         let half = l / 3.0;
-        let score = 1.2 - (-0.5 * (1.0 * half) / (l * l)).exp();
+        let score = 1.2 - (-0.5 * half / (l * l)).exp();
         return OrderedFloat(score / normaliser);
     }
 
-    let (add_value, lost_value) = c
+    let children_or = c
         .node
         .children()
         .iter()
         .filter_map(|ch| match ch {
-            Child::Hole(_, i) => Some(*i),
+            Child::Hole(_, i) => Some(ctxt.classes[*i].satcount),
             _ => None,
         })
-        .fold((0.0f64, 0.0f64), |(add, lost), s| {
-            let sc = ctxt.classes[s].satcount;
-            (
-                add + (c.satcount & !sc).count_ones() as f64,
-                lost + (!c.satcount & sc).count_ones() as f64,
-            )
-        });
+        .fold(0u64, |acc, sc| acc | sc);
+
+    let add_value  = (c.satcount & !children_or).count_ones() as f64;
+    let lost_value = (!c.satcount & children_or).count_ones() as f64;
 
     let sc = c.satcount.count_ones() as f64;
-    let score = 1.3 - (-0.4 * (sc * (add_value - lost_value)) / (l * l)).exp();
+    let score = 1.3 - (-0.4 * (sc  + add_value - lost_value) / (l * l)).exp();
 
     OrderedFloat(score / normaliser)
 }
