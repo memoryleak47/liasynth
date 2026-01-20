@@ -14,8 +14,7 @@ base_dir = os.getcwd()
 outdir = os.path.abspath(outdir)
 os.makedirs(outdir, exist_ok=True)
 
-# g1 = [None, "size", "random", "learned"]
-g1 = [None, "size", "learned"]
+g1 = ["expert, lia", "expert, rf", "size", "random", "learned"]
 g2 = [None, "winning"]
 g3 = [None, "total"]
 

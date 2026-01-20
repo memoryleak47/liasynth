@@ -5,7 +5,6 @@ use indexmap::IndexSet;
 use itertools::Itertools;
 use ordered_float::OrderedFloat;
 use priority_queue::PriorityQueue;
-use rand::seq::IndexedRandom;
 use std::collections::hash_map::Entry;
 use std::collections::{HashMap, HashSet};
 
