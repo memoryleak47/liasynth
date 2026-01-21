@@ -247,19 +247,17 @@ fn update_class(
     let new_sat = satcount(nt, id, ctxt, Some(vec![ctxt.big_sigmas.len() - 1]));
     if new_sat != 0 {
         ctxt.classes[id].satcount |= new_sat;
-        // ctxt.seen_scs[nt].insert(ctxt.classes[id].satcount.clone());
         seen_insert_maximal(&mut ctxt.seen_scs[nt], ctxt.classes[id].satcount);
     }
     enqueue(nt, id, ctxt);
 
-    if ctxt.classes[id].prev_sol > 0 {
+    if ctxt.classes[id].in_sol || ctxt.classes[id].prev_sol > 0 {
         for WithOrd(n, _) in nodes.into_sorted_vec().into_iter().skip(1) {
             if let Some(id) = add_incremental_nodes(id, nt, n, vals, seen, ctxt) {
                 return Some(id);
             }
         }
     }
-
     None
 }
 
@@ -304,7 +302,6 @@ fn add_incremental_nodes(
 
         if !ctxt.vals_lookup.contains_key(&(nt, new_vals.clone())) {
             let (id, is_sol, satcount) = add_node(nt, new_node, ctxt, Some(new_vals));
-            // ctxt.seen_scs[nt].insert(satcount.clone());
             seen_insert_maximal(&mut ctxt.seen_scs[nt], satcount);
             seen.get_mut(&oid).unwrap().push(id);
             ctxt.classes[id].prev_sol = ctxt.classes[oid].prev_sol;
@@ -313,9 +310,6 @@ fn add_incremental_nodes(
                 return Some(id);
             }
             ctxt.classes[id].handled_complex = Some(ctxt.classes[id].complex);
-            // for o in ctxt.problem.nt_tc.reached_by(nt) {
-            //     ctxt.solids[*o].push(id);
-            // }
         }
     }
     None
@@ -828,54 +822,13 @@ pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
     t
 }
 
-#[cfg(all(feature = "rf", feature = "expert"))]
-fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
-    let c = &ctxt.classes[x];
-    let ty = ctxt.classes[x].node.ty();
-    let l = ctxt.big_sigmas.len() as f64;
-    let normaliser = c.complex as f64;
-    
-    if ctxt
-        .problem
-        .nt_mapping
-        .get(&ty)
-        .expect("this never happens")
-        != &ctxt.problem.rettype
-    {
-        let half = l / 3.0;
-        let score = 1.2 - (-0.5 * half / (l * l)).exp();
-        return OrderedFloat(score / normaliser);
-    }
-    
-    let children_diff = c
-        .node
-        .children()
-        .iter()
-        .filter_map(|ch| match ch {
-            Child::Hole(_, i) => Some(ctxt.classes[*i].satcount),
-            _ => None,
-        })
-        .fold(0u64, |acc, sc| acc | (sc & !c.satcount));
-    
-    let diff = children_diff.count_ones() as f64;
-    let sc = c.satcount.count_ones() as f64;
-    
-    let k = 0.7; 
-    let coverage_metric = sc + k * diff;
-    
-    let dampening_factor = l.max(1.0); 
-    let score = 1.3 - (-0.4 * coverage_metric / dampening_factor).exp();
-    
-    OrderedFloat(score / normaliser)
-}
-
 // #[cfg(all(feature = "rf", feature = "expert"))]
 // fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
 //     let c = &ctxt.classes[x];
 //     let ty = ctxt.classes[x].node.ty();
 //     let l = ctxt.big_sigmas.len() as f64;
-//     let normaliser = (c.complex as f64).sqrt();
-// 
+//     let normaliser = c.complex as f64;
+
 //     if ctxt
 //         .problem
 //         .nt_mapping
@@ -887,7 +840,7 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
 //         let score = 1.2 - (-0.5 * half / (l * l)).exp();
 //         return OrderedFloat(score / normaliser);
 //     }
-// 
+
 //     let children_diff = c
 //         .node
 //         .children()
@@ -897,14 +850,58 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
 //             _ => None,
 //         })
 //         .fold(0u64, |acc, sc| acc | (sc & !c.satcount));
-// 
+
 //     let diff = children_diff.count_ones() as f64;
-// 
 //     let sc = c.satcount.count_ones() as f64;
-//     let score = 1.3 - (-0.5 * (sc * diff) / (l * l)).exp();
-// 
+
+//     let k = 0.7;
+//     let coverage_metric = sc + k * diff;
+
+//     let dampening_factor = l.max(1.0);
+//     let score = 1.3 - (-0.4 * coverage_metric / dampening_factor).exp();
+
 //     OrderedFloat(score / normaliser)
 // }
+#[cfg(all(feature = "rf", feature = "expert"))]
+fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
+    let c = &ctxt.classes[x];
+    let ty = ctxt.classes[x].node.ty();
+    let l = ctxt.big_sigmas.len() as f64;
+    let normaliser = c.complex as f64;
+
+    if ctxt
+        .problem
+        .nt_mapping
+        .get(&ty)
+        .expect("this never happens")
+        != &ctxt.problem.rettype
+    {
+        let half = l / 3.1;
+        let score = 1.3 - (-1.0 * half / (l * l)).exp();
+        return OrderedFloat(score / normaliser);
+    }
+
+    let sc = c.satcount.count_ones() as f64;
+    let dampening_factor = l.max(1.0);
+
+    let children_union = c
+        .node
+        .children()
+        .iter()
+        .filter_map(|ch| match ch {
+            Child::Hole(_, i) => Some(ctxt.classes[*i].satcount),
+            _ => None,
+        })
+        .fold(0u64, |acc, sc| acc | sc);
+
+    let loss = (children_union & !c.satcount).count_ones() as f64;
+
+    let gain = (c.satcount & !children_union).count_ones() as f64;
+    let coverage_metric = sc - (loss * 0.5 + gain * 0.3);
+    let score = 1.3 - (-1.0 * coverage_metric / dampening_factor).exp();
+
+    OrderedFloat(score / normaliser)
+}
 
 #[cfg(all(feature = "lia", feature = "expert"))]
 fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
@@ -984,27 +981,9 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
 
     let diff = f64::max(sc - max_subterm_satcount, 0.0);
 
-    // let (add_value, lost_value) = c
-    //     .node
-    //     .children()
-    //     .iter()
-    //     .filter_map(|ch| match ch {
-    //         Child::Hole(_, i) => Some(*i),
-    //         _ => None,
-    //     })
-    //     .fold((0.0f64, 0.0f64), |(add, lost), s| {
-    //         let sc = ctxt.classes[s].satcount;
-    //         (
-    //             add + (c.satcount & !sc).count_ones() as f64,
-    //             lost + (!c.satcount & sc).count_ones() as f64,
-    //         )
-    //     });
-
     vec![
         expm1_norm(sc, l, 1.7),
         expm1_norm(diff, l, 3.5),
-        // expm1_norm(add_value, sc, 3.5),
-        // expm1_norm(sc / lost_value, l, 0.5),
         (1.0 / c.complex as f64).exp(),
     ]
     .into_iter()
