@@ -462,8 +462,8 @@ fn prune(nt: usize, rule: &Node, children: &[(usize, Id)], ctxt: &Ctxt) -> bool 
                 return true;
             }
 
-            return (rt == tt && ctxt.classes[*b_then].satcount == 0)
-                || (rt == te && ctxt.classes[*b_else].satcount == 0);
+            // return rt == tt && rt == te && (ctxt.classes[*b_then].satcount == 0
+            //     || ctxt.classes[*b_else].satcount == 0);
         }
 
         Some("(div ? ?)") | Some("(mod ? ?)") => {
