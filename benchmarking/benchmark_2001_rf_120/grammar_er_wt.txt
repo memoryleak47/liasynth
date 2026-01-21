@@ -4,16 +4,17 @@
 Candidate: arg0
 Candidate: arg2
 Candidate: (+ (+ arg2 arg0) (+ arg2 arg2))
+Candidate: (+ (+ (+ arg2 arg0) (+ arg2 arg2)) (+ arg2 (+ arg2 arg2)))
 Candidate: (ite (< arg0 0) arg2 (- arg0 arg1))
-Candidate: (ite (= arg0 0) arg0 arg2)
-Candidate: (ite (< 0 arg0) (+ arg2 arg0) (- arg1 arg0))
 Candidate: (ite (< arg0 0) arg2 (- arg0 1))
-Candidate: (+ (ite (= arg0 0) arg0 arg2) (ite (= arg2 arg0) arg0 (- arg0)))
-Candidate: (ite (< arg0 1) (+ arg1 (- arg1 arg0)) (+ arg0 (+ arg2 arg2)))
-Candidate: (+ (+ arg2 arg2) (ite (< arg0 0) arg2 arg0))
-Candidate: (+ (ite (< arg0 0) arg2 arg0) (ite (= arg2 arg1) arg2 (- arg0)))
-Answer: (+ (ite (< arg0 0) arg2 arg0) (ite (= arg2 arg1) arg2 (- arg0)))
-Time: 21510ms
+Candidate: (+ (+ arg2 arg2) (ite (< arg0 0) arg2 (- arg0 1)))
+Candidate: (+ (ite (< arg0 0) arg2 (- arg0 1)) (+ (+ arg2 arg2) (+ arg2 1)))
+Candidate: (+ (ite (< arg0 0) arg2 (- arg0 1)) (+ (+ arg2 arg2) (+ arg2 arg2)))
+Candidate: (+ (+ (+ arg2 arg2) (+ arg2 arg2)) (+ arg2 (ite (< arg0 0) arg2 arg0)))
+Candidate: (+ (+ arg2 (ite (< arg0 0) arg2 arg0)) (ite (< 1 arg0) (- arg0) arg2))
+Candidate: (ite (= arg2 arg1) (ite (< arg0 0) arg2 arg0) (- arg0))
+Answer: (ite (= arg2 arg1) (ite (< arg0 0) arg2 arg0) (- arg0))
+Time: 45306ms
 
 ==========
 [1/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010easy1RFSynt.noassumptions.sl:
@@ -23,26 +24,26 @@ Candidate: (- arg1)
 Candidate: (- 1 arg1)
 Candidate: (- arg2 arg1)
 Answer: (- arg2 arg1)
-Time: 7022ms
+Time: 7518ms
 
 ==========
 [2/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010easy21RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 10163ms
+Time: 7688ms
 
 ==========
 [3/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010easy22RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6822ms
+Time: 7824ms
 
 ==========
 [4/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010ndecrRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg1
 Answer: arg1
-Time: 6948ms
+Time: 8015ms
 
 ==========
 [5/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010speedpldi2RFSynt.noassumptions.sl:
@@ -50,7 +51,7 @@ Candidate: arg0
 Candidate: arg3
 Candidate: (+ arg3 arg2)
 Answer: (+ arg3 arg2)
-Time: 7013ms
+Time: 8096ms
 
 ==========
 [6/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010speedpldi3RFSynt.noassumptions.sl:
@@ -59,13 +60,13 @@ Candidate: arg2
 Candidate: arg3
 Candidate: (+ arg2 arg3)
 Answer: (+ arg2 arg3)
-Time: 7071ms
+Time: 8072ms
 
 ==========
 [7/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010speedpldi4RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg2
-Time: 127218ms
+Time: 128085ms
 
 ==========
 [8/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010terminateRFSynt.noassumptions.sl:
@@ -76,52 +77,48 @@ Candidate: (- arg3 arg0)
 Candidate: (- 0 arg0)
 Candidate: (- arg2 arg0)
 Candidate: (- 1 arg0)
-Candidate: (+ (- 1 arg0) (- arg1))
-Candidate: (+ 1 (- 1 arg1))
+Candidate: (+ (- arg0) (- arg3 arg1))
+Candidate: (+ 1 (- 1 arg0))
+Candidate: (+ (- arg3 arg0) (- arg2 arg0))
 Candidate: (+ (- 1 arg0) (- 1 arg1))
-Candidate: (+ (- arg3 arg0) (- arg1))
 Candidate: (+ (- arg3 arg0) (- 1 arg1))
-Candidate: (+ (- 1 arg1) (+ 1 1))
-Candidate: (+ (- (- arg3 arg0) arg1) (+ 1 1))
-Candidate: (+ (+ 1 1) (+ 1 (- 1 arg0)))
-Candidate: (+ (+ 1 (- 1 arg1)) (+ 1 1))
-Candidate: (+ (- (- 1 arg1) arg0) (+ 1 (+ arg3 1)))
-Candidate: (+ (+ 1 1) (+ (- 1 arg0) (+ 1 1)))
-Candidate: (+ (+ 1 (- 1 arg1)) (+ 1 (+ 1 1)))
-Candidate: (+ (+ (- 1 arg0) (+ 1 1)) (+ 1 (+ 1 1)))
-Candidate: (+ (+ arg3 (- 1 arg1)) (+ (- 1 arg0) (+ 1 1)))
-Candidate: (+ (+ (- 1 arg1) (+ 1 1)) (+ 1 (+ 1 1)))
-Candidate: (ite (= arg3 arg2) (- arg2 arg0) (- arg0))
-Candidate: (ite (= arg3 arg2) (- arg2 arg0) (- 1 arg0))
-Candidate: (ite (< arg2 arg3) (+ (- arg3 arg0) (- 1 arg1)) (- (- arg2 arg0) 1))
-Candidate: (ite (< 1 arg0) (- arg2 arg0) (+ 1 (- 1 arg0)))
-Candidate: (ite (< 1 arg0) (+ arg2 (- arg3 arg1)) (+ (- 1 arg0) (+ 1 1)))
-Candidate: (ite (< 1 arg0) (+ (- arg2 arg0) (- arg3 arg1)) (- 1 arg0))
-Candidate: (ite (< arg2 arg3) (+ (- arg3 arg0) (- 1 arg0)) (+ (- arg3 arg0) (- arg2 arg0)))
-Candidate: (+ (+ 1 (+ 1 1)) (ite (< arg1 arg0) arg3 (- 1 arg0)))
-Candidate: (+ (+ (- 1 arg0) (+ 1 1)) (+ (+ arg3 1) (- 1 arg1)))
-Candidate: (+ (- (- arg3 arg0) arg0) (ite (< arg2 arg3) (- arg3 arg0) arg3))
-memory allocation of 3221225472 bytes failed
-timeout: the monitored command dumped core
-./runall_dir.sh: line 12: 2817699 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
-Time: 74308ms
+Candidate: (+ (- 1 arg1) (+ arg3 (- 1 arg0)))
+Candidate: (+ (+ 1 (- 1 arg0)) (+ 1 (- arg2 arg0)))
+Candidate: (+ (+ 1 (- arg2 arg0)) (+ 1 (- 1 arg1)))
+Candidate: (+ (+ arg3 (- 1 arg0)) (+ 1 (- 1 arg1)))
+Candidate: (+ (+ 1 (- 1 arg0)) (+ (- 1 arg0) (+ 1 arg2)))
+Candidate: (+ (+ 1 (- 1 arg1)) (+ (- 1 arg0) (+ 1 arg2)))
+Candidate: (+ (+ 1 (- arg3 arg1)) (+ 1 (+ 1 (- 1 arg0))))
+Candidate: (+ (+ 1 (+ 1 (- 1 arg0))) (+ (- 1 arg1) (+ 1 arg2)))
+Candidate: (+ (+ (- 1 arg0) (+ 1 arg2)) (+ 1 (+ 1 (- 1 arg0))))
+Candidate: (+ (+ (+ arg3 1) (- 1 arg0)) (+ 1 (+ 1 (- 1 arg1))))
+Candidate: (ite (= arg3 arg2) (- arg2 arg0) (- (- arg3 arg0) arg0))
+Candidate: (ite (= arg3 arg2) (+ 1 (- arg2 arg0)) (- (- arg1 arg0) arg0))
+Candidate: (ite (= arg3 arg2) (+ 1 (- arg2 arg0)) (+ (- arg3 arg0) (- 1 arg0)))
+Candidate: (ite (< arg2 arg3) (+ (- arg3 arg0) (- 1 arg0)) (+ (- 1 arg0) (+ 1 arg2)))
+Candidate: (+ (+ (- arg3 arg0) (- 1 arg0)) (ite (= arg3 arg2) arg2 (- arg2 arg0)))
+Candidate: (+ (+ (- arg3 arg0) (- 1 arg0)) (ite (< arg2 arg3) (- arg2 arg0) arg3))
+Time: 127889ms
 
 ==========
 [9/106] examples/RF_no_assumptions/AliasDarteFeautrierGonnordSAS2010wiseRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0)
-Candidate: (ite (< 0 arg0) (- arg1) (- arg0))
-Candidate: (ite (< 0 arg1) (- arg1 arg0) (- arg1))
-Candidate: (ite (< arg0 arg1) (- arg1 arg0) (- arg0 arg1))
-Answer: (ite (< arg0 arg1) (- arg1 arg0) (- arg0 arg1))
-Time: 6845ms
+Candidate: (+ (- 1 arg0) (+ 1 (- 1 arg1)))
+Candidate: (+ (+ 1 (- 1 arg1)) (+ 1 (- 1 arg0)))
+Candidate: (ite (< arg1 1) (- arg1) (- arg0))
+Candidate: (ite (< arg1 arg0) (- arg1) (- 1 arg0))
+Candidate: (ite (< arg0 arg1) (- arg1 arg0) (- arg1))
+Candidate: (ite (< arg1 arg0) (- arg0 arg1) (- arg1 arg0))
+Answer: (ite (< arg1 arg0) (- arg0 arg1) (- arg1 arg0))
+Time: 7271ms
 
 ==========
 [10/106] examples/RF_no_assumptions/AviadRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg1
 Answer: arg1
-Time: 6826ms
+Time: 7664ms
 
 ==========
 [11/106] examples/RF_no_assumptions/BradleyMannaSipmaCAV2005Fig1RFSynt.noassumptions.sl:
@@ -129,13 +126,13 @@ Candidate: arg0
 Candidate: arg1
 Candidate: (+ arg1 arg0)
 Answer: (+ arg1 arg0)
-Time: 6914ms
+Time: 7675ms
 
 ==========
 [12/106] examples/RF_no_assumptions/BrockschmidtCookFuhsCAV2013IntroductionRFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6999ms
+Time: 7582ms
 
 ==========
 [13/106] examples/RF_no_assumptions/ChawdharyCookGulwaniSagivYangESOP2008easy1RFSynt.noassumptions.sl:
@@ -145,108 +142,106 @@ Candidate: (- arg1)
 Candidate: (- 1 arg1)
 Candidate: (- arg2 arg1)
 Answer: (- arg2 arg1)
-Time: 7004ms
+Time: 7735ms
 
 ==========
 [14/106] examples/RF_no_assumptions/ChawdharyCookGulwaniSagivYangESOP2008easy2RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 7008ms
+Time: 7806ms
 
 ==========
 [15/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex101RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (+ (- arg0) (+ 1 1))
 Candidate: (ite (= 1 (- arg0 1)) (+ arg0 arg0) (- (- arg0 1) (+ 1 1)))
-Candidate: (ite (< (+ 1 1) (- (- arg0 1) 1)) arg0 (+ (+ arg0 arg0) (+ arg0 1)))
-Answer: (ite (< (+ 1 1) (- (- arg0 1) 1)) arg0 (+ (+ arg0 arg0) (+ arg0 1)))
-Time: 7487ms
+Candidate: (- (ite (< 0 arg0) (- (+ 1 1) (- (- arg0 1) (+ 1 1))) arg0) (- arg0 (ite (= 1 (- arg0 1)) arg0 (+ (+ 1 1) (+ arg0 1)))))
+Answer: (- (ite (< 0 arg0) (- (+ 1 1) (- (- arg0 1) (+ 1 1))) arg0) (- arg0 (ite (= 1 (- arg0 1)) arg0 (+ (+ 1 1) (+ arg0 1)))))
+Time: 11293ms
 
 ==========
 [16/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex201RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg1
 Candidate: (+ arg1 arg0)
-Candidate: (+ arg0 (+ arg1 1))
-Candidate: (+ (+ arg1 1) (+ arg0 1))
-Candidate: (+ (+ arg1 1) (+ 1 (+ arg0 1)))
-Candidate: (+ (+ 1 (+ arg0 1)) (+ 1 (+ arg1 1)))
-Candidate: (ite (< arg1 0) arg0 (+ arg0 1))
-Candidate: (ite (= arg0 1) arg0 arg1)
-Candidate: (+ 1 (ite (= arg0 1) arg0 arg1))
-Candidate: (ite (< arg1 0) (- arg0 1) (+ 1 (+ arg1 1)))
-Candidate: (+ (+ 1 (+ 1 1)) (+ (+ arg1 1) (+ 1 1)))
-Candidate: (ite (= arg1 1) (ite (< arg1 0) arg0 (+ arg0 arg0)) (ite (< arg1 0) arg0 (+ arg0 1)))
-Candidate: (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 (+ arg1 1))))
-Candidate: (ite (< (- arg1) arg0) (+ (+ arg1 1) (+ 1 1)) (- arg0 1))
-Candidate: (ite (< (- arg1) 1) (+ (+ 1 1) (+ 1 (+ arg1 1))) (- arg0 1))
-Candidate: (ite (< (- arg1) arg0) (+ (+ 1 1) (+ 1 (+ arg1 1))) arg0)
-Candidate: (ite (< 1 (- arg1)) arg0 (+ (+ 1 1) (+ 1 (+ arg1 1))))
-Candidate: (+ (+ (+ 1 1) (+ 1 (+ arg1 1))) (+ (+ 1 1) (+ 1 1)))
-Candidate: (ite (< 1 (- arg1)) (- arg0 1) (+ (+ 1 1) (+ 1 (+ arg1 1))))
-Candidate: (ite (< 1 (- arg1)) (ite (= arg0 1) (- arg0 1) (+ arg1 arg0)) (+ (+ 1 1) (+ 1 (+ arg1 1))))
-Candidate: (+ (ite (< 0 arg1) (+ arg0 (+ arg1 arg1)) arg0) (ite (= arg0 1) (- arg0 1) (+ arg1 1)))
-Candidate: (+ (ite (< 0 arg1) (+ arg0 (+ arg1 arg1)) arg0) (ite (= arg0 1) arg0 (+ 1 (+ arg1 1))))
-Time: 126891ms
+Candidate: (+ (+ arg1 arg0) 1)
+Candidate: (+ (+ arg1 arg0) (+ arg0 1))
+Candidate: (+ (+ arg0 1) (+ arg0 (+ arg1 arg0)))
+Candidate: (+ (+ arg0 (+ arg1 arg0)) (+ arg0 (+ arg0 1)))
+Candidate: (+ (+ arg0 (+ arg0 arg0)) (+ (+ arg1 arg0) (+ arg0 arg0)))
+Candidate: (+ (+ (+ arg1 arg0) (+ arg0 arg0)) (+ (+ arg0 1) (+ arg0 1)))
+Candidate: (ite (< 1 arg0) arg1 arg0)
+Candidate: (+ arg0 (ite (< 1 arg0) arg1 arg0))
+Candidate: (+ 1 (ite (< 1 arg0) arg1 arg0))
+Candidate: (+ (ite (< 1 arg0) arg1 arg0) (+ 1 1))
+Candidate: (+ (+ 1 (ite (< 1 arg0) arg1 arg0)) (+ 1 1))
+Candidate: (ite (= arg1 1) (+ arg0 arg0) (+ arg0 (ite (< 1 arg0) arg1 arg0)))
+Candidate: (ite (= arg1 0) (+ (+ arg1 1) (+ 1 1)) (+ (- arg0 1) (- arg0 1)))
+Candidate: (ite (< arg1 0) arg0 (+ (+ arg1 1) (+ 1 1)))
+Candidate: (+ (+ (+ arg1 1) (+ 1 (+ arg0 1))) (- 1 (ite (= arg0 1) arg1 arg0)))
+Candidate: (+ (ite (< arg1 1) arg0 (+ arg1 (+ arg1 arg0))) (ite (< 1 arg0) (+ 1 (+ arg1 1)) arg0))
+Candidate: (+ (+ 1 (+ 1 1)) (ite (= arg0 1) arg0 (+ 1 (+ arg1 1))))
+Candidate: (- (+ (+ 1 (+ arg0 1)) (+ 1 1)) (- (- (- arg0 1) 1) (+ 1 (+ arg1 1))))
+Time: 127914ms
 
 ==========
 [17/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex206RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (+ arg0 1)
 Candidate: (- arg0 arg2)
+Candidate: (ite (< arg0 arg2) (- arg2 (- arg1 arg2)) (- arg2))
 Candidate: (ite (< 0 arg0) (- arg2 (+ arg0 arg0)) (- arg2))
-Candidate: (ite (< arg2 arg0) (- arg2) (+ arg2 (- arg2 arg1)))
-Candidate: (ite (< arg1 (+ arg2 arg2)) arg0 (- arg2))
-Candidate: (+ (ite (< arg1 (+ arg2 arg2)) arg0 (- arg2)) (+ (+ arg0 arg2) (+ 1 1)))
-Candidate: (ite (< arg1 (+ arg2 arg2)) arg2 (+ 1 (+ arg0 1)))
-Candidate: (ite (< (- 1) arg0) (- (- arg2 arg0) (+ arg0 arg0)) (- arg2))
-Candidate: (+ (ite (< arg2 1) arg2 (+ arg2 (- arg2 arg1))) (ite (< arg0 1) (- arg2) (+ arg2 arg2)))
-Candidate: (+ (ite (< arg1 (+ arg2 arg2)) arg0 (- arg2)) (ite (< arg2 arg0) (- 1 arg0) (+ arg0 arg2)))
-Answer: (+ (ite (< arg1 (+ arg2 arg2)) arg0 (- arg2)) (ite (< arg2 arg0) (- 1 arg0) (+ arg0 arg2)))
-Time: 10767ms
+Candidate: (ite (< (- arg2) arg0) (+ (+ arg2 arg2) (- arg2 arg1)) (- arg2))
+Candidate: (+ (ite (< arg0 0) (- arg0 arg2) (- arg2 (+ arg0 arg0))) (- (ite (< arg2 arg0) (- arg0 arg2) arg0)))
+Candidate: (ite (< (- arg2) arg0) (+ (+ arg2 arg2) (- arg2 (- arg1 arg2))) (- arg2))
+Candidate: (ite (< 1 (- arg0)) (- arg2) (- (- arg2 (+ arg0 arg0)) (+ arg0 arg0)))
+Candidate: (- (ite (< 0 arg0) (- arg2 (+ arg0 arg0)) (- arg0 arg2)) (ite (< arg0 0) arg0 (+ arg0 arg0)))
+Candidate: (ite (< 1 (- arg0 1)) (- arg2 (- arg1 arg2)) (+ 1 (+ arg0 1)))
+Candidate: (ite (= 1 (- arg0 1)) arg0 (+ arg0 (ite (< arg0 arg2) (- arg2 (- arg1 arg2)) (- arg2))))
+Time: 128158ms
 
 ==========
 [18/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex207RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg1 arg0)
 Answer: (- arg1 arg0)
-Time: 6794ms
+Time: 7689ms
 
 ==========
 [19/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex208RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0 arg1)
-Candidate: (+ arg0 (- 1 arg1))
-Candidate: (+ (- 1 arg1) (+ arg0 1))
-Candidate: (+ (- 1 arg1) (+ 1 (+ arg0 1)))
-Candidate: (ite (= arg1 1) arg0 (+ arg0 1))
-Candidate: (ite (< arg1 arg0) (- arg1) arg0)
-Candidate: (ite (< arg1 arg0) (- 1 arg1) arg0)
-Candidate: (ite (< arg1 arg0) (+ 1 (- 1 arg1)) arg0)
-Candidate: (+ (+ 1 1) (+ (- 1 arg1) (+ 1 1)))
-Candidate: (+ (+ (- 1 arg1) (+ 1 1)) (+ 1 (+ 1 1)))
-Candidate: (+ (ite (= arg0 1) arg0 (- arg1)) (ite (< arg1 0) (+ arg0 arg0) arg0))
-Candidate: (+ (ite (< arg1 0) (+ arg0 arg0) arg0) (ite (< arg1 arg0) (- arg0 arg1) arg0))
-Candidate: (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 (- 1 arg1))))
-Candidate: (+ (+ (+ 1 1) (+ 1 (- 1 arg1))) (+ (+ 1 1) (+ 1 1)))
-Candidate: (+ (ite (< arg1 arg0) (- (- 1 arg1) arg1) arg0) (ite (< arg1 1) (- 1 arg1) (- arg0 1)))
-Candidate: (+ (+ (+ 1 1) (+ (- 1 arg1) (+ 1 1))) (+ (+ 1 1) (+ 1 1)))
-Candidate: (+ (ite (< 0 arg1) (- arg0 1) (+ 1 (- 1 arg1))) (ite (< arg1 arg0) (- arg1) (+ arg0 1)))
-Candidate: (+ (ite (< arg1 arg0) (- (- 1 arg1) arg1) arg0) (ite (< 1 arg1) arg0 (+ (- 1 arg1) (+ 1 1))))
-Time: 127769ms
+Candidate: (+ (- arg0 arg1) 1)
+Candidate: (+ (- arg0 arg1) (+ arg0 arg0))
+Candidate: (+ (+ arg0 arg0) (+ arg0 (- arg0 arg1)))
+Candidate: (+ (+ arg0 (- arg0 arg1)) (+ arg0 (+ arg0 1)))
+Candidate: (+ (+ (- arg0 arg1) (+ arg0 arg0)) (+ 1 (+ arg0 1)))
+Candidate: (+ (+ (- arg0 arg1) (+ arg0 1)) (+ 1 (+ 1 (+ arg0 1))))
+Candidate: (ite (= arg1 0) arg0 (- arg0 1))
+Candidate: (ite (< arg1 0) (- arg1) (ite (= arg1 0) arg0 (- arg0 1)))
+Candidate: (ite (= arg0 1) arg0 (- arg1))
+Candidate: (ite (< arg1 arg0) (+ 1 (- 1 arg1)) (- arg0 1))
+Candidate: (ite (< arg0 arg1) arg0 (+ (- 1 arg1) (+ 1 1)))
+Candidate: (ite (< 1 arg1) (- arg0 1) (+ 1 (- 1 arg1)))
+Candidate: (ite (< 1 arg1) (- arg0 1) (+ (- 1 arg1) (+ 1 1)))
+Candidate: (ite (< arg1 1) (+ (- 1 arg1) (+ 1 1)) (- arg0 1))
+Candidate: (ite (< 1 arg1) (ite (< 1 arg0) (- arg0 arg1) arg0) (+ (- 1 arg1) (+ 1 1)))
+Candidate: (ite (< 1 arg1) (ite (< arg0 arg1) arg0 (- arg0 arg1)) (+ (- 1 arg1) (+ 1 1)))
+Candidate: (- (+ (+ 1 1) (+ 1 (+ arg0 1))) (- (- (- arg0 1) 1) (+ 1 (- 1 arg1))))
+Time: 128440ms
 
 ==========
 [20/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex209RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg2 arg0)
 Answer: (- arg2 arg0)
-Time: 6833ms
+Time: 7437ms
 
 ==========
 [21/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex210RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6744ms
+Time: 7703ms
 
 ==========
 [22/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex213RFSynt.noassumptions.sl:
@@ -254,70 +249,61 @@ Candidate: arg0
 Candidate: (- arg0 arg1)
 Candidate: (- 1 arg1)
 Answer: (- 1 arg1)
-Time: 6883ms
+Time: 7950ms
 
 ==========
 [23/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex216RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg1
 Candidate: (+ arg1 arg0)
-Candidate: (+ arg0 (+ arg1 1))
-Candidate: (+ (+ arg1 1) (+ arg0 1))
-Candidate: (+ (+ arg1 1) (+ 1 (+ arg0 1)))
-Candidate: (+ (+ 1 (+ arg0 1)) (+ 1 (+ arg1 1)))
-Candidate: (ite (< arg1 0) arg0 arg1)
-Candidate: (+ arg0 (ite (< arg1 0) arg0 arg1))
-Candidate: (ite (< arg1 0) arg0 (+ arg1 1))
-Answer: (ite (< arg1 0) arg0 (+ arg1 1))
-Time: 7131ms
+Candidate: (+ (+ arg1 arg0) 1)
+Candidate: (+ (+ arg1 arg0) (+ arg0 arg0))
+Candidate: (+ (+ arg0 1) (+ arg0 (+ arg1 arg0)))
+Candidate: (+ (+ arg0 (+ arg1 arg0)) (+ arg0 (+ arg0 1)))
+Candidate: (+ (+ 1 (+ arg0 1)) (+ (+ arg0 1) (+ arg1 1)))
+Candidate: (+ (+ (+ arg1 arg0) (+ arg0 1)) (+ 1 (+ 1 (+ arg0 1))))
+Candidate: (ite (= arg1 arg0) arg0 (- arg0 1))
+Candidate: (ite (< 1 arg0) (- arg1 arg0) (ite (= arg1 arg0) arg0 (- arg0 1)))
+Candidate: (ite (< 0 arg1) arg1 (- arg0 1))
+Answer: (ite (< 0 arg1) arg1 (- arg0 1))
+Time: 8164ms
 
 ==========
 [24/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex218RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg1
 Candidate: (+ arg1 arg0)
-Candidate: (+ arg1 (+ arg0 1))
-Candidate: (+ (+ arg1 arg0) (+ 1 (+ arg0 1)))
-Candidate: (ite (< arg0 arg1) (+ arg0 1) (- arg0 1))
-Candidate: (ite (< arg1 arg0) arg0 (+ 1 (+ arg0 1)))
+Candidate: (+ (+ arg1 arg0) 1)
+Candidate: (+ (+ arg0 arg0) (+ arg0 (+ arg1 arg0)))
+Candidate: (+ (+ (+ arg1 arg0) (+ arg0 1)) (+ arg0 (+ arg0 arg0)))
+Candidate: (ite (< arg1 arg0) arg0 (+ arg0 (+ arg1 arg0)))
+Candidate: (ite (< 0 arg1) (+ arg0 arg0) (- arg0 1))
 Candidate: (ite (< arg1 0) arg0 (+ 1 (+ arg0 1)))
-Candidate: (ite (< arg1 0) arg0 (+ arg0 (+ arg1 arg0)))
-Candidate: (ite (< arg1 0) (+ arg0 1) (+ arg0 (+ arg1 arg0)))
-Candidate: (ite (< arg1 0) (+ arg0 1) (- arg0 (- 1 arg1)))
-Candidate: (ite (< arg1 0) (+ arg0 arg0) (+ arg0 (+ arg1 arg0)))
-Candidate: (ite (< arg1 0) (+ 1 (+ arg0 1)) (+ arg0 (+ arg1 arg0)))
-Candidate: (ite (= arg0 1) arg0 (+ arg0 (+ arg1 arg0)))
-Candidate: (ite (< arg1 0) (+ arg0 (- arg0 1)) (+ arg0 (+ arg1 arg0)))
-Candidate: (+ (+ arg0 (+ arg0 arg0)) (ite (< 1 arg0) arg1 arg0))
-Candidate: (- (ite (< 1 arg0) (+ arg1 arg0) arg0) (ite (< 0 arg1) arg0 (- 1 arg0)))
-Candidate: (+ (+ arg0 (+ arg0 arg0)) (ite (< 1 arg0) arg1 (+ arg0 1)))
-Candidate: (+ (ite (< arg0 arg1) arg1 (+ arg1 arg0)) (ite (< 1 arg0) arg0 (- arg1)))
-Candidate: (+ (+ (+ arg0 1) (+ 1 1)) (+ (+ arg1 (+ arg0 1)) (+ arg0 arg0)))
-Candidate: (+ (ite (< arg1 0) (+ arg0 1) arg0) (ite (< 1 arg0) (+ arg1 (+ arg0 1)) arg0))
-Candidate: (ite (< (- arg1) arg0) arg0 (- (ite (< 0 arg1) (- arg1) arg1) arg1))
-Candidate: (ite (= arg0 1) (ite (< 0 arg1) arg1 arg0) (+ (+ arg1 arg0) (+ arg0 arg0)))
-Candidate: (ite (< arg0 (- arg1)) arg0 (+ (+ arg1 arg0) (+ arg0 arg0)))
-Candidate: (ite (< (- arg1) arg0) (+ (+ arg1 arg0) (+ arg0 arg0)) (+ 1 (+ arg0 1)))
-Candidate: (ite (< (- arg1) arg0) (+ (+ arg1 arg0) (+ arg0 arg0)) (+ (+ 1 1) (+ 1 (+ arg0 1))))
-Candidate: (ite (< (- arg1) arg0) (ite (< arg1 0) arg0 (+ arg0 arg0)) (- (ite (< 0 arg1) arg0 arg1) arg1))
-Candidate: (ite (< (- arg1) arg0) (ite (< arg0 arg1) arg0 (+ arg1 arg0)) (- (ite (< 0 arg1) arg0 arg1) arg1))
-Candidate: (ite (< (- arg1) arg0) (ite (< arg1 0) (+ arg1 arg0) arg0) (- (ite (< 0 arg1) arg0 arg1) arg1))
-Answer: (ite (< (- arg1) arg0) (ite (< arg1 0) (+ arg1 arg0) arg0) (- (ite (< 0 arg1) arg0 arg1) arg1))
-Time: 69926ms
+Candidate: (ite (< 1 arg0) (+ arg1 arg0) arg0)
+Candidate: (+ arg0 (ite (< 1 arg0) (+ arg1 arg0) arg0))
+Candidate: (+ (+ arg0 arg0) (ite (< 1 arg0) (+ arg1 arg0) arg0))
+Candidate: (ite (< 0 arg1) arg0 (ite (< 1 arg0) (+ arg1 arg0) arg0))
+Candidate: (+ (+ arg0 (+ arg0 arg0)) (ite (= arg0 1) arg0 (- arg1 1)))
+Candidate: (+ (+ (+ arg0 arg0) (+ arg0 1)) (ite (= arg0 1) arg0 (- arg1 1)))
+Candidate: (ite (< 0 arg1) (+ arg0 (ite (= arg0 1) arg1 arg0)) arg0)
+Candidate: (+ (+ (+ arg0 (+ arg1 arg0)) (+ 1 (+ arg0 1))) (+ (+ 1 1) (+ 1 (+ arg0 1))))
+Candidate: (+ (+ (+ 1 1) (+ 1 (+ arg0 1))) (+ (+ (+ arg1 arg0) 1) (+ 1 (+ arg0 1))))
+Answer: (+ (+ (+ 1 1) (+ 1 (+ arg0 1))) (+ (+ (+ arg1 arg0) 1) (+ 1 (+ arg0 1))))
+Time: 81073ms
 
 ==========
 [25/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex219RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6939ms
+Time: 7578ms
 
 ==========
 [26/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex221RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg1
-Candidate: (+ arg1 (+ arg0 arg0))
-Answer: (+ arg1 (+ arg0 arg0))
-Time: 6703ms
+Candidate: (+ arg0 (+ arg1 arg0))
+Answer: (+ arg0 (+ arg1 arg0))
+Time: 7595ms
 
 ==========
 [27/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex301RFSynt.noassumptions.sl:
@@ -325,43 +311,39 @@ Candidate: arg0
 Candidate: (- arg0)
 Candidate: (- 1 arg0)
 Candidate: (+ 1 (- 1 arg0))
-Candidate: (+ (- 1 arg0) (+ 1 1))
-Candidate: (+ (+ 1 (- 1 arg0)) (+ 1 1))
-Candidate: (ite (< arg2 arg0) arg1 (- arg0))
-Candidate: (ite (< arg2 arg1) (+ 1 arg1) (- arg2 arg0))
-Candidate: (ite (< arg0 arg2) (- arg0) (- arg1 arg0))
-Candidate: (ite (< arg2 arg1) (- arg1 arg2) (- arg2 arg0))
-Candidate: (ite (< arg2 arg0) (- arg1 arg0) (- 1 arg0))
-Candidate: (ite (< arg2 arg0) (- arg1 arg0) (- arg2 arg0))
-Answer: (ite (< arg2 arg0) (- arg1 arg0) (- arg2 arg0))
-Time: 6862ms
+Candidate: (+ (+ 1 (- 1 arg0)) (- arg1 arg0))
+Candidate: (+ (+ 1 (- 1 arg0)) (- (+ arg2 arg1) arg0))
+Candidate: (+ (+ 1 (- 1 arg0)) (- (+ 1 arg1) arg0))
+Candidate: (+ (+ 1 (- 1 arg0)) (+ (+ 1 arg1) (- arg2 arg0)))
+Candidate: (+ (- (+ 1 arg1) arg0) (+ 1 (+ 1 (- 1 arg0))))
+Candidate: (+ (+ (+ 1 arg1) (- arg2 arg0)) (+ 1 (+ 1 (- 1 arg0))))
+Candidate: (+ (+ 1 (+ 1 (- 1 arg0))) (+ (- 1 arg0) (+ 1 arg1)))
+Candidate: (+ (+ (- 1 arg0) (+ 1 arg1)) (ite (< arg2 0) arg1 (- arg2 arg0)))
+Candidate: (ite (< 1 arg0) (ite (= arg2 0) arg1 (- arg2 arg1)) (+ 1 (- 1 arg0)))
+Candidate: (ite (< arg0 1) (- arg0) (ite (< 1 arg2) (- arg2 arg1) arg1))
+Candidate: (ite (= arg2 0) (ite (< arg0 0) (- arg1) arg1) (ite (< arg2 0) arg1 (- arg2 arg0)))
+Candidate: (ite (< arg0 arg2) (- arg2 arg0) (- arg1 arg0))
+Answer: (ite (< arg0 arg2) (- arg2 arg0) (- arg1 arg0))
+Time: 8821ms
 
 ==========
 [28/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex303RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg2
 Candidate: (+ arg2 arg0)
-Candidate: (+ arg0 (+ arg2 1))
-Candidate: (+ (+ arg2 1) (+ arg0 1))
-Candidate: (+ (- arg2 arg1) (+ arg0 arg0))
+Candidate: (+ (+ arg2 arg0) 1)
+Candidate: (+ (+ arg2 arg0) (+ arg0 arg0))
+Candidate: (- (+ arg0 arg0) (- arg1 arg2))
 Candidate: (+ (+ 1 1) (+ 1 (+ arg2 1)))
-Candidate: (ite (< arg2 0) arg0 (+ 1 (+ arg2 1)))
-Candidate: (ite (< arg1 0) (ite (= arg0 1) arg0 arg1) (+ arg2 1))
-Candidate: (ite (< arg2 0) (ite (= arg0 1) arg0 arg1) (+ 1 (+ arg2 1)))
-Candidate: (ite (= 0 arg1) (+ arg2 (+ arg0 arg0)) (ite (< 0 arg2) arg2 arg0))
-Candidate: (+ (+ 1 (+ arg2 1)) (+ 1 (+ 1 1)))
-Candidate: (+ (+ 1 (+ 1 1)) (+ (+ arg2 1) (+ 1 1)))
-Candidate: (- (ite (= arg2 1) (- arg1) (+ arg0 arg0)) (ite (< 1 arg0) (- arg1) (- arg1 arg2)))
-Candidate: (+ (+ (+ 1 1) (+ 1 (+ arg2 1))) (+ 1 (+ 1 1)))
-Candidate: (+ (ite (= 0 arg1) arg1 arg2) (+ 1 (ite (< arg2 arg1) (- arg1) arg0)))
-Candidate: (ite (< 1 (- arg2)) arg0 (+ (+ 1 1) (+ 1 (+ arg2 1))))
-Candidate: (+ (ite (= arg0 1) (- arg1) arg0) (ite (= arg2 1) (- arg1) (+ arg2 arg0)))
-Candidate: (+ (+ (+ 1 1) (+ 1 (+ arg2 1))) (+ (+ 1 1) (+ 1 1)))
-Candidate: (+ (+ 1 (ite (= arg0 1) arg0 arg2)) (ite (< arg2 0) arg0 (+ 1 (- 1 arg1))))
-memory allocation of 640 bytes failed
-timeout: the monitored command dumped core
-./runall_dir.sh: line 12: 2821825 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
-Time: 103156ms
+Candidate: (+ (+ 1 1) (+ 1 (+ 1 (+ arg2 1))))
+Candidate: (ite (< 1 arg0) (- arg2 arg0) (- (+ arg0 arg0) (- arg1 arg2)))
+Candidate: (ite (< 1 arg0) (- arg0 arg1) (- (+ arg0 arg0) (- arg1 arg2)))
+Candidate: (+ (- (+ arg2 arg0) arg1) (ite (< 1 arg0) arg2 (+ arg0 1)))
+Candidate: (+ (- 1 (- arg1 arg2)) (ite (= arg0 1) arg0 (+ arg2 1)))
+Candidate: (+ (ite (< arg2 arg1) (- arg1) arg0) (ite (= arg1 0) arg0 (+ arg2 1)))
+Candidate: (+ (+ (+ 1 1) (+ 1 (+ arg2 1))) (ite (< arg1 1) (+ arg0 arg0) arg2))
+Candidate: (+ (ite (= arg1 0) arg0 (+ arg2 1)) (+ 1 (ite (< arg2 arg1) (- arg1) arg0)))
+Time: 127656ms
 
 ==========
 [29/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex304RFSynt.noassumptions.sl:
@@ -369,7 +351,7 @@ Candidate: arg0
 Candidate: (- arg0)
 Candidate: (- arg2 arg0)
 Answer: (- arg2 arg0)
-Time: 6990ms
+Time: 7447ms
 
 ==========
 [30/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex305RFSynt.noassumptions.sl:
@@ -378,26 +360,29 @@ Candidate: (- arg0)
 Candidate: (- arg2 arg0)
 Candidate: (+ arg2 (- 1 arg1))
 Answer: (+ arg2 (- 1 arg1))
-Time: 6917ms
+Time: 7429ms
 
 ==========
 [31/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex307RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg1
 Candidate: (+ arg1 1)
-Candidate: (- arg1 arg2)
-Candidate: (- 0 arg2)
-Candidate: (ite (< arg2 arg0) arg0 (+ arg1 arg2))
-Candidate: (ite (< arg2 arg0) (- arg1) arg1)
-Candidate: (ite (< arg1 0) arg0 (+ 1 (+ 1 arg2)))
-Candidate: (ite (< arg1 0) (- arg2) (+ 1 (+ 1 arg2)))
-Candidate: (ite (< arg2 0) (- arg0) (+ arg1 arg2))
-Candidate: (+ (+ (+ arg1 1) (+ 1 1)) (ite (< arg1 0) arg0 (+ 1 arg2)))
-Candidate: (+ (ite (= arg1 1) arg2 (- arg0)) (ite (< arg2 0) (- 1 arg0) arg0))
-Candidate: (+ (ite (< arg2 0) (- arg1) arg2) (ite (< arg0 1) (+ arg1 1) arg2))
-Candidate: (ite (< arg0 (- arg2)) (+ 1 arg0) (ite (< arg1 0) (- arg2) (+ arg2 arg2)))
-Candidate: (ite (= 1 (- arg2)) (ite (= 1 arg0) arg2 (- arg0 arg2)) (ite (< arg1 0) (- arg2) (- 1 arg1)))
-Time: 127666ms
+Candidate: (- arg0 arg2)
+Candidate: (+ 1 (- arg0 arg2))
+Candidate: (+ (+ 1 arg0) (- 1 arg2))
+Candidate: (- (- arg0 arg1) (+ arg2 arg2))
+Candidate: (+ (- arg0 arg2) (- (- 1 arg2) arg1))
+Candidate: (+ (+ 1 (- arg0 arg1)) (- (- 1 arg2) arg2))
+Candidate: (- (- (- arg0 arg1) arg1) (+ arg2 (+ arg2 arg2)))
+Candidate: (+ (+ (- arg0 arg1) (- 1 arg2)) (- (- arg1) (+ arg2 arg2)))
+Candidate: (- (- (- 1 arg1) (+ arg1 arg2)) (- (- arg2 arg0) (- 1 arg2)))
+Candidate: (- (- (- (- arg0 arg1) arg1) arg1) (+ (+ arg2 arg2) (+ arg2 arg2)))
+Candidate: (ite (= arg1 arg0) arg0 (- (- (- arg1) 1) (+ 1 arg2)))
+Candidate: (ite (= arg1 0) (- arg2) arg0)
+Candidate: (ite (< arg1 arg2) arg0 (- (- 1 arg1) arg1))
+Candidate: (ite (< arg1 arg0) (+ arg0 (- arg0 arg1)) (+ 1 (+ 1 (+ 1 arg2))))
+Candidate: (+ (ite (< arg1 arg2) arg0 (- 1 arg1)) (ite (= arg0 arg2) (+ arg1 1) arg0))
+Time: 128061ms
 
 ==========
 [32/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex308RFSynt.noassumptions.sl:
@@ -405,7 +390,7 @@ Candidate: arg0
 Candidate: (- arg0 arg1)
 Candidate: (- arg1)
 Answer: (- arg1)
-Time: 6774ms
+Time: 7768ms
 
 ==========
 [33/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex310RFSynt.noassumptions.sl:
@@ -413,7 +398,7 @@ Candidate: arg0
 Candidate: arg1
 Candidate: (+ arg1 arg0)
 Answer: (+ arg1 arg0)
-Time: 6786ms
+Time: 7720ms
 
 ==========
 [34/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Ex401RFSynt.noassumptions.sl:
@@ -423,21 +408,18 @@ Candidate: (+ arg1 arg0)
 Candidate: (- arg1 arg2)
 Candidate: (- 1 arg2)
 Candidate: (+ 1 (- 1 arg2))
-Candidate: (+ (- 1 arg2) (+ 1 1))
+Candidate: (+ 1 (+ 1 (- 1 arg2)))
 Candidate: (+ (+ 1 (- 1 arg2)) (+ 1 1))
-Candidate: (ite (< arg1 arg2) (- arg1) (- 1 arg2))
+Candidate: (+ (+ 1 (+ 1 (- 1 arg2))) (+ 1 1))
+Candidate: (ite (= arg1 arg2) (- 1 arg1) (ite (= arg1 arg0) arg1 (- arg1 arg2)))
+Candidate: (ite (< arg1 arg2) (- arg1) (+ 1 (- 1 arg2)))
 Candidate: (ite (< arg1 arg2) (- 1 arg1) (+ 1 (- 1 arg2)))
-Candidate: (+ (+ (- 1 arg2) (+ 1 1)) (+ 1 (- 1 arg0)))
-Candidate: (+ (+ (- 1 arg2) (+ 1 1)) (+ 1 (+ 1 1)))
-Candidate: (+ (+ 1 1) (ite (< arg3 arg2) (- arg1) (+ arg1 1)))
-Candidate: (+ (+ 1 1) (ite (< 0 arg2) (- arg1) (+ arg1 1)))
-Candidate: (+ (ite (< arg1 arg2) (- arg1) (- 1 arg2)) (+ 1 (- 1 arg0)))
-Candidate: (+ (ite (< arg1 arg2) (- arg1) (- 1 arg2)) (+ 1 (+ 1 1)))
-Candidate: (+ (+ (+ 1 (- 1 arg2)) (+ 1 1)) (+ 1 (+ 1 1)))
-Candidate: (ite (< 1 arg2) (- (- arg2 arg0) (+ arg1 1)) (+ 1 (- 1 arg2)))
-Candidate: (ite (< 1 arg2) (- (- arg2 arg0) (+ arg1 arg0)) (+ (- 1 arg2) (+ 1 1)))
-Candidate: (+ (ite (< arg1 arg2) (- arg1) (- 1 arg2)) (+ (+ 1 1) (+ 1 1)))
-Time: 127115ms
+Candidate: (ite (< 1 arg2) (- (- arg3 arg1) (- arg0 arg2)) (+ 1 (+ 1 (- 1 arg2))))
+Candidate: (ite (< arg1 arg2) (+ 1 (- 1 arg1)) (+ 1 (+ 1 (- 1 arg2))))
+Candidate: (+ (+ (+ 1 (- 1 arg2)) (+ 1 1)) (+ 1 (- 1 arg0)))
+Candidate: (+ (+ (+ 1 1) (- 1 arg0)) (ite (< arg0 arg2) (- arg1) (+ arg1 1)))
+Candidate: (+ (+ (+ 1 (- 1 arg2)) (+ 1 1)) (+ (+ 1 1) (- 1 arg0)))
+Time: 127599ms
 
 ==========
 [35/106] examples/RF_no_assumptions/ChenFlurMukhopadhyaySAS2012Fig1RFSynt.noassumptions.sl:
@@ -445,22 +427,19 @@ Candidate: arg0
 Candidate: arg1
 Candidate: (+ arg1 arg0)
 Candidate: (- arg0 arg2)
-Candidate: (+ arg0 (- 1 arg2))
-Candidate: (+ (- 1 arg2) (+ arg0 1))
-Candidate: (- (- arg0 arg1) (+ arg2 arg2))
-Candidate: (+ (- 1 arg2) (- (- arg0 arg1) arg2))
-Candidate: (- (- (- arg0 arg1) arg2) (- (- arg2 1) 1))
-Candidate: (ite (< arg2 0) arg0 (- arg0 1))
-Candidate: (ite (< arg1 0) arg0 (+ 1 (+ arg0 1)))
-Candidate: (ite (< arg2 0) arg0 (- arg2 1))
-Candidate: (ite (< arg2 0) (+ 1 (+ arg0 1)) (+ arg2 arg2))
-Candidate: (ite (= arg0 0) arg0 (ite (< arg2 0) arg0 arg2))
-Candidate: (ite (= arg0 0) (- arg0 1) (ite (< arg2 0) arg0 arg2))
-Candidate: (ite (= arg0 1) (ite (< arg2 0) arg0 arg2) (- arg2 1))
-Candidate: (ite (= arg1 arg0) (+ arg0 (+ arg0 arg2)) (ite (= arg2 0) arg2 arg0))
-Candidate: (ite (= arg0 1) (ite (< arg0 arg2) arg2 (- arg2)) (ite (= arg1 arg2) arg0 arg2))
-Candidate: (+ (ite (< 1 arg0) arg1 arg0) (ite (< arg2 0) (- arg0 arg1) arg2))
-Time: 127579ms
+Candidate: (+ (- arg0 arg2) 1)
+Candidate: (+ (+ arg0 arg0) (- 1 arg2))
+Candidate: (+ (+ arg0 1) (+ arg0 (- arg0 arg2)))
+Candidate: (+ (+ arg0 (- arg0 arg2)) (+ arg0 (+ arg0 1)))
+Candidate: (+ (+ (- arg0 arg2) (+ arg0 arg0)) (+ 1 (+ 1 (+ arg0 1))))
+Candidate: (ite (< arg2 arg0) (- arg2) (- arg2 (- 1 arg2)))
+Candidate: (ite (< arg0 arg2) arg0 (+ (+ arg1 arg0) (+ arg0 arg0)))
+Candidate: (ite (< arg1 0) arg0 (+ (+ arg0 arg2) (+ arg0 1)))
+Candidate: (ite (= arg2 0) (ite (< arg1 0) arg2 (+ arg0 arg0)) (ite (< 1 arg2) (- arg0 1) arg0))
+Candidate: (+ (+ arg0 (ite (= arg1 arg2) arg0 arg1)) (ite (= arg1 0) arg0 (- arg1)))
+Candidate: (+ (ite (= arg1 arg2) arg0 (- arg0 1)) (ite (< arg1 arg2) arg0 (+ arg0 arg0)))
+Candidate: (+ (ite (= arg1 arg2) arg0 (- arg0 1)) (ite (= arg1 0) (+ arg0 arg0) arg0))
+Time: 128075ms
 
 ==========
 [36/106] examples/RF_no_assumptions/ColonSipmaTACAS2001Fig1RFSynt.noassumptions.sl:
@@ -468,98 +447,90 @@ Candidate: arg0
 Candidate: arg1
 Candidate: (+ arg1 1)
 Candidate: (- arg1 arg0)
-Candidate: (- 0 arg2)
 Candidate: (- 1 arg2)
-Candidate: (+ (- 1 arg2) (- arg0))
-Candidate: (+ (- 1 arg2) (- 1 arg0))
 Candidate: (+ (- arg1 arg0) (- arg2))
 Candidate: (+ arg1 (- 1 arg2))
 Answer: (+ arg1 (- 1 arg2))
-Time: 6829ms
+Time: 7475ms
 
 ==========
 [37/106] examples/RF_no_assumptions/CookSeeZulegerTACAS2013Fig8aRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0)
-Candidate: (ite (= arg0 0) (- arg0 1) (+ arg0 1))
 Candidate: (ite (< arg0 1) (- arg0) arg0)
 Answer: (ite (< arg0 1) (- arg0) arg0)
-Time: 6766ms
+Time: 7561ms
 
 ==========
 [38/106] examples/RF_no_assumptions/CookSeeZulegerTACAS2013Fig8bRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0)
 Candidate: (- arg1 arg0)
+Candidate: (ite (= arg0 0) (- arg0 arg1) (+ (- arg1 arg0) 1))
+Candidate: (ite (< 0 arg0) (ite (= arg0 arg1) (- arg0) arg0) (- arg1 arg0))
 Candidate: (ite (< arg1 arg0) arg0 (- arg1 arg0))
 Answer: (ite (< arg1 arg0) arg0 (- arg1 arg0))
-Time: 6774ms
+Time: 7478ms
 
 ==========
 [39/106] examples/RF_no_assumptions/CountUpRoundRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0 arg1)
 Answer: (- arg0 arg1)
-Time: 6701ms
+Time: 7519ms
 
 ==========
 [40/106] examples/RF_no_assumptions/DivMinusRFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6661ms
+Time: 7028ms
 
 ==========
 [41/106] examples/RF_no_assumptions/DynamiteEx2VarsRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- 1 arg3)
 Candidate: (- arg1 arg3)
-Candidate: (- (- arg2) (+ arg0 arg0))
-Candidate: (+ (+ 1 1) (- (- 1 arg2) arg0))
-Candidate: (ite (< arg3 arg1) (- arg2) (- arg3))
-Candidate: (ite (= arg3 arg1) (- arg3) (- arg2))
+Candidate: (+ (- arg0) (- (- arg2) arg0))
+Candidate: (ite (< arg3 arg0) (- arg3) (- (- (- arg2) arg0) arg0))
+Candidate: (+ (+ 1 (- 1 arg3)) (+ 1 (+ 1 (- arg1 arg3))))
+Candidate: (+ (+ 1 1) (+ 1 (+ 1 (- 1 arg3))))
 Candidate: (ite (< arg1 arg0) (- arg0 arg2) (- arg1 arg3))
-Candidate: (ite (< 0 arg3) (- arg2) (- arg3))
-Candidate: (ite (= arg3 arg1) (- arg1 arg3) (- (- arg0 arg2) arg2))
-Candidate: (ite (< arg1 0) (- arg2) (+ arg1 (- arg1 arg3)))
-Candidate: (ite (< arg2 1) (- 1 arg2) (- 1 arg3))
-Candidate: (ite (< arg1 arg0) (- arg0 arg2) (+ arg1 (- arg1 arg3)))
-Candidate: (ite (< 0 arg3) (- (- arg0 arg2) arg2) (- arg3))
-Candidate: (ite (< arg1 arg3) (- (- arg0 arg2) arg2) (- arg1 arg3))
-Candidate: (ite (< arg0 arg2) (- (- arg3) arg0) (- arg0 arg2))
-Candidate: (ite (< arg1 arg3) (+ 1 (- 1 arg2)) (+ (- 1 arg3) (+ 1 arg1)))
-Candidate: (ite (< arg0 arg1) (+ arg1 (- arg1 arg3)) (- arg0 arg2))
-Candidate: (+ (+ 1 (+ 1 1)) (+ (- 1 arg3) (+ 1 1)))
-Candidate: (ite (< 1 arg3) (+ 1 (- arg1 arg2)) (+ (- arg0 arg3) (- arg2 arg3)))
-Candidate: (ite (< arg1 arg3) (- (- arg0 arg2) arg2) (+ (- arg1 arg3) (+ arg1 arg1)))
-Candidate: (ite (< arg1 arg3) (- (- arg0 arg2) (+ arg2 arg2)) (+ (- 1 arg3) (+ arg1 arg1)))
-Candidate: (ite (< arg1 arg3) (- (- arg0 arg2) (+ arg2 arg2)) (+ (- arg1 arg3) (+ arg1 arg1)))
-Candidate: (ite (< arg0 arg1) (+ arg1 (- arg1 arg3)) (+ arg0 (- arg0 arg2)))
-Candidate: (ite (< arg0 arg1) (+ (- 1 arg3) (+ arg1 arg1)) (+ 1 (- arg0 arg2)))
-Candidate: (+ (+ 1 (+ 1 1)) (ite (< arg2 arg3) (- arg2) (- 1 arg3)))
+Candidate: (ite (< arg1 0) (- arg2) (- arg1 arg3))
+Candidate: (ite (< arg1 arg0) (- (- arg3) arg1) (- arg1 arg3))
+Candidate: (ite (< arg1 arg0) (+ arg0 (- arg0 arg2)) (- arg1 arg3))
+Candidate: (ite (< arg0 arg1) (- arg1 arg3) (- (- arg0 arg3) arg1))
+Candidate: (ite (< 0 arg1) (- arg1 arg3) (- (- arg3) arg1))
+Candidate: (ite (< arg0 arg1) (+ 1 (- arg1 arg3)) (+ arg0 (+ arg0 (- arg0 arg2))))
+Candidate: (ite (< arg3 arg2) (- arg1 arg3) (- arg0 arg2))
+Candidate: (ite (< arg1 arg3) (- (- arg0 arg2) arg2) (+ arg1 (- arg1 arg3)))
+Candidate: (ite (< arg1 arg3) (- (- 1 arg2) arg1) (- arg1 arg3))
+Candidate: (ite (< arg1 arg3) (- (- (- arg0 arg2) arg2) arg2) (+ arg1 (+ arg1 (- arg1 arg3))))
+Candidate: (+ (ite (< arg1 arg3) (- arg2) (- arg1 arg3)) (ite (< arg3 arg2) (- arg3) (- arg0 arg2)))
+Candidate: (ite (< arg1 arg0) (+ arg0 (+ arg0 (- arg0 arg2))) (- (- arg1 arg2) (+ arg0 arg0)))
 Candidate: (+ (ite (< arg1 arg3) (- arg2) (- arg1 arg3)) (ite (< arg0 arg2) (- arg3) (- arg0 arg2)))
 Answer: (+ (ite (< arg1 arg3) (- arg2) (- arg1 arg3)) (ite (< arg0 arg2) (- arg3) (- arg0 arg2)))
-Time: 17117ms
+Time: 19316ms
 
 ==========
 [42/106] examples/RF_no_assumptions/DynamiteExampleRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0 arg1)
 Answer: (- arg0 arg1)
-Time: 6828ms
+Time: 7713ms
 
 ==========
 [43/106] examples/RF_no_assumptions/DynamiteExampleX4RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0 arg1)
 Answer: (- arg0 arg1)
-Time: 6701ms
+Time: 7741ms
 
 ==========
 [44/106] examples/RF_no_assumptions/DynExUpTo2VarsConjRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0 arg2)
 Answer: (- arg0 arg2)
-Time: 6695ms
+Time: 7651ms
 
 ==========
 [45/106] examples/RF_no_assumptions/DynExUpTo2VarsDisjRFSynt.noassumptions.sl:
@@ -567,18 +538,19 @@ Candidate: arg0
 Candidate: (- 1 arg2)
 Candidate: (- arg1 arg2)
 Candidate: (ite (< 0 arg2) (- arg0 arg2) (- arg2))
-Candidate: (ite (< 0 arg2) (+ (- arg1 arg2) arg0) (- arg2))
-Candidate: (ite (< 1 arg2) (+ (- arg1 arg2) arg0) (- 1 arg2))
-Candidate: (ite (< arg1 1) (- (- arg2) arg1) (- arg1 arg2))
+Candidate: (ite (< arg2 arg1) (- arg1 arg2) (- (- arg2) arg1))
+Candidate: (+ (+ 1 1) (+ (- 1 arg2) (+ 1 1)))
 Candidate: (ite (< arg1 arg2) (- arg0 arg2) (- arg1 arg2))
+Candidate: (ite (< 0 arg2) (+ (- arg1 arg2) arg0) (- arg1 arg2))
+Candidate: (ite (< arg0 0) (- arg2) (+ (- arg1 arg2) arg0))
+Candidate: (ite (< arg1 1) (- (- arg2) arg1) (+ (- arg1 arg2) arg0))
+Candidate: (ite (< arg1 0) (- arg0 arg2) (+ 1 (+ 1 (- arg1 arg2))))
+Candidate: (ite (< 0 arg1) (+ arg1 (+ (- arg1 arg2) arg0)) (+ (- 1 arg2) (+ 1 1)))
 Candidate: (ite (< arg0 arg2) (- arg1 arg2) (- arg0 arg2))
 Candidate: (ite (< arg2 arg0) (- arg0 arg2) (- arg1 arg2))
-Candidate: (ite (< arg2 arg1) (- arg1 arg2) (- (- arg2) (+ arg1 arg1)))
-Candidate: (ite (< arg2 arg0) (- arg0 arg2) (- (- arg1 arg2) arg2))
-Candidate: (ite (< 1 arg1) (- arg1 arg2) (- (- arg2) (+ arg1 arg1)))
-Candidate: (ite (< arg1 arg0) (- arg0 arg2) (- arg1 arg2))
-Answer: (ite (< arg1 arg0) (- arg0 arg2) (- arg1 arg2))
-Time: 6972ms
+Candidate: (ite (< arg0 arg1) (- arg1 arg2) (- arg0 arg2))
+Answer: (ite (< arg0 arg1) (- arg1 arg2) (- arg0 arg2))
+Time: 7873ms
 
 ==========
 [46/106] examples/RF_no_assumptions/DynExUpTo3VarsDisjRFSynt.noassumptions.sl:
@@ -586,45 +558,39 @@ Candidate: arg0
 Candidate: (- arg1 arg3)
 Candidate: (- arg2 arg3)
 Candidate: (+ (- arg2 arg3) arg0)
-Candidate: (+ (+ arg1 1) (- arg0 arg3))
-Candidate: (+ (- arg2 arg3) (+ arg1 arg0))
-Candidate: (+ (+ 1 1) (+ arg1 (- arg0 arg3)))
-Candidate: (+ (+ (- arg2 arg3) arg0) (+ arg1 arg0))
-Candidate: (ite (< 0 arg1) (+ arg1 (- arg2 arg3)) (- 1 arg3))
-Candidate: (ite (< 1 arg2) (- arg2 arg3) (- arg0 arg3))
-Candidate: (ite (< 1 arg2) (- arg2 arg3) (- (- arg2) arg3))
-Candidate: (ite (< arg1 arg0) (- arg0 arg3) (- (- arg2 arg3) arg0))
-Candidate: (ite (< arg0 arg2) (- (- arg2 arg3) arg0) (- (- arg0 arg3) arg2))
-Candidate: (ite (< arg1 arg2) (- (- arg2 arg3) arg1) (+ arg1 (- 1 arg3)))
-Candidate: (ite (< arg2 arg0) (- (- arg0 arg3) arg2) (+ (+ arg1 1) (- 1 arg3)))
-Candidate: (ite (< 1 arg1) (- arg1 arg3) (+ (- 1 arg3) (+ 1 1)))
-Candidate: (ite (< arg3 arg1) (- arg1 arg3) (+ (- 1 arg3) (+ 1 1)))
-Candidate: (ite (< arg2 arg1) (+ arg1 (- 1 arg3)) (+ (- 1 arg3) (+ 1 1)))
-Candidate: (ite (< 0 arg2) (+ (- arg0 arg3) (+ arg2 arg2)) (- (- arg2) arg3))
-Candidate: (ite (< 0 arg1) (+ (+ arg1 1) (- 1 arg3)) (- 1 arg3))
-Candidate: (ite (< arg2 0) (- (- arg0 arg2) (+ arg3 arg2)) (+ (- arg1 arg3) (+ arg2 arg2)))
-Candidate: (ite (< arg2 arg3) (- (- arg0 arg2) (+ arg3 arg2)) (- arg2 arg3))
-Candidate: (ite (< 0 arg1) (+ (- arg1 arg3) (+ arg1 1)) (- 1 arg3))
-Candidate: (ite (< arg2 1) (- (- arg0 arg2) (+ arg3 arg2)) (+ (- arg1 arg3) (+ arg2 arg2)))
-Candidate: (ite (< arg1 arg2) (- (+ arg2 arg0) (+ arg1 arg3)) (+ arg1 (- 1 arg3)))
-Candidate: (ite (< arg2 0) (- (- arg1 arg2) (+ arg3 arg2)) (+ (- arg0 arg3) (+ arg2 arg2)))
-Candidate: (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 1) (+ 1 (- 1 arg3))))
-Candidate: (+ (+ (+ arg2 1) (+ 1 1)) (ite (< arg3 arg0) (- arg0 arg3) (- arg1 arg3)))
-Candidate: (+ (+ (+ 1 1) (+ 1 (- 1 arg3))) (ite (< arg1 arg2) (- arg2 arg3) (- arg1 arg3)))
+Candidate: (+ arg0 (+ arg1 (- arg2 arg3)))
+Candidate: (+ arg2 (+ (- arg2 arg3) arg0))
+Candidate: (+ arg2 (+ arg1 (- arg2 arg3)))
+Candidate: (+ (+ (- arg2 arg3) arg0) (+ arg1 (- arg2 arg3)))
+Candidate: (ite (< 0 arg3) (+ arg0 (+ arg1 (- arg2 arg3))) (- arg3))
+Candidate: (ite (< arg1 arg0) (+ arg2 (+ (- arg2 arg3) arg0)) (- arg1 arg3))
+Candidate: (ite (< 1 arg3) (+ (- arg1 arg3) arg0) (- 1 arg3))
+Candidate: (ite (< arg0 arg2) (- arg2 arg3) (+ 1 (+ (- arg1 arg3) arg0)))
+Candidate: (ite (< arg2 0) (+ arg1 (+ (- arg1 arg3) arg0)) (+ (- arg2 arg3) 1))
+Candidate: (ite (< arg1 arg0) (+ arg0 (+ 1 (- 1 arg3))) (- arg1 arg3))
+Candidate: (ite (< arg1 arg0) (+ arg0 (+ 1 (- 1 arg3))) (+ (- arg1 arg3) 1))
+Candidate: (ite (< arg1 arg0) (+ arg0 (+ 1 (- 1 arg3))) (- (- arg1 arg3) arg0))
+Candidate: (ite (< 1 arg0) (- arg0 arg3) (- (- (- arg3) arg0) arg0))
+Candidate: (ite (< arg1 arg0) (+ arg0 (+ 1 (- 1 arg3))) (+ (- arg1 arg3) (+ 1 1)))
+Candidate: (ite (< arg1 arg0) (+ arg0 (+ 1 (- 1 arg3))) (- (+ arg1 (- arg2 arg3)) arg0))
+Candidate: (ite (< arg0 0) (- (- (- arg3) arg0) arg0) (+ (- arg0 arg3) 1))
+Candidate: (ite (< arg0 arg2) (- (- arg2 arg3) arg0) (+ 1 (+ (- arg1 arg3) arg0)))
+Candidate: (ite (< 1 arg0) (- arg0 arg3) (- (- (- 1 arg3) arg0) arg0))
+Candidate: (ite (< 1 arg0) (+ (- arg0 arg3) 1) (- (- (- 1 arg3) arg0) arg0))
+Candidate: (ite (< 1 arg0) (+ arg0 (- arg0 arg3)) (- (- (- 1 arg3) arg0) arg0))
+Candidate: (ite (< arg0 0) (- (- (- 1 arg3) arg0) arg0) (+ arg0 (+ (- arg1 arg3) arg0)))
+Candidate: (ite (< arg0 arg1) (- (+ arg1 (- arg1 arg3)) arg0) (+ arg0 (+ 1 (- 1 arg3))))
 Candidate: (+ (+ (+ 1 1) (+ (- arg2 arg3) 1)) (ite (< arg1 arg0) (- arg0 arg3) (- arg1 arg3)))
-Candidate: (ite (< 0 arg2) (+ (- arg0 arg3) (+ arg2 arg2)) (- (- 1 arg2) (+ arg3 arg2)))
-Candidate: (ite (< arg1 arg0) (+ (- 1 arg3) (+ arg0 1)) (+ (- arg1 arg3) (- arg2 arg0)))
-Candidate: (ite (< arg2 1) (- (- 1 arg2) (+ arg3 arg2)) (+ (- arg1 arg3) (+ arg2 arg2)))
-Candidate: (ite (< arg1 arg0) (- (- arg0 arg3) (- arg1 arg0)) (+ (- arg1 arg3) (- arg2 arg0)))
-Candidate: (ite (< arg2 1) (- (- 1 arg2) (+ arg3 arg2)) (+ (- 1 arg3) (+ arg2 1)))
-Candidate: (ite (< arg2 0) (- (- 1 arg2) (+ arg3 arg2)) (+ (- 1 arg3) (+ arg2 1)))
-Candidate: (+ (+ (+ 1 1) (+ 1 1)) (ite (< 1 arg2) (- arg2 arg3) (- 1 arg3)))
-Candidate: (+ (+ (+ 1 1) (+ 1 1)) (ite (= arg3 0) (- arg3) (+ arg1 (- arg0 arg3))))
-Candidate: (+ (+ (+ 1 1) (+ 1 1)) (ite (< 0 arg2) (- arg2 arg3) (- (- arg2) arg3)))
-Candidate: (+ (+ (+ 1 1) (+ 1 1)) (ite (< arg1 0) (- arg3) (+ arg1 (- 1 arg3))))
-Candidate: (+ (ite (< 0 arg2) (- arg2 arg3) (- (- arg2) arg3)) (ite (< 1 arg1) (- arg1 arg3) (- (- arg3) arg1)))
-Candidate: (+ (ite (< 1 arg1) (+ arg1 (- arg1 arg3)) (- arg3)) (ite (< arg2 arg3) (- arg0 arg3) (- arg2 arg3)))
-Time: 127589ms
+Candidate: (+ (ite (< arg1 arg0) (- arg0 arg3) (- arg1 arg3)) (+ 1 (+ 1 1)))
+Candidate: (+ (ite (< arg1 arg3) (- arg2 arg3) (- arg1 arg3)) (ite (< 1 arg0) (- arg0 arg3) (- arg3)))
+Candidate: (+ (ite (< arg0 arg3) (- 1 arg3) (- arg0 arg3)) (ite (< arg2 arg3) (- arg1 arg3) (- arg2 arg3)))
+Candidate: (+ (ite (< 1 arg0) (- arg0 arg3) (- arg3)) (ite (< arg1 arg2) (- arg2 arg3) (- arg1 arg3)))
+Candidate: (+ (ite (< arg1 arg2) (- arg2 arg3) (- arg1 arg3)) (ite (< arg0 arg3) (- arg3) (- arg0 arg3)))
+Candidate: (+ (ite (< 1 arg2) (- arg2 arg3) (- (- 1 arg3) arg2)) (ite (< arg0 1) (- 1 arg3) (- arg0 arg3)))
+memory allocation of 1056 bytes failed
+timeout: the monitored command dumped core
+./runall_dir.sh: line 12: 2999086 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 112781ms
 
 ==========
 [47/106] examples/RF_no_assumptions/DynExUpTo4VarsDisjRFSynt.noassumptions.sl:
@@ -632,65 +598,65 @@ Candidate: arg0
 Candidate: (- arg1 arg4)
 Candidate: (- arg2 arg4)
 Candidate: (+ 1 (- arg3 arg4))
-Candidate: (+ (- arg3 arg4) (+ 1 arg0))
-Candidate: (+ (- arg1 arg4) (+ 1 arg0))
-Candidate: (+ (+ 1 1) (+ (- arg1 arg4) arg3))
-Candidate: (ite (= arg1 arg3) (- arg4) (- arg2 arg4))
-Candidate: (ite (< 1 arg4) (- arg2 arg4) (- (- arg4) arg0))
-Candidate: (ite (< arg4 arg0) (+ arg1 (- arg2 arg4)) (+ (- arg1 arg4) 1))
-Candidate: (ite (< arg4 arg1) (- arg1 arg4) (- arg0 arg4))
-Candidate: (ite (< arg1 0) (+ 1 (- arg3 arg4)) (+ arg1 (- arg2 arg4)))
-Candidate: (ite (< arg1 arg0) (- arg0 arg4) (+ arg1 (- arg2 arg4)))
-Candidate: (ite (< arg1 arg0) (- arg0 arg4) (- (- arg1 arg4) arg0))
-Candidate: (+ (+ 1 (- 1 arg4)) (+ 1 (+ arg1 1)))
-Candidate: (+ (+ 1 (+ 1 1)) (+ (- 1 arg4) (+ 1 1)))
-Candidate: (ite (< 0 arg1) (+ (- arg2 arg4) (+ arg1 arg1)) (+ 1 (- arg3 arg4)))
-Candidate: (ite (< arg4 arg1) (- arg1 arg4) (- (+ arg3 arg0) (+ arg1 arg4)))
-Candidate: (ite (< 0 arg2) (+ (- arg2 arg4) arg3) (- (- arg0 arg4) arg2))
-Candidate: (ite (< 0 arg2) (+ (- arg3 arg4) (+ arg2 arg3)) (- (- arg0 arg4) arg2))
-Candidate: (ite (< 0 arg2) (+ (- arg2 arg4) (+ arg1 arg2)) (- (- arg1 arg4) (- arg2 arg1)))
-Candidate: (ite (< 0 arg0) (- arg0 arg4) (- (- 1 arg0) (+ arg4 arg0)))
-Candidate: (ite (< arg0 0) (+ (- arg1 arg4) (- 1 arg0)) (- arg0 arg4))
-Candidate: (ite (< 0 arg2) (+ (- 1 arg4) (+ arg2 arg2)) (- (- arg1 arg4) (- arg2 arg1)))
-Candidate: (ite (< arg1 arg2) (+ (- arg2 arg4) arg0) (- (- arg1 arg4) (- arg2 arg1)))
-Candidate: (ite (< arg0 0) (- (- arg3 arg0) (+ arg4 arg0)) (+ (- 1 arg4) (+ arg0 arg0)))
-Candidate: (ite (< arg0 0) (- (- arg1 arg0) (+ arg4 arg0)) (+ (- 1 arg4) (+ arg0 arg0)))
-Candidate: (ite (< arg1 arg2) (- (- arg2 arg4) arg1) (- (- arg1 arg4) (- arg2 arg1)))
-Candidate: (ite (< arg3 arg1) (+ (- arg1 arg4) (+ arg2 arg0)) (+ 1 (- arg3 arg4)))
+Candidate: (+ 1 (+ arg1 (- arg0 arg4)))
+Candidate: (+ 1 (+ arg3 (- arg0 arg4)))
+Candidate: (+ (+ 1 (- arg3 arg4)) (+ (- arg1 arg4) 1))
+Candidate: (+ (+ 1 (+ (- arg2 arg4) 1)) (+ (- 1 arg4) (+ 1 1)))
+Candidate: (ite (< arg0 arg2) (+ (- arg2 arg4) 1) (- arg0 arg4))
+Candidate: (ite (< arg4 arg1) (- arg1 arg4) (+ (- 1 arg4) (+ 1 1)))
+Candidate: (ite (< arg0 arg3) (- (- arg4) arg0) (- arg0 arg4))
+Candidate: (ite (< 0 arg1) (- arg1 arg4) (+ (- 1 arg4) (+ 1 1)))
+Candidate: (ite (< arg3 arg1) (+ (- arg2 arg4) 1) (+ 1 (- arg3 arg4)))
+Candidate: (ite (< arg3 0) (- (- arg4) arg3) (- arg3 arg4))
+Candidate: (ite (< arg3 arg2) (+ (- arg2 arg4) 1) (+ (- arg1 arg4) 1))
+Candidate: (ite (< arg0 0) (- (- arg4) arg0) (- arg0 arg4))
+Candidate: (ite (< arg3 arg0) (- arg0 arg4) (+ 1 (+ 1 (- arg3 arg4))))
+Candidate: (ite (< arg3 arg4) (- (+ (- arg1 arg4) 1) arg3) (- arg3 arg4))
+Candidate: (ite (< arg0 arg1) (+ (- arg1 arg4) 1) (+ 1 (+ arg3 (- arg0 arg4))))
+Candidate: (ite (= arg4 0) (- arg4) (+ (- arg2 arg4) arg0))
+Candidate: (ite (< arg4 arg0) (+ arg1 (- arg0 arg4)) (- (+ 1 (- arg3 arg4)) arg0))
+Candidate: (ite (< arg1 arg0) (- arg0 arg4) (- (- arg3 arg4) arg0))
+Candidate: (ite (< arg0 arg4) (- (- arg3 arg4) arg0) (- arg0 arg4))
+Candidate: (ite (< arg1 arg2) (+ (- arg2 arg4) arg0) (+ (- arg1 arg4) 1))
+Candidate: (ite (< arg1 arg0) (- arg0 arg4) (- (+ arg1 (- arg2 arg4)) arg0))
+Candidate: (ite (< arg2 arg1) (+ arg1 (- (- arg1 arg4) arg2)) (+ (- arg2 arg4) arg0))
+Candidate: (ite (< arg1 arg0) (+ 1 (- arg0 arg4)) (- (+ arg1 (- arg2 arg4)) arg0))
+Candidate: (ite (< 0 arg4) (+ arg2 (+ arg3 (- arg0 arg4))) (- arg4))
+Candidate: (ite (< arg2 arg3) (+ 1 (- arg3 arg4)) (+ arg2 (- (- arg2 arg4) arg3)))
+Candidate: (+ (+ (- 1 arg4) (+ 1 1)) (+ 1 (+ 1 1)))
 Candidate: (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 (- 1 arg4))))
-Candidate: (+ (+ (+ 1 1) (+ 1 (- 1 arg4))) (+ (+ 1 1) (+ 1 1)))
-Candidate: (+ (+ (+ 1 1) (+ 1 1)) (ite (< arg2 0) (- 1 arg4) (- arg2 arg4)))
-Candidate: (+ (+ (+ 1 1) (+ 1 1)) (ite (< 0 arg2) (- arg2 arg4) (- 1 arg4)))
-memory allocation of 1056 bytes failed
+memory allocation of 992 bytes failed
 timeout: the monitored command dumped core
-./runall_dir.sh: line 12: 2825560 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
-Time: 109222ms
+./runall_dir.sh: line 12: 2999898 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 97336ms
 
 ==========
 [48/106] examples/RF_no_assumptions/GCD5RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg1
 Candidate: (- arg1 arg0)
-Candidate: (+ (- arg1 arg0) (+ arg1 arg2))
-Candidate: (ite (= arg0 1) arg1 (- arg0 arg2))
-Candidate: (ite (= arg0 1) arg1 (+ 1 (- arg1 arg2)))
-Candidate: (+ (+ arg1 arg1) (+ arg1 (- arg1 arg0)))
-Candidate: (ite (< arg0 arg2) arg0 (- arg1 1))
+Candidate: (+ arg1 (- arg1 arg0))
+Candidate: (+ (- arg1 arg0) (+ arg1 arg1))
+Candidate: (+ (+ arg1 (- arg1 arg0)) (+ arg1 arg1))
+Candidate: (+ (+ arg1 (- arg1 arg0)) (+ arg1 (+ arg1 arg1)))
+Candidate: (+ (+ (- arg1 arg0) (+ arg1 arg1)) (+ arg1 (+ arg1 arg1)))
+Candidate: (+ (+ (- arg1 arg0) (+ arg1 arg1)) (+ (+ arg1 arg1) (+ arg1 arg1)))
+Candidate: (ite (= arg1 arg0) arg0 (- arg1 arg2))
 Candidate: (ite (< arg0 arg2) arg0 (- arg1 arg2))
-Time: 127478ms
+Time: 127408ms
 
 ==========
 [49/106] examples/RF_no_assumptions/GenadyRFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6732ms
+Time: 7063ms
 
 ==========
 [50/106] examples/RF_no_assumptions/GopanRepsCAV2006Fig1aRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg1
 Candidate: (ite (< arg1 arg0) arg1 (- arg0))
-Time: 127044ms
+Time: 127278ms
 
 ==========
 [51/106] examples/RF_no_assumptions/GulavaniGulwaniCAV2008Fig1aRFSynt.noassumptions.sl:
@@ -700,39 +666,38 @@ Candidate: (- 1 arg3)
 Candidate: (- (- arg2) arg0)
 Candidate: (+ (- 1 arg3) (- arg2))
 Candidate: (+ (- arg0) (- arg1 arg2))
-Candidate: (+ (- arg0) (- 1 arg2))
+Candidate: (+ (- arg2) (- 1 arg0))
 Candidate: (+ (- 1 arg3) (- 1 arg0))
-Candidate: (+ (- 1 arg2) (- arg1 arg0))
 Candidate: (+ (- 1 arg3) (- 1 arg2))
-Candidate: (+ (- 1 arg0) (+ 1 (- 1 arg3)))
+Candidate: (+ (- arg1 arg2) (- 1 arg0))
+Candidate: (+ (- 1 arg3) (- (- 1 arg0) arg2))
 Candidate: (+ (- 1 arg2) (+ 1 (- 1 arg3)))
-Candidate: (+ (- (- arg1 arg0) arg2) (+ 1 1))
 Candidate: (+ (- (- 1 arg0) arg2) (+ 1 (- 1 arg3)))
+Candidate: (+ (- 1 arg0) (+ arg1 (- 1 arg2)))
 Candidate: (+ (+ 1 (- 1 arg3)) (+ 1 (- 1 arg2)))
 Candidate: (+ (+ 1 (- 1 arg2)) (+ 1 (- arg1 arg0)))
-Candidate: (+ (- (- 1 arg0) arg2) (+ (- 1 arg3) (+ 1 1)))
-Candidate: (+ (+ 1 (- 1 arg2)) (+ (- 1 arg3) (+ 1 1)))
-Candidate: (+ (+ (- 1 arg2) (- arg1 arg0)) (+ 1 (+ 1 1)))
-Candidate: (ite (< arg3 1) (- arg3) (- arg2))
-Candidate: (ite (< arg3 0) (- arg3) (- (- arg1 arg0) (+ arg2 1)))
-Candidate: (ite (< arg2 arg3) (- (- arg2) arg0) (+ 1 (- 1 arg3)))
-Candidate: (ite (= arg2 0) (- arg3) (- arg1 arg0))
-Candidate: (ite (< arg0 arg2) (- arg0) (- (- arg1 arg0) arg2))
-Candidate: (ite (< arg3 0) (+ (- 1 arg3) (+ 1 1)) (- (- arg2) (+ arg0 arg0)))
-Candidate: (+ (+ (- 1 arg3) (+ 1 1)) (+ (- 1 arg0) (+ 1 1)))
-Candidate: (ite (< 1 arg3) (- (- 1 arg0) (+ arg0 arg2)) (+ (- 1 arg3) (+ 1 1)))
-Candidate: (ite (< 1 arg2) (- arg1 arg0) (- (- arg1 arg0) arg2))
-Candidate: (ite (< 0 arg2) (+ (- 1 arg3) (+ 1 1)) (- (- arg1 arg0) arg2))
-Candidate: (ite (< arg2 arg3) (- (- arg1 arg0) arg2) (+ (- 1 arg3) (+ 1 1)))
-Candidate: (+ (+ (- 1 arg0) (+ 1 arg1)) (ite (< arg2 arg3) (- arg2) (- arg3)))
-Candidate: (ite (< arg0 arg2) (- arg1 arg0) (+ (- arg1 arg2) (- arg1 arg0)))
-Candidate: (ite (< arg0 arg2) (- (- arg1 arg0) arg0) (+ (- 1 arg2) (- arg1 arg0)))
-Candidate: (ite (< 1 arg2) (ite (< arg3 1) (- arg3) (- arg0)) (- (- arg1 arg0) arg2))
-Candidate: (ite (< arg1 arg2) (- arg2 arg0) (+ (- 1 arg2) (- arg1 arg0)))
-Candidate: (ite (< arg0 0) (ite (= arg2 0) (- arg2) (- arg0)) (+ (- arg1 arg3) (+ arg1 arg1)))
-Candidate: (ite (< arg1 arg2) (- arg2 arg0) (+ (- arg1 arg2) (- arg1 arg0)))
-Answer: (ite (< arg1 arg2) (- arg2 arg0) (+ (- arg1 arg2) (- arg1 arg0)))
-Time: 58884ms
+Candidate: (+ (+ 1 (- 1 arg3)) (+ (- 1 arg0) (- 1 arg2)))
+Candidate: (+ (+ 1 (- 1 arg2)) (+ 1 (+ 1 (- 1 arg3))))
+Candidate: (+ (+ (- 1 arg0) (- 1 arg2)) (+ 1 (+ 1 (- 1 arg3))))
+Candidate: (+ (+ 1 (- 1 arg0)) (+ arg1 (+ 1 (- 1 arg2))))
+Candidate: (+ (+ 1 (+ 1 (- 1 arg3))) (+ 1 (+ 1 (- 1 arg2))))
+Candidate: (ite (< arg2 arg3) (- arg2) (- 1 arg3))
+Candidate: (ite (= arg0 arg2) (- arg1 arg2) (- arg3))
+Candidate: (ite (< arg2 arg3) (- arg1 arg2) (- arg3))
+Candidate: (ite (< 0 arg3) (+ (- 1 arg0) (- 1 arg2)) (- arg3))
+Candidate: (ite (< arg2 arg3) (- 1 arg2) (+ 1 (- 1 arg3)))
+Candidate: (ite (< arg2 arg3) (- arg0 arg2) (+ (- 1 arg3) arg1))
+Candidate: (ite (< arg2 arg3) (+ (- arg1 arg2) (- 1 arg0)) (+ 1 (- 1 arg3)))
+Candidate: (ite (< arg2 arg3) (+ (- arg1 arg2) (- 1 arg0)) (+ 1 (+ 1 (- 1 arg3))))
+Candidate: (ite (< arg0 arg2) (- (- arg1 arg0) arg0) (+ (- arg1 arg2) (- 1 arg0)))
+Candidate: (ite (< arg2 arg1) (+ (- arg1 arg2) (- 1 arg0)) (- arg2 arg3))
+Candidate: (ite (< arg3 arg2) (- arg2 arg0) (+ (- arg1 arg2) (- 1 arg0)))
+Candidate: (+ (+ arg1 (+ 1 (- 1 arg2))) (+ (- 1 arg0) (+ 1 1)))
+Candidate: (+ (+ (- 1 arg0) (+ 1 arg1)) (ite (< arg2 1) (- arg2) (- arg3)))
+Candidate: (+ (+ (- 1 arg0) (+ 1 arg1)) (ite (< arg3 1) (- arg3) (- arg2)))
+Candidate: (ite (< arg2 arg1) (+ (- arg1 arg2) (- arg1 arg0)) (- arg1 arg0))
+Answer: (ite (< arg2 arg1) (+ (- arg1 arg2) (- arg1 arg0)) (- arg1 arg0))
+Time: 68411ms
 
 ==========
 [52/106] examples/RF_no_assumptions/GulavaniGulwaniCAV2008Fig1cRFSynt.noassumptions.sl:
@@ -740,78 +705,79 @@ Candidate: arg0
 Candidate: (- arg0)
 Candidate: (- arg2 arg0)
 Answer: (- arg2 arg0)
-Time: 6779ms
+Time: 7774ms
 
 ==========
 [53/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig1RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6870ms
+Time: 7656ms
 
 ==========
 [54/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig2RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg1
 Answer: arg1
-Time: 6944ms
+Time: 7778ms
 
 ==========
 [55/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig4RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6789ms
+Time: 7717ms
 
 ==========
 [56/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig5RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6708ms
+Time: 7549ms
 
 ==========
 [57/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig8RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6764ms
+Time: 7200ms
 
 ==========
 [58/106] examples/RF_no_assumptions/HeizmannHoenickeLeikePodelskiATVA2013Fig9RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6782ms
+Time: 7129ms
 
 ==========
 [59/106] examples/RF_no_assumptions/KroeningSharyginaTsitovichWintersteigerCAV2010Fig1RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (+ arg0 1)
 Candidate: (+ (+ arg0 1) (+ 1 1))
-Candidate: (+ (+ 1 (+ arg0 1)) (+ 1 (+ 1 1)))
-Candidate: (+ (+ (+ arg0 1) (+ 1 1)) (+ (+ 1 1) (+ 1 1)))
-Candidate: (+ (+ (+ 1 (+ arg0 1)) (+ 1 (+ 1 1))) (+ (+ 1 1) (+ 1 1)))
-Candidate: (+ (+ (+ 1 1) (+ 1 (+ 1 1))) (+ (+ (+ arg0 1) (+ 1 1)) (+ 1 (+ 1 1))))
-Candidate: (+ (+ (+ (+ arg0 1) (+ 1 1)) (+ (+ 1 1) (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1))))
-Candidate: (+ (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 1))) (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 1) (+ 1 (+ arg0 1)))))
-Candidate: (+ (+ (+ (+ 1 (+ arg0 1)) (+ 1 (+ 1 1))) (+ (+ 1 1) (+ 1 1))) (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 1) (+ 1 1))))
-Candidate: (+ (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 1) (+ 1 (+ 1 1)))) (+ (+ (+ 1 (+ arg0 1)) (+ 1 (+ 1 1))) (+ (+ 1 1) (+ 1 (+ 1 1)))))
-Candidate: (+ (+ (+ (+ 1 1) (+ 1 (+ 1 1))) (+ (+ (+ arg0 1) (+ 1 1)) (+ 1 (+ 1 1)))) (+ (+ (+ 1 1) (+ 1 (+ 1 1))) (+ (+ 1 1) (+ 1 (+ 1 1)))))
-Candidate: (+ (+ (+ (+ (+ arg0 1) (+ 1 1)) (+ (+ 1 1) (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1)))) (+ (+ (+ 1 1) (+ 1 (+ 1 1))) (+ (+ 1 1) (+ 1 (+ 1 1)))))
-Candidate: (+ (+ (+ (+ 1 1) (+ 1 (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1)))) (+ (+ (+ (+ arg0 1) (+ 1 1)) (+ (+ 1 1) (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 1)))))
-Candidate: (+ (+ (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 1))) (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 1) (+ 1 (+ arg0 1))))) (+ (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1)))))
-Candidate: (+ (+ (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 1)))) (+ (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 1) (+ 1 (+ arg0 1)))) (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 1) (+ 1 1)))))
-Time: 126983ms
+Candidate: (+ (+ 1 1) (+ (+ arg0 1) (+ 1 1)))
+Candidate: (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 (+ arg0 1))))
+Candidate: (+ (+ (+ 1 1) (+ (+ arg0 1) (+ 1 1))) (+ (+ 1 1) (+ 1 1)))
+Candidate: (+ (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 (+ arg0 1)))) (+ (+ 1 1) (+ 1 1)))
+Candidate: (+ (+ (+ 1 1) (+ 1 (+ 1 1))) (+ (+ (+ 1 1) (+ 1 (+ arg0 1))) (+ (+ 1 1) (+ 1 1))))
+Candidate: (+ (+ (+ (+ 1 1) (+ (+ arg0 1) (+ 1 1))) (+ (+ 1 1) (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1))))
+Candidate: (+ (+ (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 (+ arg0 1)))) (+ (+ 1 1) (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1))))
+Candidate: (+ (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 1))) (+ (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 (+ arg0 1)))) (+ (+ 1 1) (+ 1 (+ 1 1)))))
+Candidate: (+ (+ (+ (+ 1 1) (+ 1 (+ 1 1))) (+ (+ (+ 1 1) (+ 1 (+ arg0 1))) (+ (+ 1 1) (+ 1 1)))) (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 1) (+ 1 1))))
+Candidate: (+ (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 1) (+ 1 (+ 1 1)))) (+ (+ (+ (+ 1 1) (+ 1 (+ arg0 1))) (+ (+ 1 1) (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1)))))
+Candidate: (+ (+ (+ (+ (+ 1 1) (+ (+ arg0 1) (+ 1 1))) (+ (+ 1 1) (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1)))) (+ (+ (+ 1 1) (+ 1 (+ 1 1))) (+ (+ 1 1) (+ 1 (+ 1 1)))))
+Candidate: (+ (+ (+ (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 (+ arg0 1)))) (+ (+ 1 1) (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1)))) (+ (+ (+ 1 1) (+ 1 (+ 1 1))) (+ (+ 1 1) (+ 1 (+ 1 1)))))
+Candidate: (+ (+ (+ (+ 1 1) (+ 1 (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1)))) (+ (+ (+ (+ 1 1) (+ (+ arg0 1) (+ 1 1))) (+ (+ 1 1) (+ 1 (+ 1 1)))) (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 1) (+ 1 1)))))
+Candidate: (+ (+ (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 1))) (+ (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 (+ arg0 1)))) (+ (+ 1 1) (+ 1 (+ 1 1))))) (+ (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1)))))
+Time: 127441ms
 
 ==========
 [60/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Ex1RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 7023ms
+Time: 7399ms
 
 ==========
 [61/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Ex7RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg1
-Candidate: (+ (+ arg1 arg0) (+ arg0 1))
-Answer: (+ (+ arg1 arg0) (+ arg0 1))
-Time: 7015ms
+Candidate: (+ arg0 (+ arg1 arg0))
+Answer: (+ arg0 (+ arg1 arg0))
+Time: 7177ms
 
 ==========
 [62/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Ex9RFSynt.noassumptions.sl:
@@ -819,50 +785,47 @@ Candidate: arg0
 Candidate: arg1
 Candidate: (+ arg1 arg0)
 Answer: (+ arg1 arg0)
-Time: 6799ms
+Time: 7185ms
 
 ==========
 [63/106] examples/RF_no_assumptions/LeikeHeizmannTACAS2014Fig1RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0 arg1)
-Candidate: (+ arg0 (- 1 arg1))
-Candidate: (+ (- 1 arg1) (+ arg0 1))
-Candidate: (+ (- 1 arg1) (+ 1 (+ arg0 1)))
-Candidate: (ite (= arg1 1) arg0 (+ arg0 1))
-Candidate: (+ (+ 1 (+ arg0 1)) (+ 1 (- 1 arg1)))
-Candidate: (ite (= arg0 1) arg0 (- arg1))
-Candidate: (ite (< 1 arg0) (- 1 arg1) arg0)
-Candidate: (ite (= arg1 0) arg0 (- arg0 1))
-Candidate: (ite (= arg0 1) arg0 (+ 1 (- 1 arg1)))
-Candidate: (ite (< arg1 1) (+ 1 (- 1 arg1)) (- arg0 1))
-Candidate: (+ (+ 1 (+ 1 1)) (+ (- 1 arg1) (+ 1 1)))
-Candidate: (ite (= arg1 0) (+ arg0 1) (ite (< arg1 1) (- arg1) arg0))
-Candidate: (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 (- 1 arg1))))
-Candidate: (ite (< (- arg1) 1) (ite (= arg1 0) arg0 (- arg0 1)) (+ (+ 1 1) (+ 1 (- 1 arg1))))
+Candidate: (+ (- arg0 arg1) 1)
+Candidate: (+ (- arg0 arg1) (+ arg0 arg0))
+Candidate: (+ (+ arg0 arg0) (+ arg0 (- arg0 arg1)))
+Candidate: (+ (+ arg0 (- arg0 arg1)) (+ arg0 (+ arg0 1)))
+Candidate: (+ (+ 1 (+ arg0 1)) (+ (- arg0 arg1) (+ arg0 1)))
+Candidate: (+ (+ (- arg0 arg1) (+ arg0 1)) (+ (+ arg0 1) (+ arg0 1)))
+Candidate: (ite (= arg0 1) arg0 (- arg0 arg1))
+Candidate: (+ arg0 (ite (= arg0 1) arg0 (- arg0 arg1)))
+Candidate: (+ (ite (= arg0 1) arg0 (- arg0 arg1)) (ite (< arg1 0) (+ arg0 arg0) arg0))
+Candidate: (ite (= arg0 1) (- arg0 1) (+ 1 (- 1 arg1)))
+Candidate: (ite (< arg1 arg0) (+ 1 (- 1 arg1)) (- arg0 1))
+Candidate: (ite (< 1 arg1) arg0 (+ (- 1 arg1) (+ 1 1)))
 Candidate: (ite (< 1 arg1) (- arg0 1) (+ (- 1 arg1) (+ 1 1)))
-Candidate: (ite (< (- arg1) 1) (ite (= arg1 0) (+ arg0 1) arg0) (- (- arg0 arg1) (+ arg1 arg1)))
-Candidate: (+ (+ (+ 1 1) (+ 1 (- 1 arg1))) (+ (+ 1 1) (+ 1 1)))
-Candidate: (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 (- 1 arg1)) (+ 1 (+ 1 1))))
-Candidate: (ite (< 1 arg1) (ite (< arg1 1) (+ 1 (- 1 arg1)) (- arg0 1)) (+ (+ 1 (- 1 arg1)) (+ 1 (+ 1 1))))
-Time: 127191ms
+Candidate: (ite (< 0 arg1) arg0 (+ (- 1 arg1) (+ 1 1)))
+Candidate: (+ (ite (= arg0 1) arg0 (+ 1 (- 1 arg1))) (ite (< arg1 0) (- (- arg0 arg1) arg1) arg0))
+Candidate: (- (+ (+ 1 1) (+ 1 (+ arg0 1))) (- (- (- arg0 1) 1) (+ 1 (- 1 arg1))))
+Time: 127600ms
 
 ==========
 [64/106] examples/RF_no_assumptions/LeikeHeizmannWST2014Ex9RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 7008ms
+Time: 7254ms
 
 ==========
 [65/106] examples/RF_no_assumptions/LogBuiltInRFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6985ms
+Time: 7059ms
 
 ==========
 [66/106] examples/RF_no_assumptions/LogIterativeRFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6714ms
+Time: 7021ms
 
 ==========
 [67/106] examples/RF_no_assumptions/LogMultRFSynt.noassumptions.sl:
@@ -870,111 +833,114 @@ Candidate: arg0
 Candidate: (- arg0 arg1)
 Candidate: (+ (- arg0 arg1) 1)
 Candidate: (+ arg0 (- arg0 arg1))
-Candidate: (+ (+ arg0 arg0) (- 1 arg1))
-Candidate: (+ (- arg0 arg1) (+ arg0 arg0))
+Candidate: (+ (+ arg0 (- arg0 arg1)) (- arg0 arg2))
+Candidate: (+ arg0 (+ arg0 (- arg0 arg1)))
 Candidate: (+ (+ arg0 (- arg0 arg1)) (+ arg0 1))
 Candidate: (+ (+ arg0 (- arg0 arg1)) (+ arg0 arg0))
-Candidate: (+ (+ arg0 (- arg0 arg1)) (+ arg0 (+ arg0 arg0)))
-Candidate: (+ (+ (- arg0 arg1) (+ arg0 arg0)) (+ 1 (+ arg0 arg0)))
-Candidate: (+ (+ (- arg0 arg1) (+ arg0 arg0)) (+ arg0 (+ arg0 arg0)))
+Candidate: (+ (+ arg0 (+ arg0 (- arg0 arg1))) (+ arg0 arg0))
+Candidate: (+ (+ (+ arg0 (- arg0 arg1)) (+ arg0 arg0)) (+ arg0 (- arg0 arg2)))
+Candidate: (+ (+ arg0 arg0) (+ (+ arg0 (- arg0 arg1)) (+ arg0 arg0)))
+Candidate: (+ (+ (+ arg0 (- arg0 arg1)) (+ arg0 arg0)) (+ arg0 (+ arg0 1)))
 Candidate: (+ (+ (+ arg0 (- arg0 arg1)) (+ arg0 arg0)) (+ arg0 (+ arg0 arg0)))
-Candidate: (+ (+ (+ arg0 (- arg0 arg1)) (+ arg0 arg0)) (+ (+ arg0 arg0) (+ arg0 arg0)))
-Candidate: (+ (+ (+ arg0 (- arg0 arg1)) (+ arg0 (+ arg0 arg0))) (+ (+ arg0 arg0) (+ arg0 arg0)))
-Candidate: (+ (+ (+ arg0 (- arg0 arg1)) (+ arg0 (+ arg0 arg0))) (+ (+ arg0 1) (+ arg0 (+ arg0 arg0))))
-Candidate: (+ (+ (+ arg0 (- arg0 arg1)) (+ arg0 (+ arg0 arg0))) (+ (+ arg0 arg0) (+ arg0 (+ arg0 arg0))))
-Candidate: (+ (+ (+ (- arg0 arg1) (+ arg0 arg0)) (+ arg0 (+ arg0 arg0))) (+ (+ arg0 arg0) (+ arg0 (+ arg0 arg0))))
-Candidate: (+ (+ (+ arg0 arg0) (+ arg0 (+ arg0 arg0))) (+ (+ (- arg0 arg1) (+ arg0 arg0)) (+ (+ arg0 arg0) (+ arg0 1))))
-Candidate: (+ (+ (+ (- arg0 arg1) (+ arg0 arg0)) (+ arg0 (+ arg0 arg0))) (+ (+ arg0 (+ arg0 arg0)) (+ arg0 (+ arg0 arg0))))
-Candidate: (+ (+ (+ (- arg0 arg1) (+ arg0 arg0)) (+ (+ arg0 arg0) (+ arg0 1))) (+ (+ arg0 (+ arg0 arg0)) (+ arg0 (+ arg0 arg0))))
-Candidate: (+ (+ (+ (+ arg0 (- arg0 arg1)) (+ arg0 arg0)) (+ arg0 (+ arg0 arg0))) (+ (+ arg0 (+ arg0 arg0)) (+ arg0 (+ arg0 arg0))))
-Candidate: (+ (+ (+ (+ arg0 (- arg0 arg1)) (+ arg0 arg0)) (+ (+ arg0 arg0) (+ arg0 arg0))) (+ (+ arg0 (+ arg0 arg0)) (+ arg0 (+ arg0 arg0))))
-Candidate: (+ (+ (+ (+ arg0 (- arg0 arg1)) (+ arg0 arg0)) (+ (+ arg0 arg0) (+ arg0 arg0))) (+ (+ arg0 (+ arg0 arg0)) (+ (+ arg0 arg0) (+ arg0 arg0))))
-Time: 126901ms
+Candidate: (+ (+ arg0 (+ arg0 arg0)) (+ (+ arg0 (+ arg0 (- arg0 arg1))) (+ arg0 1)))
+Candidate: (+ (+ (+ arg0 (+ arg0 (- arg0 arg1))) (+ arg0 arg0)) (+ arg0 (+ arg0 arg0)))
+Candidate: (+ (+ (+ arg0 (+ arg0 (- arg0 arg1))) (+ arg0 arg0)) (+ (+ arg0 arg0) (+ arg0 1)))
+Candidate: (+ (+ (+ arg0 (+ arg0 (- arg0 arg1))) (+ arg0 arg0)) (+ (+ arg0 arg0) (+ arg0 arg0)))
+Candidate: (+ (+ (+ arg0 arg0) (+ (+ arg0 (- arg0 arg1)) (+ arg0 arg0))) (+ (+ arg0 arg0) (+ arg0 arg0)))
+Candidate: (+ (+ (+ (+ arg0 (- arg0 arg1)) (+ arg0 arg0)) (+ arg0 (+ arg0 arg0))) (+ (+ arg0 arg0) (+ arg0 arg0)))
+Candidate: (+ (+ (+ (+ arg0 (- arg0 arg1)) (+ arg0 arg0)) (+ arg0 (+ arg0 arg0))) (+ (+ arg0 arg0) (+ arg0 (+ arg0 arg0))))
+Candidate: (+ (+ (+ (+ arg0 (+ arg0 (- arg0 arg1))) (+ arg0 arg0)) (+ arg0 (+ arg0 arg0))) (+ (+ arg0 arg0) (+ arg0 (+ arg0 arg0))))
+Candidate: (+ (+ (+ (+ arg0 (+ arg0 (- arg0 arg1))) (+ arg0 arg0)) (+ (+ arg0 arg0) (+ arg0 arg0))) (+ (+ arg0 1) (+ arg0 (+ arg0 arg0))))
+Candidate: (+ (+ (+ (+ arg0 (+ arg0 (- arg0 arg1))) (+ arg0 arg0)) (+ (+ arg0 arg0) (+ arg0 arg0))) (+ (+ arg0 arg0) (+ arg0 (+ arg0 arg0))))
+Candidate: (+ (+ (+ (+ arg0 (+ arg0 (- arg0 arg1))) (+ arg0 arg0)) (+ (+ arg0 arg0) (+ arg0 arg0))) (+ (+ arg0 (+ arg0 arg0)) (+ arg0 (+ arg0 arg0))))
+Candidate: (+ (+ (+ arg0 (+ arg0 arg0)) (+ arg0 (+ arg0 arg0))) (+ (+ (+ arg0 arg0) (+ (+ arg0 (- arg0 arg1)) (+ arg0 arg0))) (+ (+ arg0 arg0) (+ arg0 1))))
+Candidate: (+ (+ (+ (+ arg0 arg0) (+ (+ arg0 (- arg0 arg1)) (+ arg0 arg0))) (+ (+ arg0 arg0) (+ arg0 arg0))) (+ (+ arg0 (+ arg0 arg0)) (+ arg0 (+ arg0 arg0))))
+Time: 127307ms
 
 ==========
 [68/106] examples/RF_no_assumptions/MasseVMCAI2014Ex6RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg1
-Candidate: (+ arg1 (+ arg0 1))
+Candidate: (+ 1 (+ arg1 arg0))
 Candidate: (+ (+ arg0 1) (+ arg1 1))
 Candidate: (+ (+ arg1 1) (+ 1 (+ arg0 1)))
-Candidate: (ite (= arg1 0) (+ arg0 1) arg0)
-Candidate: (ite (< arg1 0) arg0 (+ arg1 1))
-Candidate: (+ (ite (< arg1 0) arg0 (+ arg0 1)) (ite (< arg1 arg0) (- arg0) arg1))
-Candidate: (ite (= arg1 0) (+ arg0 1) (ite (< arg1 0) arg0 arg1))
-Candidate: (+ (ite (< arg1 arg0) arg0 (+ arg1 1)) (ite (< arg0 1) (+ arg0 1) arg1))
-Candidate: (ite (= 1 (- arg1)) (ite (= arg0 0) arg0 arg1) (ite (< arg1 0) arg0 (+ arg1 1)))
-Candidate: (ite (< (- arg1) 1) (+ 1 (+ arg1 1)) (ite (< 0 arg0) (+ arg1 arg0) arg0))
-Candidate: (ite (< (- arg1) 1) (+ 1 (+ arg1 1)) (ite (= arg0 0) arg0 (- arg0 1)))
-Candidate: (+ (ite (< 1 (- arg1)) arg0 (+ arg1 arg1)) (ite (= arg0 0) (+ 1 (+ arg0 1)) arg0))
-Candidate: (+ (ite (< arg1 0) arg0 (+ arg1 (+ arg1 arg1))) (+ 1 (ite (= 1 (- arg1)) arg1 arg0)))
-Candidate: (+ (ite (< 1 (- arg1)) arg0 (+ arg1 (+ arg1 1))) (ite (< arg0 arg1) arg1 (+ arg0 1)))
-Candidate: (+ (ite (< 1 (- arg1)) arg0 (+ arg1 (+ arg1 1))) (ite (< arg0 arg1) (+ arg1 arg1) (+ arg0 1)))
-Time: 127341ms
+Candidate: (+ (+ (+ arg0 1) (+ arg1 1)) (+ 1 (+ arg0 1)))
+Candidate: (+ (+ (+ arg0 1) (+ arg1 1)) (+ 1 (+ 1 (+ arg0 1))))
+Candidate: (ite (< arg1 arg0) arg0 (+ arg0 (+ arg0 1)))
+Candidate: (ite (< arg1 arg0) (ite (= arg0 0) arg0 arg1) (ite (= arg0 0) (+ arg0 1) arg1))
+Candidate: (ite (= arg1 0) (+ arg0 1) (ite (< arg0 arg1) (+ arg1 1) arg0))
+Candidate: (ite (< arg1 arg0) (ite (= arg0 0) arg0 arg1) (+ arg1 (+ arg1 1)))
+Candidate: (ite (< arg1 arg0) (ite (= arg0 1) arg1 arg0) (+ 1 (+ arg1 arg0)))
+Candidate: (ite (= arg1 0) (+ arg0 1) (ite (= arg1 1) (- arg0) arg0))
+Candidate: (ite (< arg1 0) arg0 (+ 1 (+ arg1 1)))
+Candidate: (+ (ite (< arg1 arg0) arg0 (+ arg1 (+ arg1 1))) (ite (< arg0 1) arg0 (+ arg1 1)))
+Candidate: (ite (< arg1 0) (- (ite (< arg0 1) (- arg0) arg1)) (+ 1 (+ arg1 1)))
+Candidate: (+ (+ arg0 (ite (< arg1 0) (- arg0) arg1)) (ite (< arg1 0) arg0 (+ arg1 (+ arg1 1))))
+Time: 127534ms
 
 ==========
 [69/106] examples/RF_no_assumptions/MasseVMCAI2014Fig1aRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg1
-Candidate: (ite (< arg1 1) (+ arg1 1) arg0)
+Candidate: (+ (+ arg0 1) (+ arg0 (+ arg1 arg0)))
+Candidate: (+ (+ arg0 (+ arg1 arg0)) (+ 1 (+ arg0 1)))
+Candidate: (+ (+ 1 (+ arg0 1)) (+ (+ arg1 arg0) (+ arg0 1)))
+Candidate: (+ (+ (+ arg1 arg0) (+ arg0 1)) (+ 1 (+ 1 (+ arg0 1))))
 Candidate: (ite (= arg1 arg0) (- 1 arg1) arg0)
-Candidate: (ite (= arg1 arg0) (+ arg1 1) (- (- arg1) 1))
-Candidate: (ite (< 0 arg0) (ite (< 1 arg1) arg1 (+ arg1 arg0)) (ite (< arg1 1) (+ arg1 1) arg0))
-Candidate: (ite (< 1 (- arg1 1)) (+ arg0 (+ arg0 arg0)) (ite (= arg0 0) (+ arg1 1) arg0))
-Candidate: (+ (+ 1 (ite (= arg1 (- arg0)) arg0 arg1)) (ite (= 1 (- arg1 1)) (- arg0) arg0))
-Candidate: (- (+ 1 (ite (< arg1 0) (+ arg0 1) arg0)) (ite (< arg1 0) (- (- arg1) arg1) arg1))
-Time: 127400ms
+Candidate: (ite (< arg1 arg0) arg0 (+ arg0 (+ arg0 1)))
+Candidate: (ite (< arg1 0) arg0 (+ arg0 (+ arg0 1)))
+Candidate: (ite (= arg1 0) (- 1 arg1) (ite (< 0 arg0) arg1 arg0))
+Candidate: (ite (= arg1 arg0) (+ arg1 (+ arg0 1)) (ite (= arg0 1) arg1 arg0))
+Time: 127497ms
 
 ==========
 [70/106] examples/RF_no_assumptions/McCarthyIterativeRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0)
-Candidate: (ite (< 0 arg1) (- 1 arg1) (- arg0))
-Candidate: (ite (= arg1 1) arg0 (- arg0))
-Candidate: (ite (= arg1 0) arg1 (+ 1 (- 1 arg1)))
-Candidate: (ite (< arg0 arg1) (+ 1 (- 1 arg0)) (- arg1 1))
-Candidate: (+ (- arg1 arg0) (ite (< arg0 arg1) (+ arg1 arg1) arg0))
-Time: 127836ms
+Candidate: (ite (< arg1 arg0) arg1 (+ arg1 (+ arg1 arg1)))
+Candidate: (ite (< arg1 arg0) (- arg1 1) (+ 1 (- arg1 arg0)))
+Candidate: (ite (< arg0 arg1) (+ 1 (+ arg0 1)) (- arg1 1))
+Candidate: (ite (< arg0 arg1) (+ 1 (- arg1 arg0)) (- arg1 1))
+Candidate: (ite (= arg1 1) arg1 (- (- arg1 1) 1))
+Candidate: (ite (< 1 arg0) arg1 (+ 1 (+ arg1 1)))
+Candidate: (ite (< 1 arg0) (- arg1 1) (+ (- 1 arg0) (+ arg1 1)))
+Time: 127707ms
 
 ==========
 [71/106] examples/RF_no_assumptions/MinusBuiltInRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0 arg1)
 Answer: (- arg0 arg1)
-Time: 6946ms
+Time: 7265ms
 
 ==========
 [72/106] examples/RF_no_assumptions/MultDisjRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg1 arg2)
 Candidate: (+ arg1 (- arg0 arg2))
-Candidate: (ite (< 0 arg2) (- (- arg2 arg3) arg3) (- arg2))
 Candidate: (+ (+ 1 1) (+ (- arg1 arg2) 1))
-Candidate: (ite (< 1 arg3) (- arg1 arg2) (- 1 arg3))
-Candidate: (ite (< 1 arg2) (+ 1 (- arg1 arg3)) (- 1 arg2))
+Candidate: (ite (< arg2 arg3) (- (- arg3 arg2) arg2) (+ arg1 (- arg0 arg2)))
+Candidate: (ite (< arg2 arg3) (+ arg3 (- (- arg1 arg2) arg2)) (+ arg0 (- arg1 arg3)))
+Candidate: (+ (+ (+ arg1 (- arg0 arg2)) 1) (+ arg3 (- 1 arg2)))
+Candidate: (ite (< arg1 1) (+ (+ 1 1) (- 1 arg2)) (+ arg1 (- arg0 arg2)))
+Candidate: (ite (< arg1 1) (+ (+ 1 1) (- 1 arg2)) (+ arg0 (- arg1 arg3)))
+Candidate: (ite (< arg1 1) (+ (+ 1 1) (- 1 arg2)) (+ (+ arg1 (- arg0 arg2)) 1))
+Candidate: (ite (< 0 arg1) (+ arg1 (+ arg1 (- arg0 arg2))) (+ (+ 1 1) (- 1 arg2)))
 Candidate: (ite (< 1 arg2) (+ arg0 (- arg1 arg3)) (- 1 arg2))
-Candidate: (ite (< arg2 arg3) (- 1 arg2) (+ arg0 (- arg1 arg3)))
-Candidate: (+ (+ arg1 (+ 1 1)) (+ (- 1 arg2) (+ 1 1)))
-Candidate: (ite (< arg0 1) (- (- arg0) (+ arg0 arg3)) (- arg0 arg3))
-Candidate: (ite (< 1 arg0) (+ 1 (- arg0 arg3)) (- (- arg0) (+ arg0 arg3)))
-Candidate: (ite (< arg0 0) (- (- arg0) (+ arg0 arg3)) (+ arg0 (- arg0 arg3)))
-Candidate: (+ (+ 1 (+ 1 1)) (ite (< arg3 arg1) (- arg1 arg3) (- arg2)))
-Candidate: (ite (< arg1 (- arg0)) (- (- arg0) (+ arg1 arg2)) (+ (+ arg1 1) (- arg0 arg3)))
-Candidate: (ite (< (- arg2) arg1) (+ (+ arg1 arg1) (- arg0 arg3)) (- (- arg2) arg1))
-Candidate: (ite (< arg1 (- arg0)) (- (- 1 arg2) (+ arg1 arg0)) (+ (+ arg1 1) (- arg0 arg3)))
-Candidate: (ite (< (- 1) arg0) (+ arg0 (- arg0 arg3)) (- (- 1 arg3) (+ arg0 arg0)))
-Candidate: (+ (ite (< arg1 arg3) (- arg2) (- arg1 arg3)) (+ (+ 1 1) (+ 1 1)))
-Candidate: (ite (< (- arg2) arg1) (ite (< arg1 arg3) (- arg0 arg3) (- arg1 arg3)) (- (- arg2) arg1))
-Candidate: (ite (< (- arg2) arg1) (ite (< arg0 arg3) (- arg1 arg3) (- arg0 arg3)) (- (- 1 arg2) arg1))
-Candidate: (ite (< (- arg2) arg1) (ite (< arg1 arg3) (- arg0 arg3) (- arg1 arg3)) (- (- 1 arg2) arg1))
-Candidate: (ite (< (- arg2) arg1) (ite (< arg1 arg0) (- arg0 arg3) (- arg1 arg3)) (ite (< arg0 arg3) (- arg2) (- arg0 arg3)))
-Candidate: (ite (< arg0 (- arg2)) (- (- arg2) arg0) (ite (< arg1 arg3) (- arg0 arg3) (- arg1 arg3)))
-Candidate: (ite (< arg1 (- arg0)) (+ (+ 1 1) (+ 1 (- 1 arg2))) (+ (+ arg1 1) (- arg0 arg3)))
-Candidate: (ite (< arg1 (- arg0)) (ite (< 0 arg2) (- 1 arg3) (- arg2)) (+ (+ arg1 1) (- arg0 arg3)))
-memory allocation of 69206032 bytes failed
+Candidate: (ite (< 1 arg2) (+ arg0 (- arg1 arg3)) (- (- arg3 arg2) arg2))
+Candidate: (ite (< 0 arg0) (- arg0 arg2) (- (- arg0) (+ arg0 arg3)))
+Candidate: (ite (< 0 arg0) (+ arg0 (+ arg0 (- arg1 arg3))) (- (- arg0) (+ arg0 arg3)))
+Candidate: (ite (< arg1 arg0) (+ arg0 (- arg0 arg3)) (- arg1 arg2))
+Candidate: (ite (< arg1 arg0) (+ arg0 (- arg0 arg3)) (+ arg1 (- arg1 arg2)))
+Candidate: (ite (< arg0 arg3) (+ arg1 (- arg1 arg2)) (- arg0 arg3))
+Candidate: (ite (< arg0 arg1) (+ arg1 (- arg1 arg2)) (+ arg0 (- arg0 arg3)))
+Candidate: (+ (+ 1 (+ 1 1)) (ite (< arg1 arg2) (- arg0 arg3) (- arg1 arg2)))
+Candidate: (ite (< arg1 (- arg0)) (- (- (- arg2) arg1) arg1) (+ (+ 1 1) (+ arg0 (- arg1 arg3))))
+Candidate: (ite (< (- 1) arg1) (+ arg1 (ite (< arg1 arg2) (- arg0 arg3) (- arg2))) (- (- 1 arg3) arg1))
+memory allocation of 704 bytes failed
 timeout: the monitored command dumped core
-./runall_dir.sh: line 12: 2830608 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
-Time: 103815ms
+./runall_dir.sh: line 12: 3009973 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 115557ms
 
 ==========
 [73/106] examples/RF_no_assumptions/NoriSharmaFSE2013Fig7RFSynt.noassumptions.sl:
@@ -983,19 +949,21 @@ Candidate: (- arg0)
 Candidate: (- arg2 arg0)
 Candidate: (- arg4 arg0)
 Answer: (- arg4 arg0)
-Time: 6890ms
+Time: 7789ms
 
 ==========
 [74/106] examples/RF_no_assumptions/NoriSharmaFSE2013Fig8RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0 arg1)
-Candidate: (- 1 arg3)
 Candidate: (- arg2 arg1)
-Candidate: (+ 1 (- 1 arg3))
+Candidate: (- arg2 arg3)
+Candidate: (- 1 arg3)
 Candidate: (+ (- arg2 arg1) arg4)
-Candidate: (+ (- arg4 arg0) (- arg4 arg1))
-Answer: (+ (- arg4 arg0) (- arg4 arg1))
-Time: 7044ms
+Candidate: (+ 1 (- 1 arg3))
+Candidate: (+ (+ arg2 arg4) (- 1 arg1))
+Candidate: (+ (- arg2 arg6) (- arg5 arg1))
+Answer: (+ (- arg2 arg6) (- arg5 arg1))
+Time: 7828ms
 
 ==========
 [75/106] examples/RF_no_assumptions/PastaA10RFSynt.noassumptions.sl:
@@ -1005,27 +973,27 @@ Candidate: (- (- arg0) arg1)
 Candidate: (+ (- arg0) (- 1 arg1))
 Candidate: (+ (- 1 arg1) (- 1 arg0))
 Candidate: (+ (- 1 arg0) (+ 1 (- 1 arg1)))
-Candidate: (ite (< arg0 0) (- arg1) (- (- arg0 arg1) 1))
-Candidate: (ite (< arg0 0) (- (- arg0) arg1) (- arg0 arg1))
-Candidate: (+ (+ 1 (- 1 arg1)) (+ 1 (- 1 arg0)))
+Candidate: (+ (+ (- 1 arg1) (- 1 arg0)) (+ 1 1))
 Candidate: (ite (< 1 arg0) (- arg0 arg1) (- (- 1 arg1) arg0))
+Candidate: (+ (+ 1 (+ 1 (- 1 arg1))) (+ 1 (- 1 arg0)))
+Candidate: (ite (= arg0 arg1) (- arg1) (+ 1 (- 1 arg1)))
 Candidate: (ite (< arg0 arg1) (- arg1 arg0) (- arg0 arg1))
 Answer: (ite (< arg0 arg1) (- arg1 arg0) (- arg0 arg1))
-Time: 7028ms
+Time: 8008ms
 
 ==========
 [76/106] examples/RF_no_assumptions/PastaA4RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0 arg1)
 Answer: (- arg0 arg1)
-Time: 6999ms
+Time: 7869ms
 
 ==========
 [77/106] examples/RF_no_assumptions/PastaA5RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0 arg1)
 Answer: (- arg0 arg1)
-Time: 6876ms
+Time: 7799ms
 
 ==========
 [78/106] examples/RF_no_assumptions/PastaA6RFSynt.noassumptions.sl:
@@ -1036,25 +1004,24 @@ Candidate: (- 1 arg1)
 Candidate: (- 1 arg2)
 Candidate: (- (- arg2) arg1)
 Candidate: (+ 1 (- 1 arg1))
-Candidate: (+ 1 (- 1 arg2))
 Candidate: (+ (- arg2) (- 1 arg1))
-Candidate: (+ (- arg2) (- arg0 arg1))
-Answer: (+ (- arg2) (- arg0 arg1))
-Time: 6946ms
+Candidate: (+ (- arg1) (- arg0 arg2))
+Answer: (+ (- arg1) (- arg0 arg2))
+Time: 7847ms
 
 ==========
 [79/106] examples/RF_no_assumptions/PastaA7RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0 arg1)
 Answer: (- arg0 arg1)
-Time: 6801ms
+Time: 7758ms
 
 ==========
 [80/106] examples/RF_no_assumptions/PastaA9RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0 arg2)
 Answer: (- arg0 arg2)
-Time: 6705ms
+Time: 7748ms
 
 ==========
 [81/106] examples/RF_no_assumptions/PastaB10RFSynt.noassumptions.sl:
@@ -1062,7 +1029,7 @@ Candidate: arg0
 Candidate: arg1
 Candidate: (+ arg1 arg0)
 Answer: (+ arg1 arg0)
-Time: 6711ms
+Time: 7525ms
 
 ==========
 [82/106] examples/RF_no_assumptions/PastaB11RFSynt.noassumptions.sl:
@@ -1070,50 +1037,58 @@ Candidate: arg0
 Candidate: arg1
 Candidate: (+ arg1 arg0)
 Answer: (+ arg1 arg0)
-Time: 6767ms
+Time: 7683ms
 
 ==========
 [83/106] examples/RF_no_assumptions/PastaB12RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg1
 Candidate: (+ arg1 arg0)
-Candidate: (+ arg0 (+ arg1 1))
-Candidate: (+ (+ arg1 1) (+ arg0 1))
-Candidate: (+ (+ arg0 1) (+ 1 (+ arg1 1)))
-Candidate: (ite (< arg0 0) arg1 (+ arg1 arg0))
-Candidate: (+ (+ arg1 1) (ite (< arg0 0) arg1 arg0))
-Candidate: (+ (+ 1 (+ arg1 1)) (ite (< arg0 0) arg1 arg0))
-Candidate: (+ (+ 1 (+ arg1 1)) (+ 1 (+ arg0 1)))
-Candidate: (ite (< arg0 arg1) arg1 arg0)
-Candidate: (+ (ite (< arg0 0) arg1 arg0) (ite (< arg0 arg1) arg1 arg0))
-Answer: (+ (ite (< arg0 0) arg1 arg0) (ite (< arg0 arg1) arg1 arg0))
-Time: 6830ms
+Candidate: (+ (+ arg1 arg0) 1)
+Candidate: (+ (+ arg1 arg0) (+ arg1 1))
+Candidate: (+ (+ arg0 1) (+ arg1 (+ arg1 1)))
+Candidate: (+ (+ arg1 (+ arg1 arg0)) (+ 1 (+ arg1 1)))
+Candidate: (+ (+ (+ arg1 arg0) (+ arg1 1)) (+ 1 (+ arg1 1)))
+Candidate: (+ (+ arg0 (+ 1 (+ arg1 1))) (+ 1 (+ 1 (+ arg1 1))))
+Candidate: (ite (< arg1 1) arg0 arg1)
+Candidate: (ite (< arg0 1) arg1 arg0)
+Candidate: (ite (< 0 arg0) (+ arg1 arg0) arg1)
+Candidate: (+ 1 (ite (< 0 arg0) (+ arg1 arg0) arg1))
+Candidate: (+ (ite (< arg1 1) arg0 arg1) (ite (< 0 arg0) (+ arg1 arg0) arg1))
+Candidate: (+ (ite (< 0 arg0) (+ arg1 arg0) arg1) (+ 1 (ite (< arg1 1) arg0 arg1)))
+Candidate: (ite (< arg0 0) arg1 (+ arg0 (ite (< arg1 1) arg0 arg1)))
+Answer: (ite (< arg0 0) arg1 (+ arg0 (ite (< arg1 1) arg0 arg1)))
+Time: 8085ms
 
 ==========
 [84/106] examples/RF_no_assumptions/PastaB13RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (+ arg0 arg1)
-Candidate: (+ arg1 (+ arg0 1))
-Candidate: (+ (+ arg0 1) (+ arg1 1))
-Candidate: (+ (+ arg0 1) (+ 1 (+ arg1 1)))
-Candidate: (ite (= arg0 arg2) arg1 (+ arg1 1))
-Candidate: (ite (< arg2 arg0) (- arg1 arg0) arg1)
-Candidate: (+ (+ 1 (+ arg1 1)) (+ 1 (+ arg0 1)))
-Candidate: (ite (< arg2 0) (- arg0 arg2) arg1)
-Candidate: (ite (= arg2 0) (ite (< arg1 arg0) arg0 arg1) (- arg0 arg2))
-Candidate: (ite (< arg0 arg2) arg1 (- arg0 arg2))
-Candidate: (ite (< arg0 arg2) (- arg1 arg2) (- arg0 arg2))
-Candidate: (+ (- (+ arg1 1) arg2) (ite (< arg0 arg2) arg1 arg0))
-Candidate: (+ (- (- arg1 arg2) arg2) (ite (< arg0 arg2) arg1 arg0))
-Candidate: (+ (- (+ arg1 1) arg2) (ite (< arg0 arg2) arg1 (- arg0 arg2)))
-Candidate: (+ (ite (< arg0 arg2) arg1 arg0) (- (+ arg1 1) (+ arg2 arg2)))
-Candidate: (+ (- (ite (< arg0 arg2) arg1 arg0) arg2) (+ (+ arg1 1) (+ 1 1)))
-Candidate: (+ (+ (+ arg1 1) (+ 1 1)) (+ (- arg0 arg2) (+ 1 1)))
-Candidate: (+ (ite (< arg0 arg2) arg1 (- arg0 arg2)) (+ (+ arg1 1) (- 1 arg2)))
-Candidate: (+ (- (ite (< arg0 arg2) arg1 arg0) arg2) (+ (+ arg1 1) (- 1 arg2)))
-Candidate: (+ (- (ite (< arg0 arg2) arg1 arg0) arg2) (- (ite (< arg1 arg0) arg0 arg1) arg2))
-Answer: (+ (- (ite (< arg0 arg2) arg1 arg0) arg2) (- (ite (< arg1 arg0) arg0 arg1) arg2))
-Time: 9244ms
+Candidate: (+ (+ arg0 arg1) 1)
+Candidate: (+ (+ arg0 arg1) (+ arg1 arg1))
+Candidate: (+ (+ arg1 1) (+ arg1 (+ arg0 arg1)))
+Candidate: (+ (+ arg1 (+ arg0 arg1)) (+ arg1 (+ arg1 arg1)))
+Candidate: (+ (+ arg1 (+ arg1 arg1)) (+ (+ arg1 1) (+ arg0 1)))
+Candidate: (+ (+ (+ arg0 arg1) (+ arg1 arg1)) (+ (+ arg1 1) (+ arg1 1)))
+Candidate: (ite (< arg2 0) (+ arg0 arg1) arg1)
+Candidate: (+ (ite (< arg2 0) (+ arg0 arg1) arg1) (+ 1 (+ 1 (+ arg1 1))))
+Candidate: (ite (= arg0 arg2) arg0 (ite (< arg1 0) arg0 arg1))
+Candidate: (+ (ite (< arg2 0) (+ arg0 arg1) arg1) (+ 1 (ite (< arg1 0) arg0 arg1)))
+Candidate: (ite (< arg2 0) (+ arg0 1) (ite (< arg1 0) arg0 arg1))
+Candidate: (ite (= arg1 1) (ite (= arg2 0) arg1 (+ arg0 1)) arg0)
+Candidate: (ite (< arg0 arg2) arg1 (+ arg0 1))
+Candidate: (+ 1 (ite (< arg0 arg2) arg1 (+ arg0 1)))
+Candidate: (+ (ite (< arg0 arg2) arg1 (+ arg0 1)) (- (- arg2) arg2))
+Candidate: (+ (ite (< arg0 arg2) arg1 (+ arg0 1)) (- (- 1) arg2))
+Candidate: (+ (- (+ arg1 1) arg2) (ite (< arg0 arg2) arg1 (+ arg0 1)))
+Candidate: (+ (- (- arg1 arg2) arg2) (ite (< arg0 arg2) arg1 (+ arg0 1)))
+Candidate: (ite (< 0 arg0) (+ arg0 (- (+ arg1 1) arg2)) (ite (< arg2 0) (- arg0 arg2) arg1))
+Candidate: (+ (ite (< arg0 arg2) arg1 (- arg0 arg2)) (ite (< arg2 arg1) (- arg1 arg2) arg0))
+Candidate: (+ (ite (< arg2 arg1) (- arg1 arg2) arg0) (- (ite (< arg0 arg2) arg1 arg0) arg2))
+Candidate: (+ (ite (< arg1 0) (- arg0 arg2) arg1) (- (ite (< arg0 arg2) arg1 arg0) arg2))
+Candidate: (+ (- (ite (< arg0 arg2) arg1 arg0) arg2) (- (ite (< arg0 arg1) arg1 arg0) arg2))
+Answer: (+ (- (ite (< arg0 arg2) arg1 arg0) arg2) (- (ite (< arg0 arg1) arg1 arg0) arg2))
+Time: 23281ms
 
 ==========
 [85/106] examples/RF_no_assumptions/PastaB1RFSynt.noassumptions.sl:
@@ -1121,7 +1096,7 @@ Candidate: arg0
 Candidate: (+ arg0 1)
 Candidate: (- arg0 arg1)
 Answer: (- arg0 arg1)
-Time: 6749ms
+Time: 7977ms
 
 ==========
 [86/106] examples/RF_no_assumptions/PastaB2RFSynt.noassumptions.sl:
@@ -1129,47 +1104,48 @@ Candidate: arg0
 Candidate: (+ arg0 1)
 Candidate: (- arg0 arg1)
 Answer: (- arg0 arg1)
-Time: 6820ms
+Time: 7874ms
 
 ==========
 [87/106] examples/RF_no_assumptions/PastaB3RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0 arg1)
 Answer: (- arg0 arg1)
-Time: 6898ms
+Time: 7991ms
 
 ==========
 [88/106] examples/RF_no_assumptions/PastaB4RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6821ms
+Time: 7958ms
 
 ==========
 [89/106] examples/RF_no_assumptions/PastaB5RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6774ms
+Time: 8063ms
 
 ==========
 [90/106] examples/RF_no_assumptions/PastaB6RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6767ms
+Time: 8041ms
 
 ==========
 [91/106] examples/RF_no_assumptions/PastaB7RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg1
 Candidate: (+ arg1 arg0)
+Candidate: (+ arg0 1)
 Candidate: (- arg1 arg2)
 Answer: (- arg1 arg2)
-Time: 6880ms
+Time: 8281ms
 
 ==========
 [92/106] examples/RF_no_assumptions/PastaB8RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6710ms
+Time: 7724ms
 
 ==========
 [93/106] examples/RF_no_assumptions/PastaC3RFSynt.noassumptions.sl:
@@ -1178,19 +1154,19 @@ Candidate: (- arg0)
 Candidate: (- arg1 arg0)
 Candidate: (+ (- arg1 arg0) (- arg1 arg2))
 Candidate: (+ (- arg1 arg0) (- 1 arg2))
-Candidate: (+ (+ arg1 arg1) (- (- 1 arg0) arg2))
-Candidate: (+ (+ arg1 1) (- (- 1 arg0) arg2))
+Candidate: (+ (- arg1 arg2) (+ 1 (- 1 arg0)))
+Candidate: (+ (- (- arg1 arg0) arg2) (+ arg1 1))
 Candidate: (+ (+ 1 (- 1 arg0)) (+ arg1 (- arg1 arg2)))
 Candidate: (+ (+ 1 (- 1 arg0)) (+ 1 (- arg1 arg2)))
-Candidate: (ite (= arg1 arg2) (- arg2 arg0) (+ arg1 (- 1 arg0)))
-Candidate: (ite (< arg2 arg1) (- arg1 arg2) (- (- arg1 arg0) 1))
-Candidate: (+ (+ (- arg1 arg0) (- 1 arg2)) (+ 1 (+ arg1 1)))
-Candidate: (+ (+ (- arg1 arg0) (- 1 arg2)) (+ 1 (+ 1 1)))
-Candidate: (+ (+ (- 1 arg0) (+ arg1 1)) (+ (- 1 arg2) (+ arg1 1)))
-Candidate: (+ (+ (- 1 arg2) (+ arg1 1)) (+ (- 1 arg0) (+ 1 1)))
-Candidate: (+ (+ arg1 (- arg1 arg0)) (ite (< arg1 arg2) (- arg0) (- arg2)))
-Answer: (+ (+ arg1 (- arg1 arg0)) (ite (< arg1 arg2) (- arg0) (- arg2)))
-Time: 7986ms
+Candidate: (ite (= arg0 arg2) (+ (- arg1 arg0) (- arg1 arg2)) (- arg1 arg0))
+Candidate: (+ (+ 1 (- arg1 arg2)) (+ 1 (+ (- arg1 arg0) 1)))
+Candidate: (+ (+ 1 (- arg1 arg2)) (+ 1 (+ 1 (- 1 arg0))))
+Candidate: (ite (< arg2 arg1) (- arg1 arg0) (- (- arg2 arg0) 1))
+Candidate: (ite (< arg0 0) (+ (- arg1 arg0) (- 1 arg2)) (+ (- arg1 arg0) (- arg1 arg2)))
+Candidate: (ite (< arg1 arg2) (- arg0) (+ (- arg1 arg0) (- arg1 arg2)))
+Candidate: (ite (< arg2 arg1) (+ (- arg1 arg0) (- arg1 arg2)) (- arg2 arg0))
+Answer: (ite (< arg2 arg1) (+ (- arg1 arg0) (- arg1 arg2)) (- arg2 arg0))
+Time: 7931ms
 
 ==========
 [94/106] examples/RF_no_assumptions/PastaC5RFSynt.noassumptions.sl:
@@ -1198,7 +1174,7 @@ Candidate: arg0
 Candidate: arg1
 Candidate: (+ arg1 arg0)
 Answer: (+ arg1 arg0)
-Time: 6895ms
+Time: 7194ms
 
 ==========
 [95/106] examples/RF_no_assumptions/PastaC7RFSynt.noassumptions.sl:
@@ -1208,7 +1184,7 @@ Candidate: (+ arg3 arg0)
 Candidate: (+ arg3 1)
 Candidate: (- arg3 arg1)
 Answer: (- arg3 arg1)
-Time: 6993ms
+Time: 6969ms
 
 ==========
 [96/106] examples/RF_no_assumptions/PlusSwapRFSynt.noassumptions.sl:
@@ -1216,103 +1192,101 @@ Candidate: arg0
 Candidate: arg2
 Candidate: (- arg2 arg3)
 Candidate: (+ arg1 (- 1 arg3))
-Candidate: (+ arg2 (- 1 arg3))
-Candidate: (+ (+ arg2 1) (- arg1 arg3))
-Candidate: (+ (- 1 arg3) (+ arg2 1))
-Candidate: (+ (+ arg2 1) (+ 1 (- 1 arg3)))
-Candidate: (+ (+ 1 (- 1 arg3)) (+ arg1 (+ arg2 1)))
-Candidate: (+ (+ 1 (- 1 arg3)) (+ 1 (+ arg2 1)))
-Candidate: (+ (+ (- 1 arg3) (+ 1 1)) (+ arg2 (+ arg2 arg2)))
-Candidate: (+ (+ (- 1 arg3) (+ 1 1)) (+ (+ arg2 1) (+ 1 1)))
-Candidate: (+ (+ (+ arg2 arg1) (+ 1 1)) (+ (+ 1 1) (+ 1 (- 1 arg3))))
-Candidate: (+ (+ (+ arg2 1) (+ 1 1)) (+ (+ 1 1) (+ 1 (- 1 arg3))))
-Candidate: (+ (+ (+ arg1 1) (+ 1 (+ arg2 1))) (- (+ arg2 arg2) (- arg3 (+ arg2 1))))
-Candidate: (+ (+ (+ 1 1) (+ 1 (- 1 arg3))) (+ (+ 1 1) (+ 1 (+ arg2 1))))
-Candidate: (+ (+ (+ 1 1) (+ 1 (+ arg2 1))) (+ (+ 1 (- 1 arg3)) (+ 1 (+ 1 1))))
-Time: 127304ms
+Candidate: (+ (- arg2 arg3) 1)
+Candidate: (+ (- 1 arg3) (+ arg2 arg2))
+Candidate: (+ (+ arg2 1) (+ arg2 (- arg2 arg3)))
+Candidate: (+ (+ arg2 (- arg2 arg3)) (+ 1 (+ arg2 1)))
+Candidate: (+ (+ 1 (+ arg2 1)) (+ (- 1 arg3) (+ arg2 1)))
+Candidate: (+ (+ (+ arg2 1) (+ arg2 1)) (+ (- arg2 arg3) (+ arg2 arg2)))
+Candidate: (ite (< arg1 arg2) arg2 (+ (- 1 arg3) (+ arg2 arg1)))
+Candidate: (+ (+ (+ arg2 arg1) (+ arg2 1)) (ite (< arg1 1) arg2 (- arg3)))
+Candidate: (+ (+ arg1 (+ 1 (+ arg2 1))) (ite (< arg1 arg2) arg2 (- 1 arg3)))
+Candidate: (+ (+ (+ arg2 1) (+ arg2 1)) (ite (= arg1 0) arg2 (- arg2 arg3)))
+Candidate: (+ (+ 1 (+ 1 (+ arg2 1))) (+ 1 (ite (= arg2 arg1) (- arg3) arg2)))
+Candidate: (+ (+ 1 (+ 1 1)) (ite (< arg1 arg2) arg2 (+ arg1 (- 1 arg3))))
+Candidate: (+ (+ (+ 1 (+ arg2 1)) (+ 1 1)) (ite (= arg2 arg1) (- 1 arg3) (- arg1 arg0)))
+Time: 127474ms
 
 ==========
 [97/106] examples/RF_no_assumptions/PodelskiRybalchenkoTACAS2011Fig1RFSynt.noassumptions.sl:
 Candidate: arg0
 Answer: arg0
-Time: 6748ms
+Time: 7027ms
 
 ==========
 [98/106] examples/RF_no_assumptions/PodelskiRybalchenkoVMCAI2004Ex2RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (+ (- arg0) (+ 1 1))
 Candidate: (ite (= 1 (- arg0 1)) (+ arg0 arg0) (- (- arg0 1) (+ 1 1)))
-Candidate: (+ (ite (= arg0 0) (+ arg0 1) arg0) (ite (< 1 (- arg0 1)) (- arg0) arg0))
-Candidate: (ite (= (+ 1 1) (- (- arg0 1) 1)) (+ arg0 arg0) (+ arg0 (ite (< 1 (- arg0 1)) (- arg0) (+ arg0 1))))
-Answer: (ite (= (+ 1 1) (- (- arg0 1) 1)) (+ arg0 arg0) (+ arg0 (ite (< 1 (- arg0 1)) (- arg0) (+ arg0 1))))
-Time: 7978ms
+Candidate: (ite (< 1 (- arg0 1)) (+ arg0 (ite (< arg0 0) arg0 (- arg0))) (+ arg0 1))
+Candidate: (+ (+ (+ (+ 1 1) (+ arg0 1)) (ite (< arg0 0) arg0 (- 1 (- arg0 1)))) (- (+ 1 1) (ite (= 1 (- arg0 1)) arg0 (- (- arg0 1) (+ 1 1)))))
+Candidate: (+ (+ (+ (+ 1 1) (+ arg0 1)) (ite (< arg0 0) arg0 (- 1 (- arg0 1)))) (- (+ 1 1) (ite (< 1 (- arg0 1)) (- (- arg0 1) (+ 1 1)) arg0)))
+Answer: (+ (+ (+ (+ 1 1) (+ arg0 1)) (ite (< arg0 0) arg0 (- 1 (- arg0 1)))) (- (+ 1 1) (ite (< 1 (- arg0 1)) (- (- arg0 1) (+ 1 1)) arg0)))
+Time: 111334ms
 
 ==========
 [99/106] examples/RF_no_assumptions/Poly2VarsCondBreakRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0 arg2)
 Answer: (- arg0 arg2)
-Time: 6796ms
+Time: 7222ms
 
 ==========
 [100/106] examples/RF_no_assumptions/PolyClosingInRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: arg1
 Answer: arg1
-Time: 6777ms
+Time: 7184ms
 
 ==========
 [101/106] examples/RF_no_assumptions/Round3RFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0)
-Candidate: (+ (+ 1 (- 1 arg0)) (+ 1 (+ 1 1)))
-Candidate: (+ (+ (+ 1 (- 1 arg0)) (+ 1 (+ 1 1))) (+ (+ 1 1) (+ 1 1)))
-Candidate: (+ (+ (+ 1 1) (+ 1 (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ (- 1 arg0) (+ 1 1))))
-Candidate: (+ (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1))) (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 1) (+ 1 (- 1 arg0)))))
-Candidate: (+ (+ (+ (+ 1 (- 1 arg0)) (+ 1 (+ 1 1))) (+ (+ 1 1) (+ 1 1))) (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 1) (+ 1 1))))
-Candidate: (+ (+ (+ (+ 1 1) (+ 1 (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ (- 1 arg0) (+ 1 1)))) (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 1) (+ 1 (+ 1 1)))))
-Candidate: (+ (+ (+ (+ 1 1) (+ 1 (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1)))) (+ (+ (+ 1 (+ 1 1)) (+ (- 1 arg0) (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1)))))
-Time: 127038ms
+Candidate: (+ (+ 1 1) (+ (- 1 arg0) (+ 1 1)))
+Candidate: (+ (+ (+ 1 1) (+ (- 1 arg0) (+ 1 1))) (+ 1 (+ 1 1)))
+Candidate: (+ (+ (+ 1 1) (+ 1 (+ 1 1))) (+ (+ (- 1 arg0) (+ 1 1)) (+ 1 (+ 1 1))))
+Candidate: (+ (+ (+ (+ 1 1) (+ (- 1 arg0) (+ 1 1))) (+ 1 (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1))))
+Candidate: (+ (+ (+ (+ 1 1) (+ 1 (+ 1 1))) (+ (+ (- 1 arg0) (+ 1 1)) (+ 1 (+ 1 1)))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1))))
+Candidate: (+ (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 1) (+ 1 1))) (+ (+ (+ (- 1 arg0) (+ 1 1)) (+ 1 (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1)))))
+Candidate: (+ (+ (+ (+ (+ 1 1) (+ (- 1 arg0) (+ 1 1))) (+ 1 (+ 1 1))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1)))) (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 1) (+ 1 (+ 1 1)))))
+Candidate: (+ (+ (+ (+ (+ 1 1) (+ 1 (+ 1 1))) (+ (+ (- 1 arg0) (+ 1 1)) (+ 1 (+ 1 1)))) (+ (+ 1 (+ 1 1)) (+ 1 (+ 1 1)))) (+ (+ (+ 1 1) (+ 1 1)) (+ (+ 1 1) (+ 1 (+ 1 1)))))
+Time: 127489ms
 
 ==========
 [102/106] examples/RF_no_assumptions/Square2VarsDisjRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- 1 arg3)
 Candidate: (- arg1 arg3)
-Candidate: (- (- (- arg2) arg0) (+ arg0 arg0))
 Candidate: (+ (+ 1 1) (+ 1 (- arg1 arg3)))
-Candidate: (ite (< 1 arg3) (- arg2) (- 1 arg3))
-Candidate: (ite (< arg3 arg2) (- arg3) (- arg0 arg2))
-Candidate: (ite (< arg1 arg2) (- 1 arg3) (- arg1 arg2))
-Candidate: (ite (< arg1 arg2) (- (- 1 arg3) arg1) (- arg1 arg2))
-Candidate: (ite (< arg0 arg1) (- arg1 arg3) (- arg0 arg2))
-Candidate: (ite (< arg0 arg1) (- arg1 arg3) (+ 1 (- arg0 arg2)))
-Candidate: (+ (+ 1 (+ 1 1)) (+ (- 1 arg3) (+ 1 1)))
-Candidate: (ite (< arg0 0) (ite (< arg0 arg2) (- arg3) (- arg0 arg2)) (+ (+ 1 arg0) (- arg0 arg2)))
-Candidate: (+ (ite (< arg0 arg2) (- arg3) (- arg0 arg2)) (ite (< arg1 arg3) (- arg2) (- arg1 arg3)))
-Candidate: (ite (< arg2 arg3) (+ (+ 1 arg0) (- arg0 arg2)) (- (- arg2 arg3) arg3))
-Candidate: (+ (+ 1 (+ 1 1)) (ite (< arg1 arg2) (- arg3) (- arg1 arg2)))
-Candidate: (+ (ite (< arg3 arg2) (- arg3) (- arg0 arg2)) (+ 1 (+ 1 1)))
-Candidate: (+ (+ 1 (+ 1 1)) (ite (< arg1 0) (- arg2) (- arg1 arg3)))
-Candidate: (+ (+ 1 (+ 1 1)) (ite (< arg0 0) (- arg3) (- arg0 arg2)))
+Candidate: (- (- (- arg2) arg0) (+ arg0 arg0))
+Candidate: (ite (< arg0 0) (- arg3) (- arg0 arg2))
+Candidate: (ite (< arg1 arg3) (- arg2) (- arg1 arg3))
+Candidate: (ite (< arg2 1) (- arg2) (- arg3))
+Candidate: (+ (+ 1 1) (ite (< arg2 1) (- arg2) (- arg3)))
+Candidate: (ite (< arg0 0) (- arg1 arg3) (- arg0 arg2))
+Candidate: (ite (< arg1 1) (+ (- 1 arg3) (+ 1 1)) (+ arg1 (- arg0 arg2)))
+Candidate: (ite (< arg0 0) (- arg1 arg3) (+ arg1 (- arg0 arg2)))
+Candidate: (ite (< arg0 0) (- arg1 arg3) (+ 1 (- arg0 arg2)))
+Candidate: (ite (< arg0 0) (- arg1 arg3) (+ 1 (+ arg0 (- arg0 arg2))))
+Candidate: (ite (< arg1 arg3) (- arg0 arg2) (+ 1 (- arg1 arg3)))
+Candidate: (ite (< 1 arg3) (+ arg3 (- (- arg0 arg2) arg2)) (- arg3))
+Candidate: (ite (< arg1 arg3) (- (- arg0 arg2) arg2) (+ arg1 (+ arg1 (- arg1 arg3))))
+Candidate: (ite (< arg0 1) (ite (< arg2 1) (- arg2) (- arg3)) (+ arg0 (- arg0 arg2)))
+Candidate: (ite (< arg1 arg3) (- (- 1 arg2) arg1) (- arg1 arg3))
+Candidate: (ite (< arg1 arg3) (- (+ 1 (- 1 arg2)) arg1) (+ 1 (- arg1 arg3)))
+Candidate: (ite (< 0 arg3) (+ arg3 (- (- arg0 arg2) arg2)) (- arg2 (+ arg3 arg3)))
+Candidate: (ite (< arg2 arg3) (+ 1 (- 1 arg2)) (+ 1 (- 1 arg3)))
+Candidate: (ite (< arg1 arg3) (- (- (- arg0 arg2) arg2) arg2) (+ arg1 (+ arg1 (- arg1 arg3))))
+Candidate: (+ (ite (< arg1 arg3) (- arg2) (- arg1 arg3)) (ite (< arg0 arg2) (- arg3) (- arg0 arg2)))
+Candidate: (+ (+ arg2 (+ 1 (- 1 arg3))) (+ (+ 1 1) (+ 1 (- 1 arg2))))
+Candidate: (+ (+ 1 (+ 1 1)) (ite (< arg3 arg2) (- arg3) (- 1 arg2)))
+Candidate: (+ (ite (< arg0 arg2) (- 1 arg3) (- arg0 arg2)) (ite (< arg1 arg3) (- 1 arg2) (- arg1 arg3)))
+Candidate: (+ (ite (< arg1 arg3) (- arg2) (- arg1 arg3)) (ite (< arg0 arg2) (- 1 arg3) (- arg0 arg2)))
 Candidate: (+ (+ 1 (+ 1 1)) (+ (+ 1 1) (+ 1 (- 1 arg3))))
-Candidate: (+ (+ (+ 1 1) (+ 1 (- arg1 arg3))) (+ (+ 1 arg0) (+ 1 1)))
-Candidate: (+ (+ (+ 1 1) (+ 1 1)) (ite (< arg3 arg2) (- arg3) (- 1 arg2)))
-Candidate: (+ (+ (+ 1 1) (+ 1 (- 1 arg3))) (+ (+ 1 arg1) (+ 1 1)))
-Candidate: (+ (ite (< arg1 0) (- arg2) (- arg1 arg3)) (+ (+ 1 1) (+ 1 1)))
-Candidate: (+ (ite (< arg0 0) (- arg3) (- arg0 arg2)) (+ (+ 1 1) (+ 1 1)))
-Candidate: (+ (+ (+ 1 1) (+ 1 (- 1 arg3))) (+ (+ 1 1) (+ 1 1)))
-Candidate: (+ (+ 1 (+ 1 1)) (ite (< arg1 arg0) (- arg0 arg3) (- arg1 arg3)))
-Candidate: (+ (ite (< arg0 arg2) (- arg3) (- arg0 arg2)) (ite (< arg1 arg3) (- 1 arg2) (- arg1 arg3)))
-Candidate: (+ (ite (< arg1 arg3) (- 1 arg2) (- arg1 arg3)) (ite (< arg0 arg2) (- 1 arg3) (- arg0 arg2)))
-Candidate: (+ (+ 1 (+ 1 1)) (ite (< arg1 arg0) (- arg0 arg2) (- arg1 arg3)))
-Candidate: (+ (ite (< arg0 arg1) (- arg1 arg3) (- arg0 arg2)) (+ 1 (+ 1 1)))
-Candidate: (+ (ite (< arg0 arg1) (- arg1 arg3) (- arg0 arg2)) (+ (+ 1 1) (+ 1 1)))
-Candidate: (+ (+ (+ 1 1) (+ 1 1)) (ite (< arg1 arg0) (- arg0 arg2) (- arg1 arg3)))
-memory allocation of 1056 bytes failed
+memory allocation of 928 bytes failed
 timeout: the monitored command dumped core
-./runall_dir.sh: line 12: 2835947 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
-Time: 112559ms
+./runall_dir.sh: line 12: 3022241 Aborted                 prlimit --as=21474836480 timeout 120s target/release/liasynth "$f"
+Time: 114894ms
 
 ==========
 [103/106] examples/RF_no_assumptions/SquareDisj2VarsRFSynt.noassumptions.sl:
@@ -1320,64 +1294,60 @@ Candidate: arg0
 Candidate: (- arg0 arg1)
 Candidate: (- arg0 arg2)
 Candidate: (+ (- arg0 arg1) 1)
-Candidate: (+ (+ 1 1) (- 1 arg2))
-Candidate: (+ (- arg0 arg2) (+ 1 1))
-Candidate: (+ (- arg0 arg1) (+ 1 1))
-Candidate: (+ (+ (- arg0 arg1) 1) (+ 1 1))
-Candidate: (ite (= arg0 arg1) (+ arg0 (- arg0 arg1)) (- arg0 arg2))
-Candidate: (ite (= arg1 1) (- 1 arg1) (- arg0 arg2))
-Candidate: (ite (< arg1 arg2) (- arg0 arg1) (- arg0 arg2))
-Answer: (ite (< arg1 arg2) (- arg0 arg1) (- arg0 arg2))
-Time: 6937ms
+Candidate: (+ arg0 (+ (- arg0 arg1) 1))
+Candidate: (+ arg0 (+ (- arg0 arg2) 1))
+Candidate: (+ (+ arg0 arg0) (+ arg0 (- arg0 arg2)))
+Candidate: (+ (+ (- arg0 arg2) 1) (+ 1 1))
+Candidate: (+ (+ arg0 1) (+ (- 1 arg2) (+ 1 1)))
+Candidate: (ite (< 1 arg1) (- arg0 arg2) (- 1 arg1))
+Candidate: (ite (< 1 arg2) (+ arg0 (- arg0 arg1)) (- arg2))
+Candidate: (ite (= arg2 0) (+ arg0 (- arg0 arg2)) (+ arg0 (- arg0 arg1)))
+Candidate: (ite (< arg2 arg1) (- arg0 arg2) (- arg0 arg1))
+Answer: (ite (< arg2 arg1) (- arg0 arg2) (- arg0 arg1))
+Time: 7750ms
 
 ==========
 [104/106] examples/RF_no_assumptions/TwoPol4VarsConjRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- arg0 arg2)
 Answer: (- arg0 arg2)
-Time: 6729ms
+Time: 7647ms
 
 ==========
 [105/106] examples/RF_no_assumptions/TwoPol4VarsDisjRFSynt.noassumptions.sl:
 Candidate: arg0
 Candidate: (- 0 arg3)
 Candidate: (- arg1 arg3)
+Candidate: (+ (- 1 arg0) (- (- 1 arg2) arg0))
 Candidate: (+ (- 1 arg3) (+ 1 1))
-Candidate: (- (+ 1 (- 1 arg2)) (+ arg0 arg0))
-Candidate: (+ (+ 1 1) (+ (- arg1 arg3) 1))
-Candidate: (ite (< arg0 arg1) (- arg1 arg3) (- arg0 arg2))
-Candidate: (ite (< arg1 1) (- arg2) (+ (- arg1 arg3) 1))
-Candidate: (ite (< arg0 0) (- arg3) (- arg0 arg2))
-Candidate: (ite (< arg0 arg1) (+ arg1 (- arg1 arg3)) (- arg0 arg2))
-Candidate: (ite (< arg2 arg3) (+ 1 (- arg0 arg2)) (- arg3))
-Candidate: (ite (< arg0 0) (- arg1 arg3) (+ 1 (- arg0 arg2)))
-Candidate: (ite (< arg1 arg3) (- arg0 arg2) (- arg1 arg3))
-Candidate: (ite (< arg3 arg1) (- arg1 arg3) (- (- arg0 arg2) arg2))
+Candidate: (+ (+ (- arg1 arg3) 1) (+ 1 1))
+Candidate: (ite (= arg3 0) (- arg3) (- arg2))
+Candidate: (ite (< 1 arg3) (- arg2) (- arg1 arg3))
+Candidate: (ite (< arg1 arg0) (- arg0 arg2) (- arg1 arg3))
+Candidate: (ite (< 0 arg3) (- (- (- arg0 arg2) arg2) arg2) (+ 1 (- 1 arg3)))
+Candidate: (ite (< arg2 arg3) (- arg0 arg2) (- arg1 arg3))
+Candidate: (ite (< arg1 arg3) (+ 1 (- 1 arg2)) (+ (- arg1 arg3) 1))
+Candidate: (ite (= arg3 0) (+ (- arg0 arg3) (- arg2 arg3)) (+ arg0 (+ 1 (- 1 arg2))))
+Candidate: (ite (< arg1 arg0) (+ arg0 (- arg0 arg2)) (- arg1 arg3))
+Candidate: (ite (< arg1 arg0) (+ arg0 (- arg0 arg2)) (+ (- arg1 arg3) 1))
+Candidate: (ite (< arg1 arg0) (+ arg0 (- arg0 arg2)) (+ arg1 (+ arg1 (- arg1 arg3))))
+Candidate: (ite (< 1 arg2) (+ (- arg0 arg3) (- arg2 arg3)) (+ arg0 (+ 1 (- 1 arg2))))
 Candidate: (ite (< arg0 arg2) (- arg1 arg3) (- arg0 arg2))
-Candidate: (ite (< arg0 1) (- arg1 arg3) (+ (+ 1 1) (- 1 arg2)))
-Candidate: (ite (< arg1 arg0) (- arg0 arg2) (+ (- arg1 arg3) (+ arg1 arg1)))
-Candidate: (ite (< arg0 arg1) (+ (- arg1 arg3) (+ arg1 arg1)) (+ arg0 (- arg0 arg2)))
-Candidate: (+ (+ (- 1 arg3) (+ 1 1)) (+ 1 (+ 1 1)))
-Candidate: (ite (< arg0 arg1) (+ (- arg1 arg3) (+ arg1 arg1)) (+ (+ arg0 arg0) (- arg0 arg2)))
-Candidate: (ite (< arg0 arg1) (+ (- arg1 arg3) (+ arg1 arg1)) (+ (- arg0 arg3) (+ 1 1)))
-Candidate: (ite (< 1 arg3) (+ (- arg3 arg2) (- 1 arg2)) (+ (- 1 arg3) (+ arg1 1)))
-Candidate: (ite (< arg1 1) (- arg0 arg2) (+ (- arg1 arg3) (+ arg1 arg1)))
-Candidate: (ite (< arg2 arg3) (+ (+ 1 1) (- 1 arg2)) (- 1 arg3))
-Candidate: (ite (< arg1 arg3) (- (- arg0 1) (+ arg2 arg2)) (+ (- 1 arg3) (+ arg1 1)))
-Candidate: (ite (< arg2 arg3) (+ (+ 1 1) (- 1 arg2)) (- (- arg0 arg3) (- arg3 arg2)))
-Candidate: (ite (< arg3 arg1) (- arg1 arg3) (- (- arg0 1) (+ arg2 arg2)))
-Candidate: (ite (< arg1 arg3) (- (- arg0 arg2) (+ arg2 arg2)) (+ (- 1 arg3) (+ arg1 1)))
-Candidate: (ite (< arg3 arg1) (+ arg1 (- arg1 arg3)) (- (- arg0 arg2) arg2))
-Candidate: (ite (< arg3 arg1) (+ arg1 (- arg1 arg3)) (- (- arg0 1) (+ arg2 arg2)))
-Candidate: (ite (< arg3 arg1) (+ arg1 (- arg1 arg3)) (+ (+ 1 1) (- 1 arg2)))
-Candidate: (ite (< arg0 arg2) (- (- arg1 arg3) 1) (+ (- 1 arg2) (+ arg0 1)))
-Candidate: (ite (< arg0 arg2) (- (- arg1 arg3) 1) (+ (- 1 arg2) (+ arg0 arg0)))
-Candidate: (ite (< arg3 arg1) (+ (- 1 arg3) (+ arg1 arg1)) (- (- arg0 1) (+ arg2 arg2)))
-Candidate: (ite (< arg0 arg2) (- (- arg1 arg3) 1) (+ (+ arg0 arg0) (- arg0 arg2)))
-Candidate: (ite (< arg3 arg1) (+ (- arg1 arg3) (+ arg1 arg1)) (- (- arg0 1) (+ arg2 arg2)))
-Candidate: (ite (< arg1 arg0) (+ (+ arg0 arg0) (- arg0 arg2)) (+ (- arg1 arg3) (+ arg1 arg1)))
-Candidate: (+ (ite (< arg1 arg3) (- arg2) (- arg1 arg3)) (ite (< arg0 arg2) (- arg3) (- arg0 arg2)))
-Answer: (+ (ite (< arg1 arg3) (- arg2) (- arg1 arg3)) (ite (< arg0 arg2) (- arg3) (- arg0 arg2)))
-Time: 27162ms
+Candidate: (ite (< arg1 arg0) (+ arg0 (+ arg0 (- arg0 arg2))) (+ arg1 (+ arg1 (- arg1 arg3))))
+Candidate: (ite (< arg2 arg0) (- arg0 arg2) (+ (- 1 arg3) (+ 1 1)))
+Candidate: (ite (< arg2 arg3) (- arg0 arg2) (+ (- 1 arg3) (+ 1 1)))
+Candidate: (ite (< arg1 arg3) (- (- (- arg0 arg2) arg2) arg2) (+ 1 (+ (- arg1 arg3) 1)))
+Candidate: (ite (< arg0 arg1) (- arg1 arg3) (+ arg0 (+ arg0 (- arg0 arg2))))
+Candidate: (ite (< arg1 arg3) (- (+ 1 (- 1 arg2)) arg1) (+ (- arg1 arg3) 1))
+Candidate: (ite (< arg3 arg1) (- arg1 arg3) (- arg0 arg2))
+Candidate: (ite (< arg3 arg1) (- arg1 arg3) (- (- (- arg0 arg2) arg2) arg2))
+Candidate: (ite (< arg3 arg1) (+ (- arg1 arg3) 1) (- (- (- arg0 arg2) arg2) arg2))
+Candidate: (ite (< arg3 arg1) (+ arg1 (- arg1 arg3)) (- (- (- arg0 arg2) arg2) arg2))
+Candidate: (ite (< arg3 arg1) (+ arg1 (+ (- arg1 arg3) 1)) (- (- (- arg0 arg2) arg2) arg2))
+Candidate: (ite (< arg3 arg2) (+ (- 1 arg3) (+ 1 1)) (+ 1 (- arg0 arg2)))
+Candidate: (+ (ite (< arg2 arg3) (- arg2) (- arg1 arg3)) (ite (< arg0 arg2) (- arg3) (- arg0 arg2)))
+Candidate: (+ (ite (< arg1 arg3) (- arg2) (- arg1 arg3)) (ite (< arg2 arg0) (- arg0 arg2) (- arg3)))
+Answer: (+ (ite (< arg1 arg3) (- arg2) (- arg1 arg3)) (ite (< arg2 arg0) (- arg0 arg2) (- arg3)))
+Time: 32851ms
 
-Completed 84/106
+Completed 83/106
