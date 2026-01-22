@@ -10,7 +10,7 @@ use std::collections::{HashMap, HashSet};
 
 type Score = OrderedFloat<f64>;
 type Queue = PriorityQueue<(usize, Id), Score, DefaultHashBuilder>;
-type NodeQueue = BinaryHeap<WithOrd<Node, usize>>;
+type NodeQueue = BinaryHeap<WithOrd<Node, Score>>;
 
 #[cfg(all(feature = "simple", any(feature = "winning")))]
 compile_error!("simple is incompatible with winning");
@@ -67,9 +67,10 @@ pub struct Ctxt<'a> {
 pub struct Class {
     pub node: Node,
     pub nodes: NodeQueue,
-    pub complex: usize,
+    pub complex: f64,
+    pub size: usize,
     pub vals: Box<[Value]>,
-    pub handled_complex: Option<usize>, // what was the size when this class was handled last time.
+    pub handled_complex: Option<f64>, // what was the size when this class was handled last time.
     pub satcount: u64,
     pub prev_sol: usize,
     pub in_sol: bool,
@@ -77,11 +78,12 @@ pub struct Class {
 }
 
 impl Class {
-    fn default_class(complex: usize, node: Node, vals: Box<[Value]>) -> Self {
+    fn default_class(size: usize, node: Node, vals: Box<[Value]>) -> Self {
         Class {
-            complex,
+            size,
+            complex: 1.0,
             node: node.clone(),
-            nodes: NodeQueue::from([WithOrd(node, complex)]),
+            nodes: NodeQueue::new(),
             vals: vals.clone(),
             handled_complex: None,
             satcount: 0,
@@ -250,7 +252,7 @@ fn update_class(
         // ctxt.seen_scs[nt].insert(ctxt.classes[id].satcount.clone());
         seen_insert_maximal(&mut ctxt.seen_scs[nt], ctxt.classes[id].satcount);
     }
-    enqueue(nt, id, ctxt);
+    enqueue(nt, ctxt.classes[id].size, id, ctxt);
 
     if ctxt.classes[id].prev_sol > 0 {
         for WithOrd(n, _) in nodes.into_sorted_vec().into_iter().skip(1) {
@@ -720,8 +722,9 @@ fn grow(nt: usize, x: Id, ctxt: &mut Ctxt) -> (Option<Id>, usize) {
     (None, max_sat as usize)
 }
 
-fn enqueue(nt: usize, x: Id, ctxt: &mut Ctxt) {
-    let h = heuristic(x, ctxt);
+fn enqueue(nt: usize, s: usize, x: Id, ctxt: &mut Ctxt) {
+    // let h = heuristic(s, x, ctxt);
+    let h = OrderedFloat(ctxt.classes[x].complex);
     ctxt.queue.push((nt, x), h);
 }
 
@@ -734,14 +737,16 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
     // GLOBAL_STATS.lock().unwrap().programs_generated += 1;
 
     let (id, satcount) = if let Some(&_id) = ctxt.vals_lookup.get(&(nt, vals.clone())) {
-        let newcomplex = mincomplexity(&node, ctxt);
+        let newsize = minsize(&node, ctxt);
+        let newcomplex = complexity(newsize, _id, ctxt);
         let c = &mut ctxt.classes[_id];
         let _satcount = c.satcount;
-        if newcomplex < c.complex {
-            c.complex = newcomplex;
+        if *newcomplex > c.complex {
+            c.complex = *newcomplex;
+            c.size = newsize;
             c.node = node.clone();
             if c.handled_complex.is_none() {
-                enqueue(nt, _id, ctxt);
+                enqueue(nt, newsize, _id, ctxt);
             }
         }
         if cfg!(feature = "total") {
@@ -751,8 +756,8 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
     } else {
         // GLOBAL_STATS.lock().unwrap().new_programs_generated += 1;
         let _id = ctxt.classes.len();
-        let complexity = mincomplexity(&node, ctxt);
-        let c = Class::default_class(complexity, node, vals.clone());
+        let size = minsize(&node, ctxt);
+        let c = Class::default_class(size, node, vals.clone());
 
         ctxt.classes.push(c);
 
@@ -782,13 +787,15 @@ fn add_node(nt: usize, node: Node, ctxt: &mut Ctxt, vals: Option<Box<[Value]>>) 
         ctxt.classes[_id].satcount = _satcount;
         ctxt.vals_lookup.insert((nt, vals), _id);
 
+        ctxt.classes[_id].complex = *complexity(size, _id, ctxt);
+
         if (ctxt.sigma_indices.len() == sc as usize)
             && ctxt.problem.rettys.contains(&Ty::NonTerminal(nt))
         {
             return (_id, true, _satcount);
         }
 
-        enqueue(nt, _id, ctxt);
+        enqueue(nt, size, _id, ctxt);
 
         (_id, _satcount)
     };
@@ -806,7 +813,7 @@ fn gen_vals(node: &Node, ctxt: &Ctxt) -> Option<Box<[Value]>> {
     Some(out.into_boxed_slice())
 }
 
-fn mincomplexity(node: &Node, ctxt: &Ctxt) -> usize {
+fn minsize(node: &Node, ctxt: &Ctxt) -> usize {
     node.children()
         .iter()
         .filter_map(|x| {
@@ -816,9 +823,13 @@ fn mincomplexity(node: &Node, ctxt: &Ctxt) -> usize {
                 None
             }
         })
-        .map(|x| ctxt.classes[*x].complex)
+        .map(|x| ctxt.classes[*x].size)
         .sum::<usize>()
         + 1
+}
+
+fn complexity(s: usize, id: Id, ctxt: &mut Ctxt) -> Score {
+    heuristic(s, id, ctxt)
 }
 
 pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
@@ -829,11 +840,11 @@ pub fn extract(x: Id, ctxt: &Ctxt) -> Term {
 }
 
 #[cfg(all(feature = "rf", feature = "expert"))]
-fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
+fn heuristic(s: usize, x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
     let ty = ctxt.classes[x].node.ty();
     let l = ctxt.big_sigmas.len() as f64;
-    let normaliser = c.complex as f64;
+    let normaliser = s as f64;
 
     if ctxt
         .problem
@@ -870,11 +881,11 @@ fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
 }
 
 #[cfg(all(feature = "lia", feature = "expert"))]
-fn heuristic(x: Id, ctxt: &Ctxt) -> Score {
+fn heuristic(s: usize, x: Id, ctxt: &Ctxt) -> Score {
     let c = &ctxt.classes[x];
     let ty = ctxt.classes[x].node.ty();
     let l = ctxt.big_sigmas.len() as f64;
-    let normaliser = c.complex as f64;
+    let normaliser = s as f64;
 
     if ctxt
         .problem
@@ -950,7 +961,7 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
     vec![
         expm1_norm(sc, l, 1.7),
         expm1_norm(diff, l, 3.5),
-        (1.0 / c.complex as f64).exp(),
+        (1.0 / c.size as f64).exp(),
     ]
     .into_iter()
     .chain(w2v)
@@ -958,22 +969,22 @@ fn feature_set(x: Id, ctxt: &mut Ctxt) -> Vec<f64> {
 }
 
 #[cfg(feature = "learned")]
-fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
+fn heuristic(s: usize, x: Id, ctxt: &mut Ctxt) -> Score {
     let ty = ctxt.classes[x].node.ty();
     let mut feats = feature_set(x, ctxt);
     let (log_odds, _) = ctxt.olinr.predict(feats.as_slice());
     let score = log_odds.clamp(-10.0, 10.0).exp() / ctxt.classes[x].complex as f64;
 
     ctxt.classes[x].features = feats;
-    OrderedFloat(score)
+    OrderedFloat(score / s as f64)
 }
 
 #[cfg(feature = "random")]
-fn heuristic(_x: Id, _ctxt: &mut Ctxt) -> Score {
+fn heuristic(_s: usize, _x: Id, _ctxt: &Ctxt) -> Score {
     OrderedFloat(rand::random::<f64>())
 }
 
 #[cfg(feature = "size")]
-fn heuristic(x: Id, ctxt: &mut Ctxt) -> Score {
-    OrderedFloat(1.0 / ctxt.classes[x].complex as f64)
+fn heuristic(s: usize, _x: Id, _ctxt: &Ctxt) -> Score {
+    OrderedFloat(1.0 / s as f64)
 }
